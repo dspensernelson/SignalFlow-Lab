@@ -1,0 +1,90 @@
+{
+  "id": "lesson-clean-price-data",
+  "nodeId": "clean-price-data",
+  "title": "Normalize Messy Price Rows into Clean JSON",
+  "difficulty": "Intermediate",
+  "skill": "Normalization & type coercion",
+  "scenario": "It is 6:20 AM. A price feed dropped overnight rows into the system, but the values are messy strings with currency symbols and units. Risk Evaluation cannot do math on \"$187/MWh\". Your job is to normalize the rows into a clean, numeric table the rest of the workflow can trust.",
+  "inputType": "text",
+  "inputLabel": "Raw Price Rows",
+  "input": "hub, peak, settled\nercot, $187/MWh, $142/MWh\nSPP, $96/MWh, $88/MWh\nmiso, $74 /MWh, $70/MWh",
+  "instructions": [
+    "Read the raw price rows and note each hub and its prices.",
+    "Build a JSON array with one object per hub.",
+    "Give each row hub, peakPrice, and settledPrice.",
+    "Convert prices to plain numbers - strip the $ sign and the /MWh unit.",
+    "Keep all three hubs (ERCOT, SPP, MISO), then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"hub\": \"ercot\", \"peakPrice\": \"$187/MWh\", \"settledPrice\": \"$142/MWh\" },\n  { \"hub\": \"SPP\", \"peakPrice\": \"$96/MWh\", \"settledPrice\": \"$88/MWh\" },\n  { \"hub\": \"miso\", \"peakPrice\": \"$74 /MWh\", \"settledPrice\": \"$70/MWh\" }\n]",
+  "validation": {
+    "type": "jsonRows",
+    "keyField": "hub",
+    "rowFields": ["hub", "peakPrice", "settledPrice"],
+    "numericFields": ["peakPrice", "settledPrice"],
+    "expectedRows": [
+      { "hub": "ERCOT", "peakPrice": 187, "settledPrice": 142 },
+      { "hub": "SPP", "peakPrice": 96, "settledPrice": 88 },
+      { "hub": "MISO", "peakPrice": 74, "settledPrice": 70 }
+    ]
+  },
+  "copilotPrompt": "Normalize these raw price rows into a JSON array. Each object should have hub, peakPrice, and settledPrice. Convert the prices to plain numbers with no currency symbol or unit.",
+  "successMessage": "Clean price table built. Risk Evaluation and the Morning Brief can now run math on trusted numeric values.",
+  "intro": {
+    "heading": "Before you build: normalization and data quality",
+    "sections": [
+      {
+        "title": "What normalization is",
+        "body": "Normalization means reshaping messy values into one consistent form. Here, every price becomes a plain number so any later step can compare or calculate without re-parsing text."
+      },
+      {
+        "title": "Type coercion",
+        "body": "\"$187/MWh\" is a string, not a number. Software cannot safely add or compare it. Coercion strips the formatting and stores the real numeric value: 187."
+      },
+      {
+        "title": "Data quality is a trust boundary",
+        "body": "Everything downstream trusts this table. If a price is left as a string or a row is dropped, Risk Evaluation inherits the error. Cleaning the data once protects every later step."
+      },
+      {
+        "title": "Where this fits",
+        "body": "Clean Price Data sits in Phase 2, the Data Structure Layer. Its clean-prices.json feeds Risk Evaluation and the Morning Brief."
+      }
+    ],
+    "jsonExample": "[\n  { \"hub\": \"PJM\", \"peakPrice\": 120, \"settledPrice\": 110 }\n]",
+    "skill": "Normalization & type coercion",
+    "artifactName": "clean-prices.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "hub",
+      "meaning": "The market hub for this price row.",
+      "type": "string",
+      "example": "\"ERCOT\"",
+      "hint": "Keep one object per hub: ERCOT, SPP, and MISO."
+    },
+    {
+      "field": "peakPrice",
+      "meaning": "The peak price for the hub, as a plain number.",
+      "type": "number",
+      "example": "187",
+      "hint": "Strip the $ and /MWh so it is a number, not a string."
+    },
+    {
+      "field": "settledPrice",
+      "meaning": "The settled price for the hub, as a plain number.",
+      "type": "number",
+      "example": "142",
+      "hint": "Strip the $ and /MWh so it is a number, not a string."
+    }
+  ],
+  "takeaway": {
+    "heading": "Clean price table built",
+    "points": [
+      "You normalized messy price strings into a numeric JSON table.",
+      "Type coercion turned values like \"$187/MWh\" into the number 187 that automation can compute on.",
+      "This artifact sits in Phase 2, the Data Structure Layer, of the Meridian workflow map.",
+      "Risk Evaluation and the Morning Brief reuse clean-prices.json downstream."
+    ],
+    "artifactName": "clean-prices.json"
+  }
+}

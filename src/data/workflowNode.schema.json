@@ -1,0 +1,153 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://signalflow-lab/schemas/workflow-node.json",
+  "title": "SignalFlow Workflow Node Contract",
+  "description": "The data contract for every node in src/data/workflowNodes.json. Derived from NODE_AUDIT.md. The app renders the selected-node panel and lesson intent from these fields instead of hardcoded assumptions. This schema documents the shape; it is not enforced at runtime.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "label",
+      "type",
+      "thingOrAction",
+      "phaseId",
+      "x",
+      "y",
+      "description",
+      "lesson",
+      "labVersion",
+      "realWorldSources",
+      "accessNeeded",
+      "soloRebuildPath",
+      "reusedBy",
+      "governanceNote",
+      "auditNote",
+      "taskId",
+      "artifactName"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Stable kebab-case identifier, unique across the map. Referenced by edges, phases, and progress."
+      },
+      "label": {
+        "type": "string",
+        "description": "Human-readable node name shown on the map and panel."
+      },
+      "type": {
+        "type": "string",
+        "description": "Taxonomy type of the node.",
+        "enum": [
+          "source",
+          "reference",
+          "artifact",
+          "process",
+          "decision",
+          "handoff",
+          "output",
+          "archive"
+        ]
+      },
+      "thingOrAction": {
+        "type": "string",
+        "description": "Doctrine taxonomy rule: a node should be a thing (object) or an action (step). 'ambiguous' flags a node that needs to be renamed or split (e.g. Distribution / Archive).",
+        "enum": ["thing", "action", "ambiguous"]
+      },
+      "phaseId": {
+        "type": "string",
+        "description": "The phase this node belongs to (must match an id in phases.json)."
+      },
+      "x": {
+        "type": "number",
+        "description": "Layout x coordinate within the phase band (design pixels)."
+      },
+      "y": {
+        "type": "number",
+        "description": "Layout y coordinate within the stage (design pixels)."
+      },
+      "description": {
+        "type": "string",
+        "description": "What this node is, in one or two sentences (the panel's lead paragraph)."
+      },
+      "lesson": {
+        "type": "object",
+        "description": "The lesson contract. Every node is a lesson; the type and maturity differ. Drives the lesson intent and lesson framing in the panel.",
+        "additionalProperties": false,
+        "required": ["type", "status", "intent", "concepts"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The active lesson type. Inspection: examine origin, contents, access, and place in the workflow. Interpretation: read a human/unstructured signal and map it to a structured field. Build: produce a new structured artifact from messy input. Transformation: normalize/compare/apply rules to existing data to emit a derived result. Decision: encode a branch/threshold and route the workflow. Handoff: move work across a human/system boundary and capture the record. Assembly: join multiple artifacts into one deliverable. Governance: define/version/approve reusable rules, policies, and templates.",
+            "enum": [
+              "inspection",
+              "interpretation",
+              "build",
+              "transformation",
+              "decision",
+              "handoff",
+              "assembly",
+              "governance"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "Interaction maturity, separate from lesson type. 'now' = fully interactive today; 'intent' = lesson type and learner action defined, interaction not yet built; 'later' = future interaction to be built in a later pass.",
+            "enum": ["now", "intent", "later"]
+          },
+          "intent": {
+            "type": "string",
+            "description": "The lesson intent: the concrete action the learner performs in this lesson (the 'what you'll do')."
+          },
+          "concepts": {
+            "type": "array",
+            "description": "The automation concepts this lesson introduces.",
+            "items": { "type": "string" },
+            "minItems": 1
+          }
+        }
+      },
+      "labVersion": {
+        "type": "string",
+        "description": "What the app simulates locally instead of the real-world system."
+      },
+      "realWorldSources": {
+        "type": "array",
+        "description": "Where this node's input/output really comes from at work.",
+        "items": { "type": "string" }
+      },
+      "accessNeeded": {
+        "type": "array",
+        "description": "Access, permissions, subscriptions, or agreements a real implementation would require.",
+        "items": { "type": "string" }
+      },
+      "soloRebuildPath": {
+        "type": "array",
+        "description": "Step-by-step path for a solo builder to recreate this node, from local fixture to real integration.",
+        "items": { "type": "string" }
+      },
+      "reusedBy": {
+        "type": "array",
+        "description": "Node ids that reuse this node's output. Mirrors the downstream edges; kept for convenience.",
+        "items": { "type": "string" }
+      },
+      "governanceNote": {
+        "type": "string",
+        "description": "Ownership, access, data quality, approval, auditability, or reuse concern for this node (learner-facing)."
+      },
+      "auditNote": {
+        "type": "string",
+        "description": "Authoring metadata from NODE_AUDIT.md: the open question or design risk for this node. Not shown to learners."
+      },
+      "taskId": {
+        "type": ["string", "null"],
+        "description": "The lesson/task that completes this node, or null. Must be present in App's LESSONS and progress.BUILT_LESSON_IDS to be buildable now."
+      },
+      "artifactName": {
+        "type": ["string", "null"],
+        "description": "The reusable artifact filename this node produces, or null if it produces none."
+      }
+    }
+  }
+}

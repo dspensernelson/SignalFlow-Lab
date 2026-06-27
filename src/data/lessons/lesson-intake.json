@@ -1,0 +1,111 @@
+{
+  "id": "lesson-intake",
+  "nodeId": "market-intake-record",
+  "title": "Turn Analyst Notes into Structured JSON",
+  "difficulty": "Beginner",
+  "skill": "Field extraction",
+  "scenario": "It is 6:15 AM. An analyst at Meridian Energy has dropped overnight market notes into the intake system. The notes are unstructured. Your job is to extract the key fields the workflow needs before anything else can run.",
+  "inputType": "text",
+  "input": "Checked overnight prices. ERCOT hub spiked around 2am, hit $187/MWh briefly then settled near $142/MWh. Wind generation underperformed, about 60% of forecast. Gas prices up slightly. Trader flagged the hub spike for review. No action taken yet. Need approval if we move on this.",
+  "instructions": [
+    "Identify the market hub referenced.",
+    "Find the peak price and the settled price.",
+    "Find the generation source and performance status.",
+    "Determine whether approval was flagged.",
+    "Return a valid JSON object with those fields."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"hub\": \"\",\n  \"peakPrice\": \"\",\n  \"settledPrice\": \"\",\n  \"generationFlag\": \"\",\n  \"approvalRequired\": false\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": [
+      "hub",
+      "peakPrice",
+      "settledPrice",
+      "generationFlag",
+      "approvalRequired"
+    ],
+    "expected": {
+      "hub": "ERCOT",
+      "approvalRequired": true
+    },
+    "acceptedValues": {
+      "peakPrice": ["187", "$187", "187/MWh", "$187/MWh"],
+      "settledPrice": ["142", "$142", "142/MWh", "$142/MWh"],
+      "generationFlag": [
+        "Wind underperformed",
+        "wind underperformed",
+        "Wind generation underperformed",
+        "wind generation underperformed"
+      ]
+    }
+  },
+  "copilotPrompt": "Extract structured JSON from this analyst note. Return fields for hub, peakPrice, settledPrice, generationFlag, and approvalRequired. Use true or false for boolean fields.",
+  "successMessage": "Intake record built. The workflow now has structured data to work with.",
+  "intro": {
+    "heading": "Before you build: structured intake",
+    "sections": [
+      {
+        "title": "What is JSON?",
+        "body": "JSON is a simple text format for structured data. It stores information as named fields and values, so software can read it reliably instead of guessing."
+      },
+      {
+        "title": "Why structured data matters",
+        "body": "Automation cannot act on a messy paragraph. Turning notes into named fields lets every later step run consistently without re-reading the original text."
+      },
+      {
+        "title": "How this workflow uses it",
+        "body": "Your Intake output is the first record in the Meridian workflow. Structure, Evaluate, Route, and Brief all build on the fields you extract here."
+      }
+    ],
+    "jsonExample": "{\n  \"city\": \"Austin\",\n  \"temperature\": 98,\n  \"alertSent\": true\n}",
+    "skill": "Field extraction",
+    "artifactName": "market-intake.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "hub",
+      "meaning": "The market hub mentioned in the note.",
+      "type": "string",
+      "example": "\"ERCOT\"",
+      "hint": "Look for the named trading hub or region."
+    },
+    {
+      "field": "peakPrice",
+      "meaning": "The highest price mentioned in the note.",
+      "type": "string",
+      "example": "\"$187/MWh\"",
+      "hint": "Find the spike or peak value before it settled."
+    },
+    {
+      "field": "settledPrice",
+      "meaning": "The later price the market settled near.",
+      "type": "string",
+      "example": "\"$142/MWh\"",
+      "hint": "Find the price the note says it settled at."
+    },
+    {
+      "field": "generationFlag",
+      "meaning": "The generation source plus its performance status.",
+      "type": "string",
+      "example": "\"Wind underperformed\"",
+      "hint": "Name the source and whether it over- or underperformed."
+    },
+    {
+      "field": "approvalRequired",
+      "meaning": "Whether approval is needed before acting.",
+      "type": "boolean",
+      "example": "true",
+      "hint": "Use true or false based on whether the note flags approval."
+    }
+  ],
+  "takeaway": {
+    "heading": "Intake complete",
+    "points": [
+      "You turned an unstructured note into structured JSON.",
+      "Each named field is now reliable input for the rest of the workflow.",
+      "Field extraction is the foundation every later automation step depends on."
+    ],
+    "artifactName": "market-intake.json"
+  }
+}

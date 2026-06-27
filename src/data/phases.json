@@ -1,0 +1,52 @@
+[
+  {
+    "id": "intake-layer",
+    "order": 1,
+    "title": "Phase 1: Intake Layer",
+    "goal": "Turn messy market commentary into the first reliable workflow artifact.",
+    "statusSource": "market-intake-record",
+    "nodeIds": ["analyst-notes", "trader-flag", "market-intake-record"],
+    "artifactNames": ["market-intake.json"],
+    "unlocks": "A structured intake record that Evaluation, Routing, and the Brief all reuse."
+  },
+  {
+    "id": "data-structure-layer",
+    "order": 2,
+    "title": "Phase 2: Data Structure Layer",
+    "goal": "Bring in numeric market data and normalize it for evaluation.",
+    "statusSource": "clean-price-data",
+    "nodeIds": ["price-feed", "forecast-data", "prior-day-reference", "clean-price-data"],
+    "artifactNames": ["clean-prices.json"],
+    "unlocks": "A clean price table the rules engine and brief can trust."
+  },
+  {
+    "id": "evaluation-layer",
+    "order": 3,
+    "title": "Phase 3: Evaluation Layer",
+    "goal": "Apply shared rules and produce a decision-ready risk view.",
+    "statusSource": "risk-evaluation",
+    "nodeIds": ["threshold-policy", "variance-check", "risk-evaluation"],
+    "artifactNames": ["risk-evaluation.json"],
+    "unlocks": "A risk evaluation that drives the approval decision and the brief."
+  },
+  {
+    "id": "routing-layer",
+    "order": 4,
+    "title": "Phase 4: Routing Layer",
+    "goal": "Convert the evaluation into an approval or a routine path.",
+    "statusSource": "approval-route",
+    "nodeIds": ["approval-template", "approval-decision", "approval-route", "routine-update-path"],
+    "artifactNames": ["approval-route.json"],
+    "unlocks": "An approval status the morning brief can include."
+  },
+  {
+    "id": "brief-assembly-layer",
+    "order": 5,
+    "title": "Phase 5: Brief Assembly Layer",
+    "goal": "Assemble the approval-ready 7:00 AM business output.",
+    "statusSource": "morning-brief",
+    "nodeIds": ["prior-day-brief-template", "morning-brief", "distribution-archive"],
+    "artifactNames": ["market-brief.md"],
+    "unlocks": "The delivered, archived brief that seeds tomorrow's run."
+  }
+]

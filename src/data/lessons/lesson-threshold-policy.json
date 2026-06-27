@@ -1,0 +1,113 @@
+{
+  "id": "lesson-threshold-policy",
+  "nodeId": "threshold-policy",
+  "title": "Set and Version a Threshold Policy",
+  "difficulty": "Intermediate",
+  "skill": "Governance & config-as-rules",
+  "scenario": "It is 6:25 AM. Before the risk and approval steps can run, Meridian needs an agreed set of thresholds - written down once, owned, and versioned - so no downstream step hardcodes its own business rules.",
+  "inputType": "text",
+  "input": "Meridian's risk desk has agreed how price movement on the ERCOT hub should be treated. A day-over-day move of 5% or more is a routine variance the morning brief should note. A move of 12% or more must be escalated for manager approval before the brief is sent. The policy is owned by the Risk Desk Lead and changes require sign-off from the Desk Manager. Record this as version 1.0.0.",
+  "instructions": [
+    "Read the policy brief and note the agreed thresholds.",
+    "Set routineThreshold and escalationThreshold as numbers (percent, no % sign).",
+    "Record the policy owner and the required approver.",
+    "Set a version so future changes can be tracked.",
+    "Make sure escalation is greater than routine, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"policyName\": \"ERCOT Hub Threshold Policy\",\n  \"version\": \"\",\n  \"owner\": \"\",\n  \"approver\": \"\",\n  \"routineThreshold\": 0,\n  \"escalationThreshold\": 0\n}",
+  "validation": {
+    "type": "jsonPolicy",
+    "requiredFields": [
+      "policyName",
+      "version",
+      "owner",
+      "approver",
+      "routineThreshold",
+      "escalationThreshold"
+    ],
+    "numericFields": ["routineThreshold", "escalationThreshold"],
+    "nonEmptyFields": ["policyName", "version", "owner", "approver"],
+    "ordering": { "greater": "escalationThreshold", "than": "routineThreshold" }
+  },
+  "copilotPrompt": "Draft a JSON threshold policy with policyName, version, owner, approver, routineThreshold, and escalationThreshold. Use plain numbers for the thresholds (no % sign) and make the escalation threshold higher than the routine threshold.",
+  "successMessage": "Threshold policy set and versioned. Downstream risk and approval steps can now reuse these rules instead of hardcoding them.",
+  "intro": {
+    "heading": "Before you build: governance as config",
+    "sections": [
+      {
+        "title": "Config-as-rules",
+        "body": "Automation should not bury business rules inside code. When a threshold lives in a config object, the people who own the rule can read and change it without touching the workflow logic."
+      },
+      {
+        "title": "What a threshold policy is",
+        "body": "A threshold policy names the values that decide when something matters - here, how big a price move is routine versus when it must be escalated. Writing it down once means every downstream step applies the same rule."
+      },
+      {
+        "title": "Versioning and ownership",
+        "body": "A governed policy records who owns it, who approves changes, and which version is in force. That is what makes a rule auditable: you can see what changed, when, and who signed off."
+      },
+      {
+        "title": "Why governance comes before automation acts",
+        "body": "Risk Evaluation, Approval Decision, and the Morning Brief all read these thresholds. If the policy is wrong or unowned, every step downstream inherits the mistake. Governance is set first so automation can act safely."
+      }
+    ],
+    "jsonExample": "{\n  \"policyName\": \"Temperature Alert Policy\",\n  \"version\": \"1.0.0\",\n  \"owner\": \"Ops Lead\",\n  \"approver\": \"Site Manager\",\n  \"warnThreshold\": 90,\n  \"alertThreshold\": 105\n}",
+    "skill": "Governance & config-as-rules",
+    "artifactName": "threshold-policy.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "policyName",
+      "meaning": "A clear, reusable name for this rule set.",
+      "type": "string",
+      "example": "\"ERCOT Hub Threshold Policy\"",
+      "hint": "Name the policy so downstream steps can refer to it."
+    },
+    {
+      "field": "version",
+      "meaning": "The version so changes can be tracked over time.",
+      "type": "string",
+      "example": "\"1.0.0\"",
+      "hint": "The brief says to record this as version 1.0.0."
+    },
+    {
+      "field": "owner",
+      "meaning": "Who owns the policy.",
+      "type": "string",
+      "example": "\"Risk Desk Lead\"",
+      "hint": "The brief names who owns the policy."
+    },
+    {
+      "field": "approver",
+      "meaning": "Who must sign off on changes.",
+      "type": "string",
+      "example": "\"Desk Manager\"",
+      "hint": "The brief names who approves changes."
+    },
+    {
+      "field": "routineThreshold",
+      "meaning": "Percent move treated as routine variance.",
+      "type": "number",
+      "example": "5",
+      "hint": "Use the lower percentage as a plain number, no % sign."
+    },
+    {
+      "field": "escalationThreshold",
+      "meaning": "Percent move that must be escalated for approval.",
+      "type": "number",
+      "example": "12",
+      "hint": "Use the higher percentage as a number; it must exceed routine."
+    }
+  ],
+  "takeaway": {
+    "heading": "Threshold policy set",
+    "points": [
+      "You turned a written policy brief into a versioned, owned threshold policy object.",
+      "The thresholds now live as config-as-rules, not hardcoded logic, so the owner can change them safely.",
+      "This policy sits in Phase 3, the Evaluation Layer, of the Meridian workflow map.",
+      "Risk Evaluation, Approval Decision, and the Morning Brief all reuse these same thresholds downstream."
+    ],
+    "artifactName": "threshold-policy.json"
+  }
+}
