@@ -1,0 +1,611 @@
+[
+  {
+    "id": "analyst-notes",
+    "label": "Analyst Notes",
+    "type": "source",
+    "thingOrAction": "thing",
+    "phaseId": "intake-layer",
+    "x": 20,
+    "y": 80,
+    "description": "Unstructured overnight market commentary from the trading desk. The raw input the whole workflow starts from.",
+    "lesson": {
+      "type": "inspection",
+      "status": "intent",
+      "intent": "Inspect where this raw note comes from, its real-world sources, and the access ingesting it would require.",
+      "concepts": ["Source provenance", "Unstructured input", "Ingestion"]
+    },
+    "labVersion": "Local text fixture stored in lesson-intake.json (the note you read in the Intake task).",
+    "realWorldSources": [
+      "Analyst email",
+      "Bloomberg or market terminal note",
+      "Teams market-watch channel",
+      "Internal desk log"
+    ],
+    "accessNeeded": [
+      "Inbox or channel access",
+      "Market data terminal subscription",
+      "Internal system permission"
+    ],
+    "soloRebuildPath": [
+      "Start with a local .txt fixture",
+      "Move to a watched folder where notes are dropped",
+      "Later replace with email or API ingestion"
+    ],
+    "reusedBy": ["market-intake-record"],
+    "governanceNote": "Ingesting from inbox, Teams, or a terminal needs access and permission; the original note's provenance must be retained for audit.",
+    "auditNote": "As an inspection lesson it needs a clear 'what did you learn' beat, or a learner clicks past it.",
+    "taskId": null,
+    "artifactName": null
+  },
+  {
+    "id": "trader-flag",
+    "label": "Trader Flag",
+    "type": "source",
+    "thingOrAction": "thing",
+    "phaseId": "intake-layer",
+    "x": 20,
+    "y": 190,
+    "description": "An escalation signal a trader raises when overnight movement may need a closer look.",
+    "lesson": {
+      "type": "interpretation",
+      "status": "intent",
+      "intent": "Interpret a human escalation signal and map it to the structured approvalRequired field the workflow acts on.",
+      "concepts": ["Escalation signals", "Boolean/event flags", "Human judgment as data"]
+    },
+    "labVersion": "Represented as the approval cue inside the analyst note fixture.",
+    "realWorldSources": [
+      "Trader chat message",
+      "A flag toggled in a trading tool",
+      "A verbal handoff captured on the desk"
+    ],
+    "accessNeeded": [
+      "Access to the trader's escalation channel",
+      "Agreement on what counts as a flag"
+    ],
+    "soloRebuildPath": [
+      "Add a simple boolean/flag field to your intake",
+      "Capture it manually at first",
+      "Later wire it to a chat or tool signal"
+    ],
+    "reusedBy": ["market-intake-record"],
+    "governanceNote": "Requires agreement on what counts as a flag, and ownership of the escalation channel.",
+    "auditNote": "Overlaps the Intake build (the flag becomes approvalRequired there); clarify the distinct lesson so the two do not feel redundant.",
+    "taskId": null,
+    "artifactName": null
+  },
+  {
+    "id": "market-intake-record",
+    "label": "Market Intake Record",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "intake-layer",
+    "x": 20,
+    "y": 320,
+    "description": "A structured JSON record created from the analyst notes and trader flag. The first machine-readable artifact in the workflow.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "Extract hub, peakPrice, settledPrice, generationFlag, and approvalRequired from a messy note into valid JSON and pass field validation.",
+      "concepts": ["JSON", "Named fields / schema", "Field extraction", "Deterministic validation"]
+    },
+    "labVersion": "Built by you in the Intake task by extracting fields from the analyst note.",
+    "realWorldSources": [
+      "Parsed analyst note",
+      "Trader escalation flag",
+      "Market desk intake form"
+    ],
+    "accessNeeded": [
+      "Access to the source notes",
+      "Agreement on the required intake fields"
+    ],
+    "soloRebuildPath": [
+      "Define the required JSON schema",
+      "Extract fields from local notes",
+      "Store the result as market-intake.json",
+      "Later automate extraction from email, Teams, or an API"
+    ],
+    "reusedBy": ["risk-evaluation", "approval-decision", "morning-brief"],
+    "governanceNote": "Requires agreement on the required intake fields; the schema is the contract every downstream step trusts.",
+    "auditNote": "Validation rules in src/lib/validators.js are frozen; any field change ripples to three downstream nodes.",
+    "taskId": "lesson-intake",
+    "artifactName": "market-intake.json"
+  },
+  {
+    "id": "price-feed",
+    "label": "Price Feed / CSV Rows",
+    "type": "source",
+    "thingOrAction": "thing",
+    "phaseId": "data-structure-layer",
+    "x": 270,
+    "y": 80,
+    "description": "Raw overnight price rows for the relevant hubs, usually delivered as CSV or a market feed.",
+    "lesson": {
+      "type": "inspection",
+      "status": "intent",
+      "intent": "Inspect where numeric data enters, its column format, and the access a real feed or export would require.",
+      "concepts": ["Tabular/CSV ingestion", "Feed scheduling", "Column formats"]
+    },
+    "labVersion": "Not wired up yet - shown to reveal where numeric data enters the workflow.",
+    "realWorldSources": [
+      "A CSV export from a market system",
+      "A pricing API",
+      "A scheduled feed file"
+    ],
+    "accessNeeded": [
+      "Access to the price feed or export",
+      "Knowledge of the column format"
+    ],
+    "soloRebuildPath": [
+      "Start with a local sample CSV",
+      "Parse it with a small script",
+      "Later subscribe to a real feed or API"
+    ],
+    "reusedBy": ["clean-price-data"],
+    "governanceNote": "Needs access to the feed or export and knowledge of the column contract.",
+    "auditNote": "No local fixture exists yet, so the inspection lesson has little to examine; add a small sample CSV.",
+    "taskId": null,
+    "artifactName": null
+  },
+  {
+    "id": "forecast-data",
+    "label": "Forecast Data",
+    "type": "source",
+    "thingOrAction": "thing",
+    "phaseId": "data-structure-layer",
+    "x": 270,
+    "y": 190,
+    "description": "Expected generation and price forecasts used to judge how the actual overnight numbers compare.",
+    "lesson": {
+      "type": "inspection",
+      "status": "intent",
+      "intent": "Inspect a second numeric input and judge why 'which forecast is authoritative' matters before it is compared.",
+      "concepts": ["Comparison inputs", "Joining datasets by key", "Authoritative source"]
+    },
+    "labVersion": "Not wired up yet - shown as a second numeric input.",
+    "realWorldSources": [
+      "A forecasting service",
+      "An internal model output",
+      "A vendor forecast file"
+    ],
+    "accessNeeded": [
+      "Access to the forecast source",
+      "Agreement on which forecast is authoritative"
+    ],
+    "soloRebuildPath": [
+      "Start with a static forecast file",
+      "Join it to the actuals by key",
+      "Later pull live forecasts on a schedule"
+    ],
+    "reusedBy": ["variance-check"],
+    "governanceNote": "Requires agreement on which forecast is authoritative (ownership of source-of-truth).",
+    "auditNote": "Feeds only Variance Check, a later transformation, so this sub-branch stays dormant until Phase 3 lands.",
+    "taskId": null,
+    "artifactName": null
+  },
+  {
+    "id": "prior-day-reference",
+    "label": "Prior Day Reference",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "data-structure-layer",
+    "x": 270,
+    "y": 300,
+    "description": "Yesterday's normalized prices, kept as a baseline so today's movement has something to compare against.",
+    "lesson": {
+      "type": "inspection",
+      "status": "intent",
+      "intent": "Inspect how a saved prior run is retained and reused as today's comparison baseline.",
+      "concepts": ["Baselines", "Historical retention", "Temporal reuse"]
+    },
+    "labVersion": "Stubbed reference object for now.",
+    "realWorldSources": [
+      "Yesterday's saved clean price table",
+      "A historical price store",
+      "An archived brief"
+    ],
+    "accessNeeded": [
+      "Read access to prior runs",
+      "A retention location for past outputs"
+    ],
+    "soloRebuildPath": [
+      "Save each day's clean prices to a dated file",
+      "Load the previous file as a baseline",
+      "Later move to a small historical store"
+    ],
+    "reusedBy": ["variance-check"],
+    "governanceNote": "Needs read access to prior runs and a retention location; retention policy is a governance decision.",
+    "auditNote": "Temporal cycle: depends on Distribution/Archive at the end of the workflow; confirm the UI does not render this as a confusing backward edge.",
+    "taskId": null,
+    "artifactName": null
+  },
+  {
+    "id": "clean-price-data",
+    "label": "Clean Price Data",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "data-structure-layer",
+    "x": 270,
+    "y": 420,
+    "description": "Normalized, validated price values pulled into a consistent table the rules engine can trust.",
+    "lesson": {
+      "type": "transformation",
+      "status": "now",
+      "intent": "Coerce and validate raw price rows into a trusted, normalized clean-prices.json table.",
+      "concepts": ["Normalization", "Validation", "Data quality", "Type coercion"]
+    },
+    "labVersion": "Built by you in the Clean Price Data task by normalizing messy price rows into a numeric table.",
+    "realWorldSources": [
+      "A transformation step in a script or notebook",
+      "A cleaned table in a database or warehouse"
+    ],
+    "accessNeeded": [
+      "Read access to the price feed",
+      "A place to store the cleaned table"
+    ],
+    "soloRebuildPath": [
+      "Read the raw price rows",
+      "Coerce and validate numeric fields",
+      "Emit a clean price table"
+    ],
+    "reusedBy": ["risk-evaluation", "morning-brief"],
+    "governanceNote": "Read access to the feed plus a store for the cleaned table; data-quality rules are the trust boundary for everything downstream.",
+    "auditNote": "Recommended next interactive build: smallest, most self-contained transformation lesson and reuses the Intake JSON/validation concepts.",
+    "taskId": "lesson-clean-price-data",
+    "artifactName": "clean-prices.json"
+  },
+  {
+    "id": "threshold-policy",
+    "label": "Threshold Policy",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "evaluation-layer",
+    "x": 520,
+    "y": 80,
+    "description": "Reusable business rules that define when market movement requires attention. Referenced by several downstream steps.",
+    "lesson": {
+      "type": "governance",
+      "status": "now",
+      "intent": "Set and version the threshold values reused by three downstream nodes, and decide their ownership and approval path.",
+      "concepts": ["Business rules as config", "Parameterization", "Policy vs logic"]
+    },
+    "labVersion": "Built by you in the Threshold Policy task by setting and versioning the threshold values.",
+    "realWorldSources": [
+      "Risk policy document",
+      "Desk operating procedure",
+      "Manager-defined thresholds"
+    ],
+    "accessNeeded": [
+      "Risk policy access",
+      "Approval from the business owner"
+    ],
+    "soloRebuildPath": [
+      "Start with a local JSON rules file",
+      "Version it alongside the workflow",
+      "Later replace with a governed policy source"
+    ],
+    "reusedBy": ["risk-evaluation", "approval-decision", "morning-brief"],
+    "governanceNote": "Strongest governance node on the map: needs business-owner approval, risk-policy access, and versioning. Reused by three downstream steps.",
+    "auditNote": "Best candidate to deliver the doctrine-required governance moment; author as a short 'set and version a threshold' lesson.",
+    "taskId": "lesson-threshold-policy",
+    "artifactName": "threshold-policy.json"
+  },
+  {
+    "id": "variance-check",
+    "label": "Variance Check",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "evaluation-layer",
+    "x": 520,
+    "y": 260,
+    "description": "Compares actuals against forecast and the prior day to surface meaningful variance before the risk rules run.",
+    "lesson": {
+      "type": "transformation",
+      "status": "later",
+      "intent": "Compute actual-vs-forecast and actual-vs-prior deltas and flag material variance.",
+      "concepts": ["Comparison steps", "Materiality thresholds", "Flagging deltas"]
+    },
+    "labVersion": "Built in a future phase - shown to reveal the full workflow shape.",
+    "realWorldSources": [
+      "A comparison step in code",
+      "A spreadsheet variance column"
+    ],
+    "accessNeeded": [
+      "Access to forecast and prior-day data",
+      "Agreement on what variance is material"
+    ],
+    "soloRebuildPath": [
+      "Subtract forecast from actual per field",
+      "Flag values over a variance threshold",
+      "Pass the result into evaluation"
+    ],
+    "reusedBy": ["risk-evaluation"],
+    "governanceNote": "Requires agreement on what variance is material (a business rule overlapping Threshold Policy).",
+    "auditNote": "Produces no named artifact yet is a transformation lesson; decide whether its output is transient or stored for audit.",
+    "taskId": null,
+    "artifactName": null
+  },
+  {
+    "id": "risk-evaluation",
+    "label": "Risk Evaluation",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "evaluation-layer",
+    "x": 520,
+    "y": 420,
+    "description": "Applies the threshold policy to the intake record, clean prices, and variance to produce a decision-ready risk view.",
+    "lesson": {
+      "type": "transformation",
+      "status": "later",
+      "intent": "Apply the threshold policy to the intake record, clean prices, and variance to emit the reusable risk-evaluation.json record.",
+      "concepts": ["Rules engine", "Applying policy to data", "Decision-ready record"]
+    },
+    "labVersion": "Built in a future phase - shown to reveal the full workflow shape.",
+    "realWorldSources": [
+      "A rules function in code",
+      "A risk engine or policy service"
+    ],
+    "accessNeeded": [
+      "The agreed threshold values",
+      "Read access to the upstream artifacts"
+    ],
+    "soloRebuildPath": [
+      "Load the intake record, clean prices, and policy",
+      "Apply the threshold rules",
+      "Emit a risk-evaluation record"
+    ],
+    "reusedBy": ["approval-decision", "morning-brief"],
+    "governanceNote": "Needs the agreed threshold values and read access to four upstream artifacts; the risk record should be auditable.",
+    "auditNote": "Typed process but emits risk-evaluation.json; eventually split into Evaluate Risk (action) and Risk Evaluation Record (artifact). Highest fan-in (4 deps), so it sequences late.",
+    "taskId": null,
+    "artifactName": "risk-evaluation.json"
+  },
+  {
+    "id": "approval-template",
+    "label": "Approval Template",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "routing-layer",
+    "x": 770,
+    "y": 80,
+    "description": "A reusable template that shapes how an approval request is written when sign-off is needed.",
+    "lesson": {
+      "type": "governance",
+      "status": "intent",
+      "intent": "Define the reusable approval format and the required fields a sign-off request must contain.",
+      "concepts": ["Output templating", "Reusable formats", "Required-field standards"]
+    },
+    "labVersion": "Stubbed reference object for now.",
+    "realWorldSources": [
+      "A saved email or form template",
+      "A documented approval format"
+    ],
+    "accessNeeded": [
+      "Access to the approval format",
+      "Agreement on required approval fields"
+    ],
+    "soloRebuildPath": [
+      "Start with a local Markdown/JSON template",
+      "Fill it from the risk evaluation",
+      "Later wire it to a real approval channel"
+    ],
+    "reusedBy": ["approval-route"],
+    "governanceNote": "Needs agreement on required approval fields; the template standardizes what every approver sees.",
+    "auditNote": "Could become interpretation instead of governance if the authored lesson has the learner read/apply a template rather than define one.",
+    "taskId": null,
+    "artifactName": "approval-template.json"
+  },
+  {
+    "id": "approval-decision",
+    "label": "Approval Decision",
+    "type": "decision",
+    "thingOrAction": "action",
+    "phaseId": "routing-layer",
+    "x": 770,
+    "y": 260,
+    "description": "The branch point: does this movement require sign-off, or can it flow straight to the brief as routine?",
+    "lesson": {
+      "type": "decision",
+      "status": "later",
+      "intent": "Encode the if/else branch from the risk evaluation and log each decision for audit.",
+      "concepts": ["Branching logic", "Thresholds", "Decision audit logging"]
+    },
+    "labVersion": "Built in a future phase - shown to reveal the full workflow shape.",
+    "realWorldSources": [
+      "A conditional in code",
+      "A documented approval policy",
+      "A human judgment call on the desk"
+    ],
+    "accessNeeded": [
+      "The escalation threshold",
+      "Knowledge of who can approve"
+    ],
+    "soloRebuildPath": [
+      "Encode the if/else from the risk evaluation",
+      "Make the threshold configurable",
+      "Log every decision for audit"
+    ],
+    "reusedBy": ["approval-route", "routine-update-path"],
+    "governanceNote": "Needs the escalation threshold and knowledge of who can approve; every decision should be logged for audit.",
+    "auditNote": "The only true fork (two downstream branches); produces no artifact, so confirm the decision outcome is persisted for audit.",
+    "taskId": null,
+    "artifactName": null
+  },
+  {
+    "id": "approval-route",
+    "label": "Approval Route",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "routing-layer",
+    "x": 770,
+    "y": 380,
+    "description": "When sign-off is needed, the request is routed to an approver and the response is captured before the brief goes out.",
+    "lesson": {
+      "type": "handoff",
+      "status": "later",
+      "intent": "Route a sign-off request to an approver and capture the yes/no response as approval-route.json.",
+      "concepts": ["Handoff", "Human-in-the-loop approval", "Capturing a response"]
+    },
+    "labVersion": "Built in a future phase - shown to reveal the full workflow shape.",
+    "realWorldSources": [
+      "An email or Teams approval request",
+      "A ticket or workflow tool",
+      "A signed checklist"
+    ],
+    "accessNeeded": [
+      "Ability to message the approver",
+      "A place to record the response"
+    ],
+    "soloRebuildPath": [
+      "Write an approval request to a file",
+      "Capture a manual yes/no response",
+      "Later wire to email or a chat approval"
+    ],
+    "reusedBy": ["morning-brief"],
+    "governanceNote": "Needs the ability to message the approver and a place to record the response; the response is an audit record.",
+    "auditNote": "Emits approval-route.json but typed handoff (action yielding an artifact); real-world messaging integrations are out of MVP scope.",
+    "taskId": null,
+    "artifactName": "approval-route.json"
+  },
+  {
+    "id": "routine-update-path",
+    "label": "Routine Update Path",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "routing-layer",
+    "x": 770,
+    "y": 500,
+    "description": "The other side of the branch: when no approval is needed, movement is logged as a routine note for the brief.",
+    "lesson": {
+      "type": "handoff",
+      "status": "later",
+      "intent": "Handle the no-approval branch: write a routine note when below threshold and keep it for the audit trail.",
+      "concepts": ["Alternate-branch handling", "No-action logging", "Path symmetry"]
+    },
+    "labVersion": "Built in a future phase - shown to reveal the full workflow shape.",
+    "realWorldSources": [
+      "A logged routine entry",
+      "A no-action note on the desk"
+    ],
+    "accessNeeded": [
+      "A place to record routine outcomes"
+    ],
+    "soloRebuildPath": [
+      "Write a routine note when below threshold",
+      "Include it in the brief as context",
+      "Keep it for the audit trail"
+    ],
+    "reusedBy": ["morning-brief"],
+    "governanceNote": "Needs a place to record routine outcomes; 'no action' must still be auditable.",
+    "auditNote": "The quiet branch, easy to under-teach; its value is that the non-escalation path is still logged.",
+    "taskId": null,
+    "artifactName": null
+  },
+  {
+    "id": "prior-day-brief-template",
+    "label": "Prior Day Brief Template",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "brief-assembly-layer",
+    "x": 1020,
+    "y": 80,
+    "description": "The brief's reusable structure, carried over from prior days so the morning output stays consistent.",
+    "lesson": {
+      "type": "inspection",
+      "status": "intent",
+      "intent": "Inspect the reusable brief structure and how it keeps the daily output consistent before assembly.",
+      "concepts": ["Output structure", "Consistency", "Templating across runs"]
+    },
+    "labVersion": "Stubbed reference object for now.",
+    "realWorldSources": [
+      "Yesterday's brief document",
+      "A saved Markdown/Word template"
+    ],
+    "accessNeeded": [
+      "Access to the brief template",
+      "Agreement on the brief sections"
+    ],
+    "soloRebuildPath": [
+      "Save the brief layout as a template file",
+      "Fill it from upstream artifacts",
+      "Version it alongside the workflow"
+    ],
+    "reusedBy": ["morning-brief"],
+    "governanceNote": "Needs agreement on the brief sections; template versioning keeps output consistent.",
+    "auditNote": "Overlaps Prior Day Reference (structure vs baseline data); inspection may be too passive - consider interpretation when authoring.",
+    "taskId": null,
+    "artifactName": null
+  },
+  {
+    "id": "morning-brief",
+    "label": "Morning Brief",
+    "type": "output",
+    "thingOrAction": "thing",
+    "phaseId": "brief-assembly-layer",
+    "x": 1020,
+    "y": 380,
+    "description": "The approval-ready 7:00 AM summary that joins intake, clean prices, risk, and approval status into one business output.",
+    "lesson": {
+      "type": "assembly",
+      "status": "later",
+      "intent": "Assemble the intake record, clean prices, risk, approval status, and template into one approval-ready market-brief.md.",
+      "concepts": ["Aggregation / assembly", "Joining artifacts", "Rendering output"]
+    },
+    "labVersion": "Built in a future phase - shown to reveal the full workflow shape.",
+    "realWorldSources": [
+      "A generated Markdown or PDF document",
+      "An email digest",
+      "A posted channel summary"
+    ],
+    "accessNeeded": [
+      "Read access to all upstream artifacts",
+      "The brief template"
+    ],
+    "soloRebuildPath": [
+      "Load the upstream artifacts",
+      "Fill the brief template",
+      "Render to Markdown",
+      "Later automate delivery on a schedule"
+    ],
+    "reusedBy": ["distribution-archive"],
+    "governanceNote": "Needs read access to all upstream artifacts plus the template; the assembled brief is the record of the day.",
+    "auditNote": "Highest fan-in (7 deps); the natural capstone but requires nearly the whole graph first, so it is last in build order.",
+    "taskId": null,
+    "artifactName": "market-brief.md"
+  },
+  {
+    "id": "distribution-archive",
+    "label": "Distribution / Archive",
+    "type": "archive",
+    "thingOrAction": "ambiguous",
+    "phaseId": "brief-assembly-layer",
+    "x": 1020,
+    "y": 500,
+    "description": "The finished brief is delivered to the desk and stored for the record, seeding tomorrow's prior-day reference.",
+    "lesson": {
+      "type": "handoff",
+      "status": "later",
+      "intent": "Deliver the brief to the desk, archive it for the record, and seed tomorrow's prior-day baseline.",
+      "concepts": ["Delivery", "Retention", "Audit trail", "Feedback loop"]
+    },
+    "labVersion": "Built in a future phase - shown to reveal the full workflow shape.",
+    "realWorldSources": [
+      "An email or channel post",
+      "A shared drive or document store",
+      "An archive bucket"
+    ],
+    "accessNeeded": [
+      "Send permission to the distribution list",
+      "Write access to the archive location"
+    ],
+    "soloRebuildPath": [
+      "Save the brief to a dated folder",
+      "Add a send step (email or chat)",
+      "Feed it back as tomorrow's prior-day reference"
+    ],
+    "reusedBy": ["prior-day-reference"],
+    "governanceNote": "Needs send permission to the distribution list and write access to the archive; retention/audit policy applies.",
+    "auditNote": "Action+thing ambiguity; recommend splitting into Distribution (handoff/action) and Archive (output/thing). Likely the first map shape change after the audit.",
+    "taskId": null,
+    "artifactName": null
+  }
+]
