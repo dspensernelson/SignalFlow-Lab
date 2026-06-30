@@ -35,7 +35,7 @@ export default function ProjectCanvas({
   )
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 text-left">
+    <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-6 px-4 py-6 text-left">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex flex-col gap-1">
           <p className="text-sm font-medium uppercase tracking-wide text-blue-600">SignalFlow Lab</p>
@@ -65,7 +65,7 @@ export default function ProjectCanvas({
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
           Workflow Map
         </h2>
-        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_260px] lg:items-start lg:gap-6">
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:gap-6">
           <div>
             <WorkflowGraph
               nodes={nodes}
@@ -74,6 +74,9 @@ export default function ProjectCanvas({
               progress={progress}
               selectedNodeId={selectedNodeId}
               onSelect={onSelect}
+              onStart={onStart}
+              onContinue={onContinue}
+              onViewArtifact={onViewArtifact}
             />
           </div>
 

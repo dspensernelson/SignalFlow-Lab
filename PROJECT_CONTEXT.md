@@ -33,7 +33,7 @@ The historical MVP was accepted against `signalflow-lab-mvp-spec-v2.md`: one com
 
 - Phase-banded workflow graph driven by `src/data/phases.json`, `src/data/workflowNodes.json`, and `src/data/workflowEdges.json`.
 - Buildable task nodes are tracked in localStorage under `signalflow_progress`; artifacts are stored under `signalflow_artifacts`.
-- The current interactive tasks are `lesson-intake`, attached to `market-intake-record`; `lesson-threshold-policy`, attached to `threshold-policy`; and `lesson-clean-price-data`, attached to `clean-price-data`.
+- The current interactive tasks are `lesson-intake`, attached to `market-intake-record`; `lesson-threshold-policy`, attached to `threshold-policy`; `lesson-clean-price-data`, attached to `clean-price-data`; and `lesson-variance-check`, attached to `variance-check`.
 - Every workflow node has a lesson intent; only nodes with built task IDs are completion-tracked today.
 - Future interactive nodes remain visible but locked/stubbed.
 - Lesson flow follows Intro -> Exercise -> Takeaway.

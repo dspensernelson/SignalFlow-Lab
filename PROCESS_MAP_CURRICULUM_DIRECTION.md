@@ -116,6 +116,7 @@ For the current build:
 - The Intake task completes the Market Intake Record workflow node.
 - The Threshold Policy task completes the Threshold Policy workflow node.
 - The Clean Price Data task completes the Clean Price Data workflow node.
+- The Variance Check task completes the Variance Check workflow node, producing `variance-summary.json` from clean actuals plus forecast and prior-day references.
 - The Analyst Notes node explains source provenance and lab simulation.
 - Other nodes remain visible with lesson intent but locked or stubbed until future passes.
 
@@ -158,6 +159,7 @@ Avoid making the learner do all the complexity. Let the map show complexity whil
 - Completing Intake marks the relevant workflow artifact complete.
 - Completing Threshold Policy marks the governance reference artifact complete.
 - Completing Clean Price Data marks the normalized price table artifact complete.
+- Completing Variance Check marks the variance summary artifact complete.
 - Artifact viewing still works.
 - Other nodes remain visible but not fully buildable.
 - Existing validation and localStorage behavior still work.

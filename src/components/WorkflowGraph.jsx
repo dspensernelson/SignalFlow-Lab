@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { STATUS, deriveNodeStatus, derivePhaseStatus } from '../lib/progress'
+import { STATUS, deriveNodeStatus, derivePhaseStatus, isBuildable } from '../lib/progress'
 import { TYPE_COLOR } from '../lib/nodeStyles'
 
 const NODE_W = 190
 const NODE_H = 84
 const HEADER_H = 50
-const STAGE_H = 612
+const STAGE_H = 592
 const DESIGN_W = 1230
 const DESIGN_H = HEADER_H + STAGE_H
 const REGION_PAD = 18
@@ -74,6 +74,9 @@ export default function WorkflowGraph({
   progress,
   selectedNodeId,
   onSelect,
+  onStart,
+  onContinue,
+  onViewArtifact,
 }) {
   const containerRef = useRef(null)
   const [scale, setScale] = useState(1)
@@ -199,17 +202,36 @@ export default function WorkflowGraph({
             if (selected) ring = 'ring-2 ring-offset-2 ring-blue-600'
             else if (isDown) ring = 'ring-2 ring-blue-400'
             else if (isUp) ring = 'ring-2 ring-amber-400'
+            const buildable = isBuildable(node)
+            // Playable nodes always stay legible: relationship-dimming only applies
+            // to non-playable context nodes, so a buildable lesson never looks disabled.
+            const dimmed = !related && !buildable
+            let action = null
+            if (buildable && status === STATUS.READY) {
+              action = { label: 'Start lesson', run: () => onStart(node.id), cls: 'bg-blue-600 text-white hover:bg-blue-700' }
+            } else if (buildable && status === STATUS.IN_PROGRESS) {
+              action = { label: 'Continue', run: () => onContinue(node.id), cls: 'bg-amber-500 text-white hover:bg-amber-600' }
+            } else if (buildable && status === STATUS.COMPLETE) {
+              action = { label: 'View', run: () => onViewArtifact(node.id), cls: 'bg-emerald-600 text-white hover:bg-emerald-700' }
+            }
             return (
-              <button
+              <div
                 key={node.id}
-                type="button"
+                role="button"
+                tabIndex={0}
                 onClick={() => onSelect(node.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    onSelect(node.id)
+                  }
+                }}
                 aria-pressed={selected}
                 title={node.label}
-                className={`absolute flex flex-col rounded-xl border p-2.5 text-left shadow-sm transition ${nodeBase(
+                className={`absolute flex cursor-pointer flex-col rounded-xl border p-2.5 text-left shadow-sm transition ${nodeBase(
                   status,
                   node.type
-                )} ${ring} ${related ? '' : 'opacity-45'}`}
+                )} ${ring} ${dimmed ? 'opacity-45' : ''}`}
                 style={{ left: p.x, top: p.y, width: NODE_W, height: NODE_H }}
               >
                 <div className="flex items-center justify-between">
@@ -229,12 +251,26 @@ export default function WorkflowGraph({
                   )}
                 </div>
                 <span className="mt-1 text-sm font-semibold leading-tight">{node.label}</span>
-                {node.artifactName && (
-                  <span className="mt-auto truncate font-mono text-[10px] opacity-70">
-                    {node.artifactName}
-                  </span>
-                )}
-              </button>
+                <div className="mt-auto flex items-center justify-between gap-1.5">
+                  {node.artifactName ? (
+                    <span className="truncate font-mono text-[10px] opacity-70">{node.artifactName}</span>
+                  ) : (
+                    <span />
+                  )}
+                  {action && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        action.run()
+                      }}
+                      className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold shadow-sm transition ${action.cls}`}
+                    >
+                      {action.label}
+                    </button>
+                  )}
+                </div>
+              </div>
             )
           })}
         </div>
