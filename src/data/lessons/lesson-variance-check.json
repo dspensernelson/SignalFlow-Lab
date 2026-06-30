@@ -1,0 +1,99 @@
+{
+  "id": "lesson-variance-check",
+  "nodeId": "variance-check",
+  "title": "Compare Actuals Against Forecast and Prior Day",
+  "difficulty": "Intermediate",
+  "skill": "Derived fields & variance",
+  "scenario": "It is 6:25 AM. The clean price table is ready, and two reference numbers came in: an overnight forecast and yesterday's settled prices. Before the risk rules run, the desk needs to know how far today's actuals moved. Your job is to compute the variance for each hub so Risk Evaluation has an explicit, auditable signal to judge.",
+  "inputType": "text",
+  "inputLabel": "Actuals vs References",
+  "input": "hub, actual, forecast, priorDay\nERCOT, 187, 170, 165\nSPP, 96, 96, 92\nMISO, 74, 80, 78\n\nMaterial variance rule: a hub is material when its actual is 10 or more away from forecast.",
+  "instructions": [
+    "Read each hub's actual price, its forecast, and the prior-day price.",
+    "For each hub, compute vsForecast = actual - forecast.",
+    "For each hub, compute vsPriorDay = actual - priorDay.",
+    "Keep deltas as plain numbers - negatives are allowed.",
+    "Optionally add material: true when |vsForecast| is 10 or more, otherwise false.",
+    "Return a JSON array with one object per hub, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"hub\": \"ERCOT\", \"vsForecast\": 0, \"vsPriorDay\": 0, \"material\": false },\n  { \"hub\": \"SPP\", \"vsForecast\": 0, \"vsPriorDay\": 0, \"material\": false },\n  { \"hub\": \"MISO\", \"vsForecast\": 0, \"vsPriorDay\": 0, \"material\": false }\n]",
+  "validation": {
+    "type": "jsonDeltas",
+    "keyField": "hub",
+    "requiredFields": ["hub", "vsForecast", "vsPriorDay"],
+    "numericFields": ["vsForecast", "vsPriorDay"],
+    "optionalBooleanFields": ["material"],
+    "expectedRows": [
+      { "hub": "ERCOT", "vsForecast": 17, "vsPriorDay": 22, "material": true },
+      { "hub": "SPP", "vsForecast": 0, "vsPriorDay": 4, "material": false },
+      { "hub": "MISO", "vsForecast": -6, "vsPriorDay": -4, "material": false }
+    ]
+  },
+  "copilotPrompt": "For each hub, compute vsForecast = actual - forecast and vsPriorDay = actual - priorDay. Keep them as plain numbers and allow negatives. Optionally add a material flag that is true when the absolute value of vsForecast is 10 or more. Return a JSON array with one object per hub.",
+  "successMessage": "Variance summary built. Risk Evaluation now has an explicit signal of how far each hub moved instead of recomputing it.",
+  "intro": {
+    "heading": "Before you build: derived fields and variance",
+    "sections": [
+      {
+        "title": "Comparison needs two inputs",
+        "body": "A single number is not a signal. Variance is a comparison: today's actual against a forecast, and today's actual against yesterday. You join the clean prices to those reference values by hub before you can compare them."
+      },
+      {
+        "title": "A delta is a derived value",
+        "body": "vsForecast and vsPriorDay are not in the source data - you compute them. A delta can be negative when the actual came in below the reference, and that direction is part of the signal."
+      },
+      {
+        "title": "Material variance is a judgement, made explicit",
+        "body": "Not every move matters. A materiality rule turns a raw delta into a yes/no flag using an agreed threshold. Here a hub is material when its actual is 10 or more away from forecast."
+      },
+      {
+        "title": "Why derived values should be stored, not recomputed",
+        "body": "If you save the deltas explicitly, every later step reads the same numbers and the result is auditable. If each step recomputes, they can drift apart. Variance Check sits in Phase 3, the Evaluation Layer, and feeds Risk Evaluation."
+      }
+    ],
+    "jsonExample": "[\n  { \"hub\": \"PJM\", \"vsForecast\": 5, \"vsPriorDay\": -3, \"material\": false }\n]",
+    "skill": "Derived fields & variance",
+    "artifactName": "variance-summary.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "hub",
+      "meaning": "The market hub for this variance row.",
+      "type": "string",
+      "example": "\"ERCOT\"",
+      "hint": "Keep one object per hub: ERCOT, SPP, and MISO."
+    },
+    {
+      "field": "vsForecast",
+      "meaning": "Actual minus forecast for the hub.",
+      "type": "number",
+      "example": "17",
+      "hint": "Compute actual - forecast as a plain number. Negatives are allowed."
+    },
+    {
+      "field": "vsPriorDay",
+      "meaning": "Actual minus the prior-day price for the hub.",
+      "type": "number",
+      "example": "22",
+      "hint": "Compute actual - priorDay as a plain number. Negatives are allowed."
+    },
+    {
+      "field": "material",
+      "meaning": "Optional flag: true when the hub's variance is material.",
+      "type": "boolean",
+      "example": "true",
+      "hint": "If you include it, use true when |vsForecast| is 10 or more, else false."
+    }
+  ],
+  "takeaway": {
+    "heading": "Variance summary built",
+    "points": [
+      "You computed derived deltas - vsForecast and vsPriorDay - from clean actuals and two reference inputs.",
+      "Deltas can be negative, and that direction is part of the signal you pass on.",
+      "An explicit material flag turns a raw number into a decision-ready judgement using an agreed threshold.",
+      "This artifact sits in Phase 3, the Evaluation Layer, and Risk Evaluation reuses variance-summary.json instead of recomputing it."
+    ],
+    "artifactName": "variance-summary.json"
+  }
+}

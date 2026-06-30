@@ -300,11 +300,11 @@
     "description": "Compares actuals against forecast and the prior day to surface meaningful variance before the risk rules run.",
     "lesson": {
       "type": "transformation",
-      "status": "later",
+      "status": "now",
       "intent": "Compute actual-vs-forecast and actual-vs-prior deltas and flag material variance.",
       "concepts": ["Comparison steps", "Materiality thresholds", "Flagging deltas"]
     },
-    "labVersion": "Built in a future phase - shown to reveal the full workflow shape.",
+    "labVersion": "Built by you in the Variance Check task by computing actual-vs-forecast and actual-vs-prior deltas and flagging material variance.",
     "realWorldSources": [
       "A comparison step in code",
       "A spreadsheet variance column"
@@ -320,9 +320,9 @@
     ],
     "reusedBy": ["risk-evaluation"],
     "governanceNote": "Requires agreement on what variance is material (a business rule overlapping Threshold Policy).",
-    "auditNote": "Produces no named artifact yet is a transformation lesson; decide whether its output is transient or stored for audit.",
-    "taskId": null,
-    "artifactName": null
+    "auditNote": "Stores an explicit variance-summary.json so Risk Evaluation consumes a derived, auditable signal instead of recomputing deltas.",
+    "taskId": "lesson-variance-check",
+    "artifactName": "variance-summary.json"
   },
   {
     "id": "risk-evaluation",

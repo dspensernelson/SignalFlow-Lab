@@ -138,6 +138,65 @@ export default function NodeDetail({
         </span>
       </div>
 
+      {/* Action zone — kept at the top so the primary action is always visible */}
+      <div className="border-b border-gray-100 pb-2">
+        {buildable && status === STATUS.READY && (
+          <button
+            type="button"
+            onClick={() => onStart(node.id)}
+            className="w-full rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700"
+          >
+            Start lesson
+          </button>
+        )}
+
+        {buildable && status === STATUS.IN_PROGRESS && (
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => onContinue(node.id)}
+              className="flex-1 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600"
+            >
+              Continue lesson
+            </button>
+            <button
+              type="button"
+              onClick={() => onRestart(node.id)}
+              className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
+            >
+              Restart
+            </button>
+          </div>
+        )}
+
+        {buildable && status === STATUS.COMPLETE && (
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => onViewArtifact(node.id)}
+              className="flex-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700"
+            >
+              View artifact
+            </button>
+            <button
+              type="button"
+              onClick={() => onRestart(node.id)}
+              className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
+            >
+              Restart
+            </button>
+          </div>
+        )}
+
+        {!buildable && lesson && (
+          <p className="rounded-lg bg-slate-50 px-2.5 py-1.5 text-[11px] leading-snug text-slate-700">
+            {lesson.status === 'intent'
+              ? `${capitalize(lesson.type)} lesson — intent is defined; the interaction is coming in a later pass.`
+              : `${capitalize(lesson.type)} lesson — planned for a later pass${phase ? `, in ${phase.title.replace(/^Phase \d+: /, '')}` : ''}.`}
+          </p>
+        )}
+      </div>
+
       <p className="text-[11px] leading-snug text-gray-600">{node.description}</p>
 
       {lesson?.intent && (
@@ -177,65 +236,6 @@ export default function NodeDetail({
           <LinkChips items={feedsInto} onSelect={onSelect} className="font-medium text-blue-700" />
         )}
       </Section>
-
-      {/* Action zone */}
-      <div className="mt-1 border-t border-gray-100 pt-2">
-        {buildable && status === STATUS.READY && (
-          <button
-            type="button"
-            onClick={() => onStart(node.id)}
-            className="w-full rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700"
-          >
-            Start task
-          </button>
-        )}
-
-        {buildable && status === STATUS.IN_PROGRESS && (
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => onContinue(node.id)}
-              className="flex-1 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600"
-            >
-              Continue task
-            </button>
-            <button
-              type="button"
-              onClick={() => onRestart(node.id)}
-              className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
-            >
-              Restart
-            </button>
-          </div>
-        )}
-
-        {buildable && status === STATUS.COMPLETE && (
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => onViewArtifact(node.id)}
-              className="flex-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700"
-            >
-              View artifact
-            </button>
-            <button
-              type="button"
-              onClick={() => onRestart(node.id)}
-              className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
-            >
-              Restart
-            </button>
-          </div>
-        )}
-
-        {!buildable && lesson && (
-          <p className="rounded-lg bg-slate-50 px-2.5 py-1.5 text-[11px] leading-snug text-slate-700">
-            {lesson.status === 'intent'
-              ? `${capitalize(lesson.type)} lesson — intent is defined; the interaction is coming in a later pass.`
-              : `${capitalize(lesson.type)} lesson — planned for a later pass${phase ? `, in ${phase.title.replace(/^Phase \d+: /, '')}` : ''}.`}
-          </p>
-        )}
-      </div>
     </div>
   )
 }

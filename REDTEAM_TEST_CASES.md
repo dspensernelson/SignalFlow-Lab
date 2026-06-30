@@ -241,3 +241,122 @@ Input:
 ```
 
 Expected result: validation passes and saves the parsed user JSON array as `clean-prices.json`.
+
+## Variance Check Validator Cases
+
+### Variance Check Invalid JSON
+
+Input:
+
+```json
+[ { "hub": "ERCOT",
+```
+
+Expected result: validation fails with a clear JSON parse message and no artifact is saved.
+
+### Variance Check Wrong Top-Level Shape
+
+Input:
+
+```json
+{ "hub": "ERCOT", "vsForecast": 17, "vsPriorDay": 22 }
+```
+
+Expected result: validation fails because the answer must be a top-level JSON array of variance rows.
+
+### Variance Check Missing Required Delta Field
+
+Input:
+
+```json
+[
+  { "hub": "ERCOT", "vsForecast": 17 },
+  { "hub": "SPP", "vsForecast": 0, "vsPriorDay": 4 },
+  { "hub": "MISO", "vsForecast": -6, "vsPriorDay": -4 }
+]
+```
+
+Expected result: validation fails because the ERCOT row is missing `vsPriorDay`.
+
+### Variance Check Deltas As Strings
+
+Input:
+
+```json
+[
+  { "hub": "ERCOT", "vsForecast": "17", "vsPriorDay": "22" },
+  { "hub": "SPP", "vsForecast": 0, "vsPriorDay": 4 },
+  { "hub": "MISO", "vsForecast": -6, "vsPriorDay": -4 }
+]
+```
+
+Expected result: validation fails because delta values must be numbers, not strings.
+
+### Variance Check Wrong Delta Value
+
+Input:
+
+```json
+[
+  { "hub": "ERCOT", "vsForecast": 10, "vsPriorDay": 22 },
+  { "hub": "SPP", "vsForecast": 0, "vsPriorDay": 4 },
+  { "hub": "MISO", "vsForecast": -6, "vsPriorDay": -4 }
+]
+```
+
+Expected result: validation fails because ERCOT `vsForecast` should be `17` (actual 187 minus forecast 170).
+
+### Variance Check Missing Expected Hub
+
+Input:
+
+```json
+[
+  { "hub": "ERCOT", "vsForecast": 17, "vsPriorDay": 22 },
+  { "hub": "SPP", "vsForecast": 0, "vsPriorDay": 4 }
+]
+```
+
+Expected result: validation fails because the expected `MISO` row is missing.
+
+### Variance Check Wrong Material Flag When Included
+
+Input:
+
+```json
+[
+  { "hub": "ERCOT", "vsForecast": 17, "vsPriorDay": 22, "material": false },
+  { "hub": "SPP", "vsForecast": 0, "vsPriorDay": 4, "material": false },
+  { "hub": "MISO", "vsForecast": -6, "vsPriorDay": -4, "material": false }
+]
+```
+
+Expected result: validation fails because ERCOT `material` should be `true` (|17| is 10 or more). The flag is only checked when the learner includes it.
+
+### Variance Check Correct Deltas Without Optional Flag
+
+Input:
+
+```json
+[
+  { "hub": "ERCOT", "vsForecast": 17, "vsPriorDay": 22 },
+  { "hub": "SPP", "vsForecast": 0, "vsPriorDay": 4 },
+  { "hub": "MISO", "vsForecast": -6, "vsPriorDay": -4 }
+]
+```
+
+Expected result: validation passes and saves the parsed user JSON array as `variance-summary.json`. The optional `material` flag is not required.
+
+### Variance Check Correct Deltas With Material Flag
+
+Input:
+
+```json
+[
+  { "hub": "ERCOT", "vsForecast": 17, "vsPriorDay": 22, "material": true },
+  { "hub": "SPP", "vsForecast": 0, "vsPriorDay": 4, "material": false },
+  { "hub": "MISO", "vsForecast": -6, "vsPriorDay": -4, "material": false }
+]
+```
+
+Expected result: validation passes and saves the parsed user JSON array as `variance-summary.json`.

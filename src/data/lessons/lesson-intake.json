@@ -1,7 +1,9 @@
 {
   "id": "lesson-intake",
   "nodeId": "market-intake-record",
-  "title": "Turn Analyst Notes into Structured JSON",
+  "title": "Create the Market Intake Record",
+  "subtitle": "Turn the overnight note into the first trusted record",
+  "clock": "6:15 AM",
   "difficulty": "Beginner",
   "skill": "Field extraction",
   "scenario": "It is 6:15 AM. An analyst at Meridian Energy has dropped overnight market notes into the intake system. The notes are unstructured. Your job is to extract the key fields the workflow needs before anything else can run.",
@@ -42,20 +44,64 @@
   },
   "copilotPrompt": "Extract structured JSON from this analyst note. Return fields for hub, peakPrice, settledPrice, generationFlag, and approvalRequired. Use true or false for boolean fields.",
   "successMessage": "Intake record built. The workflow now has structured data to work with.",
+  "validateLabel": "Validate Record",
+  "editorHelper": "Create one JSON object that the workflow can reuse downstream.",
   "intro": {
+    "recordName": "Market Intake Record",
+    "subtitle": "Create the first trusted record in the workflow",
+    "summary": "The Market Intake Record captures the analyst's overnight market observations in a structured format. It is the first trusted artifact in the workflow, so downstream steps can validate, evaluate, and reuse it with confidence.",
+    "concept": "Structured data / field extraction",
+    "directConsumers": ["risk-evaluation", "approval-decision", "morning-brief"],
+    "mission": "The workflow is blocked until the note becomes a reusable record.",
+    "missionSubtext": "Your job creates the first structured record downstream steps can trust.",
+    "whatCameIn": {
+      "label": "Incoming signals",
+      "noteTitle": "Analyst Notes",
+      "noteSubtitle": "Overnight market observations in prose",
+      "flagTitle": "Trader Flag",
+      "flagSubtitle": "Approval cue and review context",
+      "flagCue": "Approval cue",
+      "flagNote": "Review needed before using.",
+      "flagType": "Price spike",
+      "flagRequestedBy": "Desk Trader"
+    },
+    "yourJob": {
+      "label": "Create the first trusted record",
+      "artifact": "Create market-intake.json",
+      "description": "Extract key facts from the note and structure them as the Market Intake Record.",
+      "signals": [
+        { "group": "Market", "icon": "market", "detail": "Identify the market hub or region." },
+        { "group": "Price signal", "icon": "price", "detail": "Capture the peak price and settled price." },
+        { "group": "Operating signal", "icon": "operating", "detail": "Record the generation source and performance." },
+        { "group": "Control signal", "icon": "control", "detail": "Determine whether approval is required." }
+      ]
+    },
+    "unlocks": {
+      "label": "Waiting consumers",
+      "consumers": [
+        { "name": "Risk Evaluation", "icon": "risk", "status": "Waiting", "needs": "Needs structured data to assess exposure and impact.", "can": "Can reuse the same facts." },
+        { "name": "Approval Decision", "icon": "approval", "status": "Waiting", "needs": "Needs approval cue and context to route the review.", "can": "Can route review." },
+        { "name": "Morning Brief", "icon": "brief", "status": "Waiting", "needs": "Needs the intake record to build the market summary.", "can": "Can cite the record." }
+      ]
+    },
+    "artifactPreviewNote": "This is the shape of the record you will create next.",
     "heading": "Before you build: structured intake",
     "sections": [
       {
-        "title": "What is JSON?",
-        "body": "JSON is a simple text format for structured data. It stores information as named fields and values, so software can read it reliably instead of guessing."
+        "title": "What this record does",
+        "body": "The Market Intake Record turns overnight analyst notes into the first structured object the workflow can trust."
       },
       {
-        "title": "Why structured data matters",
-        "body": "Automation cannot act on a messy paragraph. Turning notes into named fields lets every later step run consistently without re-reading the original text."
+        "title": "Why the note is not enough",
+        "body": "A paragraph is useful for a person, but downstream automation needs stable fields: market, price signal, operating signal, and approval cue."
       },
       {
-        "title": "How this workflow uses it",
-        "body": "Your Intake output is the first record in the Meridian workflow. Structure, Evaluate, Route, and Brief all build on the fields you extract here."
+        "title": "Who reuses it",
+        "body": "Risk Evaluation, Approval Decision, and Morning Brief all read this record instead of reinterpreting the original note."
+      },
+      {
+        "title": "Format you will use",
+        "body": "The record is saved as JSON because JSON gives each fact a clear field name and value."
       }
     ],
     "jsonExample": "{\n  \"city\": \"Austin\",\n  \"temperature\": 98,\n  \"alertSent\": true\n}",
@@ -68,43 +114,70 @@
       "meaning": "The market hub mentioned in the note.",
       "type": "string",
       "example": "\"ERCOT\"",
-      "hint": "Look for the named trading hub or region."
+      "group": "Market",
+      "lookFor": "which market is affected?",
+      "hint": "Look for the named trading hub or region.",
+      "attention": { "needs": "the market hub named in the note", "source": "ERCOT hub spiked around 2am", "shape": "ERCOT" }
     },
     {
       "field": "peakPrice",
       "meaning": "The highest price mentioned in the note.",
       "type": "string",
       "example": "\"$187/MWh\"",
-      "hint": "Find the spike or peak value before it settled."
+      "group": "Price signal",
+      "lookFor": "how high did it spike?",
+      "hint": "Find the spike or peak value before it settled.",
+      "attention": { "needs": "the peak price before it settled", "source": "hit $187/MWh briefly", "shape": "$187/MWh" }
     },
     {
       "field": "settledPrice",
       "meaning": "The later price the market settled near.",
       "type": "string",
       "example": "\"$142/MWh\"",
-      "hint": "Find the price the note says it settled at."
+      "group": "Price signal",
+      "lookFor": "where did it settle?",
+      "hint": "Find the price the note says it settled at.",
+      "attention": { "needs": "the price it settled near", "source": "settled near $142/MWh", "shape": "$142/MWh" }
     },
     {
       "field": "generationFlag",
       "meaning": "The generation source plus its performance status.",
       "type": "string",
       "example": "\"Wind underperformed\"",
-      "hint": "Name the source and whether it over- or underperformed."
+      "group": "Operating signal",
+      "lookFor": "what changed operationally?",
+      "hint": "Name the source and whether it over- or underperformed.",
+      "attention": { "needs": "both the source and performance status", "source": "Wind generation underperformed", "shape": "Wind underperformed" }
     },
     {
       "field": "approvalRequired",
       "meaning": "Whether approval is needed before acting.",
       "type": "boolean",
       "example": "true",
-      "hint": "Use true or false based on whether the note flags approval."
+      "group": "Control signal",
+      "lookFor": "does this need review?",
+      "hint": "Use true or false based on whether the note flags approval.",
+      "attention": { "needs": "whether review was requested", "source": "Trader flagged the hub spike for review", "shape": "true" }
     }
   ],
   "takeaway": {
     "heading": "Intake complete",
+    "before": "The workflow only had a human analyst note.",
+    "after": "The workflow has a structured Market Intake Record that downstream steps can reuse.",
+    "capability": "The workflow can now consume structured market observations.",
+    "recordBanner": "First trusted structured record",
+    "recordSummary": "Structured market observations",
+    "auditNote": "Downstream automation reads the Market Intake Record. The original note remains available for audit and provenance.",
+    "nextNodeId": "clean-price-data",
+    "consumers": [
+      { "name": "Risk Evaluation", "nodeId": "risk-evaluation", "note": "can reuse market, price, and operating signals; still needs other inputs" },
+      { "name": "Approval Decision", "nodeId": "approval-decision", "note": "can reuse approvalRequired; still needs risk/policy context" },
+      { "name": "Morning Brief", "nodeId": "morning-brief", "note": "can cite the structured record" }
+    ],
     "points": [
-      "You turned an unstructured note into structured JSON.",
-      "Each named field is now reliable input for the rest of the workflow.",
-      "Field extraction is the foundation every later automation step depends on."
+      "You created market-intake.json, the first operational record in the workflow.",
+      "Risk Evaluation, Approval Decision, and Morning Brief can now reuse the same structured facts.",
+      "The original note remains available for audit and provenance, but downstream automation reads the Market Intake Record."
     ],
     "artifactName": "market-intake.json"
   }

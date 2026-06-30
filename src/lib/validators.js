@@ -343,10 +343,149 @@ function jsonRows(answer, validation) {
   }
 }
 
+// Derived-values / variance validator. Config-driven and additive: it does NOT
+// touch jsonFields, jsonPolicy, or jsonRows. Checks valid JSON, a top-level
+// array, that each expected row (matched by keyField) is present, that required
+// fields are present, that configured numeric delta fields are real numbers
+// (not strings), that delta values match the expected derived value, and that an
+// optional boolean flag (e.g. material variance) is correct ONLY when included.
+function jsonDeltas(answer, validation) {
+  let parsed
+  try {
+    parsed = JSON.parse(answer)
+  } catch {
+    return {
+      passed: false,
+      results: [
+        {
+          id: 'json-parse',
+          label: 'Valid JSON',
+          passed: false,
+          message: 'Your answer is not valid JSON. Check for missing quotes, commas, or braces.',
+        },
+      ],
+      artifact: null,
+    }
+  }
+
+  const {
+    keyField = 'id',
+    requiredFields = [],
+    numericFields = [],
+    optionalBooleanFields = [],
+    expectedRows = [],
+  } = validation
+  const results = []
+
+  // 1. Top-level must be an array of rows.
+  const isArray = Array.isArray(parsed)
+  results.push({
+    id: 'top-level-array',
+    label: 'Top-level array',
+    passed: isArray,
+    message: isArray
+      ? 'The answer is a JSON array of variance rows.'
+      : 'The answer must be a JSON array of variance rows.',
+  })
+  if (!isArray) {
+    return { passed: false, results, artifact: null }
+  }
+
+  // Index the user's rows by their normalized key field.
+  const byKey = {}
+  parsed.forEach((row) => {
+    if (
+      row &&
+      typeof row === 'object' &&
+      !Array.isArray(row) &&
+      Object.prototype.hasOwnProperty.call(row, keyField)
+    ) {
+      byKey[normalize(row[keyField])] = row
+    }
+  })
+
+  // 2. Each expected row must be present, complete, numeric, and correct.
+  expectedRows.forEach((expected) => {
+    const keyVal = expected[keyField]
+    const row = byKey[normalize(keyVal)]
+    const present = Boolean(row)
+    results.push({
+      id: `present-${keyVal}`,
+      label: `Row present: ${keyVal}`,
+      passed: present,
+      message: present ? `Row for "${keyVal}" is present.` : `Missing row for "${keyVal}".`,
+    })
+    if (!present) return
+
+    // Required fields present (key field is implicitly present via the match).
+    requiredFields.forEach((field) => {
+      if (field === keyField) return
+      const hasField = Object.prototype.hasOwnProperty.call(row, field)
+      const value = row[field]
+      const expectedVal = expected[field]
+      const isNumericField = numericFields.includes(field)
+
+      let passed
+      let message
+      if (!hasField) {
+        passed = false
+        message = `"${keyVal}" is missing "${field}".`
+      } else if (isNumericField && !(typeof value === 'number' && Number.isFinite(value))) {
+        passed = false
+        message = `"${keyVal}" ${field} must be a number, not a string.`
+      } else if (isNumericField && value !== expectedVal) {
+        passed = false
+        message = `"${keyVal}" ${field} should be ${expectedVal}.`
+      } else if (!isNumericField && normalize(value) !== normalize(expectedVal)) {
+        passed = false
+        message = `"${keyVal}" ${field} should be "${expectedVal}".`
+      } else {
+        passed = true
+        message = `"${keyVal}" ${field} is correct.`
+      }
+
+      results.push({
+        id: `value-${keyVal}-${field}`,
+        label: `${keyVal} ${field}`,
+        passed,
+        message,
+      })
+    })
+
+    // Optional boolean flags: validated ONLY when the learner includes them.
+    optionalBooleanFields.forEach((field) => {
+      if (!Object.prototype.hasOwnProperty.call(row, field)) return
+      const value = row[field]
+      const expectedVal = expected[field]
+      const isBool = typeof value === 'boolean'
+      const passed = isBool && value === expectedVal
+      results.push({
+        id: `value-${keyVal}-${field}`,
+        label: `${keyVal} ${field}`,
+        passed,
+        message: !isBool
+          ? `"${keyVal}" ${field} must be true or false (a real boolean).`
+          : passed
+            ? `"${keyVal}" ${field} is correct.`
+            : `"${keyVal}" ${field} should be ${expectedVal}.`,
+      })
+    })
+  })
+
+  const passed = results.every((r) => r.passed)
+
+  return {
+    passed,
+    results,
+    artifact: passed ? parsed : null,
+  }
+}
+
 const validators = {
   jsonFields,
   jsonPolicy,
   jsonRows,
+  jsonDeltas,
   // Stubs for future build passes.
   csvColumns: null,
   ruleBuilder: null,

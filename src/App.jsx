@@ -5,6 +5,7 @@ import edges from './data/workflowEdges.json'
 import lessonIntake from './data/lessons/lesson-intake.json'
 import lessonThresholdPolicy from './data/lessons/lesson-threshold-policy.json'
 import lessonCleanPriceData from './data/lessons/lesson-clean-price-data.json'
+import lessonVarianceCheck from './data/lessons/lesson-variance-check.json'
 import ProjectCanvas from './components/ProjectCanvas'
 import LessonWorkspace from './components/LessonWorkspace'
 import ArtifactViewer from './components/ArtifactViewer'
@@ -25,6 +26,7 @@ const LESSONS = {
   'lesson-intake': lessonIntake,
   'lesson-threshold-policy': lessonThresholdPolicy,
   'lesson-clean-price-data': lessonCleanPriceData,
+  'lesson-variance-check': lessonVarianceCheck,
 }
 
 export default function App() {
@@ -87,9 +89,12 @@ export default function App() {
     setSelectedNodeId(nodeId)
   }
 
-  function returnToCanvas() {
+  function returnToCanvas(nextNodeId) {
     setView('canvas')
     setActiveLessonId(null)
+    if (typeof nextNodeId === 'string' && nextNodeId) {
+      setSelectedNodeId(nextNodeId)
+    }
   }
 
   function handleReset() {

@@ -18,6 +18,7 @@ export const BUILT_LESSON_IDS = [
   'lesson-intake',
   'lesson-threshold-policy',
   'lesson-clean-price-data',
+  'lesson-variance-check',
 ]
 
 // A node is buildable now when it has a task wired to a built lesson.

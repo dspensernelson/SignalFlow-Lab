@@ -34,8 +34,8 @@ export default function LessonWorkspace({ lesson, onPass, onReturnToCanvas }) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 text-left">
-      <header className="flex flex-col gap-3">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-5 text-left">
+      <header className="flex flex-col gap-2">
         <div className="flex flex-col gap-1">
           <button
             type="button"
@@ -44,8 +44,17 @@ export default function LessonWorkspace({ lesson, onPass, onReturnToCanvas }) {
           >
             &larr; Back to Canvas
           </button>
-          <h1 className="text-2xl font-semibold text-gray-900">{lesson.title}</h1>
-          <p className="text-sm text-gray-500">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-2xl font-semibold text-gray-900">{lesson.title}</h1>
+            {lesson.clock && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                {lesson.clock}
+              </span>
+            )}
+          </div>
+          {lesson.subtitle && <p className="text-sm text-gray-600">{lesson.subtitle}</p>}
+          <p className="text-xs text-gray-400">
             {lesson.difficulty} &middot; {lesson.skill}
           </p>
         </div>
@@ -91,7 +100,6 @@ export default function LessonWorkspace({ lesson, onPass, onReturnToCanvas }) {
           onValidate={handleValidate}
           results={results}
           passed={passed}
-          outputPreview={outputPreview}
           onContinue={() => setStep('takeaway')}
         />
       )}

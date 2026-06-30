@@ -9,7 +9,7 @@ The first project is **Meridian Morning Market Brief**, a fictional energy-marke
 - The process map is the curriculum.
 - The canvas is a phase-banded workflow graph with sources, references, artifacts, processes, decisions, handoffs, outputs, and archive nodes.
 - Learners click workflow nodes to inspect provenance, lab simulation, access needs, reuse, and solo rebuild context.
-- Three tasks are currently buildable: `Market Intake Record`, `Threshold Policy`, and `Clean Price Data`.
+- Four tasks are currently buildable: `Market Intake Record`, `Threshold Policy`, `Clean Price Data`, and `Variance Check`.
 - Future nodes are visible with defined lesson intent but remain locked/stubbed until explicitly scoped.
 
 ## Run Locally

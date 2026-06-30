@@ -65,3 +65,13 @@ A lesson is good enough when it has:
 - Deterministic validation.
 - A governance moment.
 - A map-connected takeaway: each lesson closes by showing what was built, where it lives on the map, and what downstream nodes can reuse it.
+
+## Screen Layout Rule: No-Scroll Exercise/Workbench Screens (NON-NEGOTIABLE)
+
+On lesson Exercise/workbench screens, the learner must be able to see the source/input, the work area, the validation/readiness state, and the next action together on a standard laptop/desktop viewport. Feedback must not create a long page-scroll stack while the learner is actively building and fixing the artifact.
+
+- Scope: Exercise/workbench screens only. This does NOT mean every page in the product can never scroll. Intro and Takeaway may scroll if needed.
+- Validation feedback may NOT grow off the page. Keep it a fixed, bounded size: inline per-line error chips beside the editor PLUS one prioritized "Fix this next" callout, never an unbounded stack of callouts.
+- Target: no page scroll on the Exercise screen at innerHeight >= 800, including the wrong-answer state. Verify after validating a WRONG answer (the tallest state).
+- Adding content means compacting or removing something else so the screen still fits. Compactness wins over extra detail.
+- This rule is duplicated in AGENTS.md and LESSON_DESIGN_FRAMEWORK.md so it is never lost.
