@@ -118,6 +118,15 @@ export default function TemplateSlotsExercise({
             })}
           </div>
         </div>
+
+        <details className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
+          <summary className="cursor-pointer text-sm text-sf-body">
+            Need help? Show Copilot prompt
+          </summary>
+          <div className="mt-3">
+            <CopilotPromptCard prompt={lesson.copilotPrompt} />
+          </div>
+        </details>
       </div>
 
       {/* Right: the template with inline slot inputs */}
@@ -126,7 +135,7 @@ export default function TemplateSlotsExercise({
           <h3 className="text-sm font-semibold uppercase tracking-sf-wide text-sf-subtle">
             {lesson.intro?.artifactName || 'Deliverable'}
           </h3>
-          <div className="mt-2 whitespace-pre-wrap rounded-md bg-sf-surface-subtle p-3 font-mono text-sm leading-7 text-sf-body">
+          <div className="mt-2 whitespace-pre-wrap rounded-md bg-sf-surface-subtle p-2.5 font-mono text-xs leading-5 text-sf-body">
             {segments.map((segment, index) => {
               if (segment.kind === 'text') {
                 return <span key={index}>{segment.value}</span>
@@ -144,7 +153,7 @@ export default function TemplateSlotsExercise({
                   placeholder={slot ? slot.label : segment.id}
                   title={slot?.hint}
                   size={Math.max(slot ? slot.label.length : 8, 8)}
-                  className={`mx-0.5 inline-block rounded border px-1.5 py-0.5 align-baseline font-mono text-sm ${
+                  className={`mx-0.5 inline-block rounded border px-1.5 py-0 align-baseline font-mono text-xs ${
                     failed
                       ? 'border-sf-warning bg-sf-progress-weak text-sf-progress-text'
                       : ok
@@ -215,15 +224,6 @@ export default function TemplateSlotsExercise({
               )}
             </div>
           ))}
-
-        <details className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
-          <summary className="cursor-pointer text-sm text-sf-body">
-            Need help? Show Copilot prompt
-          </summary>
-          <div className="mt-3">
-            <CopilotPromptCard prompt={lesson.copilotPrompt} />
-          </div>
-        </details>
       </div>
     </div>
   )
