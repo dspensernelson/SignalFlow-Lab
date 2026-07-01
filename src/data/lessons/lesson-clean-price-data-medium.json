@@ -1,0 +1,69 @@
+{
+  "id": "lesson-clean-price-data-medium",
+  "nodeId": "clean-price-data",
+  "title": "Clean a Feed That Fights Back",
+  "difficulty": "Medium",
+  "skill": "Dedupe, coercion & dropping bad rows",
+  "clock": "6:20 AM",
+  "scenario": "It is 6:20 AM. Today's feed arrived with a duplicate row, a decimal value, inconsistent formatting, and one row missing a required value. Your job is the same as always - emit a table downstream math can trust - but today the feed fights back.",
+  "inputType": "text",
+  "inputLabel": "Raw Price Rows (as delivered)",
+  "input": "hub, peak, settled\nercot , $204/MWh, $151/MWh\nERCOT, $204/MWh, $151/MWh\nspp, 98.5 /MWh, $90/MWh\nMISO, $77/MWh,\nwaue, $63/MWh, $58/MWh\n\nDesk rule: one row per hub. A row missing a required value is DROPPED from the clean table (never guessed, never zero-filled) and reported through the exception process - do not include MISO in your output.",
+  "instructions": [
+    "Deduplicate: the two ERCOT rows are the same reading delivered twice - keep one.",
+    "Coerce every price to a plain number; decimals are valid numbers.",
+    "MISO is missing its settled price: drop the row entirely per the desk rule.",
+    "Emit ERCOT, SPP, and WAUE only, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n]",
+  "validation": {
+    "type": "jsonRows",
+    "keyField": "hub",
+    "rowFields": ["hub", "peakPrice", "settledPrice"],
+    "numericFields": ["peakPrice", "settledPrice"],
+    "expectedRows": [
+      { "hub": "ERCOT", "peakPrice": 204, "settledPrice": 151 },
+      { "hub": "SPP", "peakPrice": 98.5, "settledPrice": 90 },
+      { "hub": "WAUE", "peakPrice": 63, "settledPrice": 58 }
+    ]
+  },
+  "copilotPrompt": "Normalize these rows into a JSON array of { hub, peakPrice, settledPrice } with plain numbers. Deduplicate the repeated ERCOT row, keep the SPP decimal as 98.5, and DROP the MISO row because its settled value is missing - do not guess or zero-fill it.",
+  "successMessage": "Clean table built. Three trustworthy rows beat four rows with a lie in one of them.",
+  "intro": {
+    "heading": "Before you build: quality means saying no",
+    "sections": [
+      {
+        "title": "Duplicates are silent double-counts",
+        "body": "The feed delivered the ERCOT reading twice. If both rows survive, anything that sums or averages this table is wrong by construction. Dedupe is the first pass of any real cleaning step."
+      },
+      {
+        "title": "A missing value poisons the row",
+        "body": "MISO has no settled price. Zero-filling it would make MISO look like it crashed; guessing would make the table a fiction. The desk rule is the industry rule: drop the row from the trusted table and report it as an exception."
+      },
+      {
+        "title": "Numbers come in shapes",
+        "body": "98.5 is as valid a number as 204. Coercion means handling decimals, stray spaces, and missing symbols - not just stripping one dollar sign the way the Easy tier did."
+      }
+    ],
+    "jsonExample": "[\n  { \"hub\": \"PJM\", \"peakPrice\": 120.5, \"settledPrice\": 110 }\n]",
+    "skill": "Dedupe, coercion & dropping bad rows",
+    "artifactName": "clean-prices.json"
+  },
+  "fieldGuide": [
+    { "field": "hub", "meaning": "One row per hub that survives cleaning.", "type": "string", "hint": "Three hubs survive. Which one does not, and why?" },
+    { "field": "peakPrice", "meaning": "Peak price as a plain number.", "type": "number", "hint": "Watch the SPP decimal." },
+    { "field": "settledPrice", "meaning": "Settled price as a plain number.", "type": "number", "hint": "If a row has no settled value, the row does not belong here." }
+  ],
+  "takeaway": {
+    "heading": "Clean table built the hard way",
+    "points": [
+      "You deduplicated a double-delivered reading before it could double-count.",
+      "You dropped a poisoned row instead of guessing - the clean table now contains only claims it can stand behind.",
+      "You coerced heterogeneous formats (decimals, stray spaces, missing symbols) into uniform numbers.",
+      "Downstream steps see three trustworthy hubs; the dropped row belongs to the exception process, not the trusted table.",
+      "The workflow can now keep its numeric trust boundary even when the feed misbehaves."
+    ],
+    "artifactName": "clean-prices.json"
+  }
+}

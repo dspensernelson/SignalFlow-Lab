@@ -1,0 +1,84 @@
+{
+  "id": "lesson-intake-hard",
+  "nodeId": "market-intake-record",
+  "title": "Migrate the Intake Record to Schema v2",
+  "difficulty": "Hard",
+  "skill": "Schema versioning & migration",
+  "clock": "6:15 AM",
+  "scenario": "The desk approved a breaking change to the intake schema: v2 renames a field, splits prices into value plus unit, and stamps every record with its schema version. Three downstream consumers read this record. Your job: migrate a v1 record to v2 exactly - because 'almost migrated' breaks consumers in ways 'not migrated' never does.",
+  "inputType": "text",
+  "inputLabel": "v1 Record + v2 Migration Spec",
+  "input": "Existing v1 record (market-intake.json):\n{ \"hub\": \"ERCOT\", \"peakPrice\": \"$187/MWh\", \"settledPrice\": \"$142/MWh\", \"generationFlag\": \"Wind underperformed\", \"approvalRequired\": true }\n\nMigration spec v1 -> v2 (approved by the Desk Manager):\n1. Add schemaVersion: \"2.0.0\" - every record must self-identify from now on.\n2. Prices become plain numbers; the unit moves to a single priceUnit field: \"USD/MWh\".\n3. generationFlag is RENAMED to operatingSignal (same value; the old name confused readers - it was never a boolean flag).\n4. approvalRequired is unchanged.\n5. Add migratedFrom: \"1.0.0\" so the record's history is traceable.",
+  "instructions": [
+    "Apply all five migration rules to the v1 record - no more, no less.",
+    "Strip price formatting: the numbers become plain numbers, the unit becomes its own field.",
+    "Rename generationFlag to operatingSignal, keeping its value.",
+    "Stamp schemaVersion and migratedFrom.",
+    "Return the migrated v2 record, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["schemaVersion", "hub", "peakPrice", "settledPrice", "priceUnit", "operatingSignal", "approvalRequired", "migratedFrom"],
+    "expected": {
+      "hub": "ERCOT",
+      "approvalRequired": true
+    },
+    "acceptedValues": {
+      "schemaVersion": ["2.0.0"],
+      "peakPrice": ["187"],
+      "settledPrice": ["142"],
+      "priceUnit": ["USD/MWh", "usd/mwh", "$/MWh"],
+      "operatingSignal": ["Wind underperformed", "wind underperformed", "Wind generation underperformed", "wind generation underperformed"],
+      "migratedFrom": ["1.0.0"]
+    }
+  },
+  "copilotPrompt": "Migrate this v1 intake record to v2: add schemaVersion 2.0.0, make peakPrice and settledPrice plain numbers with the unit in a separate priceUnit field (USD/MWh), rename generationFlag to operatingSignal keeping its value, keep approvalRequired, and add migratedFrom 1.0.0.",
+  "successMessage": "Record migrated to v2. Every downstream consumer can now check schemaVersion before reading - the contract is explicit.",
+  "intro": {
+    "heading": "Before you build: schemas are contracts, and contracts change",
+    "sections": [
+      {
+        "title": "Why breaking changes get versions",
+        "body": "Risk Evaluation, Approval Decision, and the Morning Brief all read this record. Rename a field silently and they break silently. Stamp schemaVersion on every record and consumers can check the contract before trusting the contents - the difference between an upgrade and an outage."
+      },
+      {
+        "title": "A migration is a mapping, not a rewrite",
+        "body": "Every v2 field traces to a v1 field or to the spec: renamed (generationFlag to operatingSignal), reshaped (price strings to number plus unit), added (schemaVersion, migratedFrom), or carried (approvalRequired, hub). If you cannot name a field's origin, you are inventing data."
+      },
+      {
+        "title": "Why the rename happened",
+        "body": "generationFlag was never a boolean - the name lied about the type. Renaming to operatingSignal is the kind of small honesty that prevents the next engineer's wrong assumption. Naming debt is real debt."
+      },
+      {
+        "title": "migratedFrom is the paper trail",
+        "body": "A record that says migratedFrom 1.0.0 can be audited against its origin. When migrations go wrong at scale, this field is how you find which records to fix."
+      }
+    ],
+    "jsonExample": "{\n  \"schemaVersion\": \"2.0.0\",\n  \"peakPrice\": 120,\n  \"priceUnit\": \"USD/MWh\",\n  \"migratedFrom\": \"1.0.0\"\n}",
+    "skill": "Schema versioning & migration",
+    "artifactName": "market-intake.json"
+  },
+  "fieldGuide": [
+    { "field": "schemaVersion", "meaning": "The contract this record honors.", "type": "string", "hint": "Rule 1 of the spec." },
+    { "field": "hub", "meaning": "Carried over unchanged.", "type": "string", "hint": "Not every field changes in a migration." },
+    { "field": "peakPrice", "meaning": "Now a plain number.", "type": "number", "hint": "The formatting moved to priceUnit." },
+    { "field": "settledPrice", "meaning": "Now a plain number.", "type": "number", "hint": "Same reshape as peakPrice." },
+    { "field": "priceUnit", "meaning": "The unit both prices share.", "type": "string", "hint": "Rule 2 names it exactly." },
+    { "field": "operatingSignal", "meaning": "The renamed field, value unchanged.", "type": "string", "hint": "Rule 3: new name, old value." },
+    { "field": "approvalRequired", "meaning": "Unchanged by the migration.", "type": "boolean", "hint": "Rule 4." },
+    { "field": "migratedFrom", "meaning": "The version this record came from.", "type": "string", "hint": "Rule 5." }
+  ],
+  "takeaway": {
+    "heading": "Schema migrated without breakage",
+    "points": [
+      "You executed a breaking change as a disciplined mapping: rename, reshape, add, carry - every v2 field traceable to its origin.",
+      "schemaVersion turns an implicit contract into a checkable one; consumers can refuse records they do not understand.",
+      "migratedFrom preserves lineage, which is what makes bad migrations findable and fixable at scale.",
+      "This is the change-management pattern behind every API version bump and every database migration you will ever run.",
+      "The workflow can now evolve its core record's contract without breaking the consumers that trust it."
+    ],
+    "artifactName": "market-intake.json"
+  }
+}

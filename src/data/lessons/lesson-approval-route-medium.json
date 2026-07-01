@@ -1,0 +1,79 @@
+{
+  "id": "lesson-approval-route-medium",
+  "nodeId": "approval-route",
+  "title": "Approval with the Approver Away",
+  "difficulty": "Medium",
+  "skill": "Delegation & substitution records",
+  "clock": "6:40 AM",
+  "scenario": "It is 6:40 AM. Today's brief needs sign-off, the request went out - and the Desk Manager is out of office. The approval template names a delegate for exactly this case. Capture the response AND the substitution, because 'who was asked' and 'who answered' are different facts today.",
+  "inputType": "text",
+  "inputLabel": "Desk Channel Exchange",
+  "input": "[6:39 AM] Meridian Workflow -> Desk Manager\nSubject: APPROVAL NEEDED: ERCOT 15.9% - morning brief\nERCOT moved 15.9 percent day-over-day, above the 14 percent escalation threshold (policy v1.1.0). Please respond within 30 minutes.\n\n[6:40 AM] Automatic reply from Desk Manager:\nOut of office until Thursday. For desk approvals contact the Deputy Desk Manager (named delegate, approval template v1.0.0).\n\n[6:44 AM] Meridian Workflow -> Deputy Desk Manager\nSubject: APPROVAL NEEDED: ERCOT 15.9% - morning brief (delegated)\n\n[6:47 AM] Deputy Desk Manager -> Meridian Workflow\nApproved. Flag the WAUE forecast gap in the ops section.",
+  "instructions": [
+    "Track the request through the redirect: who was asked first, who actually decided.",
+    "Record the substitution explicitly and its reason.",
+    "Capture the decision word and the time it arrived.",
+    "Return one JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["hub", "movePct", "sentTo", "decision", "decidedBy", "decidedAt", "substitution", "substitutionReason"],
+    "expected": {
+      "hub": "ERCOT",
+      "decision": "approved",
+      "sentTo": "Desk Manager",
+      "decidedBy": "Deputy Desk Manager"
+    },
+    "acceptedValues": {
+      "movePct": ["15.9", "15.9%"],
+      "decidedAt": ["6:47", "6:47 AM", "06:47"],
+      "substitution": ["true"],
+      "substitutionReason": ["out-of-office", "out of office", "ooo", "approver out of office"]
+    }
+  },
+  "copilotPrompt": "Capture this delegated approval as JSON with hub, movePct, sentTo (the original addressee), decision, decidedBy (who actually responded), decidedAt, substitution (true), and substitutionReason. The Desk Manager was out of office; the named delegate decided.",
+  "successMessage": "Delegated approval captured. The record shows who was asked, who answered, and why they differ - no archaeology required.",
+  "intro": {
+    "heading": "Before you build: asked and answered can differ",
+    "sections": [
+      {
+        "title": "Delegation is designed, not improvised",
+        "body": "The out-of-office reply did not send the workflow scrambling - the approval template already named a delegate. That is what governance buys: the exception path was decided before the exception happened."
+      },
+      {
+        "title": "The substitution is part of the record",
+        "body": "An auditor seeing 'Deputy Desk Manager approved' with sentTo 'Desk Manager' and no explanation smells a control failure. substitution: true with a reason turns the same facts into a documented, legitimate delegation."
+      },
+      {
+        "title": "Timeouts and redirects are normal",
+        "body": "Humans are the least reliable component in any workflow - not from malice, just vacations, meetings, and mornings. Mature handoffs assume this: deadline, delegate, and a record shape that can hold the detour."
+      }
+    ],
+    "jsonExample": "{\n  \"sentTo\": \"Site Manager\",\n  \"decidedBy\": \"Deputy Site Manager\",\n  \"substitution\": true,\n  \"substitutionReason\": \"out-of-office\"\n}",
+    "skill": "Delegation & substitution records",
+    "artifactName": "approval-route.json"
+  },
+  "fieldGuide": [
+    { "field": "hub", "meaning": "The hub that triggered escalation.", "type": "string", "hint": "In the subject line." },
+    { "field": "movePct", "meaning": "The move stated in the request.", "type": "string", "hint": "Policy v1.1.0 numbers now." },
+    { "field": "sentTo", "meaning": "Who was asked FIRST.", "type": "string", "hint": "The original addressee, not the delegate." },
+    { "field": "decision", "meaning": "The decision word from the reply.", "type": "string", "hint": "First word of the final message." },
+    { "field": "decidedBy", "meaning": "Who actually decided.", "type": "string", "hint": "Not the same person who was asked." },
+    { "field": "decidedAt", "meaning": "When the decision arrived.", "type": "string", "hint": "Timestamp of the final message." },
+    { "field": "substitution", "meaning": "Whether a delegate decided.", "type": "boolean", "hint": "Asked and answered differ today." },
+    { "field": "substitutionReason", "meaning": "Why the delegate decided.", "type": "string", "hint": "The automatic reply states it." }
+  ],
+  "takeaway": {
+    "heading": "Delegated approval captured",
+    "points": [
+      "You kept 'who was asked' and 'who answered' as separate facts - the difference IS the story of this approval.",
+      "The substitution is explicit and reasoned, turning a would-be control question into a documented delegation.",
+      "The template's named delegate meant the exception path was governed in advance, not invented at 6:40 AM.",
+      "The deputy's ops note (the WAUE gap) flows to the brief - exceptions from upstream keep surfacing downstream, which is exactly right.",
+      "The workflow can now survive an absent approver without losing auditability."
+    ],
+    "artifactName": "approval-route.json"
+  }
+}

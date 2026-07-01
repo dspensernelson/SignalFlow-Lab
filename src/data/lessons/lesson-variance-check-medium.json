@@ -1,0 +1,68 @@
+{
+  "id": "lesson-variance-check-medium",
+  "nodeId": "variance-check",
+  "title": "Variance with a Hole in the Data",
+  "difficulty": "Medium",
+  "skill": "Partial computation & honest exclusion",
+  "clock": "6:25 AM",
+  "scenario": "It is 6:25 AM. The clean table has three hubs, but the forecast file only covers two of them - WAUE was added to the desk last month and the forecast model does not know it yet. Compute what can be computed, and exclude what cannot, explicitly.",
+  "inputType": "text",
+  "inputLabel": "Actuals vs References (with a gap)",
+  "input": "hub, actual, forecast, priorDay\nERCOT, 204, 188, 176\nSPP, 98.5, 100, 97\nWAUE, 63, (no forecast), 59\n\nDesk rule: a variance row requires BOTH references. A hub missing a reference is excluded from the variance summary and reported through the exception process - do not fabricate a forecast for WAUE, and do not include a partial row.",
+  "instructions": [
+    "For each fully-referenced hub, compute vsForecast = actual - forecast and vsPriorDay = actual - priorDay.",
+    "Decimals are allowed and negatives are allowed.",
+    "WAUE has no forecast: exclude it entirely per the desk rule.",
+    "Return a JSON array with one object per computable hub, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n]",
+  "validation": {
+    "type": "jsonDeltas",
+    "keyField": "hub",
+    "requiredFields": ["hub", "vsForecast", "vsPriorDay"],
+    "numericFields": ["vsForecast", "vsPriorDay"],
+    "expectedRows": [
+      { "hub": "ERCOT", "vsForecast": 16, "vsPriorDay": 28 },
+      { "hub": "SPP", "vsForecast": -1.5, "vsPriorDay": 1.5 }
+    ]
+  },
+  "copilotPrompt": "Compute vsForecast = actual - forecast and vsPriorDay = actual - priorDay for each hub that has BOTH references. ERCOT: 204/188/176. SPP: 98.5/100/97. WAUE has no forecast, so exclude it entirely - do not fabricate a value. Return a JSON array of { hub, vsForecast, vsPriorDay }.",
+  "successMessage": "Variance computed where it could be, excluded where it could not - and the difference is visible instead of invented.",
+  "intro": {
+    "heading": "Before you build: compute honestly or not at all",
+    "sections": [
+      {
+        "title": "Partial data is the default",
+        "body": "New hubs, late files, renamed keys - real reference data has holes. The mature move is not heroics; it is a rule: compute the rows you can defend, exclude the ones you cannot, and say so."
+      },
+      {
+        "title": "Why exclusion beats invention",
+        "body": "Any number you invent for WAUE's vsForecast will be consumed downstream as if it were real. An absent row is a visible gap the workflow can route around; a fabricated value is an invisible error it cannot."
+      },
+      {
+        "title": "Decimals carry signal",
+        "body": "SPP came in at 98.5 against a forecast of 100 - a delta of -1.5. Rounding it away to 'about zero' would erase the direction. Keep the precision the sources gave you."
+      }
+    ],
+    "jsonExample": "[\n  { \"hub\": \"PJM\", \"vsForecast\": -2.5, \"vsPriorDay\": 4 }\n]",
+    "skill": "Partial computation & honest exclusion",
+    "artifactName": "variance-summary.json"
+  },
+  "fieldGuide": [
+    { "field": "hub", "meaning": "One row per hub with complete references.", "type": "string", "hint": "Two hubs qualify. One does not - why?" },
+    { "field": "vsForecast", "meaning": "actual - forecast.", "type": "number", "hint": "Negatives and decimals are part of the signal." },
+    { "field": "vsPriorDay", "meaning": "actual - priorDay.", "type": "number", "hint": "Compute from the input columns." }
+  ],
+  "takeaway": {
+    "heading": "Variance with a visible gap",
+    "points": [
+      "You computed defensible deltas for the hubs with complete references, keeping decimal precision.",
+      "You excluded WAUE instead of fabricating its forecast - the gap stays visible instead of becoming an invisible error.",
+      "The exclusion rule came from governance (both references required), not from your mood at 6:25 AM.",
+      "Risk Evaluation on this tier will still classify WAUE using the day-over-day data that DOES exist - different steps, different requirements.",
+      "The workflow can now produce partial-but-honest derived data when its references have holes."
+    ],
+    "artifactName": "variance-summary.json"
+  }
+}

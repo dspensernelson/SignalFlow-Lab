@@ -19,6 +19,16 @@ import lessonForecastData from './data/lessons/lesson-forecast-data.json'
 import lessonPriorDayReference from './data/lessons/lesson-prior-day-reference.json'
 import lessonPriorDayBriefTemplate from './data/lessons/lesson-prior-day-brief-template.json'
 import lessonMorningBrief from './data/lessons/lesson-morning-brief.json'
+import lessonIntakeMedium from './data/lessons/lesson-intake-medium.json'
+import lessonCleanPriceDataMedium from './data/lessons/lesson-clean-price-data-medium.json'
+import lessonThresholdPolicyMedium from './data/lessons/lesson-threshold-policy-medium.json'
+import lessonVarianceCheckMedium from './data/lessons/lesson-variance-check-medium.json'
+import lessonRiskEvaluationMedium from './data/lessons/lesson-risk-evaluation-medium.json'
+import lessonApprovalDecisionMedium from './data/lessons/lesson-approval-decision-medium.json'
+import lessonApprovalRouteMedium from './data/lessons/lesson-approval-route-medium.json'
+import lessonIntakeHard from './data/lessons/lesson-intake-hard.json'
+import lessonThresholdPolicyHard from './data/lessons/lesson-threshold-policy-hard.json'
+import lessonPriceFeedHard from './data/lessons/lesson-price-feed-hard.json'
 import ProjectCanvas from './components/ProjectCanvas'
 import LessonWorkspace from './components/LessonWorkspace'
 import ArtifactViewer from './components/ArtifactViewer'
@@ -57,6 +67,18 @@ const LESSONS = {
   'lesson-prior-day-reference': lessonPriorDayReference,
   'lesson-prior-day-brief-template': lessonPriorDayBriefTemplate,
   'lesson-morning-brief': lessonMorningBrief,
+  // Medium tier variants (resolved via tierLessonId: `${taskId}-medium`).
+  'lesson-intake-medium': lessonIntakeMedium,
+  'lesson-clean-price-data-medium': lessonCleanPriceDataMedium,
+  'lesson-threshold-policy-medium': lessonThresholdPolicyMedium,
+  'lesson-variance-check-medium': lessonVarianceCheckMedium,
+  'lesson-risk-evaluation-medium': lessonRiskEvaluationMedium,
+  'lesson-approval-decision-medium': lessonApprovalDecisionMedium,
+  'lesson-approval-route-medium': lessonApprovalRouteMedium,
+  // Hard tier variants (`${taskId}-hard`).
+  'lesson-intake-hard': lessonIntakeHard,
+  'lesson-threshold-policy-hard': lessonThresholdPolicyHard,
+  'lesson-price-feed-hard': lessonPriceFeedHard,
 }
 
 export default function App() {
