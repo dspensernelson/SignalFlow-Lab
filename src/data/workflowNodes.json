@@ -335,11 +335,11 @@
     "description": "Applies the threshold policy to the intake record, clean prices, and variance to produce a decision-ready risk view.",
     "lesson": {
       "type": "transformation",
-      "status": "later",
+      "status": "now",
       "intent": "Apply the threshold policy to the intake record, clean prices, and variance to emit the reusable risk-evaluation.json record.",
       "concepts": ["Rules engine", "Applying policy to data", "Decision-ready record"]
     },
-    "labVersion": "Built in a future phase - shown to reveal the full workflow shape.",
+    "labVersion": "Built by you in the Risk Evaluation task by applying the governed thresholds to today's day-over-day moves.",
     "realWorldSources": [
       "A rules function in code",
       "A risk engine or policy service"
@@ -356,7 +356,7 @@
     "reusedBy": ["approval-decision", "morning-brief"],
     "governanceNote": "Needs the agreed threshold values and read access to four upstream artifacts; the risk record should be auditable.",
     "auditNote": "Typed process but emits risk-evaluation.json; eventually split into Evaluate Risk (action) and Risk Evaluation Record (artifact). Highest fan-in (4 deps), so it sequences late.",
-    "taskId": null,
+    "taskId": "lesson-risk-evaluation",
     "artifactName": "risk-evaluation.json"
   },
   {
@@ -370,11 +370,11 @@
     "description": "A reusable template that shapes how an approval request is written when sign-off is needed.",
     "lesson": {
       "type": "governance",
-      "status": "intent",
+      "status": "now",
       "intent": "Define the reusable approval format and the required fields a sign-off request must contain.",
       "concepts": ["Output templating", "Reusable formats", "Required-field standards"]
     },
-    "labVersion": "Stubbed reference object for now.",
+    "labVersion": "Built by you in the Approval Template task by recording the desk's agreed request format as a versioned template.",
     "realWorldSources": [
       "A saved email or form template",
       "A documented approval format"
@@ -391,7 +391,7 @@
     "reusedBy": ["approval-route"],
     "governanceNote": "Needs agreement on required approval fields; the template standardizes what every approver sees.",
     "auditNote": "Could become interpretation instead of governance if the authored lesson has the learner read/apply a template rather than define one.",
-    "taskId": null,
+    "taskId": "lesson-approval-template",
     "artifactName": "approval-template.json"
   },
   {
@@ -405,11 +405,11 @@
     "description": "The branch point: does this movement require sign-off, or can it flow straight to the brief as routine?",
     "lesson": {
       "type": "decision",
-      "status": "later",
+      "status": "now",
       "intent": "Encode the if/else branch from the risk evaluation and log each decision for audit.",
       "concepts": ["Branching logic", "Thresholds", "Decision audit logging"]
     },
-    "labVersion": "Built in a future phase - shown to reveal the full workflow shape.",
+    "labVersion": "Built by you in the Approval Decision task by routing three mornings through the escalation fork and logging each decision.",
     "realWorldSources": [
       "A conditional in code",
       "A documented approval policy",
@@ -426,9 +426,9 @@
     ],
     "reusedBy": ["approval-route", "routine-update-path"],
     "governanceNote": "Needs the escalation threshold and knowledge of who can approve; every decision should be logged for audit.",
-    "auditNote": "The only true fork (two downstream branches); produces no artifact, so confirm the decision outcome is persisted for audit.",
-    "taskId": null,
-    "artifactName": null
+    "auditNote": "The only true fork (two downstream branches); the decision log is now persisted as decision-log.json for audit.",
+    "taskId": "lesson-approval-decision",
+    "artifactName": "decision-log.json"
   },
   {
     "id": "approval-route",
@@ -441,11 +441,11 @@
     "description": "When sign-off is needed, the request is routed to an approver and the response is captured before the brief goes out.",
     "lesson": {
       "type": "handoff",
-      "status": "later",
+      "status": "now",
       "intent": "Route a sign-off request to an approver and capture the yes/no response as approval-route.json.",
       "concepts": ["Handoff", "Human-in-the-loop approval", "Capturing a response"]
     },
-    "labVersion": "Built in a future phase - shown to reveal the full workflow shape.",
+    "labVersion": "Built by you in the Approval Route task by capturing the Desk Manager's chat response as a structured approval record.",
     "realWorldSources": [
       "An email or Teams approval request",
       "A ticket or workflow tool",
@@ -463,7 +463,7 @@
     "reusedBy": ["morning-brief"],
     "governanceNote": "Needs the ability to message the approver and a place to record the response; the response is an audit record.",
     "auditNote": "Emits approval-route.json but typed handoff (action yielding an artifact); real-world messaging integrations are out of MVP scope.",
-    "taskId": null,
+    "taskId": "lesson-approval-route",
     "artifactName": "approval-route.json"
   },
   {
@@ -477,11 +477,11 @@
     "description": "The other side of the branch: when no approval is needed, movement is logged as a routine note for the brief.",
     "lesson": {
       "type": "handoff",
-      "status": "later",
+      "status": "now",
       "intent": "Handle the no-approval branch: write a routine note when below threshold and keep it for the audit trail.",
       "concepts": ["Alternate-branch handling", "No-action logging", "Path symmetry"]
     },
-    "labVersion": "Built in a future phase - shown to reveal the full workflow shape.",
+    "labVersion": "Built by you in the Routine Update Path task by writing the system-authored log entry for a quiet morning.",
     "realWorldSources": [
       "A logged routine entry",
       "A no-action note on the desk"
@@ -496,9 +496,9 @@
     ],
     "reusedBy": ["morning-brief"],
     "governanceNote": "Needs a place to record routine outcomes; 'no action' must still be auditable.",
-    "auditNote": "The quiet branch, easy to under-teach; its value is that the non-escalation path is still logged.",
-    "taskId": null,
-    "artifactName": null
+    "auditNote": "The quiet branch, easy to under-teach; its value is that the non-escalation path is still logged as routine-log.json.",
+    "taskId": "lesson-routine-update-path",
+    "artifactName": "routine-log.json"
   },
   {
     "id": "prior-day-brief-template",
@@ -583,11 +583,11 @@
     "description": "The finished brief is delivered to the desk and stored for the record, seeding tomorrow's prior-day reference.",
     "lesson": {
       "type": "handoff",
-      "status": "later",
+      "status": "now",
       "intent": "Deliver the brief to the desk, archive it for the record, and seed tomorrow's prior-day baseline.",
       "concepts": ["Delivery", "Retention", "Audit trail", "Feedback loop"]
     },
-    "labVersion": "Built in a future phase - shown to reveal the full workflow shape.",
+    "labVersion": "Built by you in the Distribution / Archive task by recording the delivery, retention, and tomorrow-seeding run record.",
     "realWorldSources": [
       "An email or channel post",
       "A shared drive or document store",
@@ -605,7 +605,7 @@
     "reusedBy": ["prior-day-reference"],
     "governanceNote": "Needs send permission to the distribution list and write access to the archive; retention/audit policy applies.",
     "auditNote": "Action+thing ambiguity; recommend splitting into Distribution (handoff/action) and Archive (output/thing). Likely the first map shape change after the audit.",
-    "taskId": null,
-    "artifactName": null
+    "taskId": "lesson-distribution-archive",
+    "artifactName": "archive-record.json"
   }
 ]
