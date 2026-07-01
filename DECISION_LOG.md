@@ -30,6 +30,31 @@ Short record of product and implementation decisions. Keep entries factual and b
 - `Clean Price Data` is the third buildable node and teaches normalization/type coercion through `lesson-clean-price-data`; added the additive `jsonRows` validator (top-level array, required row fields, numeric coercion, expected rows present) producing `clean-prices.json`.
 - `Variance Check` is the fourth buildable node and teaches derived fields/deltas and material variance through `lesson-variance-check`; added the additive `jsonDeltas` validator (top-level array, expected hub rows present, required delta fields, numeric delta coercion, expected delta values, and an optional boolean `material` flag validated only when included) producing `variance-summary.json`. Chose to store an explicit artifact so Risk Evaluation later consumes an auditable signal instead of recomputing deltas.
 
+## 2026-07-01 (curriculum master plan pass)
+
+- Adopted the 10-module curriculum model: modules are SCENARIO-BASED (different
+  business domains), each with easy/medium/hard tiers. Difficulty is depth on the
+  SAME workflow map (easy = operate the pattern, medium = handle the mess, hard =
+  own the design), not new territory. See CURRICULUM_MASTER_PLAN.md.
+- End goal confirmed as personal mastery + portfolio product; commercialization
+  stays parked.
+- Module 1 Easy = the existing 17-node Meridian map, one lesson per node. The 13
+  unbuilt lessons are fully scripted in curriculum/module-01/easy/ with complete
+  lesson JSON, ready for a builder.
+- Approved two new ADDITIVE interaction types to cover inspection/interpretation
+  and assembly lesson types: choiceCheck (deterministic quiz minting a profile
+  artifact) and templateSlots (fill a governed template from stored artifacts,
+  rendering a string artifact). Spec: ENGINE_ADDITIONS_SPEC.md. Existing validator
+  matching rules remain frozen.
+- All other new lessons reuse existing validators (jsonDeltas for risk-evaluation
+  and approval-decision, jsonPolicy for approval-template, jsonFields for the
+  handoff/archive records).
+- Canon data for Module 1 fixed in curriculum/module-01/easy/_OVERVIEW.md
+  (hubs, prices, forecast, prior day, pct moves, approval at 6:41 AM by the Desk
+  Manager, day-1/2/3 decision cases).
+- Deferred per NODE_AUDIT: distribution-archive node split and risk-evaluation
+  split stay single nodes through Module 1 Easy; revisit before Medium.
+
 ## 2026-07-01 (visual / design-system pass)
 
 - Adopted the design system in `Mock Ups/SignalFlow Lab Design System/` as the visual source of truth. Copied its tokens into `src/styles/tokens/` (palette, node-types, typography, spacing, semantic) and import them in `src/index.css` before the Tailwind directives.
