@@ -1,0 +1,84 @@
+{
+  "id": "lesson-price-feed-hard",
+  "nodeId": "price-feed",
+  "title": "Handle the Morning the Feed Breaks",
+  "difficulty": "Hard",
+  "skill": "Failure handling & incident records",
+  "clock": "6:20 AM",
+  "scenario": "The feed contract you profiled at Easy tier just got violated twice in one morning: the file is late, and when it finally lands, one row is malformed. The brief still ships at 7:00. Your job is to execute the runbook and produce the incident record that proves the failure was handled, not hidden.",
+  "inputType": "text",
+  "inputLabel": "Incident Timeline + Runbook",
+  "input": "Timeline:\n- 6:15 AM: feed expected. Nothing arrives.\n- 6:20 AM: workflow detects the feed is late and opens an incident.\n- 6:42 AM: feed arrives. The SPP row is malformed - its settled column reads 'n/a'.\n\nRunbook for feed incidents:\n1. Log the incident with expected and actual arrival times.\n2. Malformed rows are QUARANTINED - held aside untouched for the vendor to inspect. Never dropped silently, never guessed.\n3. The brief proceeds in DEGRADED mode and must say so - readers deserve to know today's numbers are partial.\n4. Notify the Risk Desk Lead (owner of upstream data quality).",
+  "instructions": [
+    "Work through the runbook in order - each numbered step maps to fields in the record.",
+    "Record the timing facts: expected, detected, arrived.",
+    "Record what was wrong, what was done with the bad row, and the brief's mode.",
+    "Record who was notified.",
+    "Return one JSON object - the incident record - then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["incidentType", "expectedAt", "detectedAt", "arrivedAt", "malformedRowHub", "malformedRowAction", "briefMode", "notified"],
+    "expected": {
+      "malformedRowHub": "SPP",
+      "notified": "Risk Desk Lead"
+    },
+    "acceptedValues": {
+      "incidentType": ["late-feed", "late feed", "feed-late", "price-feed-late"],
+      "expectedAt": ["6:15", "6:15 AM", "06:15"],
+      "detectedAt": ["6:20", "6:20 AM", "06:20"],
+      "arrivedAt": ["6:42", "6:42 AM", "06:42"],
+      "malformedRowAction": ["quarantine", "quarantined"],
+      "briefMode": ["degraded"]
+    }
+  },
+  "copilotPrompt": "Write a feed-incident record as JSON with incidentType, expectedAt, detectedAt, arrivedAt, malformedRowHub, malformedRowAction, briefMode, and notified, following this runbook: quarantine malformed rows, run the brief in degraded mode, notify the data-quality owner.",
+  "successMessage": "Incident handled and recorded. The workflow failed gracefully, visibly, and on schedule - which is what resilience actually means.",
+  "intro": {
+    "heading": "Before you build: failure is a mode, not a surprise",
+    "sections": [
+      {
+        "title": "Contracts break; runbooks answer",
+        "body": "At Easy tier you read the feed's contract. Hard tier is the morning the contract is violated. Mature automation does not prevent every failure - it decides IN ADVANCE what each failure means and what happens next. That decision, written down, is a runbook."
+      },
+      {
+        "title": "Quarantine beats both alternatives",
+        "body": "Drop the SPP row silently and nobody learns the vendor has a problem. Guess its value and the brief lies. Quarantine - hold the row untouched, visibly - preserves both the evidence and the truth."
+      },
+      {
+        "title": "Degraded mode is honest shipping",
+        "body": "The brief ships at 7:00 with partial data AND SAYS SO. Readers who know the numbers are partial can act accordingly; readers who are not told cannot. Silent degradation is the failure mode that destroys trust in automation."
+      },
+      {
+        "title": "Detection is its own timestamp",
+        "body": "The feed was due at 6:15; the workflow NOTICED at 6:20. That five-minute gap is a measurable property of your monitoring - which is why detectedAt is its own field, distinct from expectedAt."
+      }
+    ],
+    "jsonExample": "{\n  \"incidentType\": \"late-feed\",\n  \"malformedRowAction\": \"quarantine\",\n  \"briefMode\": \"degraded\",\n  \"notified\": \"Risk Desk Lead\"\n}",
+    "skill": "Failure handling & incident records",
+    "artifactName": "source-profile-price-feed.json"
+  },
+  "fieldGuide": [
+    { "field": "incidentType", "meaning": "What kind of failure this was.", "type": "string", "hint": "The feed missed its window." },
+    { "field": "expectedAt", "meaning": "When the contract said the feed arrives.", "type": "string", "hint": "From the timeline's first line." },
+    { "field": "detectedAt", "meaning": "When the workflow noticed.", "type": "string", "hint": "Distinct from expected - the gap measures your monitoring." },
+    { "field": "arrivedAt", "meaning": "When the feed actually landed.", "type": "string", "hint": "From the timeline." },
+    { "field": "malformedRowHub", "meaning": "Which row violated the contract.", "type": "string", "hint": "Its settled column reads 'n/a'." },
+    { "field": "malformedRowAction", "meaning": "What the runbook does with bad rows.", "type": "string", "hint": "Not dropped, not guessed." },
+    { "field": "briefMode", "meaning": "How today's brief ships.", "type": "string", "hint": "Partial data, and it says so." },
+    { "field": "notified", "meaning": "Who was told.", "type": "string", "hint": "The owner of upstream data quality." }
+  ],
+  "takeaway": {
+    "heading": "Graceful failure, on the record",
+    "points": [
+      "You executed a failure path that was designed before the failure happened - the defining trait of resilient automation.",
+      "The bad row is quarantined evidence, not a silent gap or a plausible lie.",
+      "The brief ships degraded and says so: honest partial output beats punctual fiction.",
+      "The incident record captures detection lag, actions, and notification - everything a postmortem needs, written while it happened.",
+      "The workflow can now break visibly and recover gracefully instead of failing silently."
+    ],
+    "artifactName": "source-profile-price-feed.json"
+  }
+}

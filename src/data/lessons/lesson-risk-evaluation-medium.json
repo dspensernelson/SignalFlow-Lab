@@ -1,0 +1,69 @@
+{
+  "id": "lesson-risk-evaluation-medium",
+  "nodeId": "risk-evaluation",
+  "title": "Compute and Classify Under the New Policy",
+  "difficulty": "Medium",
+  "skill": "Deriving and applying rules in one pass",
+  "clock": "6:30 AM",
+  "scenario": "It is 6:30 AM. At Easy tier the percent moves were handed to you. Not today: you have raw actuals, raw prior-day values, and the freshly versioned 1.1.0 policy (routine 6, escalation 14). Compute each hub's move, round it the way the desk rounds, and classify it.",
+  "inputType": "text",
+  "inputLabel": "Policy v1.1.0 + Raw Values",
+  "input": "Threshold Policy v1.1.0 (day-over-day percent move, size of the move regardless of direction):\n- Under 6 percent: normal.\n- 6 percent or more, but under 14: routine.\n- 14 percent or more: escalate.\n\nRaw values (actual vs prior day):\nERCOT: actual 204, prior day 176\nSPP: actual 98.5, prior day 97\nWAUE: actual 63, prior day 59\n\nDesk rounding rule: pctMove = (actual - priorDay) / priorDay * 100, rounded to 1 decimal place.",
+  "instructions": [
+    "Compute each hub's pctMove with the desk formula and round to 1 decimal.",
+    "ERCOT: (204-176)/176*100. SPP: (98.5-97)/97*100. WAUE: (63-59)/59*100.",
+    "Classify each hub against the 1.1.0 bands (6 and 14), using the size of the move.",
+    "Return a JSON array with one object per hub, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n]",
+  "validation": {
+    "type": "jsonDeltas",
+    "keyField": "hub",
+    "requiredFields": ["hub", "pctMove", "status"],
+    "numericFields": ["pctMove"],
+    "expectedRows": [
+      { "hub": "ERCOT", "pctMove": 15.9, "status": "escalate" },
+      { "hub": "SPP", "pctMove": 1.5, "status": "normal" },
+      { "hub": "WAUE", "pctMove": 6.8, "status": "routine" }
+    ]
+  },
+  "copilotPrompt": "For each hub compute pctMove = (actual - priorDay) / priorDay * 100 rounded to 1 decimal, then classify with bands: under 6 normal, 6 to under 14 routine, 14 or more escalate. ERCOT 204/176, SPP 98.5/97, WAUE 63/59. Return a JSON array of { hub, pctMove, status }.",
+  "successMessage": "Risk record computed and classified under policy 1.1.0 - the same workflow, correctly obeying a changed rule.",
+  "intro": {
+    "heading": "Before you build: the formula is part of the rule",
+    "sections": [
+      {
+        "title": "Rounding is a governed choice",
+        "body": "15.909 and 15.9 and 16 are three different claims. The desk rounds to 1 decimal - not because it is right in the abstract, but because every step agreeing on one rounding rule is what keeps records comparable."
+      },
+      {
+        "title": "New version, new behavior",
+        "body": "Under 1.0.0, WAUE's 6.8 percent move would have been routine and ERCOT's 15.9 would still escalate - but a 13 percent day would have flipped. You are watching a policy change propagate through unchanged workflow logic. That separation is the whole point of config-as-rules."
+      },
+      {
+        "title": "Classify on size, report with sign",
+        "body": "Same discipline as Easy tier: the bands care about magnitude, the record keeps direction. A rule you learned once now holds under harder arithmetic."
+      }
+    ],
+    "jsonExample": "[\n  { \"hub\": \"PJM\", \"pctMove\": 7.2, \"status\": \"routine\" }\n]",
+    "skill": "Deriving and applying rules in one pass",
+    "artifactName": "risk-evaluation.json"
+  },
+  "fieldGuide": [
+    { "field": "hub", "meaning": "One row per hub.", "type": "string", "hint": "All three hubs have day-over-day data." },
+    { "field": "pctMove", "meaning": "The desk-formula percent move, rounded to 1 decimal.", "type": "number", "hint": "Round the final result, not the intermediates." },
+    { "field": "status", "meaning": "Classification under policy 1.1.0.", "type": "string", "hint": "normal, routine, or escalate - the bands are 6 and 14 now." }
+  ],
+  "takeaway": {
+    "heading": "Risk classified under the changed rule",
+    "points": [
+      "You derived the percent moves yourself, with the desk's rounding rule as part of the computation contract.",
+      "You applied version 1.1.0's bands - and saw how a policy change alters outcomes without any workflow logic changing.",
+      "WAUE was excluded from variance (no forecast) but classified here (day-over-day data exists) - two steps with different data requirements, both honest.",
+      "ERCOT escalates again; the routing tier ahead will handle it with a complication.",
+      "The workflow can now derive and classify risk under whichever policy version is in force."
+    ],
+    "artifactName": "risk-evaluation.json"
+  }
+}

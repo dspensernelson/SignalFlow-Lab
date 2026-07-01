@@ -1,0 +1,82 @@
+{
+  "id": "lesson-threshold-policy-hard",
+  "nodeId": "threshold-policy",
+  "title": "Design the Thresholds from Evidence",
+  "difficulty": "Hard",
+  "skill": "Designing rules from historical data",
+  "clock": "6:25 AM",
+  "scenario": "Nobody hands you numbers this time. You have one quarter of historical daily moves and two design constraints from the desk. YOU choose the thresholds, and you defend the choice in writing - because at Hard tier, you are not applying the policy, you are the person the policy comes from.",
+  "inputType": "text",
+  "inputLabel": "One Quarter of History + Design Constraints",
+  "input": "Biggest day-over-day percent move (absolute), last 60 trading days, sorted:\n1.1, 1.4, 1.8, 2.0, 2.3, 2.5, 2.8, 3.0, 3.1, 3.4, 3.6, 3.9, 4.0, 4.2, 4.4, 4.7, 4.9, 5.0, 5.2, 5.5, 5.6, 5.8, 6.0, 6.1, 6.3, 6.6, 6.8, 7.0, 7.2, 7.5, 7.7, 8.0, 8.2, 8.5, 8.8, 9.0, 9.3, 9.6, 10.0, 10.4, 10.8, 11.2, 11.6, 12.0, 12.5, 13.0, 13.6, 14.2, 14.9, 15.7, 16.5, 17.4, 18.4, 19.5, 20.7, 22.0, 23.4, 24.9, 26.5, 28.2\n\nDesk constraints:\n1. Escalations should be RARE: roughly the top 10 percent of days (about 6 of these 60) should have escalated, no more.\n2. Routine notes should catch meaningful movement without drowning the brief: somewhere between a third and a half of days making the brief's routine section is acceptable.\n\nGovernance: owner Risk Desk Lead, changes approved by Desk Manager. This is a redesign from evidence: version 2.0.0. Your rationale must reference the data.",
+  "instructions": [
+    "Study the distribution: where do the top ~6 days begin? Where does 'meaningful movement' plausibly start?",
+    "Choose escalationThreshold so roughly 6 of 60 days would have escalated.",
+    "Choose routineThreshold so roughly 20 to 30 of 60 days would have been noted.",
+    "Write a rationale that cites the data (counts of days), not vibes.",
+    "Record owner, approver, and version 2.0.0, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n}",
+  "validation": {
+    "type": "jsonPolicy",
+    "requiredFields": [
+      "policyName",
+      "version",
+      "owner",
+      "approver",
+      "routineThreshold",
+      "escalationThreshold",
+      "rationale"
+    ],
+    "numericFields": ["routineThreshold", "escalationThreshold"],
+    "nonEmptyFields": ["policyName", "version", "owner", "approver", "rationale"],
+    "ordering": { "greater": "escalationThreshold", "than": "routineThreshold" }
+  },
+  "copilotPrompt": "Design a threshold policy from 60 days of historical moves. Choose escalationThreshold so about the top 6 days would have escalated, and routineThreshold so about 20-30 days would have been noted. Return JSON with policyName, version 2.0.0, owner, approver, both thresholds as numbers, and a rationale that cites day counts from the data.",
+  "successMessage": "Policy designed from evidence. The thresholds are yours - and the rationale means they can be challenged, defended, and revised.",
+  "intro": {
+    "heading": "Before you design: rules come from distributions",
+    "sections": [
+      {
+        "title": "Where thresholds actually come from",
+        "body": "Every threshold you applied in earlier tiers was once someone staring at a distribution asking 'where does normal end?'. Today that someone is you. The honest method: pick the outcome you want (escalations rare, notes useful) and read the numbers backwards to the boundary."
+      },
+      {
+        "title": "The constraints do not decide for you",
+        "body": "Several threshold pairs satisfy the desk's constraints - 15 or 16 for escalation both leave about six days on top; routine anywhere near 5 to 7 lands in the acceptable band. Design means choosing within the acceptable region and OWNING the choice. The validator checks your policy's shape and governance, not your exact numbers - the numbers are yours to defend."
+      },
+      {
+        "title": "A rationale is a falsifiable claim",
+        "body": "'Feels right' cannot be challenged. 'At 16, exactly 5 of the last 60 days would have escalated' can be checked, argued with, and revised when next quarter's data lands. Cite counts."
+      },
+      {
+        "title": "Version 2.0.0, not 1.2.0",
+        "body": "This is not a tweak to inherited numbers - it is a redesign from evidence. Major version. The numbering itself communicates what kind of change happened."
+      }
+    ],
+    "jsonExample": "{\n  \"policyName\": \"ERCOT Hub Threshold Policy\",\n  \"version\": \"2.0.0\",\n  \"routineThreshold\": 6,\n  \"escalationThreshold\": 16,\n  \"rationale\": \"At 16, 5 of 60 days escalate (top ~8%); at 6, 23 of 60 days are noted (~38%).\"\n}",
+    "skill": "Designing rules from historical data",
+    "artifactName": "threshold-policy.json"
+  },
+  "fieldGuide": [
+    { "field": "policyName", "meaning": "The policy you are redesigning.", "type": "string", "hint": "Same policy, new foundation." },
+    { "field": "version", "meaning": "Major bump for a redesign.", "type": "string", "hint": "2.0.0 - the intro explains why." },
+    { "field": "owner", "meaning": "Who owns the policy.", "type": "string", "hint": "Stated in the governance line." },
+    { "field": "approver", "meaning": "Who approves changes.", "type": "string", "hint": "Stated in the governance line." },
+    { "field": "routineThreshold", "meaning": "Your chosen routine band, as a number.", "type": "number", "hint": "About 20-30 of 60 days should land at or above it." },
+    { "field": "escalationThreshold", "meaning": "Your chosen escalation band, as a number.", "type": "number", "hint": "About 6 of 60 days should land at or above it." },
+    { "field": "rationale", "meaning": "Your defense, citing day counts.", "type": "string", "hint": "Count the days above each of your boundaries and say so." }
+  ],
+  "takeaway": {
+    "heading": "You are now where rules come from",
+    "points": [
+      "You derived thresholds from a distribution and outcome constraints - the actual method behind every alerting rule, credit limit, and SLA you will ever meet.",
+      "Your numbers are choices inside an acceptable region, and your rationale makes them falsifiable: cite counts, invite challenge.",
+      "The governance shape (owner, approver, version, rationale) is what separates a designed rule from a magic number in code.",
+      "Next quarter's data may move these boundaries - and because the rationale cites evidence, the next redesign starts from method, not archaeology.",
+      "The workflow can now be governed by rules whose origins are evidence, not folklore."
+    ],
+    "artifactName": "threshold-policy.json"
+  }
+}

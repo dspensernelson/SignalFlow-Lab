@@ -68,8 +68,20 @@ export const BUILT_LESSON_IDS_BY_TIER = {
     'lesson-prior-day-brief-template',
     'lesson-morning-brief',
   ],
-  medium: [],
-  hard: [],
+  medium: [
+    'lesson-intake-medium',
+    'lesson-clean-price-data-medium',
+    'lesson-threshold-policy-medium',
+    'lesson-variance-check-medium',
+    'lesson-risk-evaluation-medium',
+    'lesson-approval-decision-medium',
+    'lesson-approval-route-medium',
+  ],
+  hard: [
+    'lesson-intake-hard',
+    'lesson-threshold-policy-hard',
+    'lesson-price-feed-hard',
+  ],
 }
 
 // Back-compat alias (easy tier), still used by older callers/tests.
