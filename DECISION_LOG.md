@@ -55,6 +55,31 @@ Short record of product and implementation decisions. Keep entries factual and b
 - Deferred per NODE_AUDIT: distribution-archive node split and risk-evaluation
   split stay single nodes through Module 1 Easy; revisit before Medium.
 
+## 2026-07-01 (module-01-tiers implementation pass)
+
+- Built all 13 remaining Module 1 Easy lessons: Easy is now 17/17 playable.
+- Added two additive validators + workspaces: choiceCheck (inspection/
+  interpretation quizzes minting source-profile artifacts) and templateSlots
+  (assembly with an artifact shelf; renders a string artifact). jsonEditor
+  path untouched; existing validator matching rules untouched.
+- Added the difficulty-tier engine: signalflow_tier in localStorage, per-tier
+  storage keys (easy keeps legacy keys), tierLessonId convention
+  (taskId-medium / taskId-hard), tier-aware isBuildable, Easy/Medium/Hard
+  switch in the canvas app bar. progress.js helpers default to the active
+  tier so components did not need changes.
+- Authored + built 7 Medium lessons on a new internally-consistent messier
+  canon (conflicting notes, explicit nulls, dropped rows, policy v1.1.0 at
+  6/14, WAUE hub, negative boundary case, out-of-office delegation). Canon
+  recorded in curriculum/module-01/medium/_OVERVIEW.md.
+- Authored + built 3 Hard lessons (intake schema v2 migration, threshold
+  design from 60 days of history with cited rationale, price-feed failure
+  handling). Deliberate choice: design lessons validate SHAPE + GOVERNANCE
+  (ordering, non-empty rationale), not exact values - the values are the
+  learner's design. Remaining hard work incl. the solo-rebuild capstone is
+  scoped in curriculum/module-01/hard/_OVERVIEW.md.
+- Smoke tests: every new lesson validated with a correct answer (passes,
+  artifact stored) and a wrong answer (fails, bounded message).
+
 ## 2026-07-01 (visual / design-system pass)
 
 - Adopted the design system in `Mock Ups/SignalFlow Lab Design System/` as the visual source of truth. Copied its tokens into `src/styles/tokens/` (palette, node-types, typography, spacing, semantic) and import them in `src/index.css` before the Tailwind directives.
