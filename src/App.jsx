@@ -32,6 +32,9 @@ import {
   startNode,
   completeNode,
   restartNode,
+  loadTier,
+  saveTier,
+  tierLessonId,
 } from './lib/progress'
 import { loadTheme, saveTheme, applyTheme } from './lib/theme'
 
@@ -57,6 +60,7 @@ const LESSONS = {
 }
 
 export default function App() {
+  const [tier, setTier] = useState(() => loadTier())
   const [progress, setProgress] = useState(() => loadProgress())
   const [artifacts, setArtifacts] = useState(() => loadArtifacts())
   const [view, setView] = useState('canvas') // 'canvas' | 'lesson' | 'artifact'
@@ -91,18 +95,37 @@ export default function App() {
     setNotice(null)
   }
 
+  // Switching tiers swaps the whole working set: lessons resolve to the tier's
+  // variants and progress/artifacts load from the tier's own storage keys.
+  function handleTierChange(nextTier) {
+    if (nextTier === tier) return
+    saveTier(nextTier)
+    setTier(nextTier)
+    const freshProgress = loadProgress(nextTier)
+    setProgress(freshProgress)
+    setArtifacts(loadArtifacts(nextTier))
+    setActiveLessonId(null)
+    setNotice(null)
+    setSelectedNodeId(getDefaultSelectedNodeId(freshProgress))
+    setView('canvas')
+  }
+
   function openLesson(nodeId) {
     const node = nodes.find((n) => n.id === nodeId)
-    const lesson = node && LESSONS[node.taskId]
+    const lesson = node && LESSONS[tierLessonId(node.taskId, tier)]
 
     if (!lesson) {
       // NOTE: task-shaped nodes can be inspected, but only built lessons launch this pass.
-      setNotice('This task is not built yet.')
+      setNotice(
+        tier === 'easy'
+          ? 'This task is not built yet.'
+          : `This task is not built for the ${tier} tier yet.`
+      )
       return
     }
 
     setProgress((prev) => startNode(prev, nodeId))
-    setActiveLessonId(node.taskId)
+    setActiveLessonId(lesson.id)
     setView('lesson')
     setNotice(null)
   }
@@ -189,6 +212,8 @@ export default function App() {
         progress={progress}
         selectedNodeId={selectedNodeId}
         theme={theme}
+        tier={tier}
+        onTierChange={handleTierChange}
         onToggleTheme={toggleTheme}
         onSelect={handleSelect}
         onStart={openLesson}
