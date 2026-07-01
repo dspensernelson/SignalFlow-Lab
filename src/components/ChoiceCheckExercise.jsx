@@ -73,7 +73,9 @@ export default function ChoiceCheckExercise({
           <h3 className="text-sm font-semibold uppercase tracking-sf-wide text-sf-subtle">
             Inspection questions
           </h3>
-          <div className="mt-2 flex flex-col gap-3">
+          {/* Two-per-row grid keeps 4-5 questions + readiness on screen at 800px
+              (no-scroll rule), including the wrong-answer state. */}
+          <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-2">
             {questions.map((question, index) => {
               const result = resultByQuestion[question.id]
               const failed = Boolean(result && !result.passed)
@@ -81,7 +83,7 @@ export default function ChoiceCheckExercise({
               return (
                 <fieldset
                   key={question.id}
-                  className={`rounded-md border p-2.5 ${
+                  className={`rounded-md border p-2 ${
                     failed
                       ? 'border-sf-warning bg-sf-progress-weak'
                       : ok
@@ -89,21 +91,21 @@ export default function ChoiceCheckExercise({
                         : 'border-sf-border-subtle bg-sf-surface-subtle'
                   }`}
                 >
-                  <legend className="px-1 text-sm font-medium text-sf-body">
+                  <legend className="px-1 text-xs font-semibold text-sf-body">
                     {index + 1}. {question.prompt}
                   </legend>
-                  <div className="mt-1 flex flex-col gap-1">
+                  <div className="mt-0.5 flex flex-col gap-0.5">
                     {question.options.map((option) => (
                       <label
                         key={option.id}
-                        className="flex cursor-pointer items-start gap-2 rounded px-1 py-0.5 text-sm text-sf-body hover:bg-sf-surface"
+                        className="flex cursor-pointer items-start gap-1.5 rounded px-1 py-0.5 text-xs leading-snug text-sf-body hover:bg-sf-surface"
                       >
                         <input
                           type="radio"
                           name={question.id}
                           checked={selections[question.id] === option.id}
                           onChange={() => select(question.id, option.id)}
-                          className="mt-1 accent-current"
+                          className="mt-0.5 accent-current"
                         />
                         <span>{option.text}</span>
                       </label>

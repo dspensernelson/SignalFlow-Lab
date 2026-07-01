@@ -88,11 +88,13 @@ export const BUILT_LESSON_IDS_BY_TIER = {
 export const BUILT_LESSON_IDS = BUILT_LESSON_IDS_BY_TIER.easy
 
 // A node is buildable in the active tier when it has a task wired to a lesson
-// built for that tier.
-export function isBuildable(node, tier = loadTier()) {
+// built for that tier. Non-tier second arguments (e.g. the index Array#filter
+// passes when this is used as a callback) fall back to the active tier.
+export function isBuildable(node, tier) {
+  const activeTier = TIERS.includes(tier) ? tier : loadTier()
   if (!node.taskId) return false
-  const built = BUILT_LESSON_IDS_BY_TIER[tier] || []
-  return built.includes(tierLessonId(node.taskId, tier))
+  const built = BUILT_LESSON_IDS_BY_TIER[activeTier] || []
+  return built.includes(tierLessonId(node.taskId, activeTier))
 }
 
 // Initial progress only tracks buildable task nodes; everything else is derived.
