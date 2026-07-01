@@ -1,9 +1,18 @@
 // localStorage read/write helpers and runtime workflow-status derivation.
+//
+// Difficulty tiers: the same workflow map runs at three depths (easy, medium,
+// hard). The active tier is persisted under signalflow_tier and read by every
+// helper, so components never need to thread it through props. Easy keeps the
+// original storage keys for backward compatibility; medium/hard use suffixed
+// keys so each tier has independent progress and artifacts.
 
 import nodes from '../data/workflowNodes.json'
 
 export const PROGRESS_KEY = 'signalflow_progress'
 export const ARTIFACTS_KEY = 'signalflow_artifacts'
+export const TIER_KEY = 'signalflow_tier'
+
+export const TIERS = ['easy', 'medium', 'hard']
 
 export const STATUS = {
   CONTEXT: 'context', // inspectable source/reference object, not completable
@@ -13,86 +22,122 @@ export const STATUS = {
   COMPLETE: 'complete',
 }
 
-// Lessons that are actually built in this version. Keep in sync with App's LESSONS.
-export const BUILT_LESSON_IDS = [
-  'lesson-intake',
-  'lesson-threshold-policy',
-  'lesson-clean-price-data',
-  'lesson-variance-check',
-  'lesson-risk-evaluation',
-  'lesson-approval-template',
-  'lesson-approval-decision',
-  'lesson-approval-route',
-  'lesson-routine-update-path',
-  'lesson-distribution-archive',
-  'lesson-analyst-notes',
-  'lesson-trader-flag',
-  'lesson-price-feed',
-  'lesson-forecast-data',
-  'lesson-prior-day-reference',
-  'lesson-prior-day-brief-template',
-  'lesson-morning-brief',
-]
+export function loadTier() {
+  try {
+    const raw = localStorage.getItem(TIER_KEY)
+    return TIERS.includes(raw) ? raw : 'easy'
+  } catch {
+    return 'easy'
+  }
+}
 
-// A node is buildable now when it has a task wired to a built lesson.
-export function isBuildable(node) {
-  return Boolean(node.taskId) && BUILT_LESSON_IDS.includes(node.taskId)
+export function saveTier(tier) {
+  if (TIERS.includes(tier)) localStorage.setItem(TIER_KEY, tier)
+}
+
+// Easy keys are unsuffixed so pre-tier progress carries over.
+function keyFor(base, tier) {
+  return tier === 'easy' ? base : `${base}_${tier}`
+}
+
+// Node taskIds name the easy lesson; medium/hard lesson ids follow the
+// convention `${taskId}-${tier}` (e.g. lesson-intake -> lesson-intake-medium).
+export function tierLessonId(taskId, tier = loadTier()) {
+  if (!taskId) return null
+  return tier === 'easy' ? taskId : `${taskId}-${tier}`
+}
+
+// Lessons that are actually built, per tier. Keep in sync with App's LESSONS.
+export const BUILT_LESSON_IDS_BY_TIER = {
+  easy: [
+    'lesson-intake',
+    'lesson-threshold-policy',
+    'lesson-clean-price-data',
+    'lesson-variance-check',
+    'lesson-risk-evaluation',
+    'lesson-approval-template',
+    'lesson-approval-decision',
+    'lesson-approval-route',
+    'lesson-routine-update-path',
+    'lesson-distribution-archive',
+    'lesson-analyst-notes',
+    'lesson-trader-flag',
+    'lesson-price-feed',
+    'lesson-forecast-data',
+    'lesson-prior-day-reference',
+    'lesson-prior-day-brief-template',
+    'lesson-morning-brief',
+  ],
+  medium: [],
+  hard: [],
+}
+
+// Back-compat alias (easy tier), still used by older callers/tests.
+export const BUILT_LESSON_IDS = BUILT_LESSON_IDS_BY_TIER.easy
+
+// A node is buildable in the active tier when it has a task wired to a lesson
+// built for that tier.
+export function isBuildable(node, tier = loadTier()) {
+  if (!node.taskId) return false
+  const built = BUILT_LESSON_IDS_BY_TIER[tier] || []
+  return built.includes(tierLessonId(node.taskId, tier))
 }
 
 // Initial progress only tracks buildable task nodes; everything else is derived.
-function buildInitialProgress() {
+function buildInitialProgress(tier) {
   const progress = {}
-  nodes.filter(isBuildable).forEach((node) => {
+  nodes.filter((n) => isBuildable(n, tier)).forEach((node) => {
     progress[node.id] = STATUS.READY
   })
   return progress
 }
 
 // Ensures every buildable node has a stored status.
-function reconcile(progress) {
+function reconcile(progress, tier) {
   const next = { ...progress }
-  nodes.filter(isBuildable).forEach((node) => {
+  nodes.filter((n) => isBuildable(n, tier)).forEach((node) => {
     if (!next[node.id]) next[node.id] = STATUS.READY
   })
   return next
 }
 
-export function loadProgress() {
+export function loadProgress(tier = loadTier()) {
   try {
-    const raw = localStorage.getItem(PROGRESS_KEY)
+    const raw = localStorage.getItem(keyFor(PROGRESS_KEY, tier))
     if (!raw) {
-      const initial = buildInitialProgress()
-      saveProgress(initial)
+      const initial = buildInitialProgress(tier)
+      saveProgress(initial, tier)
       return initial
     }
-    return reconcile(JSON.parse(raw))
+    return reconcile(JSON.parse(raw), tier)
   } catch {
-    const initial = buildInitialProgress()
-    saveProgress(initial)
+    const initial = buildInitialProgress(tier)
+    saveProgress(initial, tier)
     return initial
   }
 }
 
-export function saveProgress(progress) {
-  localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress))
+export function saveProgress(progress, tier = loadTier()) {
+  localStorage.setItem(keyFor(PROGRESS_KEY, tier), JSON.stringify(progress))
 }
 
-export function loadArtifacts() {
+export function loadArtifacts(tier = loadTier()) {
   try {
-    const raw = localStorage.getItem(ARTIFACTS_KEY)
+    const raw = localStorage.getItem(keyFor(ARTIFACTS_KEY, tier))
     return raw ? JSON.parse(raw) : {}
   } catch {
     return {}
   }
 }
 
-export function saveArtifacts(artifacts) {
-  localStorage.setItem(ARTIFACTS_KEY, JSON.stringify(artifacts))
+export function saveArtifacts(artifacts, tier = loadTier()) {
+  localStorage.setItem(keyFor(ARTIFACTS_KEY, tier), JSON.stringify(artifacts))
 }
 
-export function clearStorage() {
-  localStorage.removeItem(PROGRESS_KEY)
-  localStorage.removeItem(ARTIFACTS_KEY)
+// Clears progress and artifacts for the active tier only.
+export function clearStorage(tier = loadTier()) {
+  localStorage.removeItem(keyFor(PROGRESS_KEY, tier))
+  localStorage.removeItem(keyFor(ARTIFACTS_KEY, tier))
 }
 
 // Resolves the visual status of a workflow node from stored progress + its type.
@@ -117,7 +162,7 @@ export function getDefaultSelectedNodeId(progress) {
     (n) => isBuildable(n) && progress[n.id] === STATUS.IN_PROGRESS
   )
   if (inProgress) return inProgress.id
-  const buildable = nodes.find(isBuildable)
+  const buildable = nodes.find((n) => isBuildable(n))
   return buildable ? buildable.id : nodes[0].id
 }
 

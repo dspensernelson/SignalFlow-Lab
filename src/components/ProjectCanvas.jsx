@@ -1,7 +1,37 @@
 import WorkflowGraph from './WorkflowGraph'
 import NodeDetail from './NodeDetail'
-import { STATUS, isBuildable, deriveNodeStatus } from '../lib/progress'
+import { STATUS, TIERS, isBuildable, deriveNodeStatus } from '../lib/progress'
 import { Logo, ThemeToggle, StatItem, Button, Icon } from './ui'
+
+const TIER_LABELS = { easy: 'Easy', medium: 'Medium', hard: 'Hard' }
+
+// Compact segmented control for the difficulty tier. Same map, three depths:
+// easy operates the pattern, medium handles the mess, hard owns the design.
+function TierSwitch({ value, onChange }) {
+  return (
+    <div
+      role="group"
+      aria-label="Difficulty tier"
+      className="inline-flex items-center rounded-full border border-sf-border bg-sf-surface-subtle p-0.5"
+    >
+      {TIERS.map((t) => (
+        <button
+          key={t}
+          type="button"
+          onClick={() => onChange(t)}
+          aria-pressed={value === t}
+          className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
+            value === t
+              ? 'bg-sf-surface text-sf-text shadow-sf-sm'
+              : 'text-sf-muted hover:text-sf-body'
+          }`}
+        >
+          {TIER_LABELS[t]}
+        </button>
+      ))}
+    </div>
+  )
+}
 
 const PROJECT_GOAL =
   'Build a workplace automation that turns messy overnight market inputs into an approval-ready 7:00 AM brief. The map below is the real dependency graph — phases on the left feed objects that get reused, evaluated, and routed downstream. Click any node to see how that piece gets built and reused.'
@@ -13,6 +43,8 @@ export default function ProjectCanvas({
   progress,
   selectedNodeId,
   theme,
+  tier = 'easy',
+  onTierChange,
   onToggleTheme,
   onSelect,
   onStart,
@@ -58,6 +90,7 @@ export default function ProjectCanvas({
               <Icon name="clock" size={13} />
               6:15 AM CT
             </span>
+            {onTierChange && <TierSwitch value={tier} onChange={onTierChange} />}
             <ThemeToggle value={theme} onChange={onToggleTheme} />
             <Button variant="neutral" size="sm" icon="rotate-cw" onClick={onReset} disabled={!anyProgress}>
               Start Over
