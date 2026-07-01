@@ -32,11 +32,23 @@ The historical MVP was accepted against `signalflow-lab-mvp-spec-v2.md`: one com
 ## Current Architecture
 
 - Phase-banded workflow graph driven by `src/data/phases.json`, `src/data/workflowNodes.json`, and `src/data/workflowEdges.json`.
-- Buildable task nodes are tracked in localStorage under `signalflow_progress`; artifacts are stored under `signalflow_artifacts`; theme preference is stored under `signalflow_theme`.
-- The current interactive tasks are `lesson-intake`, attached to `market-intake-record`; `lesson-threshold-policy`, attached to `threshold-policy`; `lesson-clean-price-data`, attached to `clean-price-data`; and `lesson-variance-check`, attached to `variance-check`.
-- Every workflow node has a lesson intent; only nodes with built task IDs are completion-tracked today.
-- Future interactive nodes remain visible but locked/stubbed.
+- Three difficulty tiers (easy/medium/hard) share the map. The active tier is
+  persisted under `signalflow_tier`; each tier has independent progress and
+  artifacts (`signalflow_progress` / `signalflow_artifacts` for easy - the
+  legacy keys - and `_medium` / `_hard` suffixed keys for the others). Theme
+  preference is stored under `signalflow_theme`.
+- Tier lesson variants resolve by convention in `src/lib/progress.js`
+  (`tierLessonId`): a node's `taskId` names its easy lesson; medium/hard
+  variants are `taskId-medium` / `taskId-hard`, registered in App's LESSONS
+  map and `BUILT_LESSON_IDS_BY_TIER`.
+- All 17 Module 1 nodes have built easy lessons. Interaction types:
+  `jsonEditor` (validators `jsonFields`, `jsonPolicy`, `jsonRows`,
+  `jsonDeltas`), `choiceCheck` (inspection/interpretation quizzes), and
+  `templateSlots` (assembly with an artifact shelf; stores a rendered string
+  artifact). Medium has 7 built lessons; hard has 3.
 - Lesson flow follows Intro -> Exercise -> Takeaway.
+- Curriculum sources of truth: `CURRICULUM_MASTER_PLAN.md` (modules/tiers),
+  `curriculum/module-01/<tier>/_OVERVIEW.md` (canon data + status per tier).
 
 ## Visual System
 
