@@ -481,11 +481,124 @@ function jsonDeltas(answer, validation) {
   }
 }
 
+// Inspection/interpretation quiz validator. Config-driven and additive: it does
+// NOT touch the JSON validators. The answer is a JSON string of
+// { questionId: optionId }. Each question yields one result row; wrong answers
+// show the question's explain text without revealing the correct option. On
+// pass, the artifact is the author-defined artifactOnPass object (a source
+// profile), so inspection lessons still mint a stored artifact.
+function choiceCheck(answer, validation) {
+  let parsed
+  try {
+    parsed = JSON.parse(answer)
+  } catch {
+    parsed = {}
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) parsed = {}
+
+  const { questions = [], artifactOnPass = null } = validation
+  const results = []
+
+  questions.forEach((question, index) => {
+    const chosen = parsed[question.id]
+    let passed = false
+    let message
+    if (chosen === undefined || chosen === null || chosen === '') {
+      message = `Answer question ${index + 1} before validating.`
+    } else if (chosen === question.correctOptionId) {
+      passed = true
+      message = 'Correct.'
+    } else {
+      message = question.explain
+    }
+    results.push({
+      id: `choice-${question.id}`,
+      label: `Question ${index + 1}`,
+      passed,
+      message,
+    })
+  })
+
+  const passed = results.length > 0 && results.every((r) => r.passed)
+
+  return {
+    passed,
+    results,
+    artifact: passed ? artifactOnPass : null,
+  }
+}
+
+// Assembly validator. Config-driven and additive. The answer is a JSON string
+// of { slotId: value }. Numeric slots compare as numbers; text slots compare
+// normalized against expected/accepted. On pass, the artifact is the template
+// string with every {{slotId}} token replaced by the learner's value - a
+// rendered document, stored as a string artifact.
+function templateSlots(answer, validation) {
+  let parsed
+  try {
+    parsed = JSON.parse(answer)
+  } catch {
+    parsed = {}
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) parsed = {}
+
+  const { slots = [], template = '' } = validation
+  const results = []
+
+  slots.forEach((slot) => {
+    const raw = parsed[slot.id]
+    const strVal = raw === undefined || raw === null ? '' : String(raw).trim()
+    let passed = false
+    let message
+    if (!strVal) {
+      message = `Fill in: ${slot.label}.${slot.hint ? ` ${slot.hint}` : ''}`
+    } else if (slot.numeric) {
+      const num = Number(strVal)
+      passed = Number.isFinite(num) && num === slot.expected
+      message = passed
+        ? `${slot.label} matches the source artifact.`
+        : `${slot.label} does not match the source artifact.${slot.hint ? ` ${slot.hint}` : ''}`
+    } else {
+      const acceptedList =
+        slot.accepted || (slot.expected !== undefined ? [slot.expected] : [])
+      passed = acceptedList.map(normalize).includes(normalize(strVal))
+      message = passed
+        ? `${slot.label} matches the source artifact.`
+        : `${slot.label} does not match the source artifact.${slot.hint ? ` ${slot.hint}` : ''}`
+    }
+    results.push({
+      id: `slot-${slot.id}`,
+      label: slot.label,
+      passed,
+      message,
+    })
+  })
+
+  const passed = results.length > 0 && results.every((r) => r.passed)
+
+  let artifact = null
+  if (passed) {
+    artifact = template
+    slots.forEach((slot) => {
+      const value = String(parsed[slot.id]).trim()
+      artifact = artifact.split(`{{${slot.id}}}`).join(value)
+    })
+  }
+
+  return {
+    passed,
+    results,
+    artifact,
+  }
+}
+
 const validators = {
   jsonFields,
   jsonPolicy,
   jsonRows,
   jsonDeltas,
+  choiceCheck,
+  templateSlots,
   // Stubs for future build passes.
   csvColumns: null,
   ruleBuilder: null,

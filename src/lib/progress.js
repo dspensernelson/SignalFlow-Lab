@@ -25,6 +25,13 @@ export const BUILT_LESSON_IDS = [
   'lesson-approval-route',
   'lesson-routine-update-path',
   'lesson-distribution-archive',
+  'lesson-analyst-notes',
+  'lesson-trader-flag',
+  'lesson-price-feed',
+  'lesson-forecast-data',
+  'lesson-prior-day-reference',
+  'lesson-prior-day-brief-template',
+  'lesson-morning-brief',
 ]
 
 // A node is buildable now when it has a task wired to a built lesson.

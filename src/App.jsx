@@ -12,6 +12,13 @@ import lessonApprovalDecision from './data/lessons/lesson-approval-decision.json
 import lessonApprovalRoute from './data/lessons/lesson-approval-route.json'
 import lessonRoutineUpdatePath from './data/lessons/lesson-routine-update-path.json'
 import lessonDistributionArchive from './data/lessons/lesson-distribution-archive.json'
+import lessonAnalystNotes from './data/lessons/lesson-analyst-notes.json'
+import lessonTraderFlag from './data/lessons/lesson-trader-flag.json'
+import lessonPriceFeed from './data/lessons/lesson-price-feed.json'
+import lessonForecastData from './data/lessons/lesson-forecast-data.json'
+import lessonPriorDayReference from './data/lessons/lesson-prior-day-reference.json'
+import lessonPriorDayBriefTemplate from './data/lessons/lesson-prior-day-brief-template.json'
+import lessonMorningBrief from './data/lessons/lesson-morning-brief.json'
 import ProjectCanvas from './components/ProjectCanvas'
 import LessonWorkspace from './components/LessonWorkspace'
 import ArtifactViewer from './components/ArtifactViewer'
@@ -40,6 +47,13 @@ const LESSONS = {
   'lesson-approval-route': lessonApprovalRoute,
   'lesson-routine-update-path': lessonRoutineUpdatePath,
   'lesson-distribution-archive': lessonDistributionArchive,
+  'lesson-analyst-notes': lessonAnalystNotes,
+  'lesson-trader-flag': lessonTraderFlag,
+  'lesson-price-feed': lessonPriceFeed,
+  'lesson-forecast-data': lessonForecastData,
+  'lesson-prior-day-reference': lessonPriorDayReference,
+  'lesson-prior-day-brief-template': lessonPriorDayBriefTemplate,
+  'lesson-morning-brief': lessonMorningBrief,
 }
 
 export default function App() {
