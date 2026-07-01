@@ -1,5 +1,18 @@
 # Node Audit - Meridian Morning Market Brief
 
+> **STATUS UPDATE (2026-07-01, module-01-tiers).** This audit was written when
+> 4 lessons were interactive. As of the module-01-tiers branch, **all 17 nodes
+> are `[NOW]` at the Easy tier** (built from curriculum/module-01/easy/), and
+> difficulty tiers exist (Medium 7 built, Hard 3 built - see the per-tier
+> overviews in curriculum/module-01/). The per-node `[INTENT]`/`[LATER]`
+> markers below are preserved as the pre-build record; the analysis, lesson
+> types, governance notes, and open risks remain the curriculum source of
+> truth. Items resolved since the audit: item 8 (concept-overlap pairs are
+> disambiguated in the built lesson copy), item 9 (Approval Decision stores
+> decision-log.json; Routine Update Path stores routine-log.json), item 10
+> (price-feed and forecast-data have fixtures). Items still open: items 2-4
+> (node splits and the temporal-edge rendering check).
+>
 > **Purpose of this document.** A per-node curriculum audit of every workflow node currently on the Meridian map. It checks each node against the Product Doctrine (the map is the curriculum; **every node is a lesson**; artifacts are the unit of progress; connections reveal context; governance is part of automation) and the Selected Node Panel Contract.
 >
 > **Doctrine update reflected in this pass.** There is no longer any "inspect-only" node. Every node is a lesson - the *lesson type* is what differs. Each node is assigned exactly one lesson type from: **inspection, interpretation, build, transformation, decision, handoff, assembly, governance.**

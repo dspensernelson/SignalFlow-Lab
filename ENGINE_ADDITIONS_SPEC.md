@@ -1,5 +1,18 @@
 # Engine Additions Spec - Module 1 Easy
 
+> **IMPLEMENTED (2026-07-01, module-01-tiers).** Both interaction types are
+> built and verified live. Implementation deltas vs this spec, discovered
+> under the no-scroll rule at 1280x800:
+> 1. choiceCheck questions render in a 2-per-row grid with compact options
+>    (the single-column layout scrolled at 992px in the wrong-answer state).
+> 2. templateSlots uses tighter template type (text-xs leading-5), slim
+>    inline inputs, and the Copilot helper lives in the LEFT column (the
+>    right column scrolled at 943px otherwise).
+> 3. progress.js later gained difficulty tiers; isBuildable validates its
+>    second parameter because Array#filter passes an index into it.
+> The spec below otherwise matches what shipped; keep it as the contract for
+> future tier variants that reuse these interaction types.
+
 Implementation spec for the engine work needed to make all 17 Module 1 Easy lessons
 playable. Written to be executed by a junior or small-model builder without further
 design decisions. Keep ASCII-only.

@@ -1,9 +1,17 @@
 # Module 1 Easy - Meridian Morning Market Brief - Overview
 
+> **STATUS: ALL 17 LESSONS BUILT (2026-07-01, module-01-tiers).** Waves A, B,
+> and C below are implemented, smoke-tested, and verified live (incl. the
+> no-scroll rule in wrong-answer states). Only Wave D (polish deltas in
+> BUILT_LESSON_AUDITS.md) remains. This file stays authoritative for the
+> CANON DATA (section 2) - medium/hard lessons and future edits must not
+> contradict it. The per-lesson script files remain the design record for the
+> built lesson JSONs.
+
 This directory contains the complete lesson scripts for Module 1 Easy: 17 lessons,
-one per workflow node, in the pedagogical order from NODE_AUDIT.md. Four lessons are
-already built (audited in BUILT_LESSON_AUDITS.md); thirteen are scripted here and
-ready to implement per ENGINE_ADDITIONS_SPEC.md.
+one per workflow node, in the pedagogical order from NODE_AUDIT.md. Four lessons
+were built before this pass (audited in BUILT_LESSON_AUDITS.md); the other
+thirteen were scripted here and are now implemented per ENGINE_ADDITIONS_SPEC.md.
 
 Read this file before implementing ANY lesson: it holds the canon data every lesson
 must agree with, the narrative spine, and the build order. Keep ASCII-only.

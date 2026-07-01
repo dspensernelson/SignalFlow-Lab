@@ -165,17 +165,17 @@ Notes:
 
 ## Part 3 - Module 1 across the three tiers
 
-### 3.1 Module 1 Easy (current work)
+### 3.1 Module 1 Easy - COMPLETE (2026-07-01)
 
 17 lessons = the 17 nodes on the existing map, in the pedagogical order fixed in
-NODE_AUDIT.md item 7. Four are built (intake, threshold-policy, clean-price-data,
-variance-check); thirteen are scripted in curriculum/module-01/easy/ and ready to
-build. Two new interaction types are required (choiceCheck, templateSlots); every
-other new lesson reuses the four existing validators unchanged. See
-curriculum/module-01/easy/_OVERVIEW.md for the canon data, build order, and
-per-lesson theory.
+NODE_AUDIT.md item 7. ALL 17 ARE BUILT AND PASSING on the module-01-tiers
+branch, implemented from the scripts in curriculum/module-01/easy/. The two new
+interaction types (choiceCheck, templateSlots) are implemented per
+ENGINE_ADDITIONS_SPEC.md; every other lesson reuses the four original
+validators unchanged. Remaining Easy work is polish only (Wave D deltas in
+curriculum/module-01/easy/BUILT_LESSON_AUDITS.md).
 
-### 3.2 Module 1 Medium - "Handle the mess" (design sketch, author later)
+### 3.2 Module 1 Medium - "Handle the mess" (7 of 17 built; canon + status in curriculum/module-01/medium/_OVERVIEW.md)
 
 Same map plus three new exception-path nodes. Planned deltas per area:
 
@@ -200,7 +200,7 @@ Same map plus three new exception-path nodes. Planned deltas per area:
 New validator work for Medium: null-tolerant expected values and an
 enumerated-exception-code check (additive; specify before building).
 
-### 3.3 Module 1 Hard - "Own the design" (design sketch, author later)
+### 3.3 Module 1 Hard - "Own the design" (3 built; status + remaining in curriculum/module-01/hard/_OVERVIEW.md)
 
 Same map plus versioning/failure overlays:
 

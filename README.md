@@ -4,24 +4,44 @@ SignalFlow Lab is a local React learning app for practicing workplace automation
 
 The first project is **Meridian Morning Market Brief**, a fictional energy-market workflow that turns messy overnight market inputs into an approval-ready 7:00 AM brief.
 
-## Current Status (2026-07-01)
+## Current Status (2026-07-01, second pass - module-01-tiers)
 
 Where things stand if you are picking this back up:
 
-- **Four lessons are buildable and passing**: Market Intake Record, Threshold Policy, Clean Price Data, Variance Check. All validators, lesson JSON, progress model, and localStorage keys are stable.
-- **The app is fully reskinned** to the design system in `Mock Ups/SignalFlow Lab Design System/` (tokens + in-house UI primitives in `src/components/ui/`), with a persisted **light/dark theme** toggle.
-- **Signal flow is the visual language**: `SignalFlowDiagram` shows inputs converging into the artifact and fanning out to consumers. Connectors were tuned so the artifact card is the hero (Takeaway = the one strong flow; Intro/Artifact Viewer/strip are subtle). Flow labels sit on top of cards and are never covered.
-- **No-scroll hard rule** (Exercise screens, innerHeight >= 800, wrong-answer state) is verified at overflow 0 for all four lessons in both themes.
-- **Open work is on branch `takeaway-workflow-diagram`** (PR against `main`). The live Vercel site (https://signal-flow-lab.vercel.app) is from an earlier build; redeploy is intentionally out of scope for this batch.
-- **Next candidate**: author Risk Evaluation (fan-in transformation consuming intake, clean prices, variance, and threshold policy). Not started.
+- **Module 1 Easy is COMPLETE: all 17 lessons buildable and passing.** Six new
+  jsonEditor lessons reuse the four frozen validators; six inspection/
+  interpretation lessons use the new `choiceCheck` quiz interaction; the
+  Morning Brief capstone uses the new `templateSlots` assembly interaction
+  (artifact shelf + inline template slots, renders market-brief.md).
+- **Difficulty tiers are live**: Easy / Medium / Hard switch in the app bar.
+  Each tier has independent progress and artifacts (`signalflow_progress_medium`
+  etc.; Easy keeps the legacy keys). Tier lesson variants resolve by convention:
+  `lesson-intake` -> `lesson-intake-medium` / `lesson-intake-hard`.
+- **Medium tier: 7 of 17 built** on a messier canon (conflicting notes,
+  explicit nulls, dropped rows, policy v1.1.0 at 6/14, negative boundary case,
+  out-of-office delegation). Canon + remaining designs:
+  `curriculum/module-01/medium/_OVERVIEW.md`.
+- **Hard tier: 3 built** (intake schema v2 migration, threshold design from
+  history, feed-failure handling). Remaining work incl. the solo-rebuild
+  capstone: `curriculum/module-01/hard/_OVERVIEW.md`.
+- **No-scroll hard rule** verified live at 1280x800 in wrong-answer states for
+  the new interaction types (and previously for the original four lessons).
+- **Branches/PRs**: PR #1 = `takeaway-workflow-diagram` -> `main` (redesign +
+  curriculum docs). PR #2 = `module-01-tiers` -> `takeaway-workflow-diagram`
+  (all implementation above). The live Vercel site is from an earlier build;
+  redeploy is intentionally out of scope.
+- **Next candidates**: remaining 10 Medium lessons (quiz variants + template/
+  routine/brief/archive), Hard approval-timeout and degraded-brief lessons,
+  the Hard solo-rebuild capstone (needs artifact import), and Wave D polish
+  deltas in `curriculum/module-01/easy/BUILT_LESSON_AUDITS.md`.
 
 ## Current Product Model
 
-- The process map is the curriculum.
+- The process map is the curriculum; the 10-module long-range plan lives in
+  `CURRICULUM_MASTER_PLAN.md` (scenario-based modules x easy/medium/hard).
 - The canvas is a phase-banded workflow graph with sources, references, artifacts, processes, decisions, handoffs, outputs, and archive nodes.
 - Learners click workflow nodes to inspect provenance, lab simulation, access needs, reuse, and solo rebuild context.
-- Four tasks are currently buildable: `Market Intake Record`, `Threshold Policy`, `Clean Price Data`, and `Variance Check`.
-- Future nodes are visible with defined lesson intent but remain locked/stubbed until explicitly scoped.
+- All 17 Module 1 nodes are buildable at Easy; Medium/Hard variants unlock per node as they are authored.
 - The interface follows the `Mock Ups/SignalFlow Lab Design System/` tokens and ships a persisted light/dark theme toggle.
 
 ## Run Locally
@@ -42,9 +62,13 @@ npm run build
 
 ## Key Docs
 
+- `CURRICULUM_MASTER_PLAN.md` - the 10-module / 3-tier long-range plan, learning theory, engine roadmap, and builder handoff protocol.
+- `ENGINE_ADDITIONS_SPEC.md` - spec for the choiceCheck and templateSlots interaction types (implemented).
+- `curriculum/module-01/` - per-tier overviews (canon data, status) and the 13 Easy lesson scripts the built lessons came from.
 - `PRODUCT_DOCTRINE.md` - purpose, guiding principles, progression model, and quality bar.
 - `PROCESS_MAP_CURRICULUM_DIRECTION.md` - current phase-graph direction.
 - `PROJECT_CONTEXT.md` - product context, implementation boundaries, and visual system.
 - `DECISION_LOG.md` - dated record of product and implementation decisions.
-- `LESSON_DESIGN_FRAMEWORK.md` - lesson design method, screen templates, and the no-scroll rule.
+- `LESSON_DESIGN_FRAMEWORK.md` - lesson design method, screen templates, the no-scroll rule, and the session handoff.
+- `NODE_AUDIT.md` - per-node curriculum audit (statuses reflect the pre-build state; see its top note).
 - `signalflow-lab-mvp-spec-v2.md` - historical accepted MVP spec.
