@@ -1,0 +1,98 @@
+<!-- @dsCard group="Brand" viewport="700x580" name="Workflow taxonomy" subtitle="Eight object types + eight signal-flow primitives" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8" /><link rel="stylesheet" href="../styles.css" />
+<style>
+  html,body{margin:0}
+  body{background:var(--sf-bg);font-family:var(--sf-font-sans);padding:20px;color:var(--sf-text)}
+  .section-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sf-text-subtle);margin-bottom:10px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .r{display:flex;gap:10px;align-items:flex-start;background:var(--sf-surface);border:1px solid var(--sf-border);border-radius:var(--sf-radius-lg);padding:10px 12px;box-shadow:var(--sf-shadow-sm)}
+  .ic{width:20px;height:20px;flex-shrink:0;margin-top:1px}
+  .n{font-size:13px;font-weight:600}
+  .d{font-size:11px;color:var(--sf-text-muted);margin-top:2px;line-height:1.4}
+  svg{display:block}
+  .divider{border:none;border-top:1px solid var(--sf-border);margin:18px 0}
+  .prim-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .prim{display:flex;gap:8px;align-items:flex-start;background:var(--sf-surface);border:1px solid var(--sf-border);border-radius:var(--sf-radius-md);padding:8px 10px}
+  .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px}
+  .pn{font-size:12px;font-weight:600}
+  .pd{font-size:10px;color:var(--sf-text-muted);margin-top:2px;line-height:1.35}
+  .tag{display:inline-block;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:1px 5px;border-radius:2px;background:var(--sf-surface-inset);color:var(--sf-text-subtle);margin-left:4px;vertical-align:middle}
+</style></head>
+<body>
+
+<div class="section-lbl">Object types — the eight nodes on the workflow map</div>
+<div class="grid">
+  <div class="r">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="var(--sf-type-source)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+    <div><div class="n">Source</div><div class="d">Raw, unstructured input entering the workflow from the left.</div></div>
+  </div>
+  <div class="r">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="var(--sf-type-reference)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+    <div><div class="n">Reference</div><div class="d">Reusable policy, config, or threshold that governs steps.</div></div>
+  </div>
+  <div class="r">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="var(--sf-type-artifact)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>
+    <div><div class="n">Artifact</div><div class="d">A structured signal object — the unit of workflow progress.</div></div>
+  </div>
+  <div class="r">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="var(--sf-type-process)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+    <div><div class="n">Process</div><div class="d">A transformation step that operates on one or more artifacts.</div></div>
+  </div>
+  <div class="r">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="var(--sf-type-decision)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
+    <div><div class="n">Decision</div><div class="d">A branch or fork — sign-off or escalation determines the path.</div></div>
+  </div>
+  <div class="r">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="var(--sf-type-handoff)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+    <div><div class="n">Handoff</div><div class="d">Human-in-the-loop routing; captures a response and routes forward.</div></div>
+  </div>
+  <div class="r">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="var(--sf-type-output)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+    <div><div class="n">Output</div><div class="d">The delivered business result — the morning brief.</div></div>
+  </div>
+  <div class="r">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="var(--sf-type-archive)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+    <div><div class="n">Archive</div><div class="d">Retention and delivery record; seeds tomorrow's run. Often locked.</div></div>
+  </div>
+</div>
+
+<hr class="divider" />
+
+<div class="section-lbl">Signal-flow primitives — conceptual layer (no CSS tokens; documented only)</div>
+<div class="prim-grid">
+  <div class="prim">
+    <div class="dot" style="background:#f59e0b"></div>
+    <div><div class="pn">Raw signal</div><div class="pd">Unstructured input entering the workflow. Not yet extracted or normalized. Lives in a source node.</div></div>
+  </div>
+  <div class="prim">
+    <div class="dot" style="background:#06b6d4"></div>
+    <div><div class="pn">Extracted signal</div><div class="pd">A field or value pulled from a raw source and normalized into a usable form.</div></div>
+  </div>
+  <div class="prim">
+    <div class="dot" style="background:#059669"></div>
+    <div><div class="pn">Trusted artifact</div><div class="pd">A structured object that passed validation. Safe to reuse downstream without rebuilding.</div></div>
+  </div>
+  <div class="prim">
+    <div class="dot" style="background:#14b8a6"></div>
+    <div><div class="pn">Reuse path</div><div class="pd">A downstream node consuming a trusted artifact without rebuilding the upstream work.</div></div>
+  </div>
+  <div class="prim">
+    <div class="dot" style="background:#d97706"></div>
+    <div><div class="pn">Needs inputs</div><div class="pd">A node that can start once an upstream artifact exists. Blocked until inputs arrive.</div></div>
+  </div>
+  <div class="prim">
+    <div class="dot" style="background:#8b5cf6"></div>
+    <div><div class="pn">Governance signal</div><div class="pd">A policy, config, or threshold that controls workflow behavior. Usually a reference node.</div></div>
+  </div>
+  <div class="prim">
+    <div class="dot" style="background:#64748b"></div>
+    <div><div class="pn">Operational source of truth<span class="tag">conceptual</span></div><div class="pd">An artifact designated as the authoritative record that downstream systems trust.</div></div>
+  </div>
+  <div class="prim">
+    <div class="dot" style="background:#94a3b8"></div>
+    <div><div class="pn">Audit / provenance<span class="tag">conceptual</span></div><div class="pd">The record of who built what artifact, when, and from which upstream inputs.</div></div>
+  </div>
+</div>
+
+</body></html>

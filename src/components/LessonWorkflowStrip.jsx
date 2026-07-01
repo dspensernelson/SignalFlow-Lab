@@ -1,5 +1,6 @@
 import nodes from '../data/workflowNodes.json'
 import edges from '../data/workflowEdges.json'
+import { SignalFlowDiagram } from './ui'
 
 // Focused, local "what you built and who reuses it" strip.
 // Derives the neighborhood from the real workflow graph (not a linear chain):
@@ -17,27 +18,19 @@ function labelFor(id) {
   return nodeById[id]?.label || id
 }
 
-function Chip({ label, sublabel, tone }) {
+function Chip({ label, sublabel, tone, className = '' }) {
   const tones = {
-    current: 'border-emerald-300 bg-emerald-50 text-emerald-900',
-    currentOverview: 'border-blue-300 bg-blue-50 text-blue-900',
-    waiting: 'border-slate-200 bg-slate-50 text-slate-600',
-    ready: 'border-blue-200 bg-blue-50 text-blue-800',
-    context: 'border-gray-200 bg-white text-gray-600',
+    current: 'border-sf-complete bg-sf-complete-weak text-sf-complete-text',
+    currentOverview: 'border-sf-accent-border bg-sf-accent-weak text-sf-accent-text',
+    waiting: 'border-sf-border bg-sf-surface-subtle text-sf-muted',
+    ready: 'border-sf-accent-border bg-sf-accent-weak text-sf-accent-text',
+    context: 'border-sf-border bg-sf-surface text-sf-body',
   }
   return (
-    <div className={`min-w-[120px] rounded-md border px-3 py-2 text-center ${tones[tone]}`}>
+    <div className={`min-w-[120px] rounded-md border px-3 py-2 text-center ${tones[tone]} ${className}`}>
       <p className="text-xs font-semibold leading-tight">{label}</p>
       {sublabel && <p className="mt-0.5 text-[11px] leading-tight opacity-80">{sublabel}</p>}
     </div>
-  )
-}
-
-function Arrow() {
-  return (
-    <span aria-hidden="true" className="px-1 text-gray-300">
-      &rarr;
-    </span>
   )
 }
 
@@ -64,21 +57,21 @@ export default function LessonWorkflowStrip({ nodeId, mode = 'overview', directC
   // Takeaway: a compact consumer-card list (no linear arrow path that wraps awkwardly).
   if (mode === 'takeaway') {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-4">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Who reuses it</h3>
-        <p className="mt-1 text-xs text-gray-500">
+      <div className="rounded-xl border border-sf-border bg-sf-surface p-4 shadow-sf-sm">
+        <h3 className="text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">Who reuses it</h3>
+        <p className="mt-1 text-xs text-sf-muted">
           {labelFor(nodeId)} is now available to these steps:
         </p>
         <div className="mt-3 grid gap-2 sm:grid-cols-3">
           {downstream.map((id) => (
             <div
               key={id}
-              className={`rounded-md border border-l-2 border-gray-200 bg-gray-50 p-3 ${
-                consumerTone(id) === 'ready' ? 'border-l-blue-400' : 'border-l-slate-300'
+              className={`rounded-md border border-l-2 border-sf-border bg-sf-surface-subtle p-3 ${
+                consumerTone(id) === 'ready' ? 'border-l-sf-accent-border' : 'border-l-sf-border-strong'
               }`}
             >
-              <p className="text-sm font-semibold text-gray-800">{labelFor(id)}</p>
-              <p className="mt-1 text-xs text-gray-500">{consumerSublabel(id)}</p>
+              <p className="text-sm font-semibold text-sf-body">{labelFor(id)}</p>
+              <p className="mt-1 text-xs text-sf-muted">{consumerSublabel(id)}</p>
             </div>
           ))}
         </div>
@@ -90,28 +83,25 @@ export default function LessonWorkflowStrip({ nodeId, mode = 'overview', directC
   const currentSub = mode === 'takeaway' ? 'Created' : 'You build this'
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4">
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+    <div className="rounded-xl border border-sf-border bg-sf-surface p-4 shadow-sf-sm">
+      <h3 className="text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">
         {mode === 'takeaway' ? 'What you built, and who reuses it' : 'Workflow context'}
       </h3>
-      <div className="mt-3 flex flex-wrap items-center gap-y-3">
-        {upstream.map((id) => (
-          <div key={id} className="flex items-center">
-            <Chip label={labelFor(id)} tone="context" />
-            <Arrow />
-          </div>
-        ))}
-
-        <Chip label={labelFor(nodeId)} sublabel={currentSub} tone={currentTone} />
-
-        {downstream.length > 0 && <Arrow />}
-
-        {downstream.map((id, index) => (
-          <div key={id} className="flex items-center">
-            <Chip label={labelFor(id)} sublabel={consumerSublabel(id)} tone={consumerTone(id)} />
-            {index < downstream.length - 1 && <span className="px-1 text-gray-200">/</span>}
-          </div>
-        ))}
+      <div className="mt-3">
+        <SignalFlowDiagram
+          inputTone="upstream"
+          inputLabel="feeds"
+          outputTone="downstream"
+          outputLabel="reused by"
+          gap={48}
+          inputs={upstream.map((id) => (
+            <Chip key={id} label={labelFor(id)} tone="context" className="w-full" />
+          ))}
+          center={<Chip label={labelFor(nodeId)} sublabel={currentSub} tone={currentTone} className="w-full" />}
+          consumers={downstream.map((id) => (
+            <Chip key={id} label={labelFor(id)} sublabel={consumerSublabel(id)} tone={consumerTone(id)} className="w-full" />
+          ))}
+        />
       </div>
     </div>
   )

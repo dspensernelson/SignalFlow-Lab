@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { STATUS, deriveNodeStatus, derivePhaseStatus, isBuildable } from '../lib/progress'
 import { TYPE_COLOR } from '../lib/nodeStyles'
+import { Icon } from './ui'
 
 const NODE_W = 190
 const NODE_H = 84
@@ -21,25 +22,41 @@ const TYPE_LABEL = {
   archive: 'Archive',
 }
 
-// Base look by status + type, WITHOUT a ring (rings are reserved for relationships).
-function nodeBase(status, type) {
-  if (status === STATUS.CONTEXT) {
-    return type === 'reference'
-      ? 'border-violet-200 bg-violet-50 text-violet-950'
-      : 'border-amber-300 bg-amber-50 text-amber-950'
-  }
-  if (status === STATUS.READY) return 'border-blue-400 bg-white text-gray-900'
-  if (status === STATUS.IN_PROGRESS) return 'border-amber-400 bg-white text-gray-900'
-  if (status === STATUS.COMPLETE) return 'border-emerald-400 bg-emerald-50 text-gray-900'
-  return 'border-gray-200 bg-gray-50 text-gray-400'
+// Node-type identity icons (DS mapping) shown in each node's type row.
+const TYPE_ICON = {
+  source: 'file-text',
+  reference: 'shield',
+  artifact: 'braces',
+  process: 'line-chart',
+  decision: 'user-check',
+  handoff: 'send',
+  output: 'file-text',
+  archive: 'archive',
 }
 
-const PHASE_DOT = {
-  [STATUS.READY]: 'bg-blue-500',
-  [STATUS.IN_PROGRESS]: 'bg-amber-500',
-  [STATUS.COMPLETE]: 'bg-emerald-500',
-  [STATUS.LOCKED]: 'bg-gray-300',
-  [STATUS.CONTEXT]: 'bg-gray-300',
+// Base look by status + type, WITHOUT a ring (rings are reserved for relationships).
+function nodeClasses(status, type) {
+  if (status === STATUS.CONTEXT) {
+    return type === 'reference'
+      ? 'border-sf-type-reference bg-sf-context-weak text-sf-text'
+      : 'border-sf-type-source bg-sf-progress-weak text-sf-text'
+  }
+  if (status === STATUS.READY) return 'border-sf-accent-border bg-sf-surface text-sf-text'
+  if (status === STATUS.IN_PROGRESS) return 'border-sf-progress bg-sf-surface text-sf-text'
+  if (status === STATUS.COMPLETE) {
+    return type === 'artifact'
+      ? 'border-sf-trusted-border bg-sf-trusted-weak text-sf-text'
+      : 'border-sf-complete bg-sf-complete-weak text-sf-text'
+  }
+  return 'border-sf-border bg-sf-surface-subtle text-sf-muted'
+}
+
+const PHASE_DOT_VAR = {
+  [STATUS.READY]: 'var(--sf-ready)',
+  [STATUS.IN_PROGRESS]: 'var(--sf-progress)',
+  [STATUS.COMPLETE]: 'var(--sf-complete)',
+  [STATUS.LOCKED]: 'var(--sf-locked)',
+  [STATUS.CONTEXT]: 'var(--sf-locked)',
 }
 
 // Curved connector. Same-column edges bow into the right gutter so they never
@@ -60,12 +77,20 @@ function edgePath(s, t) {
   return `M ${sx} ${sy} C ${sx + dx} ${sy}, ${tx - dx} ${ty}, ${tx} ${ty}`
 }
 
+// Edge colors reference the design-system edge tokens.
 const EDGE_COLOR = {
-  slate: '#cbd5e1',
-  blue: '#3b82f6',
-  amber: '#f59e0b',
-  emerald: '#10b981',
+  muted: 'var(--sf-edge-muted)',
+  downstream: 'var(--sf-edge-downstream)',
+  upstream: 'var(--sf-edge-upstream)',
+  completed: 'var(--sf-edge-completed)',
 }
+
+const LEGEND = [
+  { kind: 'arrow', color: 'var(--sf-edge-upstream)', label: 'Upstream / raw signal' },
+  { kind: 'arrow', color: 'var(--sf-edge-downstream)', label: 'Downstream / signal path' },
+  { kind: 'arrow', color: 'var(--sf-edge-completed)', label: 'Completed / trusted path' },
+  { kind: 'arrow-dashed', color: 'var(--sf-edge-muted)', label: 'Locked / future' },
+]
 
 export default function WorkflowGraph({
   nodes,
@@ -100,9 +125,10 @@ export default function WorkflowGraph({
   const downstreamIds = new Set(edges.filter((e) => e.from === selectedNodeId).map((e) => e.to))
   const selectedNode = byId[selectedNodeId]
   const relatedPhaseId = selectedNode?.phaseId
+  const hasSelection = Boolean(selectedNodeId)
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-3">
+    <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
       <div ref={containerRef} className="relative w-full overflow-hidden" style={{ height: DESIGN_H * scale }}>
         <div
           className="absolute left-0 top-0 origin-top-left"
@@ -115,19 +141,26 @@ export default function WorkflowGraph({
             const left = colNode.x - REGION_PAD
             const related = phase.id === relatedPhaseId
             const phaseStatus = derivePhaseStatus(phase, progress)
-            const bg = related ? 'bg-blue-50' : i % 2 === 0 ? 'bg-slate-50/70' : 'bg-transparent'
+            const bg = related
+              ? 'var(--sf-phase-band-sel)'
+              : i % 2 === 0
+                ? 'var(--sf-phase-band)'
+                : 'transparent'
             return (
               <div
                 key={phase.id}
-                className={`absolute rounded-2xl transition-colors ${bg}`}
-                style={{ left, top: 0, width: NODE_W + REGION_PAD * 2, height: DESIGN_H }}
+                className="absolute rounded-2xl transition-colors"
+                style={{ left, top: 0, width: NODE_W + REGION_PAD * 2, height: DESIGN_H, backgroundColor: bg }}
               >
                 <div className="px-3 pt-2.5">
                   <div className="flex items-center gap-1.5">
-                    <span className={`inline-block h-2 w-2 rounded-full ${PHASE_DOT[phaseStatus]}`} />
                     <span
-                      className={`text-[10px] font-semibold uppercase tracking-widest ${
-                        related ? 'text-blue-600' : 'text-slate-400'
+                      className="inline-block h-2 w-2 rounded-full"
+                      style={{ backgroundColor: PHASE_DOT_VAR[phaseStatus] }}
+                    />
+                    <span
+                      className={`text-[10px] font-semibold uppercase tracking-sf-widest ${
+                        related ? 'text-sf-accent-text' : 'text-sf-subtle'
                       }`}
                     >
                       Phase {phase.order}
@@ -135,7 +168,7 @@ export default function WorkflowGraph({
                   </div>
                   <p
                     className={`mt-0.5 text-xs font-medium leading-tight ${
-                      related ? 'text-slate-700' : 'text-slate-500'
+                      related ? 'text-sf-body' : 'text-sf-muted'
                     }`}
                   >
                     {phase.title.replace(/^Phase \d+: /, '')}
@@ -146,7 +179,7 @@ export default function WorkflowGraph({
           })}
 
           {/* Edge layer */}
-          <svg className="pointer-events-none absolute inset-0" width={DESIGN_W} height={DESIGN_H} aria-hidden="true">
+          <svg className="pointer-events-none absolute inset-0 overflow-visible" width={DESIGN_W} height={DESIGN_H} aria-hidden="true">
             <defs>
               {Object.entries(EDGE_COLOR).map(([key, color]) => (
                 <marker
@@ -155,8 +188,8 @@ export default function WorkflowGraph({
                   viewBox="0 0 10 10"
                   refX="8"
                   refY="5"
-                  markerWidth="6"
-                  markerHeight="6"
+                  markerWidth="7"
+                  markerHeight="7"
                   orient="auto-start-reverse"
                 >
                   <path d="M0 0 L10 5 L0 10 z" fill={color} />
@@ -170,19 +203,36 @@ export default function WorkflowGraph({
               const isUp = edge.to === selectedNodeId
               const isDown = edge.from === selectedNodeId
               const connected = isUp || isDown
-              let color = 'slate'
-              if (isDown) color = 'blue'
-              else if (isUp) color = 'amber'
-              else if (statusById[edge.from] === STATUS.COMPLETE) color = 'emerald'
+              const sourceComplete = statusById[edge.from] === STATUS.COMPLETE
+              const targetLocked = statusById[edge.to] === STATUS.LOCKED
+              let color = 'muted'
+              let dashed = false
+              if (isDown) color = 'downstream'
+              else if (isUp) color = 'upstream'
+              else if (sourceComplete) color = 'completed'
+              else if (targetLocked) dashed = true
+              const dim = hasSelection && !connected
+              const strokeColor = EDGE_COLOR[color]
+              const strokeWidth = connected ? 3 : sourceComplete ? 2 : 1.75
+              const opacity = connected
+                ? 1
+                : dashed
+                  ? dim ? 0.4 : 0.6
+                  : sourceComplete
+                    ? dim ? 0.7 : 0.9
+                    : dim ? 0.3 : 0.6
               return (
                 <path
                   key={`${edge.from}->${edge.to}`}
                   d={edgePath(s, t)}
                   fill="none"
-                  stroke={EDGE_COLOR[color]}
-                  strokeWidth={connected ? 2.5 : 1.5}
-                  opacity={connected ? 1 : 0.45}
+                  stroke={strokeColor}
+                  strokeWidth={strokeWidth}
+                  strokeLinecap="round"
+                  strokeDasharray={dashed ? '5 6' : undefined}
+                  opacity={opacity}
                   markerEnd={`url(#arrow-${color})`}
+                  style={connected ? { filter: `drop-shadow(0 0 3px ${strokeColor})` } : undefined}
                 >
                   <title>{`${byId[edge.from].label} ${edge.label} ${byId[edge.to].label}`}</title>
                 </path>
@@ -198,22 +248,27 @@ export default function WorkflowGraph({
             const isUp = upstreamIds.has(node.id)
             const isDown = downstreamIds.has(node.id)
             const related = selected || isUp || isDown
+            const isComplete = status === STATUS.COMPLETE
             let ring = ''
-            if (selected) ring = 'ring-2 ring-offset-2 ring-blue-600'
-            else if (isDown) ring = 'ring-2 ring-blue-400'
-            else if (isUp) ring = 'ring-2 ring-amber-400'
+            if (selected) ring = 'ring-2 ring-offset-2 ring-offset-sf-surface ring-sf-ring'
+            else if (isDown) ring = 'ring-2 ring-offset-1 ring-offset-sf-surface ring-sf-type-artifact'
+            else if (isUp) ring = 'ring-2 ring-offset-1 ring-offset-sf-surface ring-sf-type-source'
             const buildable = isBuildable(node)
             // Playable nodes always stay legible: relationship-dimming only applies
             // to non-playable context nodes, so a buildable lesson never looks disabled.
             const dimmed = !related && !buildable
             let action = null
             if (buildable && status === STATUS.READY) {
-              action = { label: 'Start lesson', run: () => onStart(node.id), cls: 'bg-blue-600 text-white hover:bg-blue-700' }
+              action = { label: 'Start lesson', run: () => onStart(node.id), cls: 'bg-sf-accent text-white hover:bg-sf-accent-hover' }
             } else if (buildable && status === STATUS.IN_PROGRESS) {
-              action = { label: 'Continue', run: () => onContinue(node.id), cls: 'bg-amber-500 text-white hover:bg-amber-600' }
+              action = { label: 'Continue', run: () => onContinue(node.id), cls: 'bg-sf-progress text-white hover:opacity-90' }
             } else if (buildable && status === STATUS.COMPLETE) {
-              action = { label: 'View', run: () => onViewArtifact(node.id), cls: 'bg-emerald-600 text-white hover:bg-emerald-700' }
+              action = { label: 'View', run: () => onViewArtifact(node.id), cls: 'bg-sf-complete text-white hover:opacity-90' }
             }
+            const eyebrowColor =
+              isComplete && node.type === 'artifact'
+                ? 'var(--sf-artifact-trusted)'
+                : TYPE_COLOR[node.type] || '#9ca3af'
             return (
               <div
                 key={node.id}
@@ -228,7 +283,7 @@ export default function WorkflowGraph({
                 }}
                 aria-pressed={selected}
                 title={node.label}
-                className={`absolute flex cursor-pointer flex-col rounded-xl border p-2.5 text-left shadow-sm transition ${nodeBase(
+                className={`absolute flex cursor-pointer flex-col rounded-xl border p-2.5 text-left shadow-sf-sm transition ${nodeClasses(
                   status,
                   node.type
                 )} ${ring} ${dimmed ? 'opacity-45' : ''}`}
@@ -236,24 +291,27 @@ export default function WorkflowGraph({
               >
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
+                    <Icon name={TYPE_ICON[node.type] || 'braces'} size={13} strokeWidth={2} style={{ color: eyebrowColor }} />
                     <span
-                      className="inline-block h-2 w-2 rounded-full"
-                      style={{ backgroundColor: TYPE_COLOR[node.type] || '#9ca3af' }}
-                    />
-                    <span className="text-[10px] font-bold uppercase tracking-wide opacity-70">
+                      className="text-[10px] font-bold uppercase tracking-sf-wide"
+                      style={{ color: eyebrowColor }}
+                    >
                       {TYPE_LABEL[node.type] || node.type}
                     </span>
                   </span>
-                  {status === STATUS.COMPLETE && (
-                    <span className="text-emerald-600" aria-hidden="true">
-                      ✓
-                    </span>
+                  {isComplete && (
+                    <Icon
+                      name="circle-check"
+                      size={14}
+                      strokeWidth={2.25}
+                      style={{ color: node.type === 'artifact' ? 'var(--sf-artifact-trusted)' : 'var(--sf-complete)' }}
+                    />
                   )}
                 </div>
                 <span className="mt-1 text-sm font-semibold leading-tight">{node.label}</span>
                 <div className="mt-auto flex items-center justify-between gap-1.5">
                   {node.artifactName ? (
-                    <span className="truncate font-mono text-[10px] opacity-70">{node.artifactName}</span>
+                    <span className="truncate font-mono text-[10px] text-sf-muted">{node.artifactName}</span>
                   ) : (
                     <span />
                   )}
@@ -264,7 +322,7 @@ export default function WorkflowGraph({
                         e.stopPropagation()
                         action.run()
                       }}
-                      className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold shadow-sm transition ${action.cls}`}
+                      className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold shadow-sf-sm transition ${action.cls}`}
                     >
                       {action.label}
                     </button>
@@ -276,20 +334,26 @@ export default function WorkflowGraph({
         </div>
       </div>
 
-      {/* Relationship legend */}
-      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-[11px] text-gray-500">
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm ring-2 ring-blue-600" />
-          Selected
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block h-0.5 w-4 rounded bg-amber-500" />
-          Depends on (upstream)
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block h-0.5 w-4 rounded bg-blue-500" />
-          Feeds into (downstream)
-        </span>
+      {/* Legend */}
+      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-[11px] text-sf-muted">
+        {LEGEND.map((item) => (
+          <span key={item.label} className="flex items-center gap-1.5">
+            <svg width="26" height="10" viewBox="0 0 26 10" aria-hidden="true">
+              <line
+                x1="1"
+                y1="5"
+                x2="18"
+                y2="5"
+                stroke={item.color}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeDasharray={item.kind === 'arrow-dashed' ? '3 3' : undefined}
+              />
+              <path d="M17 1.5 L24 5 L17 8.5" fill="none" stroke={item.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            {item.label}
+          </span>
+        ))}
       </div>
     </div>
   )

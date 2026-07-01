@@ -32,11 +32,18 @@ The historical MVP was accepted against `signalflow-lab-mvp-spec-v2.md`: one com
 ## Current Architecture
 
 - Phase-banded workflow graph driven by `src/data/phases.json`, `src/data/workflowNodes.json`, and `src/data/workflowEdges.json`.
-- Buildable task nodes are tracked in localStorage under `signalflow_progress`; artifacts are stored under `signalflow_artifacts`.
+- Buildable task nodes are tracked in localStorage under `signalflow_progress`; artifacts are stored under `signalflow_artifacts`; theme preference is stored under `signalflow_theme`.
 - The current interactive tasks are `lesson-intake`, attached to `market-intake-record`; `lesson-threshold-policy`, attached to `threshold-policy`; `lesson-clean-price-data`, attached to `clean-price-data`; and `lesson-variance-check`, attached to `variance-check`.
 - Every workflow node has a lesson intent; only nodes with built task IDs are completion-tracked today.
 - Future interactive nodes remain visible but locked/stubbed.
 - Lesson flow follows Intro -> Exercise -> Takeaway.
+
+## Visual System
+
+- The app is reskinned to the design system in `Mock Ups/SignalFlow Lab Design System/`. Tokens live in `src/styles/tokens/` and are imported in `src/index.css` before Tailwind; `tailwind.config.js` maps them to `sf.*` classes via `var(--sf-*)`.
+- Light and dark themes are supported via a persisted toggle (`signalflow_theme`, applied as `data-theme` by `src/lib/theme.js`).
+- Reusable UI primitives live in `src/components/ui/`. Signal flow is the core visual metaphor: `SignalFlowDiagram` converges upstream inputs into the central artifact and fans out to downstream consumers, colored by DS edge semantics.
+- Hard rule: Exercise/workbench screens must not page-scroll at innerHeight >= 800 in any state, including the wrong-answer state. Intro and Takeaway may scroll. See `AGENTS.md` and `PRODUCT_DOCTRINE.md`.
 
 ## Next Direction
 

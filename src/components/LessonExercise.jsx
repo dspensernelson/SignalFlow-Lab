@@ -1,4 +1,5 @@
 import CopilotPromptCard from './CopilotPromptCard'
+import { Button } from './ui'
 
 // The editor renders one JSON field per line; these constants match the
 // textarea's padding (p-3 = 12px) and line-height (leading-6 = 24px) so each
@@ -13,8 +14,8 @@ function Callout({ passed, message, hint }) {
       title={hint ? `${message} \u2014 ${hint}` : message}
       className={`flex items-center gap-1 truncate rounded-md border px-2 py-0.5 text-[11px] leading-tight ${
         passed
-          ? 'border-green-200 bg-green-50 text-green-700'
-          : 'border-red-200 bg-red-50 text-red-700'
+          ? 'border-sf-complete bg-sf-success-weak text-sf-complete-text'
+          : 'border-sf-danger bg-sf-danger-weak text-sf-danger'
       }`}
     >
       <span aria-hidden="true">{passed ? '\u2713' : '\u2717'}</span>
@@ -31,7 +32,7 @@ function StateIcon({ state }) {
   if (state === 'correct') {
     return (
       <span
-        className="mt-0.5 flex h-4 w-4 flex-none items-center justify-center rounded-full bg-green-100 text-[10px] font-bold text-green-700"
+        className="mt-0.5 flex h-4 w-4 flex-none items-center justify-center rounded-full bg-sf-complete-weak text-[10px] font-bold text-sf-complete-text"
         aria-label="correct"
       >
         {'\u2713'}
@@ -41,7 +42,7 @@ function StateIcon({ state }) {
   if (state === 'warning') {
     return (
       <span
-        className="mt-0.5 flex h-4 w-4 flex-none items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-700"
+        className="mt-0.5 flex h-4 w-4 flex-none items-center justify-center rounded-full bg-sf-progress-weak text-[10px] font-bold text-sf-progress-text"
         aria-label="needs attention"
       >
         !
@@ -50,7 +51,7 @@ function StateIcon({ state }) {
   }
   return (
     <span
-      className="mt-0.5 h-4 w-4 flex-none rounded-full border border-gray-300"
+      className="mt-0.5 h-4 w-4 flex-none rounded-full border border-sf-border-strong"
       aria-label="not captured"
     />
   )
@@ -205,35 +206,35 @@ export default function LessonExercise({
     <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-12">
       {/* Left: source + three-state fields-to-capture checklist */}
       <div className="flex flex-col gap-3 lg:col-span-5">
-        <div className="rounded-lg border border-gray-200 bg-white p-3">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+        <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
+          <h3 className="text-sm font-semibold uppercase tracking-sf-wide text-sf-subtle">
             {came ? 'What came in' : lesson.inputLabel || 'Source Note'}
           </h3>
           {came?.noteTitle && (
-            <p className="mt-2 text-xs font-semibold text-gray-600">{came.noteTitle}</p>
+            <p className="mt-2 text-xs font-semibold text-sf-body">{came.noteTitle}</p>
           )}
-          <pre className="mt-1 whitespace-pre-wrap rounded-md bg-gray-50 p-3 text-sm text-gray-700">
+          <pre className="mt-1 whitespace-pre-wrap rounded-md bg-sf-surface-subtle p-3 text-sm text-sf-body">
             {lesson.input}
           </pre>
           {came?.flagCue && (
-            <div className="mt-3 flex flex-wrap items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
-              <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+            <div className="mt-3 flex flex-wrap items-center gap-2 rounded-md border border-sf-warning bg-sf-progress-weak px-3 py-2">
+              <span className="inline-flex items-center rounded-full border border-sf-warning bg-sf-surface px-2 py-0.5 text-xs font-medium text-sf-progress-text">
                 {came.flagCue}
               </span>
-              {came.flagNote && <span className="text-xs text-amber-900">{came.flagNote}</span>}
+              {came.flagNote && <span className="text-xs text-sf-progress-text">{came.flagNote}</span>}
             </div>
           )}
         </div>
 
-        <div className="rounded-lg border border-gray-200 bg-white p-3">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+        <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
+          <h3 className="text-sm font-semibold uppercase tracking-sf-wide text-sf-subtle">
             Fields to capture
           </h3>
           <div className="mt-2 flex flex-col gap-2">
             {fieldGroups.map((group) => (
               <div key={group.name || 'fields'}>
                 {grouped && group.name && (
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                  <p className="text-xs font-semibold uppercase tracking-sf-wide text-sf-subtle">
                     {group.name}
                   </p>
                 )}
@@ -242,10 +243,10 @@ export default function LessonExercise({
                     const state = stateByField[f.field]
                     const textClass =
                       state === 'correct'
-                        ? 'text-gray-400'
+                        ? 'text-sf-subtle'
                         : state === 'warning'
-                          ? 'text-amber-800'
-                          : 'text-gray-800'
+                          ? 'text-sf-progress-text'
+                          : 'text-sf-body'
                     return (
                       <li key={f.field} className="flex items-start gap-2 text-sm">
                         <StateIcon state={state} />
@@ -253,14 +254,14 @@ export default function LessonExercise({
                           <span className="font-mono text-[13px]">{f.field}</span>
                           {(f.lookFor || f.hint) && (
                             <span
-                              className={state === 'warning' ? 'text-amber-700' : 'text-gray-500'}
+                              className={state === 'warning' ? 'text-sf-progress-text' : 'text-sf-muted'}
                             >
                               {' '}
                               &mdash; {f.lookFor || f.hint}
                             </span>
                           )}
                           {state === 'warning' && primary && f.field === primary.field && (
-                            <span className="mt-0.5 block text-xs font-medium text-amber-700">
+                            <span className="mt-0.5 block text-xs font-medium text-sf-progress-text">
                               Present, but not the trusted value yet.
                             </span>
                           )}
@@ -277,12 +278,12 @@ export default function LessonExercise({
 
       {/* Right: workspace + readiness + optional helper */}
       <div className="flex flex-col gap-3 lg:col-span-7">
-        <div className="rounded-lg border border-gray-200 bg-white p-3">
-          <label htmlFor="answer-editor" className="font-mono text-sm font-semibold text-gray-700">
+        <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
+          <label htmlFor="answer-editor" className="font-mono text-sm font-semibold text-sf-body">
             {editorLabel}
           </label>
           {lesson.editorHelper && (
-            <p className="mt-1 text-xs text-gray-500">{lesson.editorHelper}</p>
+            <p className="mt-1 text-xs text-sf-muted">{lesson.editorHelper}</p>
           )}
           <div className="mt-2 flex items-stretch gap-3">
             <textarea
@@ -291,7 +292,7 @@ export default function LessonExercise({
               onChange={(e) => onAnswerChange(e.target.value)}
               spellCheck={false}
               rows={7}
-              className="flex-1 rounded-md border border-gray-300 p-3 font-mono text-sm leading-6 text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="flex-1 rounded-md border border-sf-border-strong bg-sf-surface p-3 font-mono text-sm leading-6 text-sf-text focus:border-sf-accent focus:outline-none focus:ring-1 focus:ring-sf-ring"
             />
             {hasResults && (
               <div className="relative w-40 flex-none">
@@ -314,23 +315,19 @@ export default function LessonExercise({
             )}
           </div>
           <div className="mt-3">
-            <button
-              type="button"
-              onClick={onValidate}
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
+            <Button variant="primary" size="md" onClick={onValidate}>
               {lesson.validateLabel || 'Validate'}
-            </button>
+            </Button>
           </div>
         </div>
 
         {hasResults &&
           (passed ? (
-            <div className="rounded-lg border border-green-300 bg-green-50 p-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-green-700">
+            <div className="rounded-xl border border-sf-complete bg-sf-success-weak p-3 shadow-sf-sm">
+              <h3 className="text-xs font-semibold uppercase tracking-sf-wide text-sf-complete-text">
                 Workflow readiness
               </h3>
-              <ul className="mt-2 flex flex-col gap-1 text-sm text-green-900">
+              <ul className="mt-2 flex flex-col gap-1 text-sm text-sf-complete-text">
                 <li className="flex items-center gap-2">
                   <span aria-hidden="true">{'\u2713'}</span>
                   {correctCount} of {totalRequired} required fields captured
@@ -343,47 +340,43 @@ export default function LessonExercise({
                   {recordName} is ready for downstream reuse.
                 </li>
               </ul>
-              <button
-                type="button"
-                onClick={onContinue}
-                className="mt-3 rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-              >
+              <Button variant="success" size="md" iconRight="arrow-right" className="mt-3" onClick={onContinue}>
                 Continue to Takeaway
-              </button>
+              </Button>
             </div>
           ) : (
-            <div className="rounded-lg border border-amber-300 bg-amber-50 p-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-amber-700">
+            <div className="rounded-xl border border-sf-warning bg-sf-progress-weak p-3 shadow-sf-sm">
+              <h3 className="text-xs font-semibold uppercase tracking-sf-wide text-sf-progress-text">
                 Workflow readiness
               </h3>
 
               {jsonParseFailed ? (
-                <div className="mt-2 rounded-md border border-amber-300 bg-white p-3">
-                  <p className="text-sm font-semibold text-amber-800">Needs attention: valid JSON</p>
-                  <p className="mt-1 text-sm text-amber-900">
+                <div className="mt-2 rounded-md border border-sf-warning bg-sf-surface p-3">
+                  <p className="text-sm font-semibold text-sf-progress-text">Needs attention: valid JSON</p>
+                  <p className="mt-1 text-sm text-sf-body">
                     Your answer is not valid JSON yet. Check for missing quotes, commas, or braces.
                   </p>
                 </div>
               ) : (
                 <>
-                  <p className="mt-1 text-sm font-medium text-amber-900">{headline}</p>
+                  <p className="mt-1 text-sm font-medium text-sf-body">{headline}</p>
 
                   {primary && (
-                    <div className="mt-2 rounded-md border border-amber-300 bg-white p-3">
-                      <p className="text-sm font-semibold text-amber-800">
+                    <div className="mt-2 rounded-md border border-sf-warning bg-sf-surface p-3">
+                      <p className="text-sm font-semibold text-sf-progress-text">
                         Fix this next: <span className="font-mono">{primary.field}</span>
                       </p>
-                      <p className="mt-1 text-sm text-amber-900">{primaryLead}</p>
+                      <p className="mt-1 text-sm text-sf-body">{primaryLead}</p>
                       {primary.attention?.source && (
-                        <p className="mt-1 text-xs text-amber-800">
+                        <p className="mt-1 text-xs text-sf-muted">
                           Look for:{' '}
                           <span className="italic">&ldquo;{primary.attention.source}.&rdquo;</span>
                         </p>
                       )}
                       {primary.attention?.shape && (
-                        <p className="mt-0.5 text-xs text-amber-800">
+                        <p className="mt-0.5 text-xs text-sf-muted">
                           Expected shape:{' '}
-                          <span className="font-mono text-amber-900">
+                          <span className="font-mono text-sf-body">
                             &ldquo;{primary.attention.shape}.&rdquo;
                           </span>
                         </p>
@@ -392,7 +385,7 @@ export default function LessonExercise({
                   )}
 
                   {attentionCount > 1 && (
-                    <p className="mt-2 text-xs text-amber-700">
+                    <p className="mt-2 text-xs text-sf-progress-text">
                       {attentionCount - 1} more{' '}
                       {attentionCount - 1 === 1 ? 'field is' : 'fields are'} flagged beside the
                       editor lines.
@@ -400,7 +393,7 @@ export default function LessonExercise({
                   )}
 
                   {correctCount > 0 && (
-                    <p className="mt-2 text-xs text-amber-700">
+                    <p className="mt-2 text-xs text-sf-progress-text">
                       {'\u2713'} {correctCount} of {totalRequired} fields look good
                     </p>
                   )}
@@ -409,8 +402,8 @@ export default function LessonExercise({
             </div>
           ))}
 
-        <details className="rounded-lg border border-gray-200 bg-white p-3">
-          <summary className="cursor-pointer text-sm text-gray-600">
+        <details className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
+          <summary className="cursor-pointer text-sm text-sf-body">
             Need help? Show Copilot prompt
           </summary>
           <div className="mt-3">

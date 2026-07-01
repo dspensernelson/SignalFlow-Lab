@@ -1,6 +1,7 @@
 import WorkflowGraph from './WorkflowGraph'
 import NodeDetail from './NodeDetail'
 import { STATUS, isBuildable, deriveNodeStatus } from '../lib/progress'
+import { Logo, ThemeToggle, StatItem, Button, Icon } from './ui'
 
 const PROJECT_GOAL =
   'Build a workplace automation that turns messy overnight market inputs into an approval-ready 7:00 AM brief. The map below is the real dependency graph — phases on the left feed objects that get reused, evaluated, and routed downstream. Click any node to see how that piece gets built and reused.'
@@ -11,6 +12,8 @@ export default function ProjectCanvas({
   edges,
   progress,
   selectedNodeId,
+  theme,
+  onToggleTheme,
   onSelect,
   onStart,
   onContinue,
@@ -35,67 +38,91 @@ export default function ProjectCanvas({
   )
 
   return (
-    <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-6 px-4 py-6 text-left">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex flex-col gap-1">
-          <p className="text-sm font-medium uppercase tracking-wide text-blue-600">SignalFlow Lab</p>
-          <h1 className="text-2xl font-semibold text-gray-900">Meridian Morning Market Brief</h1>
-          <p className="max-w-4xl text-sm text-gray-600">{PROJECT_GOAL}</p>
-          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-            <span className="font-medium text-gray-700">
-              Interactive tasks built: {completeCount} of {buildableNodes.length}
+    <div className="min-h-full text-left text-sf-text">
+      {/* Top app bar */}
+      <header className="sticky top-0 z-20 border-b border-sf-border bg-sf-surface">
+        <div className="mx-auto flex w-full max-w-[1680px] items-center justify-between gap-4 px-4 py-2.5">
+          <div className="flex items-center gap-3">
+            <Logo size={22} uppercase wordmark="SignalFlow Lab" />
+            <span className="hidden h-6 w-px bg-sf-border sm:inline-block" />
+            <div className="hidden flex-col leading-tight sm:flex">
+              <span className="text-[9px] font-semibold uppercase tracking-sf-wide text-sf-subtle">Project</span>
+              <span className="flex items-center gap-1 text-sm font-medium text-sf-text">
+                Meridian Morning Market Brief
+                <Icon name="chevron-down" size={14} className="text-sf-muted" />
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2.5">
+            <span className="hidden items-center gap-1.5 rounded-full border border-sf-border bg-sf-surface-subtle px-2.5 py-1 text-xs font-medium text-sf-muted md:inline-flex">
+              <Icon name="clock" size={13} />
+              6:15 AM CT
             </span>
-            <span className="hidden text-gray-300 sm:inline">·</span>
-            <span className="font-medium text-gray-500">
-              Workflow lessons defined: {lessonsDefined} of {nodes.length}
-            </span>
+            <ThemeToggle value={theme} onChange={onToggleTheme} />
+            <Button variant="neutral" size="sm" icon="rotate-cw" onClick={onReset} disabled={!anyProgress}>
+              Start Over
+            </Button>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={onReset}
-          disabled={!anyProgress}
-          className="w-fit rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Start Over
-        </button>
       </header>
 
-      <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
-          Workflow Map
-        </h2>
-        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:gap-6">
-          <div>
-            <WorkflowGraph
-              nodes={nodes}
-              phases={phases}
-              edges={edges}
-              progress={progress}
-              selectedNodeId={selectedNodeId}
-              onSelect={onSelect}
-              onStart={onStart}
-              onContinue={onContinue}
-              onViewArtifact={onViewArtifact}
+      <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-6 px-4 py-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-2xl font-semibold text-sf-text">Meridian Morning Market Brief</h1>
+            <p className="max-w-4xl text-sm text-sf-muted">{PROJECT_GOAL}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 sm:justify-end">
+            <StatItem
+              icon="clipboard-list"
+              tone="accent"
+              value={`${completeCount} of ${buildableNodes.length}`}
+              label="tasks built"
+            />
+            <StatItem
+              icon="workflow"
+              value={`${lessonsDefined} of ${nodes.length}`}
+              label="lessons defined"
             />
           </div>
-
-          <aside className="mt-6 lg:mt-0 lg:sticky lg:top-6">
-            <NodeDetail
-              node={selectedNode}
-              status={selectedStatus}
-              phase={selectedPhase}
-              nodesById={nodesById}
-              edges={edges}
-              onSelect={onSelect}
-              onStart={onStart}
-              onContinue={onContinue}
-              onViewArtifact={onViewArtifact}
-              onRestart={onRestartNode}
-            />
-          </aside>
         </div>
-      </section>
+
+        <section>
+          <h2 className="mb-3 text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">
+            Workflow Map
+          </h2>
+          <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:gap-6">
+            <div>
+              <WorkflowGraph
+                nodes={nodes}
+                phases={phases}
+                edges={edges}
+                progress={progress}
+                selectedNodeId={selectedNodeId}
+                onSelect={onSelect}
+                onStart={onStart}
+                onContinue={onContinue}
+                onViewArtifact={onViewArtifact}
+              />
+            </div>
+
+            <aside className="mt-6 lg:mt-0 lg:sticky lg:top-20">
+              <NodeDetail
+                node={selectedNode}
+                status={selectedStatus}
+                phase={selectedPhase}
+                nodesById={nodesById}
+                edges={edges}
+                onSelect={onSelect}
+                onStart={onStart}
+                onContinue={onContinue}
+                onViewArtifact={onViewArtifact}
+                onRestart={onRestartNode}
+              />
+            </aside>
+          </div>
+        </section>
+      </div>
     </div>
   )
 }
