@@ -20,6 +20,7 @@ import {
   completeNode,
   restartNode,
 } from './lib/progress'
+import { loadTheme, saveTheme, applyTheme } from './lib/theme'
 
 // Only built lessons are wired here. Other lessonIds resolve to undefined.
 const LESSONS = {
@@ -38,6 +39,17 @@ export default function App() {
   )
   const [activeLessonId, setActiveLessonId] = useState(null)
   const [notice, setNotice] = useState(null)
+  const [theme, setTheme] = useState(() => loadTheme())
+
+  // Apply and persist the theme whenever it changes.
+  useEffect(() => {
+    applyTheme(theme)
+    saveTheme(theme)
+  }, [theme])
+
+  function toggleTheme(next) {
+    setTheme(next === 'dark' || next === 'light' ? next : theme === 'dark' ? 'light' : 'dark')
+  }
 
   // Persist progress and artifacts whenever they change.
   useEffect(() => {
@@ -139,7 +151,7 @@ export default function App() {
     <div className="min-h-full">
       {notice && (
         <div className="mx-auto mt-4 w-full max-w-6xl px-4">
-          <div className="rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <div className="rounded-md border border-sf-warning bg-sf-warning-weak px-4 py-3 text-sm text-sf-progress-text">
             {notice}
           </div>
         </div>
@@ -150,6 +162,8 @@ export default function App() {
         edges={edges}
         progress={progress}
         selectedNodeId={selectedNodeId}
+        theme={theme}
+        onToggleTheme={toggleTheme}
         onSelect={handleSelect}
         onStart={openLesson}
         onContinue={openLesson}

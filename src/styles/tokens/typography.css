@@ -1,0 +1,40 @@
+/* ============================================================
+   SignalFlow Lab — Typography
+   Native Microsoft UI font (Segoe UI) with system-ui fallback.
+   JSON / artifact filenames use a Consolas-led mono stack.
+   ============================================================ */
+
+:root {
+  /* Families */
+  --sf-font-sans: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont,
+                  'Helvetica Neue', Arial, sans-serif;
+  --sf-font-mono: Consolas, ui-monospace, 'SF Mono', Menlo, Monaco,
+                  'Courier New', monospace;
+
+  /* Type scale (px values used literally in the product UI) */
+  --sf-text-9:   9px;
+  --sf-text-10:  10px;
+  --sf-text-11:  11px;
+  --sf-text-xs:  12px;
+  --sf-text-sm:  14px;
+  --sf-text-base:16px;
+  --sf-text-lg:  18px;
+  --sf-text-xl:  20px;
+  --sf-text-2xl: 24px;
+  --sf-text-3xl: 30px;
+
+  /* Weights */
+  --sf-weight-normal:   400;
+  --sf-weight-medium:   500;
+  --sf-weight-semibold: 600;
+  --sf-weight-bold:     700;
+
+  /* Line heights */
+  --sf-leading-tight:  1.2;
+  --sf-leading-snug:   1.4;
+  --sf-leading-normal: 1.5;
+
+  /* Letter spacing — uppercase eyebrow labels are a signature */
+  --sf-tracking-wide:    0.04em;
+  --sf-tracking-widest:  0.1em;
+}

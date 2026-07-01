@@ -3,6 +3,7 @@ import LessonIntro from './LessonIntro'
 import LessonExercise from './LessonExercise'
 import LessonTakeaway from './LessonTakeaway'
 import { validateAnswer } from '../lib/validators'
+import { Stepper, Button, Icon } from './ui'
 
 // Reusable lesson template: a three-step click-through flow.
 const STEPS = [
@@ -34,58 +35,28 @@ export default function LessonWorkspace({ lesson, onPass, onReturnToCanvas }) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-5 text-left">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-5 text-left text-sf-text">
       <header className="flex flex-col gap-2">
         <div className="flex flex-col gap-1">
-          <button
-            type="button"
-            onClick={onReturnToCanvas}
-            className="w-fit text-sm text-blue-600 hover:underline"
-          >
-            &larr; Back to Canvas
-          </button>
+          <Button variant="link" size="sm" icon="arrow-left" onClick={onReturnToCanvas} className="w-fit">
+            Back to Canvas
+          </Button>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-semibold text-gray-900">{lesson.title}</h1>
+            <h1 className="text-2xl font-semibold text-sf-text">{lesson.title}</h1>
             {lesson.clock && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
-                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-sf-warning bg-sf-progress-weak px-2.5 py-0.5 text-xs font-medium text-sf-progress-text">
+                <Icon name="clock" size={12} />
                 {lesson.clock}
               </span>
             )}
           </div>
-          {lesson.subtitle && <p className="text-sm text-gray-600">{lesson.subtitle}</p>}
-          <p className="text-xs text-gray-400">
+          {lesson.subtitle && <p className="text-sm text-sf-body">{lesson.subtitle}</p>}
+          <p className="text-xs text-sf-subtle">
             {lesson.difficulty} &middot; {lesson.skill}
           </p>
         </div>
 
-        <ol className="flex flex-wrap items-center gap-2" aria-label="Lesson steps">
-          {STEPS.map((s, index) => {
-            const isCurrent = s.id === step
-            const isDone = index < currentIndex
-            return (
-              <li key={s.id} className="flex items-center gap-2">
-                <span
-                  className={`flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${
-                    isCurrent
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
-                      : isDone
-                        ? 'border-green-300 bg-green-50 text-green-700'
-                        : 'border-gray-200 bg-white text-gray-500'
-                  }`}
-                >
-                  <span aria-hidden="true">{isDone ? '✓' : index + 1}</span>
-                  {s.label}
-                </span>
-                {index < STEPS.length - 1 && (
-                  <span className="text-gray-300" aria-hidden="true">
-                    &rarr;
-                  </span>
-                )}
-              </li>
-            )
-          })}
-        </ol>
+        <Stepper steps={STEPS.map((s) => s.label)} current={currentIndex} aria-label="Lesson steps" />
       </header>
 
       {step === 'intro' && (

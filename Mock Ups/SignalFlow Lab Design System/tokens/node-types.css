@@ -1,0 +1,50 @@
+/* ============================================================
+   SignalFlow Lab — Workflow node-type accents
+   Every object on the workflow map is colored by its TYPE so a
+   node and its detail panel read as the same thing. These eight
+   hues are the product's most distinctive color signal.
+   Source of truth: src/lib/nodeStyles.js (exact values).
+
+   Signal-flow color logic:
+     Source   = amber  — raw, unstructured input
+     Artifact = cyan   — structured signal object (structural identity)
+     Complete artifact = emerald/cyan (--sf-type-artifact-trusted)
+   ============================================================ */
+
+:root {
+  --sf-type-source:    #f59e0b; /* amber  — raw, unstructured input          */
+  --sf-type-reference: #8b5cf6; /* violet — policy / governance / config      */
+  --sf-type-artifact:  #0891b2; /* cyan   — structured signal object          */
+  --sf-type-process:   #6366f1; /* indigo — a transformation step             */
+  --sf-type-decision:  #eab308; /* yellow — a branch / fork                   */
+  --sf-type-handoff:   #14b8a6; /* teal   — human-in-the-loop / routing       */
+  --sf-type-output:    #22c55e; /* green  — a delivered business output       */
+  --sf-type-archive:   #a8a29e; /* stone  — retention / future / locked       */
+
+  /* Trusted artifact emphasis — type=artifact AND status=complete only.
+     Do NOT apply to all artifact nodes; use the structural cyan above for type identity. */
+  --sf-type-artifact-trusted: #059669; /* emerald-600 — validated, safe to reuse */
+
+  /* Workflow edge semantic colors.
+     Components MUST reference these names, not raw palette values.
+     Semantics match the signal-flow mental model:
+       upstream   = where raw signal came from (amber)
+       downstream = where signal flows to (cyan)
+       reuse      = trusted artifact consumed downstream (cobalt-cyan)
+       completed  = path from a fully validated node (emerald)
+       muted      = idle / inactive / future path (slate)
+       selected   = selected-node relationship emphasis (blue)          */
+  --sf-edge-upstream:   #f59e0b; /* depends-on; amber  = raw source signal     */
+  --sf-edge-downstream: #06b6d4; /* feeds-into; cyan   = signal-path forward   */
+  --sf-edge-reuse:      #0891b2; /* artifact reuse; cobalt-cyan = trusted reuse */
+  --sf-edge-completed:  #10b981; /* from a validated node; emerald = done path  */
+  --sf-edge-muted:      #cbd5e1; /* idle / inactive / future path; slate        */
+  --sf-edge-selected:   #2563eb; /* selected-node relationship; blue            */
+
+  /* Legacy aliases — kept so existing consumers do not break.
+     New code should use the semantic names above. */
+  --sf-edge-neutral: var(--sf-edge-muted);
+  --sf-edge-down:    var(--sf-edge-downstream);
+  --sf-edge-up:      var(--sf-edge-upstream);
+  --sf-edge-done:    var(--sf-edge-completed);
+}

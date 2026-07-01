@@ -1,4 +1,5 @@
 import LessonWorkflowStrip from './LessonWorkflowStrip'
+import { Button, SignalFlowDiagram } from './ui'
 
 // Inline icons for the takeaway workflow diagram (stroke-based, currentColor).
 function Icon({ name, className }) {
@@ -62,29 +63,10 @@ function Icon({ name, className }) {
   }
 }
 
-// Horizontal flow connector, hidden when the diagram stacks on small screens.
-function FlowArrow() {
-  return (
-    <div className="hidden items-center justify-center text-gray-300 lg:flex" aria-hidden="true">
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.8}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="h-7 w-7"
-      >
-        <path d="M4 12h15M13 6l6 6-6 6" />
-      </svg>
-    </div>
-  )
-}
-
 const CONSUMER_ICON = {
-  'risk-evaluation': { name: 'shield', color: 'text-violet-500' },
-  'approval-decision': { name: 'person', color: 'text-slate-500' },
-  'morning-brief': { name: 'doc', color: 'text-blue-500' },
+  'risk-evaluation': { name: 'shield', color: 'text-sf-type-reference' },
+  'approval-decision': { name: 'person', color: 'text-sf-muted' },
+  'morning-brief': { name: 'doc', color: 'text-sf-accent' },
 }
 
 // Step 3 of the lesson template: show what the workflow can do now.
@@ -102,32 +84,28 @@ export default function LessonTakeaway({ lesson, artifact, onReturnToCanvas }) {
   if (!rich) {
     return (
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <section className="lg:col-span-2 rounded-lg border border-green-300 bg-green-50 p-5">
-          <h2 className="text-lg font-semibold text-green-900">{takeaway.heading}</h2>
+        <section className="lg:col-span-2 rounded-xl border border-sf-complete bg-sf-success-weak p-5 shadow-sf-sm">
+          <h2 className="text-lg font-semibold text-sf-complete-text">{takeaway.heading}</h2>
           <ul className="mt-3 flex flex-col gap-2">
             {takeaway.points.map((point, index) => (
-              <li key={index} className="flex items-start gap-2 text-sm text-green-900">
+              <li key={index} className="flex items-start gap-2 text-sm text-sf-complete-text">
                 <span aria-hidden="true">&#10003;</span>
                 <span>{point}</span>
               </li>
             ))}
           </ul>
-          <button
-            type="button"
-            onClick={() => onReturnToCanvas()}
-            className="mt-5 rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-          >
+          <Button variant="success" size="md" className="mt-5" onClick={() => onReturnToCanvas()}>
             Return to Canvas
-          </button>
+          </Button>
         </section>
 
-        <aside className="rounded-lg border border-gray-200 bg-white p-4">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <aside className="rounded-xl border border-sf-border bg-sf-surface p-4 shadow-sf-sm">
+          <h3 className="text-xs font-semibold uppercase tracking-sf-wide text-sf-subtle">
             Artifact produced
           </h3>
-          <p className="mt-1 text-sm font-medium text-gray-800">{takeaway.artifactName}</p>
+          <p className="mt-1 text-sm font-medium text-sf-text">{takeaway.artifactName}</p>
           {artifact && (
-            <pre className="mt-3 overflow-auto rounded-md bg-gray-50 p-3 text-sm text-gray-800">
+            <pre className="mt-3 overflow-auto rounded-md bg-sf-surface-subtle p-3 text-sm text-sf-body">
               {typeof artifact === 'string' ? artifact : JSON.stringify(artifact, null, 2)}
             </pre>
           )}
@@ -151,147 +129,132 @@ export default function LessonTakeaway({ lesson, artifact, onReturnToCanvas }) {
     return (
       <div className="flex flex-col gap-4">
         {/* Workflow diagram: incoming signals -> the record you built -> consumers */}
-        <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5">
-          <div className="grid grid-cols-1 items-center gap-4 lg:grid-cols-[minmax(0,5fr)_auto_minmax(0,6fr)_auto_minmax(0,5fr)]">
-            {/* LEFT: what came in (quieter than the center) */}
-            <div className="flex flex-col gap-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                What came in
-              </h3>
-              <div className="rounded-lg border border-gray-200 bg-white p-3">
-                <div className="flex items-center gap-2">
-                  <Icon name="note" className="h-4 w-4 flex-none text-gray-500" />
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800">{came.noteTitle}</p>
-                    {came.noteSubtitle && (
-                      <p className="text-[11px] text-gray-500">{came.noteSubtitle}</p>
-                    )}
-                  </div>
-                </div>
-                <p className="mt-2 rounded-md border border-dashed border-gray-200 bg-gray-50 p-2 font-mono text-[11px] leading-snug text-gray-600">
-                  {lesson.input}
-                </p>
-              </div>
-              <div className="rounded-lg border border-gray-200 bg-white p-3">
-                <div className="flex items-center gap-2">
-                  <Icon name="flag" className="h-4 w-4 flex-none text-gray-500" />
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800">{came.flagTitle}</p>
-                    {came.flagSubtitle && (
-                      <p className="text-[11px] text-gray-500">{came.flagSubtitle}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  {came.flagCue && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700">
-                      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-                      {came.flagCue}
-                    </span>
-                  )}
-                  {came.flagNote && (
-                    <span className="text-[11px] text-gray-500">{came.flagNote}</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <FlowArrow />
-
-            {/* CENTER: the artifact you built - the visual payoff */}
-            <div className="rounded-xl border-2 border-emerald-300 bg-emerald-50/70 p-4 shadow-sm">
-              <p className="text-center text-sm font-semibold text-emerald-800">{recordBanner}</p>
-              <div className="mt-3 rounded-lg border border-emerald-200 bg-white p-4">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-emerald-600 font-mono text-sm font-semibold text-white">
-                    {'{ }'}
-                  </span>
-                  <div>
-                    <p className="text-lg font-semibold text-emerald-900">{recordName}</p>
-                    <p className="font-mono text-sm text-gray-700">{takeaway.artifactName}</p>
-                  </div>
-                </div>
-                {recordSummary && <p className="mt-3 text-sm text-gray-500">{recordSummary}</p>}
-              </div>
-              <div className="mt-3 flex items-center gap-2.5">
-                <span
-                  className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-emerald-600 text-sm text-white"
-                  aria-hidden="true"
-                >
-                  &#10003;
-                </span>
-                <div className="text-sm leading-tight">
-                  {fieldCount != null && (
-                    <p className="font-medium text-emerald-900">
-                      {fieldCount} of {fieldCount} fields captured
-                    </p>
-                  )}
-                  <p className="text-emerald-700">JSON is valid</p>
-                </div>
-              </div>
-            </div>
-
-            <FlowArrow />
-
-            {/* RIGHT: who reuses it (honest dependency language) */}
-            <div className="flex flex-col gap-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500 lg:text-right">
-                Who reuses it
-              </h3>
-              {consumers.map((c) => {
-                const ic = CONSUMER_ICON[c.nodeId] || { name: 'doc', color: 'text-gray-500' }
-                return (
-                  <div
-                    key={c.nodeId || c.name}
-                    className="rounded-lg border border-gray-200 bg-white p-3"
-                  >
-                    <div className="flex items-start gap-2">
-                      <Icon name={ic.name} className={`mt-0.5 h-4 w-4 flex-none ${ic.color}`} />
-                      <div>
-                        <p className="text-sm font-semibold text-gray-800">{c.name}</p>
-                        {c.note && (
-                          <p className="mt-0.5 text-[11px] leading-snug text-gray-500">{c.note}</p>
-                        )}
-                      </div>
+        <div className="rounded-xl border border-sf-border bg-sf-surface p-4 shadow-sf-sm sm:p-5">
+          <SignalFlowDiagram
+            intensity="primary"
+            inputTone="upstream"
+            inputLabel="raw signal"
+            inputHeader="What came in"
+            outputTone="completed"
+            outputLabel="trusted signal"
+            outputHeader="Who reuses it"
+            inputs={[
+              (
+                <div key="notes" className="rounded-lg border border-sf-border bg-sf-surface p-3">
+                  <div className="flex items-center gap-2">
+                    <Icon name="note" className="h-4 w-4 flex-none text-sf-muted" />
+                    <div>
+                      <p className="text-sm font-semibold text-sf-text">{came.noteTitle}</p>
+                      {came.noteSubtitle && (
+                        <p className="text-[11px] text-sf-muted">{came.noteSubtitle}</p>
+                      )}
                     </div>
                   </div>
-                )
-              })}
-            </div>
-          </div>
+                  <p className="mt-2 rounded-md border border-dashed border-sf-border bg-sf-surface-subtle p-2 font-mono text-[11px] leading-snug text-sf-muted">
+                    {lesson.input}
+                  </p>
+                </div>
+              ),
+              (
+                <div key="flag" className="rounded-lg border border-sf-border bg-sf-surface p-3">
+                  <div className="flex items-center gap-2">
+                    <Icon name="flag" className="h-4 w-4 flex-none text-sf-muted" />
+                    <div>
+                      <p className="text-sm font-semibold text-sf-text">{came.flagTitle}</p>
+                      {came.flagSubtitle && (
+                        <p className="text-[11px] text-sf-muted">{came.flagSubtitle}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    {came.flagCue && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-sf-warning bg-sf-progress-weak px-2 py-0.5 text-[11px] font-medium text-sf-progress-text">
+                        <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-sf-warning" />
+                        {came.flagCue}
+                      </span>
+                    )}
+                    {came.flagNote && (
+                      <span className="text-[11px] text-sf-muted">{came.flagNote}</span>
+                    )}
+                  </div>
+                </div>
+              ),
+            ]}
+            center={
+              <div className="w-full rounded-xl border-2 border-sf-complete bg-sf-success-weak p-4 shadow-sf-sm">
+                <p className="text-center text-sm font-semibold text-sf-complete-text">{recordBanner}</p>
+                <div className="mt-3 rounded-lg border border-sf-trusted-border bg-sf-surface p-4">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-sf-complete font-mono text-sm font-semibold text-white">
+                      {'{ }'}
+                    </span>
+                    <div>
+                      <p className="text-lg font-semibold text-sf-complete-text">{recordName}</p>
+                      <p className="font-mono text-sm text-sf-body">{takeaway.artifactName}</p>
+                    </div>
+                  </div>
+                  {recordSummary && <p className="mt-3 text-sm text-sf-muted">{recordSummary}</p>}
+                </div>
+                <div className="mt-3 flex items-center gap-2.5">
+                  <span
+                    className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-sf-complete text-sm text-white"
+                    aria-hidden="true"
+                  >
+                    &#10003;
+                  </span>
+                  <div className="text-sm leading-tight">
+                    {fieldCount != null && (
+                      <p className="font-medium text-sf-complete-text">
+                        {fieldCount} of {fieldCount} fields captured
+                      </p>
+                    )}
+                    <p className="text-sf-complete-text">JSON is valid</p>
+                  </div>
+                </div>
+              </div>
+            }
+            consumers={consumers.map((c) => {
+              const ic = CONSUMER_ICON[c.nodeId] || { name: 'doc', color: 'text-sf-muted' }
+              return (
+                <div key={c.nodeId || c.name} className="rounded-lg border border-sf-border bg-sf-surface p-3">
+                  <div className="flex items-start gap-2">
+                    <Icon name={ic.name} className={`mt-0.5 h-4 w-4 flex-none ${ic.color}`} />
+                    <div>
+                      <p className="text-sm font-semibold text-sf-text">{c.name}</p>
+                      {c.note && (
+                        <p className="mt-0.5 text-[11px] leading-snug text-sf-muted">{c.note}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          />
         </div>
 
         {/* Capability statement - prominent, but secondary to the center node */}
-        <div className="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
-          <Icon name="bars" className="h-6 w-6 flex-none text-blue-600" />
-          <p className="text-base font-semibold text-blue-900">{takeaway.capability}</p>
+        <div className="flex items-center gap-3 rounded-xl border border-sf-accent-border bg-sf-accent-weak p-4">
+          <Icon name="bars" className="h-6 w-6 flex-none text-sf-accent" />
+          <p className="text-base font-semibold text-sf-accent-text">{takeaway.capability}</p>
         </div>
 
         {/* Audit / provenance note */}
         {takeaway.auditNote && (
           <div className="flex items-start gap-2 px-1">
-            <Icon name="shield" className="mt-0.5 h-4 w-4 flex-none text-gray-400" />
-            <p className="text-xs text-gray-500">{takeaway.auditNote}</p>
+            <Icon name="shield" className="mt-0.5 h-4 w-4 flex-none text-sf-subtle" />
+            <p className="text-xs text-sf-muted">{takeaway.auditNote}</p>
           </div>
         )}
 
         {/* Actions */}
         <div className="flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => onReturnToCanvas()}
-            className="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300"
-          >
-            &larr; Back to Map
-          </button>
+          <Button variant="neutral" size="md" icon="arrow-left" onClick={() => onReturnToCanvas()}>
+            Back to Map
+          </Button>
           {takeaway.nextNodeId && (
-            <button
-              type="button"
-              onClick={() => onReturnToCanvas(takeaway.nextNodeId)}
-              className="inline-flex items-center gap-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Next Node &rarr;
-            </button>
+            <Button variant="primary" size="md" iconRight="arrow-right" onClick={() => onReturnToCanvas(takeaway.nextNodeId)}>
+              Next Node
+            </Button>
           )}
         </div>
       </div>
@@ -301,32 +264,32 @@ export default function LessonTakeaway({ lesson, artifact, onReturnToCanvas }) {
   return (
     <div className="flex flex-col gap-4">
       {/* Artifact + Complete badge */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-sf-border bg-sf-surface p-4 shadow-sf-sm">
         <div className="flex items-center gap-3">
-          <span className="rounded-md bg-gray-100 px-2 py-1 font-mono text-xs text-gray-600">
+          <span className="rounded-md bg-sf-surface-inset px-2 py-1 font-mono text-xs text-sf-body">
             {'{ }'}
           </span>
           <div>
-            <p className="text-sm font-semibold text-gray-900">{takeaway.artifactName}</p>
-            <p className="text-xs text-gray-500">
+            <p className="text-sm font-semibold text-sf-text">{takeaway.artifactName}</p>
+            <p className="text-xs text-sf-muted">
               {lesson.intro?.recordName || takeaway.heading} &middot; created just now by you
             </p>
           </div>
         </div>
-        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+        <span className="inline-flex items-center gap-1 rounded-full border border-sf-complete bg-sf-complete-weak px-2.5 py-0.5 text-xs font-medium text-sf-complete-text">
           <span aria-hidden="true">&#10003;</span> Complete
         </span>
       </div>
 
       {/* Before / After */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Before</h3>
-          <p className="mt-1 text-sm text-gray-700">{takeaway.before}</p>
+        <div className="rounded-xl border border-sf-border bg-sf-surface-subtle p-4">
+          <h3 className="text-xs font-semibold uppercase tracking-sf-wide text-sf-subtle">Before</h3>
+          <p className="mt-1 text-sm text-sf-body">{takeaway.before}</p>
         </div>
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-emerald-700">After</h3>
-          <p className="mt-1 text-sm text-emerald-900">{takeaway.after}</p>
+        <div className="rounded-xl border border-sf-complete bg-sf-success-weak p-4">
+          <h3 className="text-xs font-semibold uppercase tracking-sf-wide text-sf-complete-text">After</h3>
+          <p className="mt-1 text-sm text-sf-complete-text">{takeaway.after}</p>
         </div>
       </div>
 
@@ -339,18 +302,18 @@ export default function LessonTakeaway({ lesson, artifact, onReturnToCanvas }) {
       />
 
       {/* Capability statement - the mission payoff */}
-      <div className="rounded-lg border border-blue-300 bg-blue-50 p-5 text-center shadow-sm">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-blue-600">
+      <div className="rounded-xl border border-sf-accent-border bg-sf-accent-weak p-5 text-center shadow-sf-sm">
+        <p className="text-[11px] font-semibold uppercase tracking-sf-wide text-sf-accent-text">
           The workflow can now do this
         </p>
-        <p className="mt-1 text-lg font-semibold text-blue-900">{takeaway.capability}</p>
+        <p className="mt-1 text-lg font-semibold text-sf-accent-text">{takeaway.capability}</p>
       </div>
 
       {/* Concept recap (secondary) */}
       {takeaway.points && takeaway.points.length > 0 && (
         <ul className="flex flex-col gap-1 px-1">
           {takeaway.points.map((point, index) => (
-            <li key={index} className="flex items-start gap-2 text-xs text-gray-600">
+            <li key={index} className="flex items-start gap-2 text-xs text-sf-muted">
               <span aria-hidden="true">&#10003;</span>
               <span>{point}</span>
             </li>
@@ -359,21 +322,13 @@ export default function LessonTakeaway({ lesson, artifact, onReturnToCanvas }) {
       )}
 
       <div className="flex flex-wrap gap-3">
-        <button
-          type="button"
-          onClick={() => onReturnToCanvas()}
-          className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300"
-        >
-          &larr; Back to Map
-        </button>
+        <Button variant="neutral" size="md" icon="arrow-left" onClick={() => onReturnToCanvas()}>
+          Back to Map
+        </Button>
         {takeaway.nextNodeId && (
-          <button
-            type="button"
-            onClick={() => onReturnToCanvas(takeaway.nextNodeId)}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            Next Node &rarr;
-          </button>
+          <Button variant="primary" size="md" iconRight="arrow-right" onClick={() => onReturnToCanvas(takeaway.nextNodeId)}>
+            Next Node
+          </Button>
         )}
       </div>
     </div>
