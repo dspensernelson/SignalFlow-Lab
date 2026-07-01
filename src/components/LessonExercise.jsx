@@ -1,4 +1,6 @@
 import CopilotPromptCard from './CopilotPromptCard'
+import ChoiceCheckExercise from './ChoiceCheckExercise'
+import TemplateSlotsExercise from './TemplateSlotsExercise'
 import { Button } from './ui'
 
 // The editor renders one JSON field per line; these constants match the
@@ -71,6 +73,35 @@ export default function LessonExercise({
   passed,
   onContinue,
 }) {
+  // Non-editor interaction types render their own workspaces; the JSON-editor
+  // workbench below stays untouched for jsonEditor lessons.
+  if (lesson.interactionType === 'choiceCheck') {
+    return (
+      <ChoiceCheckExercise
+        lesson={lesson}
+        answer={answer}
+        onAnswerChange={onAnswerChange}
+        onValidate={onValidate}
+        results={results}
+        passed={passed}
+        onContinue={onContinue}
+      />
+    )
+  }
+  if (lesson.interactionType === 'templateSlots') {
+    return (
+      <TemplateSlotsExercise
+        lesson={lesson}
+        answer={answer}
+        onAnswerChange={onAnswerChange}
+        onValidate={onValidate}
+        results={results}
+        passed={passed}
+        onContinue={onContinue}
+      />
+    )
+  }
+
   const fields = lesson.fieldGuide || []
   const came = lesson.intro?.whatCameIn
   const hasResults = Boolean(results && results.length > 0)
