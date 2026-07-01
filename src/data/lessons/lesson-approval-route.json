@@ -1,0 +1,115 @@
+{
+  "id": "lesson-approval-route",
+  "nodeId": "approval-route",
+  "title": "Capture the Approval as a Record",
+  "difficulty": "Intermediate",
+  "skill": "Human-in-the-loop handoffs",
+  "clock": "6:40 AM",
+  "scenario": "It is 6:40 AM. The decision log routed today's brief to approval, the request went out using the governed template, and the Desk Manager just replied in the desk channel. A chat message is not something the workflow can act on. Your job is to capture the exchange as the approval record.",
+  "inputType": "text",
+  "inputLabel": "Desk Channel Exchange",
+  "input": "[6:39 AM] Meridian Workflow -> Desk Manager\nSubject: APPROVAL NEEDED: ERCOT 13.3% - morning brief\nERCOT moved 13.3 percent day-over-day, above the 12 percent escalation threshold. Please respond within 30 minutes.\n\n[6:41 AM] Desk Manager -> Meridian Workflow\nApproved. Note the wind shortfall in the ops section.",
+  "instructions": [
+    "Identify which hub triggered the request and its percent move.",
+    "Record who the request was sent to and who actually responded.",
+    "Capture the decision word itself and the time it arrived.",
+    "Return one JSON object - the approval record - then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"hub\": \"\",\n  \"movePct\": \"\",\n  \"sentTo\": \"\",\n  \"decision\": \"\",\n  \"decidedBy\": \"\",\n  \"decidedAt\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["hub", "movePct", "sentTo", "decision", "decidedBy", "decidedAt"],
+    "expected": {
+      "hub": "ERCOT",
+      "decision": "approved",
+      "sentTo": "Desk Manager",
+      "decidedBy": "Desk Manager"
+    },
+    "acceptedValues": {
+      "movePct": ["13.3", "13.3%"],
+      "decidedAt": ["6:41", "6:41 AM", "06:41"]
+    }
+  },
+  "copilotPrompt": "Extract an approval record from this exchange as JSON with hub, movePct, sentTo, decision, decidedBy, and decidedAt. Use the decision word from the response and the response timestamp.",
+  "successMessage": "Approval captured. The brief can now state its sign-off status without anyone re-reading the thread.",
+  "intro": {
+    "heading": "Before you build: transport vs record",
+    "sections": [
+      {
+        "title": "The chat is transport, not truth",
+        "body": "The approval genuinely happened in the channel - but channels scroll away, and automation cannot act on a thread. The workflow needs the response captured as a structured record it can read."
+      },
+      {
+        "title": "The template did its job",
+        "body": "Look at the outgoing message: it follows the subject format and required fields you governed in the Approval Template lesson. That is why the manager could answer in two minutes - handoffs are fast when requests are standard."
+      },
+      {
+        "title": "What an approval record must hold",
+        "body": "Who was asked, what they were asked about, what they decided, who decided, and when. Those five facts are what an auditor - or tomorrow's automation - needs to trust the sign-off."
+      },
+      {
+        "title": "Real-world note",
+        "body": "At work this handoff would ride on Teams, email, or an approvals app, and capturing the response would be an integration. The lab simulates the transport but keeps the important part real: the response becomes a record."
+      }
+    ],
+    "jsonExample": "{\n  \"hub\": \"PJM\",\n  \"movePct\": \"14.2\",\n  \"sentTo\": \"Site Manager\",\n  \"decision\": \"approved\",\n  \"decidedBy\": \"Site Manager\",\n  \"decidedAt\": \"6:50 AM\"\n}",
+    "skill": "Human-in-the-loop handoffs",
+    "artifactName": "approval-route.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "hub",
+      "meaning": "The hub that triggered the escalation.",
+      "type": "string",
+      "example": "\"ERCOT\"",
+      "hint": "Named in the request subject line."
+    },
+    {
+      "field": "movePct",
+      "meaning": "The percent move stated in the request.",
+      "type": "string",
+      "example": "\"13.3\"",
+      "hint": "From the request body or subject."
+    },
+    {
+      "field": "sentTo",
+      "meaning": "Who the request was addressed to.",
+      "type": "string",
+      "example": "\"Desk Manager\"",
+      "hint": "The recipient of the 6:39 message."
+    },
+    {
+      "field": "decision",
+      "meaning": "The decision word from the response.",
+      "type": "string",
+      "example": "\"approved\"",
+      "hint": "Use the first word of the reply."
+    },
+    {
+      "field": "decidedBy",
+      "meaning": "Who actually responded.",
+      "type": "string",
+      "example": "\"Desk Manager\"",
+      "hint": "The sender of the reply. Asked and answered can differ in real life - record who answered."
+    },
+    {
+      "field": "decidedAt",
+      "meaning": "When the response arrived.",
+      "type": "string",
+      "example": "\"6:41 AM\"",
+      "hint": "The timestamp on the reply."
+    }
+  ],
+  "takeaway": {
+    "heading": "Approval record captured",
+    "points": [
+      "You converted a chat exchange into approval-route.json - the response is now a fact in the system, not a fact in a thread.",
+      "The record holds the five audit facts: who was asked, about what, what they decided, who decided, and when.",
+      "The governed template from the previous lesson is what made the request instant to read and answer.",
+      "The Morning Brief will print its approval line straight from this record - and the manager's ops note foreshadows the brief's Operations section.",
+      "The workflow can now capture a human approval response as an auditable record."
+    ],
+    "artifactName": "approval-route.json"
+  }
+}

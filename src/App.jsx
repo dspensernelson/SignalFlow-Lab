@@ -6,6 +6,12 @@ import lessonIntake from './data/lessons/lesson-intake.json'
 import lessonThresholdPolicy from './data/lessons/lesson-threshold-policy.json'
 import lessonCleanPriceData from './data/lessons/lesson-clean-price-data.json'
 import lessonVarianceCheck from './data/lessons/lesson-variance-check.json'
+import lessonRiskEvaluation from './data/lessons/lesson-risk-evaluation.json'
+import lessonApprovalTemplate from './data/lessons/lesson-approval-template.json'
+import lessonApprovalDecision from './data/lessons/lesson-approval-decision.json'
+import lessonApprovalRoute from './data/lessons/lesson-approval-route.json'
+import lessonRoutineUpdatePath from './data/lessons/lesson-routine-update-path.json'
+import lessonDistributionArchive from './data/lessons/lesson-distribution-archive.json'
 import ProjectCanvas from './components/ProjectCanvas'
 import LessonWorkspace from './components/LessonWorkspace'
 import ArtifactViewer from './components/ArtifactViewer'
@@ -28,6 +34,12 @@ const LESSONS = {
   'lesson-threshold-policy': lessonThresholdPolicy,
   'lesson-clean-price-data': lessonCleanPriceData,
   'lesson-variance-check': lessonVarianceCheck,
+  'lesson-risk-evaluation': lessonRiskEvaluation,
+  'lesson-approval-template': lessonApprovalTemplate,
+  'lesson-approval-decision': lessonApprovalDecision,
+  'lesson-approval-route': lessonApprovalRoute,
+  'lesson-routine-update-path': lessonRoutineUpdatePath,
+  'lesson-distribution-archive': lessonDistributionArchive,
 }
 
 export default function App() {
