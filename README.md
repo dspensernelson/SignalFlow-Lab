@@ -25,9 +25,15 @@ Where things stand if you are picking this back up:
   threshold design from history, feed-failure handling, escalation ladder,
   classify-under-quarantine, degraded brief, retention design). Only the
   solo-rebuild capstone remains: `curriculum/module-01/hard/_OVERVIEW.md`.
-- **Lessons are force-ordered**: one lesson is READY at a time and completing
-  it unlocks the next (LESSON_PATH in src/lib/progress.js; locking is derived,
-  never stored). Locked nodes name the lesson that unlocks them.
+- **Lessons unlock as a branching tree**: one intro lesson (Analyst Notes)
+  opens the board 2-3 lessons at a time (LESSON_PREREQS in
+  src/lib/progress.js; locking is derived, never stored). Locked nodes name
+  every prerequisite that unlocks them; tiers collapse unbuilt prerequisites
+  transitively.
+- **The build is guarded**: `npm run check` = eslint + lesson lint (canon +
+  authoring contract, scripts/lint-lessons.mjs) + lesson regression tests
+  (correct/wrong fixtures, scripts/validate-lessons.mjs) + build. All green
+  is the bar for every commit.
 - **No-scroll hard rule** verified live at 1280x800 in wrong-answer states for
   the new interaction types (and previously for the original four lessons).
 - **Branches/PRs**: PR #1 = `takeaway-workflow-diagram` -> `main` (redesign +
@@ -59,13 +65,18 @@ Vite usually starts on port 5173 and may fall back to 5174 if 5173 is in use.
 ## Validate
 
 ```powershell
-npm run lint
-npm run build
+npm run check    # eslint + lesson lint + lesson regression tests + build
 ```
+
+Individually: `npm run lint`, `npm run lint:lessons`, `npm run test:lessons`,
+`npm run build`.
 
 ## Key Docs
 
-- `CURRICULUM_MASTER_PLAN.md` - the 10-module / 3-tier long-range plan, learning theory, engine roadmap, and builder handoff protocol.
+- `CURRICULUM_MASTER_PLAN.md` - the 10-module / 3-tier long-range plan, learning theory, engine roadmap, and the execution sequence (Part 8).
+- `MODULE_AUTHORING_PLAYBOOK.md` - the gated procedure for authoring any new module (scenario -> map -> audit -> canon -> scripts -> waves).
+- `DECISION_BOUNDARIES.md` - owner-only vs builder decisions and the stop-and-ask protocol.
+- `VERIFICATION_PLAYBOOK.md` - the check pipeline plus live-browser procedures (no-scroll, gating, seeding, end-to-end).
 - `ENGINE_ADDITIONS_SPEC.md` - spec for the choiceCheck and templateSlots interaction types (implemented).
 - `curriculum/module-01/` - per-tier overviews (canon data, status) and the 13 Easy lesson scripts the built lessons came from.
 - `PRODUCT_DOCTRINE.md` - purpose, guiding principles, progression model, and quality bar.

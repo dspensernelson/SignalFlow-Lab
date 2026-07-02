@@ -357,26 +357,29 @@ Module 1: IMPLEMENTATION is already delegable, AUTHORING is not - so the next
 work is the five artifacts that make authoring checkable, before any Module 2
 content exists.
 
-### Phase 0 - Industrialize (before any new content; ~sessions, not months)
+### Phase 0 - Industrialize (COMPLETE 2026-07-02)
 
-0.1 Commit the regression harness: scripts/validate-lessons.mjs + one fixtures
-    file per lesson (correct answer + wrong answer), run as
-    `npm run test:lessons`. Every future change must keep it green.
-0.2 Canon as data: curriculum/module-01/<tier>/canon.json holding every number,
-    role, time, and artifact name; plus scripts/lint-lessons.mjs that
-    cross-checks each lesson JSON against canon and the authoring checklist
-    (one primary concept, capability statement last, honest difficulty label,
-    ASCII, validator config well-formed).
-0.3 MODULE_AUTHORING_PLAYBOOK.md: the repeatable procedure scenario -> map
-    (15-18 nodes, one true fork, one temporal loop, fan-in ordering, one
-    concept per node) -> NODE_AUDIT -> canon.json -> lesson scripts -> build
-    waves, with an acceptance gate per step and explicit stop-and-ask-owner
-    points.
-0.4 DECISION_BOUNDARIES.md: what a builder may never decide alone (doctrine,
-    scenario selection, node taxonomy, new interaction types, validator
-    changes, map shape).
-0.5 Verification playbook: the no-scroll eval snippets and artifact-seeding
-    recipes as a committed script/doc, so live verification is not tribal.
+0.1 DONE - scripts/validate-lessons.mjs + scripts/lesson-fixtures.json
+    (`npm run test:lessons`): every lesson proven with a correct and a wrong
+    answer; missing fixtures fail; 41/41 green.
+0.2 DONE - curriculum/module-01/canon.json (58 assertions) +
+    scripts/lint-lessons.mjs (`npm run lint:lessons`): identity/registration,
+    authoring contract, capability statement, interaction-shape rules, canon
+    enforcement. `npm run check` chains eslint + both + build.
+0.3 DONE - MODULE_AUTHORING_PLAYBOOK.md: charter -> map (with unlock tree) ->
+    node audit -> canon -> scripts -> waves -> tiers -> wrap, with gates,
+    owner stops, and the five observed failure modes it prevents.
+0.4 DONE - DECISION_BOUNDARIES.md: owner-only vs builder decisions, the
+    stop-and-ask protocol, and the standing constraints.
+0.5 DONE - VERIFICATION_PLAYBOOK.md: the check pipeline, no-scroll procedure,
+    gating checks, artifact/progress seeding recipes, per-lesson end-to-end
+    recipe, and the clean-up-your-test-state rule.
+
+Also landed with Phase 0: the unlock model changed from a linear chain to a
+BRANCHING TREE (LESSON_PREREQS in progress.js) - one intro lesson fans the
+board open 2-3 lessons at a time; tiers collapse unbuilt prerequisites
+transitively. A secondary builder can now execute lesson work from the
+playbooks with the harness catching drift.
 
 ### Phase 1 - Finish Module 1 (the capstone)
 

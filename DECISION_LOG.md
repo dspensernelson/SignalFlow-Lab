@@ -55,6 +55,28 @@ Short record of product and implementation decisions. Keep entries factual and b
 - Deferred per NODE_AUDIT: distribution-archive node split and risk-evaluation
   split stay single nodes through Module 1 Easy; revisit before Medium.
 
+## 2026-07-02 (unlock tree + Phase 0 industrialization)
+
+- PRODUCT DECISION (owner): gating changed from a linear chain to a BRANCHING
+  TREE. One intro lesson (Analyst Notes) fans the board open 2-3 lessons at a
+  time (LESSON_PREREQS in progress.js); a lesson unlocks when ALL its
+  prerequisites complete; tiers collapse unbuilt prerequisites transitively
+  (hard opens with intake + price-feed). Locked panels name every incomplete
+  prerequisite.
+- Phase 0 of CURRICULUM_MASTER_PLAN Part 8 is COMPLETE:
+  scripts/validate-lessons.mjs + lesson-fixtures.json (41/41 lessons proven
+  with correct/wrong answers), scripts/lint-lessons.mjs +
+  curriculum/module-01/canon.json (58 drift-blocking assertions plus the
+  authoring contract), `npm run check` as the commit bar,
+  MODULE_AUTHORING_PLAYBOOK.md, DECISION_BOUNDARIES.md,
+  VERIFICATION_PLAYBOOK.md.
+- The lint's first run caught a real gap (the rich takeaway dialect carries
+  its capability statement in takeaway.capability); the lint accepts both
+  dialects now.
+- Handoff posture: lesson implementation and verification are delegable to a
+  secondary builder today; module AUTHORING is delegable with owner gates at
+  charter, map, and wrap (per the playbook).
+
 ## 2026-07-02 (forced lesson ordering + formatting pass)
 
 - PRODUCT DECISION (owner): lessons are now FORCE-ORDERED. Exactly one lesson
