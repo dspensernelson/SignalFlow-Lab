@@ -1,0 +1,229 @@
+// Lesson lint. Run with: npm run lint:lessons
+//
+// Enforces the authoring contract (LESSON_AUTHORING_TEMPLATE.md) and the
+// module canon (curriculum/module-01/canon.json) on every lesson JSON, so a
+// builder cannot drift from the doctrine or the shared numbers without the
+// check going red. Checks:
+//
+//  1. Identity: lesson id matches its filename; nodeId exists on the map;
+//     tier suffix matches its BUILT_LESSON_IDS_BY_TIER registration; the
+//     node's taskId names the easy lesson.
+//  2. Structure: required fields, known interactionType and validator,
+//     intro sections in range, instructions present, takeaway points >= 3.
+//  3. Capability statement: the LAST takeaway point starts with
+//     "The workflow can now".
+//  4. Interaction shape: choiceCheck 3-5 questions x exactly 3 options with
+//     a valid correctOptionId, explain text, and artifactOnPass; templateSlots
+//     slots<->{{tokens}} match exactly, each slot has label/hint and an
+//     expected or accepted, shelf entries are complete; jsonEditor lessons
+//     have a fieldGuide row for every validated field and a parseable
+//     starterAnswer.
+//  5. Canon: every assertion in curriculum/module-01/canon.json holds.
+//
+// Non-ASCII characters in lesson copy are reported as warnings (repo docs are
+// ASCII-only by rule; lesson copy should stay close to it).
+
+import { readFileSync, readdirSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+const lessonsDir = path.join(root, 'src', 'data', 'lessons')
+
+const nodes = JSON.parse(readFileSync(path.join(root, 'src', 'data', 'workflowNodes.json'), 'utf8'))
+const canon = JSON.parse(readFileSync(path.join(root, 'curriculum', 'module-01', 'canon.json'), 'utf8'))
+const progressSource = readFileSync(path.join(root, 'src', 'lib', 'progress.js'), 'utf8')
+
+const VALID_INTERACTIONS = ['jsonEditor', 'choiceCheck', 'templateSlots']
+const VALID_VALIDATORS = ['jsonFields', 'jsonPolicy', 'jsonRows', 'jsonDeltas', 'choiceCheck', 'templateSlots']
+const VALID_DIFFICULTIES = ['Beginner', 'Intermediate', 'Medium', 'Hard']
+
+// Extract BUILT_LESSON_IDS_BY_TIER from progress.js source (progress.js
+// imports app JSON, so it cannot be imported directly under plain node).
+function extractTierIds(tier) {
+  const block = progressSource.match(new RegExp(`${tier}:\\s*\\[([^\\]]*)\\]`, 's'))
+  if (!block) return []
+  return Array.from(block[1].matchAll(/'([^']+)'/g)).map((m) => m[1])
+}
+const TIER_IDS = { easy: extractTierIds('easy'), medium: extractTierIds('medium'), hard: extractTierIds('hard') }
+
+// Path resolver: dot segments, [index], and [key=value] finders.
+function resolvePath(obj, pathExpr) {
+  const segments = pathExpr.split('.')
+  let current = obj
+  for (const seg of segments) {
+    if (current === undefined || current === null) return undefined
+    const match = seg.match(/^([\w]+)(?:\[([^\]]+)\])?$/)
+    if (!match) return undefined
+    current = current[match[1]]
+    if (match[2] !== undefined) {
+      if (!Array.isArray(current)) return undefined
+      if (/^\d+$/.test(match[2])) {
+        current = current[Number(match[2])]
+      } else {
+        const [key, value] = match[2].split('=')
+        current = current.find((item) => String(item?.[key]) === value)
+      }
+    }
+  }
+  return current
+}
+
+const files = readdirSync(lessonsDir).filter((f) => f.endsWith('.json'))
+let errors = 0
+let warnings = 0
+
+function err(id, msg) {
+  errors++
+  console.log(`ERROR ${id}: ${msg}`)
+}
+function warn(id, msg) {
+  warnings++
+  console.log(`warn  ${id}: ${msg}`)
+}
+
+const lessonsById = {}
+
+for (const file of files.sort()) {
+  const lesson = JSON.parse(readFileSync(path.join(lessonsDir, file), 'utf8'))
+  const id = lesson.id || file
+  lessonsById[id] = lesson
+
+  // 1. Identity
+  if (`${lesson.id}.json` !== file) err(id, `id does not match filename "${file}"`)
+  const node = nodes.find((n) => n.id === lesson.nodeId)
+  if (!node) err(id, `nodeId "${lesson.nodeId}" not found in workflowNodes.json`)
+  const tier = id.endsWith('-medium') ? 'medium' : id.endsWith('-hard') ? 'hard' : 'easy'
+  if (!TIER_IDS[tier].includes(id)) {
+    err(id, `not registered in BUILT_LESSON_IDS_BY_TIER.${tier} (src/lib/progress.js)`)
+  }
+  if (node && tier === 'easy' && node.taskId !== id) {
+    err(id, `node taskId "${node.taskId}" should equal the easy lesson id`)
+  }
+  if (node && tier !== 'easy' && id !== `${node.taskId}-${tier}`) {
+    err(id, `id should be "${node.taskId}-${tier}" per the tier naming convention`)
+  }
+
+  // 2. Structure
+  for (const field of ['title', 'skill', 'scenario', 'input', 'successMessage']) {
+    if (typeof lesson[field] !== 'string' || !lesson[field].trim()) err(id, `missing or empty "${field}"`)
+  }
+  if (!VALID_DIFFICULTIES.includes(lesson.difficulty)) err(id, `difficulty "${lesson.difficulty}" not in ${VALID_DIFFICULTIES.join('/')}`)
+  if (!Array.isArray(lesson.instructions) || lesson.instructions.length === 0) err(id, 'instructions missing or empty')
+  if (!VALID_INTERACTIONS.includes(lesson.interactionType)) err(id, `unknown interactionType "${lesson.interactionType}"`)
+  if (!VALID_VALIDATORS.includes(lesson.validation?.type)) err(id, `unknown validation.type "${lesson.validation?.type}"`)
+  if (!lesson.intro?.heading) err(id, 'intro.heading missing')
+  const sections = lesson.intro?.sections
+  if (!Array.isArray(sections) || sections.length < 2 || sections.length > 5) {
+    err(id, `intro.sections should have 2-5 entries (has ${sections?.length ?? 0})`)
+  } else if (sections.some((s) => !s.title || !s.body)) {
+    err(id, 'every intro section needs a title and body')
+  }
+  const points = lesson.takeaway?.points
+  if (!Array.isArray(points) || points.length < 3) {
+    err(id, `takeaway.points should have >= 3 entries (has ${points?.length ?? 0})`)
+  } else {
+    // 3. Capability statement - either the rich dialect's takeaway.capability
+    // or the last takeaway point must carry it.
+    const capability = lesson.takeaway?.capability
+    const hasCapability =
+      (typeof capability === 'string' && /^The workflow can now /.test(capability)) ||
+      /^The workflow can now /.test(points[points.length - 1])
+    if (!hasCapability) {
+      err(id, 'Capability Statement missing: takeaway.capability or the last takeaway point must start "The workflow can now ..."')
+    }
+  }
+  if (!lesson.takeaway?.artifactName) err(id, 'takeaway.artifactName missing')
+
+  // 4. Interaction shape
+  if (lesson.interactionType === 'choiceCheck') {
+    const qs = lesson.validation?.questions
+    if (!Array.isArray(qs) || qs.length < 3 || qs.length > 5) {
+      err(id, `choiceCheck needs 3-5 questions (has ${qs?.length ?? 0})`)
+    } else {
+      qs.forEach((q, i) => {
+        if (!Array.isArray(q.options) || q.options.length !== 3) err(id, `question ${i + 1} must have exactly 3 options`)
+        else if (!q.options.some((o) => o.id === q.correctOptionId)) err(id, `question ${i + 1} correctOptionId "${q.correctOptionId}" matches no option`)
+        if (!q.explain || !q.explain.trim()) err(id, `question ${i + 1} needs explain text`)
+      })
+    }
+    if (!lesson.validation?.artifactOnPass || typeof lesson.validation.artifactOnPass !== 'object') {
+      err(id, 'choiceCheck needs validation.artifactOnPass (the minted profile artifact)')
+    }
+  } else if (lesson.interactionType === 'templateSlots') {
+    const template = lesson.validation?.template || ''
+    const slots = lesson.validation?.slots || []
+    const tokens = Array.from(template.matchAll(/\{\{(\w+)\}\}/g)).map((m) => m[1])
+    const slotIds = slots.map((s) => s.id)
+    tokens.filter((t) => !slotIds.includes(t)).forEach((t) => err(id, `template token {{${t}}} has no slot definition`))
+    slotIds.filter((s) => !tokens.includes(s)).forEach((s) => err(id, `slot "${s}" never appears in the template`))
+    slots.forEach((s) => {
+      if (!s.label || !s.hint) err(id, `slot "${s.id}" needs label and hint`)
+      if (s.numeric && typeof s.expected !== 'number') err(id, `numeric slot "${s.id}" needs a numeric expected value`)
+      if (!s.numeric && s.expected === undefined && !Array.isArray(s.accepted)) err(id, `slot "${s.id}" needs expected or accepted`)
+    })
+    const shelf = lesson.shelf
+    if (!Array.isArray(shelf) || shelf.length === 0) err(id, 'templateSlots lessons need a shelf config')
+    else shelf.forEach((item) => {
+      if (!item.nodeId || !item.artifactName || !item.producedBy) err(id, 'each shelf entry needs nodeId, artifactName, producedBy')
+      else if (!nodes.some((n) => n.id === item.nodeId)) err(id, `shelf nodeId "${item.nodeId}" not on the map`)
+    })
+  } else {
+    // jsonEditor
+    const guide = lesson.fieldGuide
+    if (!Array.isArray(guide) || guide.length === 0) err(id, 'jsonEditor lessons need a fieldGuide')
+    else {
+      guide.forEach((f) => {
+        if (!f.field || !f.meaning || !f.type || !f.hint) err(id, `fieldGuide entry "${f.field}" needs field/meaning/type/hint`)
+      })
+      const guideFields = new Set(guide.map((f) => f.field))
+      const validated =
+        lesson.validation.requiredFields || lesson.validation.rowFields || []
+      validated
+        .filter((f) => !guideFields.has(f))
+        .forEach((f) => err(id, `validated field "${f}" has no fieldGuide row`))
+    }
+    if (typeof lesson.starterAnswer !== 'string') err(id, 'jsonEditor lessons need a starterAnswer string')
+    else {
+      try {
+        JSON.parse(lesson.starterAnswer)
+      } catch {
+        err(id, 'starterAnswer is not valid JSON')
+      }
+    }
+  }
+
+  // Non-ASCII warning (copy should stay ASCII-adjacent like the docs)
+  const raw = JSON.stringify(lesson)
+  const nonAscii = raw.match(/[^\x20-\x7E]/g)
+  if (nonAscii) warn(id, `${nonAscii.length} non-ASCII character(s) in lesson copy (e.g. ${JSON.stringify(nonAscii[0])})`)
+}
+
+// Registration completeness: every registered id has a file.
+for (const [tier, ids] of Object.entries(TIER_IDS)) {
+  ids.filter((lid) => !lessonsById[lid]).forEach((lid) => {
+    errors++
+    console.log(`ERROR registration: BUILT_LESSON_IDS_BY_TIER.${tier} lists "${lid}" but no lesson file exists`)
+  })
+}
+
+// 5. Canon assertions
+for (const a of canon.assertions) {
+  const lesson = lessonsById[a.lesson]
+  if (!lesson) {
+    errors++
+    console.log(`ERROR canon: assertion targets missing lesson "${a.lesson}"`)
+    continue
+  }
+  const actual = resolvePath(lesson, a.path)
+  let ok
+  if (a.op === 'includes') ok = Array.isArray(actual) && actual.includes(a.value)
+  else ok = typeof a.value === 'number' || typeof a.value === 'boolean' ? actual === a.value : String(actual) === String(a.value)
+  if (!ok) {
+    errors++
+    console.log(`ERROR canon: ${a.lesson} ${a.path} ${a.op} ${JSON.stringify(a.value)} - actual: ${JSON.stringify(actual)}`)
+  }
+}
+
+console.log(`\n${files.length} lessons linted: ${errors} errors, ${warnings} warnings (${canon.assertions.length} canon assertions)`)
+process.exit(errors === 0 ? 0 : 1)
