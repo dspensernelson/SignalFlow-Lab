@@ -4,15 +4,16 @@ SignalFlow Lab is a local React learning app for practicing workplace automation
 
 The first project is **Meridian Morning Market Brief**, a fictional energy-market workflow that turns messy overnight market inputs into an approval-ready 7:00 AM brief.
 
-## Current Status (2026-07-01, second pass - module-01-tiers)
+## Current Status (2026-07-02, module-01-tiers - MODULE 1 COMPLETE)
 
 Where things stand if you are picking this back up:
 
-- **Module 1 Easy is COMPLETE: all 17 lessons buildable and passing.** Six new
-  jsonEditor lessons reuse the four frozen validators; six inspection/
-  interpretation lessons use the new `choiceCheck` quiz interaction; the
-  Morning Brief capstone uses the new `templateSlots` assembly interaction
-  (artifact shelf + inline template slots, renders market-brief.md).
+- **Module 1 is COMPLETE across all three tiers** (Easy 17/17, Medium 17/17,
+  Hard 8/8). The hard-tier solo-rebuild capstone
+  (`lesson-approval-decision-hard`) shipped the new `artifactImport`
+  interaction (SPEC_ARTIFACT_IMPORT.md): the learner rebuilds the four core
+  files outside the app in any tool, imports them, and the app runs the frozen
+  easy-tier validators against each before minting `rebuilt-pipeline.json`.
 - **Difficulty tiers are live**: Easy / Medium / Hard switch in the app bar.
   Each tier has independent progress and artifacts (`signalflow_progress_medium`
   etc.; Easy keeps the legacy keys). Tier lesson variants resolve by convention:
@@ -21,10 +22,10 @@ Where things stand if you are picking this back up:
   notes, explicit nulls, dropped rows, policy v1.1.0 at 6/14, negative
   boundary case, out-of-office delegation, exception-surfacing brief). Canon:
   `curriculum/module-01/medium/_OVERVIEW.md`.
-- **Hard tier: 7 built - the full curated drill set** (schema v2 migration,
+- **Hard tier: COMPLETE - 8 built** (schema v2 migration,
   threshold design from history, feed-failure handling, escalation ladder,
-  classify-under-quarantine, degraded brief, retention design). Only the
-  solo-rebuild capstone remains: `curriculum/module-01/hard/_OVERVIEW.md`.
+  classify-under-quarantine, degraded brief, retention design, plus the
+  solo-rebuild capstone): `curriculum/module-01/hard/_OVERVIEW.md`.
 - **Lessons unlock as a branching tree**: one intro lesson (Analyst Notes)
   opens the board 2-3 lessons at a time (LESSON_PREREQS in
   src/lib/progress.js; locking is derived, never stored). Locked nodes name
@@ -45,9 +46,9 @@ Where things stand if you are picking this back up:
   pre-approved (`SPEC_ARTIFACT_IMPORT.md`, `SPEC_MULTI_PROJECT.md`), and
   `AUTONOMY_CHARTER.md` carries the owner's standing approvals across every
   decision gate. A builder starts at `BUILDER_KICKOFF.md` and works the
-  fixed queue: Module 1 capstone -> Module 1 wrap -> multi-project engine
-  -> modules 2-10 in order -> stop. Parked questions go to
-  `OPEN_QUESTIONS.md`; CI runs `npm run check` on every push.
+  fixed queue: Module 1 capstone (DONE) -> Module 1 wrap (DONE) ->
+  multi-project engine -> modules 2-10 in order -> stop. Parked questions go
+  to `OPEN_QUESTIONS.md`; CI runs `npm run check` on every push.
 
 ## Current Product Model
 

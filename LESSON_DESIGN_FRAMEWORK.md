@@ -233,7 +233,7 @@ developer thinking.
 
 Data-driven lessons follow Intro -> Exercise -> Takeaway, rendered by shared components.
 
-State as of 2026-07-01 (branch module-01-tiers, PR #2):
+State as of 2026-07-02 (branch module-01-tiers, PR #2 - MODULE 1 COMPLETE):
 
 - EASY TIER COMPLETE: all 17 nodes have built, passing lessons. The 13 newer
   ones were implemented from the scripts in curriculum/module-01/easy/ (one
@@ -246,11 +246,11 @@ State as of 2026-07-01 (branch module-01-tiers, PR #2):
 - MEDIUM: COMPLETE - 17 of 17 built. Canon and per-lesson judgments:
   curriculum/module-01/medium/_OVERVIEW.md. Decision recorded there:
   exceptions stay fields inside artifacts, no new node at this tier.
-- HARD: 7 built - the full curated drill set (intake v2 migration, threshold
-  design, feed failure, escalation ladder, classify-under-quarantine,
-  degraded brief, retention design). Curation decision recorded: inspection
-  nodes get no hard variant. Only the solo-rebuild capstone remains:
-  curriculum/module-01/hard/_OVERVIEW.md.
+- HARD: COMPLETE - 8 of 8 built - the curated drill set (intake v2 migration,
+  threshold design, feed failure, escalation ladder, classify-under-quarantine,
+  degraded brief, retention design) plus the solo-rebuild capstone
+  (lesson-approval-decision-hard, artifactImport). Curation decision recorded:
+  inspection nodes get no hard variant. curriculum/module-01/hard/_OVERVIEW.md.
 - Wave D polish is APPLIED (capability statements + dual-materiality note on
   the original four lessons).
 
@@ -260,12 +260,14 @@ Key files:
 - Nodes / phases / edges: src/data/workflowNodes.json, phases.json, workflowEdges.json
 - Node schema (doc only): src/data/workflowNode.schema.json
 - Validators: src/lib/validators.js (jsonFields, jsonPolicy, jsonRows,
-  jsonDeltas, choiceCheck, templateSlots - all additive and config-driven;
-  DO NOT change matching rules)
+  jsonDeltas, choiceCheck, templateSlots, artifactImport - all additive and
+  config-driven; DO NOT change matching rules)
 - Interaction workspaces: LessonExercise branches on lesson.interactionType -
   jsonEditor (inline), ChoiceCheckExercise.jsx (quiz; questions render in a
   2-per-row grid to hold the no-scroll rule), TemplateSlotsExercise.jsx
-  (assembly; artifact shelf reads loadArtifacts(), template slots inline)
+  (assembly; artifact shelf reads loadArtifacts(), template slots inline),
+  ArtifactImportExercise.jsx (solo-rebuild import; per-file picker/paste,
+  grades each import through validateAnswer, mints the composite artifact)
 - Components: LessonWorkspace (orchestrator), LessonIntro, LessonExercise, LessonTakeaway,
   FieldGuide, ValidationResults, WorkflowGraph, NodeDetail, ProjectCanvas, ArtifactViewer
 - Progress / artifacts / tiers: src/lib/progress.js; localStorage keys
@@ -295,13 +297,14 @@ accepted MVP). README.md is the quick orientation.
 
 ---
 
-## 7. Where we are in the process / pick up here (updated 2026-07-01)
+## 7. Where we are in the process / pick up here (updated 2026-07-02)
 
 The design pass this document originally scoped is DONE and shipped well past
 it: the framework was applied, LESSON_AUTHORING_TEMPLATE.md exists, all 17
-Easy lessons are built, the tier engine is live, and Medium/Hard are partially
-built (see section 6). The long-range plan (10 scenario-based modules x 3
-tiers, ten-year horizons) is CURRICULUM_MASTER_PLAN.md.
+Easy lessons are built, the tier engine is live, and Module 1 is COMPLETE
+across all three tiers (Easy 17, Medium 17, Hard 8 - see section 6). The
+long-range plan (10 scenario-based modules x 3 tiers, ten-year horizons) is
+CURRICULUM_MASTER_PLAN.md.
 
 ### Open work, in priority order
 
@@ -311,9 +314,13 @@ tiers, ten-year horizons) is CURRICULUM_MASTER_PLAN.md.
    by import; each file is graded by the frozen easy-tier JSON validator that
    built it, and a full pass mints the composite `rebuilt-pipeline.json`. Hard
    tier is now 8/8. No-scroll verified live in the wrong-answer state.
-2. Module 1 wrap: node-split decisions (NODE_AUDIT items 2-3), Module 1 case
-   study, tagged release. Then Module 2 (Beacon Invoice Desk) STRICTLY via
-   MODULE_AUTHORING_PLAYBOOK.md - multi-project engine support specced first.
+2. Module 1 wrap - DONE (2026-07-02). All three tiers played through end to
+   end at 1280x800 (gating, no-scroll wrong-answer state, completion +
+   artifacts); docs synced (README status, this section, DECISION_LOG, all
+   three tier _OVERVIEW.md); Module 1 case study written
+   (curriculum/module-01/CASE_STUDY.md); release tagged. NEXT: the
+   multi-project engine (SPEC_MULTI_PROJECT.md) before Module 2 (Beacon
+   Invoice Desk), which is built STRICTLY via MODULE_AUTHORING_PLAYBOOK.md.
 3. Housekeeping: bundle >500 kB (dynamic import per tier when it matters);
    rich-intro migration for the 40 lessons still on the simple dialect.
 

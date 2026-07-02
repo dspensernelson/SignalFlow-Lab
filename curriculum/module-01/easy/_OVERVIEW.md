@@ -2,8 +2,9 @@
 
 > **STATUS: ALL 17 LESSONS BUILT (2026-07-01, module-01-tiers).** Waves A, B,
 > and C below are implemented, smoke-tested, and verified live (incl. the
-> no-scroll rule in wrong-answer states). Only Wave D (polish deltas in
-> BUILT_LESSON_AUDITS.md) remains. This file stays authoritative for the
+> no-scroll rule in wrong-answer states). Wave D polish (BUILT_LESSON_AUDITS.md)
+> is applied. Module 1 is COMPLETE across all three tiers (Easy 17, Medium 17,
+> Hard 8) as of 2026-07-02. This file stays authoritative for the
 > CANON DATA (section 2) - medium/hard lessons and future edits must not
 > contradict it. The per-lesson script files remain the design record for the
 > built lesson JSONs.
