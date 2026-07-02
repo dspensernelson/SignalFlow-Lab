@@ -1,0 +1,6 @@
+{
+  "_comment": "Machine-checkable canon for Module 2 (Beacon Invoice Desk), enforced by scripts/lint-lessons.mjs. Same contract as Module 1's canon.json: each assertion resolves a path inside a lesson JSON and compares it to the canonical value (ops: equals, includes). Derivations RECOMPUTE derived numbers from their sources so an internally-consistent-but-wrong figure cannot ship (op delta = a - b; op pctMove = (a - b) / b * 100, rounded to `round` decimals). The prose canon lives in curriculum/module-02/<tier>/_OVERVIEW.md; THIS file prevents cross-lesson drift. Assertions are added per lesson as the tier is built.",
+  "module": "module-02",
+  "derivations": [],
+  "assertions": []
+}
