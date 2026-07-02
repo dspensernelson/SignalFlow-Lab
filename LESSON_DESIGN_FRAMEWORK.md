@@ -308,18 +308,20 @@ tiers, ten-year horizons) is CURRICULUM_MASTER_PLAN.md.
 1. THE CAPSTONE - the last piece of Module 1: solo rebuild outside the app,
    validated by an artifact-import surface (file picker -> validateAnswer per
    imported file). Specced in CURRICULUM_MASTER_PLAN.md Part 3.3 and
-   curriculum/module-01/hard/_OVERVIEW.md.
-2. Module 1 wrap: consider the deferred node splits (NODE_AUDIT items 2-3,
-   distribution-archive and risk-evaluation) before starting Module 2; then
-   Module 2 (Beacon Invoice Desk) needs its own NODE_AUDIT-style document
-   before any lessons are authored (CURRICULUM_MASTER_PLAN Part 2 note).
-3. Housekeeping candidates: the JS bundle passed 500 kB (all lesson JSON is
-   statically imported) - dynamic import per tier is the natural split when
-   it starts to matter. NODE_AUDIT full re-audit is optional, not blocking.
+   curriculum/module-01/hard/_OVERVIEW.md. Spec first, at
+   ENGINE_ADDITIONS_SPEC fidelity.
+2. Module 1 wrap: node-split decisions (NODE_AUDIT items 2-3), Module 1 case
+   study, tagged release. Then Module 2 (Beacon Invoice Desk) STRICTLY via
+   MODULE_AUTHORING_PLAYBOOK.md - multi-project engine support specced first.
+3. Housekeeping: bundle >500 kB (dynamic import per tier when it matters);
+   rich-intro migration for the 40 lessons still on the simple dialect.
 
-DONE (this pass): Medium 17/17 with canon fix, Wave D polish, Hard curated
-set complete at 7 drills (escalation ladder, quarantine classification,
-degraded brief, retention design), hard curation decision logged.
+DONE (Phase 0, 2026-07-02): unlock TREE (one intro fans the board open;
+LESSON_PREREQS), regression harness (`npm run test:lessons`, 41/41), lesson
+lint + canon.json (`npm run lint:lessons`, 58 assertions), `npm run check`
+pipeline, MODULE_AUTHORING_PLAYBOOK.md, DECISION_BOUNDARIES.md,
+VERIFICATION_PLAYBOOK.md. Secondary builders can now execute lesson work
+from the playbooks with the harness catching drift.
 
 ### Recommended opening prompt for the next session
 
@@ -327,16 +329,17 @@ Paste this if starting cold:
 
 ```text
 We are continuing SignalFlow Lab. Read README.md (Current Status),
-LESSON_DESIGN_FRAMEWORK.md sections 6-7, CURRICULUM_MASTER_PLAN.md, and
-curriculum/module-01/medium/_OVERVIEW.md first.
+LESSON_DESIGN_FRAMEWORK.md sections 6-7, DECISION_BOUNDARIES.md, and
+CURRICULUM_MASTER_PLAN.md Part 8 first. For lesson work also read
+MODULE_AUTHORING_PLAYBOOK.md and VERIFICATION_PLAYBOOK.md.
 
 Work the open list in LESSON_DESIGN_FRAMEWORK.md section 7. Default next
 task: the Hard solo-rebuild capstone, which needs an artifact-import
-surface (design it against ENGINE_ADDITIONS_SPEC.md conventions before
-coding). Constraints: validators are additive (never change
-matching rules), keep the no-scroll rule (verify the wrong-answer state at
-innerHeight >= 800), keep repo docs ASCII-only, lint+build must pass, and
-commit per lesson or small batch.
+surface (spec it at ENGINE_ADDITIONS_SPEC.md fidelity before coding; that
+is an owner gate). Constraints: respect DECISION_BOUNDARIES.md, `npm run
+check` green before every commit, verify the no-scroll rule live in the
+wrong-answer state, keep repo docs ASCII-only, commit per lesson or small
+batch.
 ```
 
 ### Market Intake Record artifact spec scaffold
