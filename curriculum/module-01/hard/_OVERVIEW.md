@@ -1,6 +1,6 @@
 # Module 1 Hard - Own the Design - Overview
 
-Status (2026-07-01): 3 of 17 lessons BUILT and playable; the tier is
+Status (2026-07-01, second pass): 4 lessons BUILT and playable; the tier is
 intentionally a curated set, not necessarily all 17 nodes (see below).
 Hard lessons live in src/data/lessons/ as `lesson-<node>-hard.json`, resolved
 via tierLessonId (taskId + "-hard"), listed in BUILT_LESSON_IDS_BY_TIER.hard.
@@ -16,13 +16,14 @@ validator deliberately checks SHAPE and GOVERNANCE (fields present, ordering,
 rationale non-empty) rather than exact values - that is the pedagogy, not a
 validation gap.
 
-## Built lessons (3)
+## Built lessons (4)
 
 | Node | Lesson id | The design responsibility |
 | --- | --- | --- |
 | market-intake-record | lesson-intake-hard | Schema v2 migration: rename, reshape, version, lineage (migratedFrom) |
 | threshold-policy | lesson-threshold-policy-hard | Design thresholds from 60 days of history; rationale must cite day counts |
 | price-feed | lesson-price-feed-hard | Failure handling: late feed, quarantined malformed row, degraded brief, incident record |
+| approval-route | lesson-approval-route-hard | Timeout design: silence-driven escalation ladder, rung timestamps, exhausted-ladder fallback |
 
 Hard canon so far: intake v2 uses the EASY canon record (187/142, wind,
 approval true) as its migration input. The policy-design lesson uses its own
@@ -30,22 +31,23 @@ approval true) as its migration input. The policy-design lesson uses its own
 6:20, arrived 6:42, SPP row malformed, quarantine, degraded brief, notify
 Risk Desk Lead.
 
+Hard canon addition (approval-route-hard): ladder = 10 minutes of silence per
+rung; request 6:30 -> delegate 6:40 -> Desk Head 6:50 -> approved 6:55;
+exhausted fallback = release marked UNAPPROVED with incident (template
+v2.0.0 names the ladder).
+
 ## Remaining to author - design notes (in priority order)
 
-1. approval-route-hard: approver timeout - the deadline passes with NO
-   response; learner executes the escalation ladder (template names the
-   ladder: delegate, then Desk Head, then release-with-note per policy) and
-   records the timeout + ladder step used (jsonFields).
-2. variance-check-hard / risk-evaluation-hard: downstream of the degraded
+1. variance-check-hard / risk-evaluation-hard: downstream of the degraded
    feed - compute under quarantine (SPP absent), propagate degraded status
    into the risk record so the brief can cite it (jsonDeltas).
-3. morning-brief-hard: assemble the DEGRADED brief - an Incidents section
+2. morning-brief-hard: assemble the DEGRADED brief - an Incidents section
    sourced from the incident record; slots for what is missing and why
    (templateSlots with a hard shelf config).
-4. distribution-archive-hard: retention design - learner chooses retention
+3. distribution-archive-hard: retention design - learner chooses retention
    and defends it (jsonPolicy-style shape check with rationale, like the
    threshold design lesson).
-5. THE CAPSTONE (biggest remaining engine work): solo rebuild outside the
+4. THE CAPSTONE (biggest remaining engine work): solo rebuild outside the
    app. Learner recreates intake -> clean -> variance -> brief with local
    files and any tool (PowerShell, Python, Power Automate), then imports the
    four produced files; the app runs the existing validators against them.

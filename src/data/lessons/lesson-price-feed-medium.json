@@ -1,0 +1,112 @@
+{
+  "id": "lesson-price-feed-medium",
+  "nodeId": "price-feed",
+  "title": "Judge a Misbehaving Delivery",
+  "difficulty": "Medium",
+  "skill": "Contract judgment on real files",
+  "clock": "6:18 AM",
+  "scenario": "It is 6:18 AM. Today's file honors the column contract - and still manages to misbehave four different ways. Before the cleaning step runs, judge each anomaly: which are contract violations, which are just mess, and which demand a check before anything consumes them.",
+  "inputType": "text",
+  "inputLabel": "Raw Price Rows (as delivered)",
+  "input": "hub, peak, settled\nercot , $204/MWh, $151/MWh\nERCOT, $204/MWh, $151/MWh\nspp, 98.5 /MWh, $90/MWh\nMISO, $77/MWh,\nwaue, $63/MWh, $58/MWh\n\nFeed contract: columns hub, peak, settled; one reading per hub per night; every column populated. WAUE was added to the desk last month.",
+  "instructions": [
+    "Compare each row against the stated contract.",
+    "Answer the four judgment questions.",
+    "Validate to record the delivery assessment."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "Two identical ERCOT rows arrived. What happened, and what must cleaning do?",
+        "options": [
+          { "id": "a", "text": "One reading was delivered twice - deduplicate, or every sum and average downstream double-counts" },
+          { "id": "b", "text": "Two different ERCOT markets reported - keep both rows" },
+          { "id": "c", "text": "The vendor emphasized an important price - keep both for safety" }
+        ],
+        "correctOptionId": "a",
+        "explain": "The contract says one reading per hub per night. Identical values under the same key are a double delivery, and duplicates silently corrupt any aggregate."
+      },
+      {
+        "id": "q2",
+        "prompt": "The MISO row has an empty settled column. Is the contract violated?",
+        "options": [
+          { "id": "a", "text": "No - blank cells are cosmetic" },
+          { "id": "b", "text": "Yes - a required column is unpopulated, so the whole row is untrustworthy" },
+          { "id": "c", "text": "Only if more than one cell is blank" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The contract requires every column populated. One missing required value poisons the row: its other values may be fine, but the row can no longer be consumed as a complete reading."
+      },
+      {
+        "id": "q3",
+        "prompt": "WAUE appears in the feed. What must be checked before downstream steps consume it?",
+        "options": [
+          { "id": "a", "text": "Nothing - new rows are automatically safe" },
+          { "id": "b", "text": "Whether its prices are higher than ERCOT's" },
+          { "id": "c", "text": "Whether the reference data (forecast, prior day) knows this key yet" }
+        ],
+        "correctOptionId": "c",
+        "explain": "A new key in one dataset is a join risk everywhere else. WAUE is valid in the feed - the question is whether the comparisons downstream have anything to join it TO."
+      },
+      {
+        "id": "q4",
+        "prompt": "SPP's peak reads 98.5. What kind of value is that?",
+        "options": [
+          { "id": "a", "text": "A valid decimal number - coercion must preserve it, not round it" },
+          { "id": "b", "text": "An error - prices are always whole numbers" },
+          { "id": "c", "text": "A percentage that slipped into the wrong column" }
+        ],
+        "correctOptionId": "a",
+        "explain": "Nothing in the contract says integers. Decimals are ordinary numeric values; the cleaning step's job is to preserve precision, not to tidy it away."
+      }
+    ],
+    "artifactOnPass": {
+      "source": "price-feed",
+      "deliveryAssessment": {
+        "duplicateRow": "ERCOT double-delivered - dedupe",
+        "contractViolation": "MISO settled column empty - row untrustworthy",
+        "newKeyRisk": "WAUE - verify references know the key",
+        "validButMessy": "SPP 98.5 decimal, casing drift, stray spaces - coerce, preserve precision"
+      },
+      "firstConsumer": "clean-price-data"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Assess this delivery against its contract: classify the duplicate row, the empty required column, the never-before-seen hub key, and the decimal value - which are violations, which are mess, which are join risks.",
+  "successMessage": "Delivery judged. The cleaning step now knows exactly which anomaly gets which treatment.",
+  "intro": {
+    "heading": "Before you judge: not all anomalies are equal",
+    "sections": [
+      {
+        "title": "Four anomalies, three verdicts",
+        "body": "Today's file contains a duplicate (dedupe it), a contract violation (distrust the row), a new key (check the joins), and honest mess (coerce it). Treating them all the same - or all differently by mood - is how pipelines rot."
+      },
+      {
+        "title": "Contracts define violations",
+        "body": "Whether a blank cell is a problem is not a matter of taste: the contract says every column populated, so it is a violation. Judgment at this tier means citing the contract, not squinting at the file."
+      },
+      {
+        "title": "New keys are everyone else's problem",
+        "body": "WAUE is perfectly valid HERE. The risk lives downstream, where forecast and baseline data may not know the key yet. Spotting cross-dataset consequences of a local change is a real reviewer's skill."
+      }
+    ],
+    "jsonExample": "{\n  \"duplicateRow\": \"dedupe\",\n  \"contractViolation\": \"distrust the row\",\n  \"newKeyRisk\": \"verify joins\"\n}",
+    "skill": "Contract judgment on real files",
+    "artifactName": "source-profile-price-feed.json"
+  },
+  "takeaway": {
+    "heading": "Delivery assessed",
+    "points": [
+      "You classified four anomalies into their correct treatments instead of one-size-fits-all suspicion.",
+      "You judged the blank cell by the contract, not by intuition - that is what makes the judgment repeatable.",
+      "You flagged the new key as a downstream join risk before any join broke.",
+      "The medium cleaning lesson executes exactly these verdicts: dedupe ERCOT, drop MISO, keep 98.5, carry WAUE.",
+      "The workflow can now triage a misbehaving delivery into violations, mess, and risks - each with its own response."
+    ],
+    "artifactName": "source-profile-price-feed.json"
+  }
+}

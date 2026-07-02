@@ -17,23 +17,23 @@ Where things stand if you are picking this back up:
   Each tier has independent progress and artifacts (`signalflow_progress_medium`
   etc.; Easy keeps the legacy keys). Tier lesson variants resolve by convention:
   `lesson-intake` -> `lesson-intake-medium` / `lesson-intake-hard`.
-- **Medium tier: 7 of 17 built** on a messier canon (conflicting notes,
-  explicit nulls, dropped rows, policy v1.1.0 at 6/14, negative boundary case,
-  out-of-office delegation). Canon + remaining designs:
+- **Medium tier: COMPLETE - 17 of 17 built** on a messier canon (conflicting
+  notes, explicit nulls, dropped rows, policy v1.1.0 at 6/14, negative
+  boundary case, out-of-office delegation, exception-surfacing brief). Canon:
   `curriculum/module-01/medium/_OVERVIEW.md`.
-- **Hard tier: 3 built** (intake schema v2 migration, threshold design from
-  history, feed-failure handling). Remaining work incl. the solo-rebuild
-  capstone: `curriculum/module-01/hard/_OVERVIEW.md`.
+- **Hard tier: 4 built** (intake schema v2 migration, threshold design from
+  history, feed-failure handling, silence-driven escalation ladder). Remaining
+  work incl. the solo-rebuild capstone:
+  `curriculum/module-01/hard/_OVERVIEW.md`.
 - **No-scroll hard rule** verified live at 1280x800 in wrong-answer states for
   the new interaction types (and previously for the original four lessons).
 - **Branches/PRs**: PR #1 = `takeaway-workflow-diagram` -> `main` (redesign +
   curriculum docs). PR #2 = `module-01-tiers` -> `takeaway-workflow-diagram`
   (all implementation above). The live Vercel site is from an earlier build;
   redeploy is intentionally out of scope.
-- **Next candidates**: remaining 10 Medium lessons (quiz variants + template/
-  routine/brief/archive), Hard approval-timeout and degraded-brief lessons,
-  the Hard solo-rebuild capstone (needs artifact import), and Wave D polish
-  deltas in `curriculum/module-01/easy/BUILT_LESSON_AUDITS.md`.
+- **Next candidates**: remaining Hard lessons (degraded variance/risk,
+  degraded morning-brief, retention design) and the Hard solo-rebuild
+  capstone (needs an artifact-import surface). Wave D polish is APPLIED.
 
 ## Current Product Model
 

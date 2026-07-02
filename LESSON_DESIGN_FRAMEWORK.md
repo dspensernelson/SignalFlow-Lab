@@ -243,12 +243,14 @@ State as of 2026-07-01 (branch module-01-tiers, PR #2):
   Per-tier progress/artifacts via suffixed localStorage keys (easy keeps the
   legacy keys). Tier variants resolve via tierLessonId in src/lib/progress.js:
   taskId, taskId-medium, taskId-hard, gated by BUILT_LESSON_IDS_BY_TIER.
-- MEDIUM: 7 of 17 built (intake, clean-price-data, threshold-policy,
-  variance-check, risk-evaluation, approval-decision, approval-route). Canon
-  and remaining designs: curriculum/module-01/medium/_OVERVIEW.md.
-- HARD: 3 built (intake v2 migration, threshold design from history,
-  price-feed failure handling). Remaining incl. the solo-rebuild capstone:
-  curriculum/module-01/hard/_OVERVIEW.md.
+- MEDIUM: COMPLETE - 17 of 17 built. Canon and per-lesson judgments:
+  curriculum/module-01/medium/_OVERVIEW.md. Decision recorded there:
+  exceptions stay fields inside artifacts, no new node at this tier.
+- HARD: 4 built (intake v2 migration, threshold design from history,
+  price-feed failure handling, approval escalation ladder). Remaining incl.
+  the solo-rebuild capstone: curriculum/module-01/hard/_OVERVIEW.md.
+- Wave D polish is APPLIED (capability statements + dual-materiality note on
+  the original four lessons).
 
 Key files:
 - Lessons: src/data/lessons/*.json (easy schema below; -medium / -hard
@@ -301,22 +303,21 @@ tiers, ten-year horizons) is CURRICULUM_MASTER_PLAN.md.
 
 ### Open work, in priority order
 
-1. Remaining 10 MEDIUM lessons. Design notes per node are already written in
-   curriculum/module-01/medium/_OVERVIEW.md - follow its canon exactly
-   (conflicting-notes morning, WAUE hub, policy v1.1.0 at 6/14). The six
-   choiceCheck variants should ask judgment questions, not identification
-   questions. One open decision recorded there: whether exceptions become a
-   first-class artifact/node or stay fields inside existing artifacts.
-2. Remaining HARD lessons, per curriculum/module-01/hard/_OVERVIEW.md:
-   approval-timeout ladder, degraded-variance/risk, degraded morning-brief,
-   retention design, and THE CAPSTONE (solo rebuild outside the app - needs
-   an artifact-import surface; specced in CURRICULUM_MASTER_PLAN.md Part 3.3).
-   Also decide (and log) whether hard stays a curated 10-12 lessons.
-3. Wave D polish: apply the deltas in
-   curriculum/module-01/easy/BUILT_LESSON_AUDITS.md (mostly appending
-   Capability Statement takeaway points to the 4 original lessons).
-4. NODE_AUDIT.md statuses reflect the pre-build state; its top note covers
-   this. A full re-audit is optional, not blocking.
+1. Remaining HARD lessons, per curriculum/module-01/hard/_OVERVIEW.md:
+   degraded variance/risk, degraded morning-brief, retention design, and THE
+   CAPSTONE (solo rebuild outside the app - needs an artifact-import surface;
+   specced in CURRICULUM_MASTER_PLAN.md Part 3.3). Also decide (and log)
+   whether hard stays a curated set (~10-12) or covers all 17 nodes.
+2. Module 1 wrap: consider the deferred node splits (NODE_AUDIT items 2-3,
+   distribution-archive and risk-evaluation) before starting Module 2; then
+   Module 2 (Beacon Invoice Desk) needs its own NODE_AUDIT-style document
+   before any lessons are authored (CURRICULUM_MASTER_PLAN Part 2 note).
+3. Housekeeping candidates: the JS bundle passed 500 kB (all lesson JSON is
+   statically imported) - dynamic import per tier is the natural split when
+   it starts to matter. NODE_AUDIT full re-audit is optional, not blocking.
+
+DONE (this pass): Medium 17/17, Wave D polish, approval-route-hard,
+medium canon correction (intake prices now match the feed: 204/151).
 
 ### Recommended opening prompt for the next session
 
@@ -328,9 +329,10 @@ LESSON_DESIGN_FRAMEWORK.md sections 6-7, CURRICULUM_MASTER_PLAN.md, and
 curriculum/module-01/medium/_OVERVIEW.md first.
 
 Work the open list in LESSON_DESIGN_FRAMEWORK.md section 7. Default next
-task: author and build the remaining Medium lessons following the medium
-canon exactly. Constraints: validators are additive (never change matching
-rules), keep the no-scroll rule (verify the wrong-answer state at
+task: the remaining Hard lessons (degraded variance/risk and morning-brief,
+retention design), then the solo-rebuild capstone which needs an
+artifact-import surface. Constraints: validators are additive (never change
+matching rules), keep the no-scroll rule (verify the wrong-answer state at
 innerHeight >= 800), keep repo docs ASCII-only, lint+build must pass, and
 commit per lesson or small batch.
 ```

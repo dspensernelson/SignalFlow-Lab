@@ -1,0 +1,145 @@
+{
+  "id": "lesson-morning-brief-medium",
+  "nodeId": "morning-brief",
+  "title": "Assemble the Brief, Exceptions and All",
+  "difficulty": "Medium",
+  "skill": "Assembly with exception surfacing",
+  "clock": "6:50 AM",
+  "scenario": "It is 6:50 AM on the messy morning. The brief must ship with everything this day actually was: a delegated approval, a dropped row, a missing forecast, an unknown generation status. An honest brief does not hide its exceptions - it gives them a section. Fill every slot from your stored artifacts.",
+  "inputType": "text",
+  "inputLabel": "Assembly Rule (template v1.1.0)",
+  "input": "Assembly rule: every slot value comes from a stored artifact - look it up, never re-derive. Template v1.1.0 includes the new Data Notes section (per the template change), which reports today's exceptions: the hub whose feed row was dropped and the hub excluded from variance. The approval line must show the delegation. The headline hub is the one risk-evaluation.json marks escalate.",
+  "instructions": [
+    "Open each artifact on the shelf as you need it.",
+    "Fill the approval line from the delegated approval record - including why a delegate decided.",
+    "Fill the headline from the risk record and prices from the clean table.",
+    "Fill Data Notes: which hub's row was dropped, which hub had no forecast.",
+    "Validate to render market-brief.md."
+  ],
+  "interactionType": "templateSlots",
+  "starterAnswer": "{}",
+  "shelf": [
+    { "nodeId": "market-intake-record", "artifactName": "market-intake.json", "producedBy": "Intake from Conflicting Notes" },
+    { "nodeId": "clean-price-data", "artifactName": "clean-prices.json", "producedBy": "Clean a Feed That Fights Back" },
+    { "nodeId": "variance-check", "artifactName": "variance-summary.json", "producedBy": "Variance with a Hole in the Data" },
+    { "nodeId": "risk-evaluation", "artifactName": "risk-evaluation.json", "producedBy": "Compute and Classify Under the New Policy" },
+    { "nodeId": "approval-route", "artifactName": "approval-route.json", "producedBy": "Approval with the Approver Away" }
+  ],
+  "validation": {
+    "type": "templateSlots",
+    "template": "# Meridian Morning Market Brief - {{briefDay}}\nStatus: {{approvalStatus}} by {{approvedBy}} at {{approvedAt}} (delegate - primary approver {{substitutionReason}})\n\n## Headline\n{{headlineHub}} moved {{headlineMovePct}} percent day-over-day (peak {{peakPrice}}, settled {{settledPrice}}).\n\n## Hub Summary\nERCOT peak 204, settled 151. SPP peak 98.5, settled 90. WAUE peak 63, settled 58.\n\n## Operations\nGeneration status not reported this morning (intake recorded null).\n## Data Notes\n{{droppedHub}} row dropped at cleaning (missing settled value). {{missingForecastHub}} excluded from variance (no forecast for this hub yet).\nPrepared by the Meridian workflow at 6:50 AM.",
+    "slots": [
+      {
+        "id": "briefDay",
+        "label": "Brief day",
+        "numeric": false,
+        "accepted": ["day-1", "today"],
+        "hint": "The escalated morning in the decision log."
+      },
+      {
+        "id": "approvalStatus",
+        "label": "Approval status",
+        "numeric": false,
+        "expected": "approved",
+        "hint": "The decision field in approval-route.json."
+      },
+      {
+        "id": "approvedBy",
+        "label": "Approved by",
+        "numeric": false,
+        "expected": "Deputy Desk Manager",
+        "hint": "decidedBy in approval-route.json - not who was asked first."
+      },
+      {
+        "id": "approvedAt",
+        "label": "Approved at",
+        "numeric": false,
+        "accepted": ["6:47", "6:47 AM", "06:47"],
+        "hint": "decidedAt in approval-route.json."
+      },
+      {
+        "id": "substitutionReason",
+        "label": "Substitution reason",
+        "numeric": false,
+        "accepted": ["out-of-office", "out of office", "ooo"],
+        "hint": "substitutionReason in approval-route.json."
+      },
+      {
+        "id": "headlineHub",
+        "label": "Headline hub",
+        "numeric": false,
+        "expected": "ERCOT",
+        "hint": "The hub with status escalate in risk-evaluation.json."
+      },
+      {
+        "id": "headlineMovePct",
+        "label": "Headline move (percent)",
+        "numeric": true,
+        "expected": 15.9,
+        "hint": "That hub's pctMove in risk-evaluation.json."
+      },
+      {
+        "id": "peakPrice",
+        "label": "Peak price",
+        "numeric": true,
+        "expected": 204,
+        "hint": "The headline hub's peakPrice in clean-prices.json."
+      },
+      {
+        "id": "settledPrice",
+        "label": "Settled price",
+        "numeric": true,
+        "expected": 151,
+        "hint": "The headline hub's settledPrice in clean-prices.json."
+      },
+      {
+        "id": "droppedHub",
+        "label": "Dropped hub",
+        "numeric": false,
+        "expected": "MISO",
+        "hint": "The hub absent from clean-prices.json that the raw feed contained."
+      },
+      {
+        "id": "missingForecastHub",
+        "label": "Missing-forecast hub",
+        "numeric": false,
+        "expected": "WAUE",
+        "hint": "The hub present in risk-evaluation.json but absent from variance-summary.json."
+      }
+    ]
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Assemble a brief from stored artifacts: delegated approval facts (status, deputy, time, reason) from the approval record, the escalated hub and move from the risk record, its prices from the clean table, and the two Data Notes exceptions - the hub dropped at cleaning and the hub excluded from variance.",
+  "successMessage": "Brief rendered with its exceptions on the page. Honest output beats tidy output.",
+  "intro": {
+    "heading": "Before you assemble: the brief tells the whole truth",
+    "sections": [
+      {
+        "title": "Exceptions are content, not noise",
+        "body": "This morning dropped a row, skipped a comparison, and delegated an approval. Readers acting on this brief NEED those facts - a brief that hides its gaps invites decisions the data cannot support."
+      },
+      {
+        "title": "Two slots you derive by ABSENCE",
+        "body": "The dropped hub is the one in the raw feed but not the clean table; the missing-forecast hub is classified in risk but absent from variance. Reading what is NOT in an artifact is a real assembly skill - lineage reasoning, not lookup."
+      },
+      {
+        "title": "The template you changed, in use",
+        "body": "Data Notes exists because of the change request you assessed in the template lesson - approved by the owner, versioned to 1.1.0, present every day. Today it has content; on quiet days it will say none."
+      }
+    ],
+    "jsonExample": "{\n  \"approvedBy\": \"Deputy Desk Manager\",\n  \"droppedHub\": \"MISO\",\n  \"missingForecastHub\": \"WAUE\"\n}",
+    "skill": "Assembly with exception surfacing",
+    "artifactName": "market-brief.md"
+  },
+  "takeaway": {
+    "heading": "Honest brief assembled",
+    "points": [
+      "You shipped a deliverable that reports its own gaps - the dropped row and the missing forecast are on the page, not buried in logs.",
+      "The approval line shows the delegation and why, straight from the substitution record.",
+      "Two slots came from lineage reasoning (what is absent between artifacts), not simple lookup - assembly at this tier reads the pipeline, not just the files.",
+      "Every exception in Data Notes traces back to a governed decision you made earlier this morning.",
+      "The workflow can now produce an output that is trustworthy BECAUSE it is honest about what it does not know."
+    ],
+    "artifactName": "market-brief.md"
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "id": "lesson-approval-template-medium",
+  "nodeId": "approval-template",
+  "title": "Add a Delegate to the Template",
+  "difficulty": "Medium",
+  "skill": "Evolving a governed format",
+  "clock": "6:35 AM",
+  "scenario": "It is 6:35 AM. Last month a brief sat unapproved for forty minutes because the Desk Manager was unreachable and nobody knew who else could sign. The desk agreed the approval template itself must name a delegate. Evolve the governed format: add the field, bump the version, note the change.",
+  "inputType": "text",
+  "inputLabel": "Desk Agreement (amendment)",
+  "input": "Amendment to the Brief Approval Request template (currently v1.0.0):\nEvery approval template must name a DELEGATE - the role that decides when the primary approver is unavailable. For brief approvals the delegate is the Deputy Desk Manager. The response deadline stays 30 minutes. Owner remains the Risk Desk Lead; changes still require Desk Manager sign-off. Record as version 1.1.0 with a change note explaining why the field was added.",
+  "instructions": [
+    "Carry forward the unchanged fields from v1.0.0 (name, owner, approver, subject format, deadline).",
+    "Add the delegate field the amendment requires.",
+    "Bump the version and write the changeNote.",
+    "Validate when every field is filled."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n}",
+  "validation": {
+    "type": "jsonPolicy",
+    "requiredFields": [
+      "templateName",
+      "version",
+      "owner",
+      "approver",
+      "delegate",
+      "subjectFormat",
+      "responseDeadlineMinutes",
+      "changeNote"
+    ],
+    "numericFields": ["responseDeadlineMinutes"],
+    "nonEmptyFields": ["templateName", "version", "owner", "approver", "delegate", "subjectFormat", "changeNote"]
+  },
+  "copilotPrompt": "Amend a governed approval template: keep templateName, owner, approver, subjectFormat, and responseDeadlineMinutes from v1.0.0; add a delegate field (Deputy Desk Manager); bump version to 1.1.0; and write a changeNote explaining the delegate was added after an approver was unreachable.",
+  "successMessage": "Template amended. When an approver goes quiet, the workflow now knows - from the template itself - who decides instead.",
+  "intro": {
+    "heading": "Before you build: formats evolve like policies",
+    "sections": [
+      {
+        "title": "The gap this field closes",
+        "body": "An unreachable approver is not an edge case - it is a certainty over enough mornings. Naming the delegate IN the template means the exception path is decided before the exception, by governance rather than by whoever is panicking at 6:40."
+      },
+      {
+        "title": "Amendments carry their history",
+        "body": "Same discipline as the threshold policy change: unchanged fields carry forward, the new field is added, the version bumps to 1.1.0, and the changeNote records why. A format whose changes are explained can be trusted through its whole history."
+      },
+      {
+        "title": "Watch this field get used",
+        "body": "On this tier's approval lesson, the Desk Manager is out of office - and the out-of-office reply points at exactly the delegate you are naming now. Governance fields earn their keep on the bad mornings."
+      }
+    ],
+    "jsonExample": "{\n  \"templateName\": \"Outage Approval Request\",\n  \"version\": \"1.1.0\",\n  \"delegate\": \"Deputy Site Manager\",\n  \"changeNote\": \"Added delegate after an unreachable approver stalled a release.\"\n}",
+    "skill": "Evolving a governed format",
+    "artifactName": "approval-template.json"
+  },
+  "fieldGuide": [
+    { "field": "templateName", "meaning": "The format being amended.", "type": "string", "hint": "Same template as v1.0.0." },
+    { "field": "version", "meaning": "The bumped version.", "type": "string", "hint": "A field addition on 1.0.0." },
+    { "field": "owner", "meaning": "Who owns the template.", "type": "string", "hint": "Unchanged by the amendment." },
+    { "field": "approver", "meaning": "Who signs off on changes.", "type": "string", "hint": "Unchanged by the amendment." },
+    { "field": "delegate", "meaning": "Who decides when the approver is unavailable.", "type": "string", "hint": "The new field - the amendment names the role." },
+    { "field": "subjectFormat", "meaning": "The standard subject line.", "type": "string", "hint": "Carried forward from v1.0.0." },
+    { "field": "responseDeadlineMinutes", "meaning": "Response window, in minutes.", "type": "number", "hint": "The amendment says it stays the same." },
+    { "field": "changeNote", "meaning": "Why the delegate field was added.", "type": "string", "hint": "The scenario's first sentence is the why." }
+  ],
+  "takeaway": {
+    "heading": "Template amended",
+    "points": [
+      "You evolved a governed format the same way policies evolve: carry forward, add, bump, explain.",
+      "The delegate is now a FIELD, so the exception path is machine-readable instead of tribal knowledge.",
+      "The changeNote preserves the incident that motivated the change - future maintainers inherit the reasoning.",
+      "This tier's approval handoff uses this exact field when the Desk Manager's out-of-office hits.",
+      "The workflow can now survive an unavailable approver by design, not by improvisation."
+    ],
+    "artifactName": "approval-template.json"
+  }
+}
