@@ -1,0 +1,40 @@
+{
+  "LESSON_PATH": [
+    "invoice-inbox",
+    "vendor-master",
+    "po-register",
+    "invoice-record",
+    "receipt-log",
+    "tolerance-policy",
+    "payment-history",
+    "duplicate-check",
+    "three-way-match",
+    "match-decision",
+    "auto-approve-path",
+    "exception-queue",
+    "payment-batch",
+    "run-approval",
+    "payment-run",
+    "remittance-advice",
+    "payment-archive"
+  ],
+  "LESSON_PREREQS": {
+    "invoice-inbox": [],
+    "vendor-master": ["invoice-inbox"],
+    "po-register": ["invoice-inbox"],
+    "invoice-record": ["invoice-inbox"],
+    "receipt-log": ["po-register"],
+    "tolerance-policy": ["po-register"],
+    "payment-history": ["invoice-record"],
+    "duplicate-check": ["invoice-record", "payment-history"],
+    "three-way-match": ["invoice-record", "po-register", "receipt-log", "tolerance-policy"],
+    "match-decision": ["three-way-match", "duplicate-check"],
+    "auto-approve-path": ["match-decision"],
+    "exception-queue": ["match-decision", "vendor-master"],
+    "payment-batch": ["auto-approve-path", "exception-queue"],
+    "run-approval": ["payment-batch"],
+    "payment-run": ["run-approval"],
+    "remittance-advice": ["payment-run", "vendor-master"],
+    "payment-archive": ["payment-run"]
+  }
+}
