@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import WorkflowGraph from './WorkflowGraph'
 import NodeDetail from './NodeDetail'
 import {
@@ -52,6 +53,75 @@ function TierSwitch({ value, onChange }) {
 const PROJECT_GOAL =
   'Build a workplace automation that turns messy overnight market inputs into an approval-ready 7:00 AM brief. The map below is the real dependency graph — phases on the left feed objects that get reused, evaluated, and routed downstream. Click any node to see how that piece gets built and reused.'
 
+const PROJECT_STATUS_LABELS = { complete: 'Complete', active: 'Active', planned: 'Coming soon' }
+
+// Header dropdown for switching modules (projects). "planned" projects render
+// disabled - they have no working data set yet. Switching behaves like a tier
+// switch (App swaps the whole working set and returns to the canvas).
+function ProjectSwitch({ projects, value, onChange }) {
+  const [open, setOpen] = useState(false)
+  const active = projects.find((p) => p.id === value) || projects[0]
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className="flex items-center gap-1 text-sm font-medium text-sf-text"
+      >
+        {active?.name}
+        <Icon name="chevron-down" size={14} className="text-sf-muted" />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} aria-hidden="true" />
+          <ul
+            role="listbox"
+            aria-label="Project"
+            className="absolute left-0 top-full z-40 mt-1 max-h-80 w-72 overflow-auto rounded-lg border border-sf-border bg-sf-surface p-1 shadow-sf-md"
+          >
+            {projects.map((p) => {
+              const planned = p.status === 'planned'
+              const selected = p.id === value
+              return (
+                <li key={p.id}>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={selected}
+                    disabled={planned}
+                    onClick={() => {
+                      if (planned) return
+                      onChange(p.id)
+                      setOpen(false)
+                    }}
+                    className={`flex w-full items-center justify-between gap-3 rounded-md px-2.5 py-2 text-left text-sm transition-colors ${
+                      planned
+                        ? 'cursor-not-allowed text-sf-subtle'
+                        : selected
+                          ? 'bg-sf-accent-weak text-sf-accent-text'
+                          : 'text-sf-body hover:bg-sf-surface-subtle'
+                    }`}
+                  >
+                    <span className="flex flex-col leading-tight">
+                      <span className="font-medium">{p.name}</span>
+                      <span className="text-[11px] text-sf-subtle">{p.org}</span>
+                    </span>
+                    <span className="shrink-0 text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">
+                      {PROJECT_STATUS_LABELS[p.status] || p.status}
+                    </span>
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        </>
+      )}
+    </div>
+  )
+}
+
 export default function ProjectCanvas({
   nodes,
   phases,
@@ -61,6 +131,9 @@ export default function ProjectCanvas({
   theme,
   tier = 'easy',
   onTierChange,
+  projects,
+  project,
+  onProjectChange,
   onToggleTheme,
   onSelect,
   onStart,
@@ -69,6 +142,8 @@ export default function ProjectCanvas({
   onReset,
   onRestartNode,
 }) {
+  const activeProject = projects?.find((p) => p.id === project)
+  const projectName = activeProject?.name || 'Meridian Morning Market Brief'
   const nodesById = Object.fromEntries(nodes.map((n) => [n.id, n]))
   const phasesById = Object.fromEntries(phases.map((p) => [p.id, p]))
   const selectedNode = nodesById[selectedNodeId]
@@ -99,10 +174,14 @@ export default function ProjectCanvas({
             <span className="hidden h-6 w-px bg-sf-border sm:inline-block" />
             <div className="hidden flex-col leading-tight sm:flex">
               <span className="text-[9px] font-semibold uppercase tracking-sf-wide text-sf-subtle">Project</span>
-              <span className="flex items-center gap-1 text-sm font-medium text-sf-text">
-                Meridian Morning Market Brief
-                <Icon name="chevron-down" size={14} className="text-sf-muted" />
-              </span>
+              {onProjectChange && projects ? (
+                <ProjectSwitch projects={projects} value={project} onChange={onProjectChange} />
+              ) : (
+                <span className="flex items-center gap-1 text-sm font-medium text-sf-text">
+                  {projectName}
+                  <Icon name="chevron-down" size={14} className="text-sf-muted" />
+                </span>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2.5">
@@ -122,7 +201,7 @@ export default function ProjectCanvas({
       <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-6 px-4 py-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold text-sf-text">Meridian Morning Market Brief</h1>
+            <h1 className="text-2xl font-semibold text-sf-text">{projectName}</h1>
             <p className="max-w-4xl text-sm text-sf-muted">{PROJECT_GOAL}</p>
           </div>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 sm:justify-end">

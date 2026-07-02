@@ -318,10 +318,21 @@ CURRICULUM_MASTER_PLAN.md.
    end at 1280x800 (gating, no-scroll wrong-answer state, completion +
    artifacts); docs synced (README status, this section, DECISION_LOG, all
    three tier _OVERVIEW.md); Module 1 case study written
-   (curriculum/module-01/CASE_STUDY.md); release tagged. NEXT: the
-   multi-project engine (SPEC_MULTI_PROJECT.md) before Module 2 (Beacon
-   Invoice Desk), which is built STRICTLY via MODULE_AUTHORING_PLAYBOOK.md.
-3. Housekeeping: bundle >500 kB (dynamic import per tier when it matters);
+   (curriculum/module-01/CASE_STUDY.md); release tagged.
+3. Multi-project engine - DONE (2026-07-02, SPEC_MULTI_PROJECT.md). A registry
+   (src/data/projects.json, order = build order) drives a header project
+   dropdown; each project owns src/data/projects/<id>/ (nodes, phases, edges,
+   lessonMeta) and its BUILT_LESSONS block in src/lib/projects.js. progress.js
+   is project-aware: module-01 keeps its legacy un-namespaced storage keys
+   byte-for-byte, new projects namespace under __<id>. Planned projects render
+   disabled ("Coming soon"). Both lint scripts iterate registry projects with
+   data on disk (canon at curriculum/<id>/canon.json). Verified live at
+   1280x800: legacy keys survive switch-away-and-back, switcher shows
+   module-01 complete + disabled planned modules, per-project tier
+   independence, no-scroll wrong-answer state intact, console clean. NEXT:
+   Module 2 (Beacon Invoice Desk), built STRICTLY via
+   MODULE_AUTHORING_PLAYBOOK.md.
+4. Housekeeping: bundle >500 kB (dynamic import per tier when it matters);
    rich-intro migration for the 40 lessons still on the simple dialect.
 
 DONE (Phase 0, 2026-07-02): unlock TREE (one intro fans the board open;

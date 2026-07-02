@@ -23,29 +23,70 @@
 // Non-ASCII characters in lesson copy are reported as warnings (repo docs are
 // ASCII-only by rule; lesson copy should stay close to it).
 
-import { readFileSync, readdirSync } from 'node:fs'
+import { readFileSync, readdirSync, existsSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const lessonsDir = path.join(root, 'src', 'data', 'lessons')
-
-const nodes = JSON.parse(readFileSync(path.join(root, 'src', 'data', 'workflowNodes.json'), 'utf8'))
-const canon = JSON.parse(readFileSync(path.join(root, 'curriculum', 'module-01', 'canon.json'), 'utf8'))
-const progressSource = readFileSync(path.join(root, 'src', 'lib', 'progress.js'), 'utf8')
+const registry = JSON.parse(readFileSync(path.join(root, 'src', 'data', 'projects.json'), 'utf8'))
+const projectsSource = readFileSync(path.join(root, 'src', 'lib', 'projects.js'), 'utf8')
 
 const VALID_INTERACTIONS = ['jsonEditor', 'choiceCheck', 'templateSlots', 'artifactImport']
 const VALID_VALIDATORS = ['jsonFields', 'jsonPolicy', 'jsonRows', 'jsonDeltas', 'choiceCheck', 'templateSlots', 'artifactImport']
 const VALID_DIFFICULTIES = ['Beginner', 'Intermediate', 'Medium', 'Hard']
 
-// Extract BUILT_LESSON_IDS_BY_TIER from progress.js source (progress.js
-// imports app JSON, so it cannot be imported directly under plain node).
-function extractTierIds(tier) {
-  const block = progressSource.match(new RegExp(`${tier}:\\s*\\[([^\\]]*)\\]`, 's'))
-  if (!block) return []
-  return Array.from(block[1].matchAll(/'([^']+)'/g)).map((m) => m[1])
+// Lessons are global (flat, unique ids); each is registered to exactly one
+// project via BUILT_LESSONS in src/lib/projects.js. Nodes and canon are per
+// project (src/data/projects/<id>/, curriculum/<id>/canon.json). projects.js
+// imports app JSON, so it cannot be imported directly under plain node - we
+// extract the per-project tier lists from its source instead.
+function projectBlock(source, projectId) {
+  const start = source.indexOf(`'${projectId}':`)
+  if (start === -1) return ''
+  const braceStart = source.indexOf('{', start)
+  if (braceStart === -1) return ''
+  let depth = 0
+  for (let i = braceStart; i < source.length; i++) {
+    if (source[i] === '{') depth++
+    else if (source[i] === '}') {
+      depth--
+      if (depth === 0) return source.slice(braceStart, i + 1)
+    }
+  }
+  return ''
 }
-const TIER_IDS = { easy: extractTierIds('easy'), medium: extractTierIds('medium'), hard: extractTierIds('hard') }
+function extractTierIds(block, tier) {
+  const m = block.match(new RegExp(`${tier}:\\s*\\[([^\\]]*)\\]`, 's'))
+  if (!m) return []
+  return Array.from(m[1].matchAll(/'([^']+)'/g)).map((x) => x[1])
+}
+
+// Projects that have a data directory on disk.
+const builtStart = projectsSource.indexOf('BUILT_LESSONS = {')
+const builtSource = builtStart === -1 ? projectsSource : projectsSource.slice(builtStart)
+const PROJECTS = []
+const lessonToProject = {}
+for (const p of registry) {
+  const nodesPath = path.join(root, 'src', 'data', 'projects', p.id, 'workflowNodes.json')
+  if (!existsSync(nodesPath)) continue
+  const nodes = JSON.parse(readFileSync(nodesPath, 'utf8'))
+  const canonPath = path.join(root, 'curriculum', p.id, 'canon.json')
+  const canon = existsSync(canonPath)
+    ? JSON.parse(readFileSync(canonPath, 'utf8'))
+    : { assertions: [], derivations: [] }
+  const block = projectBlock(builtSource, p.id)
+  const tierIds = {
+    easy: extractTierIds(block, 'easy'),
+    medium: extractTierIds(block, 'medium'),
+    hard: extractTierIds(block, 'hard'),
+  }
+  PROJECTS.push({ id: p.id, nodes, canon, tierIds })
+  for (const tier of ['easy', 'medium', 'hard']) {
+    tierIds[tier].forEach((lid) => { lessonToProject[lid] = p.id })
+  }
+}
+const projectById = Object.fromEntries(PROJECTS.map((p) => [p.id, p]))
 
 // Path resolver: dot segments, [index], and [key=value] finders.
 function resolvePath(obj, pathExpr) {
@@ -91,12 +132,17 @@ for (const file of files.sort()) {
 
   // 1. Identity
   if (`${lesson.id}.json` !== file) err(id, `id does not match filename "${file}"`)
-  const node = nodes.find((n) => n.id === lesson.nodeId)
-  if (!node) err(id, `nodeId "${lesson.nodeId}" not found in workflowNodes.json`)
   const tier = id.endsWith('-medium') ? 'medium' : id.endsWith('-hard') ? 'hard' : 'easy'
-  if (!TIER_IDS[tier].includes(id)) {
-    err(id, `not registered in BUILT_LESSON_IDS_BY_TIER.${tier} (src/lib/progress.js)`)
+  const projectId = lessonToProject[id]
+  const proj = projectId ? projectById[projectId] : null
+  const nodes = proj ? proj.nodes : []
+  if (!proj) {
+    err(id, `not registered in any project's BUILT_LESSONS (src/lib/projects.js)`)
+  } else if (!proj.tierIds[tier].includes(id)) {
+    err(id, `not registered in BUILT_LESSONS.${projectId}.${tier} (src/lib/projects.js)`)
   }
+  const node = nodes.find((n) => n.id === lesson.nodeId)
+  if (!node) err(id, `nodeId "${lesson.nodeId}" not found in ${projectId || 'any'} workflowNodes.json`)
   if (node && tier === 'easy' && node.taskId !== id) {
     err(id, `node taskId "${node.taskId}" should equal the easy lesson id`)
   }
@@ -221,58 +267,67 @@ for (const file of files.sort()) {
 }
 
 // Registration completeness: every registered id has a file.
-for (const [tier, ids] of Object.entries(TIER_IDS)) {
-  ids.filter((lid) => !lessonsById[lid]).forEach((lid) => {
-    errors++
-    console.log(`ERROR registration: BUILT_LESSON_IDS_BY_TIER.${tier} lists "${lid}" but no lesson file exists`)
-  })
+for (const p of PROJECTS) {
+  for (const [tier, ids] of Object.entries(p.tierIds)) {
+    ids.filter((lid) => !lessonsById[lid]).forEach((lid) => {
+      errors++
+      console.log(`ERROR registration: BUILT_LESSONS.${p.id}.${tier} lists "${lid}" but no lesson file exists`)
+    })
+  }
 }
 
 // 5a. Canon derivations: recompute derived numbers from their sources so an
 // internally-consistent-but-wrong figure cannot ship.
-for (const d of canon.derivations || []) {
-  const lesson = lessonsById[d.lesson]
-  if (!lesson) {
-    errors++
-    console.log(`ERROR canon derivation targets missing lesson "${d.lesson}"`)
-    continue
+let assertionCount = 0
+let derivationCount = 0
+for (const proj of PROJECTS) {
+  const canon = proj.canon
+  derivationCount += (canon.derivations || []).length
+  assertionCount += (canon.assertions || []).length
+  for (const d of canon.derivations || []) {
+    const lesson = lessonsById[d.lesson]
+    if (!lesson) {
+      errors++
+      console.log(`ERROR canon derivation targets missing lesson "${d.lesson}"`)
+      continue
+    }
+    let expected
+    if (d.op === 'delta') expected = d.a - d.b
+    else if (d.op === 'pctMove') expected = ((d.a - d.b) / d.b) * 100
+    else {
+      errors++
+      console.log(`ERROR canon derivation for ${d.lesson}: unknown op "${d.op}"`)
+      continue
+    }
+    if (typeof d.round === 'number') {
+      const f = Math.pow(10, d.round)
+      expected = Math.round(expected * f) / f
+    }
+    const actual = resolvePath(lesson, d.path)
+    if (actual !== expected) {
+      errors++
+      console.log(`ERROR canon derivation: ${d.lesson} ${d.path} should be ${expected} (${d.op} of ${d.a}, ${d.b}) - actual: ${JSON.stringify(actual)}`)
+    }
   }
-  let expected
-  if (d.op === 'delta') expected = d.a - d.b
-  else if (d.op === 'pctMove') expected = ((d.a - d.b) / d.b) * 100
-  else {
-    errors++
-    console.log(`ERROR canon derivation for ${d.lesson}: unknown op "${d.op}"`)
-    continue
-  }
-  if (typeof d.round === 'number') {
-    const f = Math.pow(10, d.round)
-    expected = Math.round(expected * f) / f
-  }
-  const actual = resolvePath(lesson, d.path)
-  if (actual !== expected) {
-    errors++
-    console.log(`ERROR canon derivation: ${d.lesson} ${d.path} should be ${expected} (${d.op} of ${d.a}, ${d.b}) - actual: ${JSON.stringify(actual)}`)
+
+  // 5b. Canon assertions
+  for (const a of canon.assertions || []) {
+    const lesson = lessonsById[a.lesson]
+    if (!lesson) {
+      errors++
+      console.log(`ERROR canon: assertion targets missing lesson "${a.lesson}"`)
+      continue
+    }
+    const actual = resolvePath(lesson, a.path)
+    let ok
+    if (a.op === 'includes') ok = Array.isArray(actual) && actual.includes(a.value)
+    else ok = typeof a.value === 'number' || typeof a.value === 'boolean' ? actual === a.value : String(actual) === String(a.value)
+    if (!ok) {
+      errors++
+      console.log(`ERROR canon: ${a.lesson} ${a.path} ${a.op} ${JSON.stringify(a.value)} - actual: ${JSON.stringify(actual)}`)
+    }
   }
 }
 
-// 5b. Canon assertions
-for (const a of canon.assertions) {
-  const lesson = lessonsById[a.lesson]
-  if (!lesson) {
-    errors++
-    console.log(`ERROR canon: assertion targets missing lesson "${a.lesson}"`)
-    continue
-  }
-  const actual = resolvePath(lesson, a.path)
-  let ok
-  if (a.op === 'includes') ok = Array.isArray(actual) && actual.includes(a.value)
-  else ok = typeof a.value === 'number' || typeof a.value === 'boolean' ? actual === a.value : String(actual) === String(a.value)
-  if (!ok) {
-    errors++
-    console.log(`ERROR canon: ${a.lesson} ${a.path} ${a.op} ${JSON.stringify(a.value)} - actual: ${JSON.stringify(actual)}`)
-  }
-}
-
-console.log(`\n${files.length} lessons linted: ${errors} errors, ${warnings} warnings (${canon.assertions.length} canon assertions, ${(canon.derivations || []).length} derivations recomputed)`)
+console.log(`\n${files.length} lessons linted: ${errors} errors, ${warnings} warnings (${assertionCount} canon assertions, ${derivationCount} derivations recomputed)`)
 process.exit(errors === 0 ? 0 : 1)

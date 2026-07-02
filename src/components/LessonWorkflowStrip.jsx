@@ -1,5 +1,4 @@
-import nodes from '../data/workflowNodes.json'
-import edges from '../data/workflowEdges.json'
+import { getProjectData, loadProject } from '../lib/projects'
 import { SignalFlowDiagram } from './ui'
 
 // Focused, local "what you built and who reuses it" strip.
@@ -9,14 +8,6 @@ import { SignalFlowDiagram } from './ui'
 // mode = 'overview' (intro): neutral, current node highlighted as "You build this".
 // mode = 'takeaway': current node = Created; each consumer is honestly labeled
 //   "Ready to build" or "Still needs other inputs" based on its other dependencies.
-const nodeById = nodes.reduce((acc, n) => {
-  acc[n.id] = n
-  return acc
-}, {})
-
-function labelFor(id) {
-  return nodeById[id]?.label || id
-}
 
 function Chip({ label, sublabel, tone, className = '' }) {
   const tones = {
@@ -35,6 +26,13 @@ function Chip({ label, sublabel, tone, className = '' }) {
 }
 
 export default function LessonWorkflowStrip({ nodeId, mode = 'overview', directConsumers, consumerNotes }) {
+  const { nodes, edges } = getProjectData(loadProject())
+  const nodeById = nodes.reduce((acc, n) => {
+    acc[n.id] = n
+    return acc
+  }, {})
+  const labelFor = (id) => nodeById[id]?.label || id
+
   const upstream = edges.filter((e) => e.to === nodeId).map((e) => e.from)
   const downstream =
     directConsumers && directConsumers.length > 0

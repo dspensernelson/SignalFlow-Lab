@@ -1,10 +1,9 @@
-import nodes from '../data/workflowNodes.json'
-import edges from '../data/workflowEdges.json'
+import { getProjectData, loadProject } from '../lib/projects'
 import { Button, Badge, CodeBlock, Card, SectionLabel, SignalFlowDiagram } from './ui'
 
-const nodeById = Object.fromEntries(nodes.map((n) => [n.id, n]))
-
 export default function ArtifactViewer({ node, artifact, onBack }) {
+  const { nodes, edges } = getProjectData(loadProject())
+  const nodeById = Object.fromEntries(nodes.map((n) => [n.id, n]))
   const upstream = edges.filter((e) => e.to === node.id).map((e) => nodeById[e.from]?.label || e.from)
   const downstream = edges.filter((e) => e.from === node.id).map((e) => nodeById[e.to]?.label || e.to)
   const hasFlow = upstream.length > 0 || downstream.length > 0
