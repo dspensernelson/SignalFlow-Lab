@@ -6,6 +6,12 @@ builder who hits one STOPS AND ASKS instead of choosing. The most damaging
 failure mode for a delegated builder is not a wrong answer - it is a
 confidently invented product decision. Keep this file ASCII-only.
 
+STANDING APPROVALS: for the work chartered in curriculum/charters/,
+AUTONOMY_CHARTER.md (ratified 2026-07-02) is the owner's standing answer to
+every gate below - it pre-clears, defines self-serve protocols, or prohibits,
+and replaces "stop and ask" with the PARK protocol (OPEN_QUESTIONS.md).
+Consult it FIRST; this file remains the underlying gate list.
+
 ## Owner-only decisions (stop and ask)
 
 1. Doctrine: anything in PRODUCT_DOCTRINE.md, including the no-scroll rule,

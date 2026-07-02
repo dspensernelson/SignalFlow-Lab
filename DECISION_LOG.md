@@ -55,6 +55,39 @@ Short record of product and implementation decisions. Keep entries factual and b
 - Deferred per NODE_AUDIT: distribution-archive node split and risk-evaluation
   split stay single nodes through Module 1 Easy; revisit before Medium.
 
+## 2026-07-02 (autonomy pass: charters, standing approvals, hardened gates)
+
+- OWNER INSTRUCTION (recorded verbatim in intent): the builder should be able
+  to run unattended and build everything; the owner does not need to be
+  involved, but the idea must live on. This entry and AUTONOMY_CHARTER.md
+  are that instruction made durable.
+- RATIFIED: nine module charters (curriculum/charters/, modules 2-10), each
+  fixing org, deliverable, roles, signature concepts, a draft map spine with
+  the module's fork and temporal loop, tier postures, and engine needs.
+  Scenario selection (DECISION_BOUNDARIES gate 2) is now pre-cleared for the
+  whole curriculum.
+- RATIFIED: AUTONOMY_CHARTER.md - the North Star, gate-by-gate standing
+  decisions (pre-cleared / self-serve / prohibited), the source-precedence
+  tie-breaker, the PARK protocol (OPEN_QUESTIONS.md), and the failure
+  protocol. DECISION_BOUNDARIES.md and MODULE_AUTHORING_PLAYBOOK.md now
+  point to it; BUILDER_KICKOFF.md is the builder entry point.
+- RATIFIED: two engine specs under gate 7 - SPEC_ARTIFACT_IMPORT.md (the
+  Module 1 capstone, attaching as lesson-approval-decision-hard with zero
+  map/storage changes) and SPEC_MULTI_PROJECT.md (project registry,
+  namespaced storage with Module 1 keeping legacy keys, header switcher).
+- SETTLED (was deferred): NODE_AUDIT items 2-3 node splits - keep single
+  dual-nature nodes, clarified in lesson copy, permanently. The map shape
+  is stable.
+- HARDENED GATES: scripts/lint-map.mjs (topology + unlock-tree invariants;
+  now in `npm run check`); canon derivations (lint recomputes every derived
+  number from its sources - 16 seeded); GitHub Actions CI running
+  `npm run check` on every push; a module-report PR template.
+- BUG FOUND BY THE NEW MAP LINT, FIXED: the temporal-loop edge
+  (distribution-archive -> prior-day-reference) was documented in NODE_AUDIT,
+  taught in two lessons, present in node metadata - and missing from
+  workflowEdges.json. Added with label "seeds tomorrow" (additive map fix,
+  logged per gate 3).
+
 ## 2026-07-02 (unlock tree + Phase 0 industrialization)
 
 - PRODUCT DECISION (owner): gating changed from a linear chain to a BRANCHING

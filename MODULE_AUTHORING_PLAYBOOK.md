@@ -7,6 +7,13 @@ that must pass before the next step starts. Steps marked OWNER GATE stop for
 the product owner - a builder never decides those alone (see
 DECISION_BOUNDARIES.md).
 
+AUTONOMOUS MODE (2026-07-02): under AUTONOMY_CHARTER.md the owner gates are
+pre-answered - Step 1 charters for modules 2-10 are ratified in
+curriculum/charters/; Step 2 map approval = charter conformance + `npm run
+lint:map` + a DECISION_LOG entry; Step 8's owner review = the PR module
+report (.github/PULL_REQUEST_TEMPLATE.md), opened but not merged by the
+builder. Everything else in this playbook applies unchanged.
+
 Keep this file ASCII-only. Companion docs: CURRICULUM_MASTER_PLAN.md (what
 each module teaches), LESSON_AUTHORING_TEMPLATE.md (per-lesson contract),
 LESSON_DESIGN_FRAMEWORK.md (pedagogy), ENGINE_ADDITIONS_SPEC.md (interaction
