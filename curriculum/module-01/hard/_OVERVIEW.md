@@ -1,11 +1,12 @@
 # Module 1 Hard - Own the Design - Overview
 
-Status (2026-07-01, third pass): 7 lessons BUILT and playable. DECIDED: the
-hard tier is a CURATED set - the seven design/failure drills below plus the
-future solo-rebuild capstone; the five inspection-type nodes (analyst-notes,
-trader-flag, forecast-data, prior-day-reference, prior-day-brief-template)
-deliberately get no hard variant, since their content does not deepen into
-design work. Hard lessons are standalone DRILLS, not one continuous morning:
+Status (2026-07-02, COMPLETE): 8 lessons BUILT and playable - the seven
+design/failure drills below plus the solo-rebuild capstone
+(lesson-approval-decision-hard). Module 1 Hard is DONE. The five
+inspection-type nodes (analyst-notes, trader-flag, forecast-data,
+prior-day-reference, prior-day-brief-template) deliberately get no hard
+variant, since their content does not deepen into design work. Hard lessons
+are standalone DRILLS, not one continuous morning:
 intake/threshold/approval-ladder each carry their own scenario, while
 price-feed, risk-evaluation, and morning-brief share the degraded-morning arc.
 Hard lessons live in src/data/lessons/ as `lesson-<node>-hard.json`, resolved
@@ -22,7 +23,7 @@ validator deliberately checks SHAPE and GOVERNANCE (fields present, ordering,
 rationale non-empty) rather than exact values - that is the pedagogy, not a
 validation gap.
 
-## Built lessons (7)
+## Built lessons (8)
 
 | Node | Lesson id | The design responsibility |
 | --- | --- | --- |
@@ -33,6 +34,7 @@ validation gap.
 | risk-evaluation | lesson-risk-evaluation-hard | Computing under quarantine; degraded-status propagation on every row |
 | morning-brief | lesson-morning-brief-hard | Degraded-mode output: incident in the deliverable, explained missing approval |
 | distribution-archive | lesson-distribution-archive-hard | Retention design from constraints; explainers outlive the explained |
+| approval-decision | lesson-approval-decision-hard | Solo-rebuild capstone: rebuild the four core files outside the app, prove them by import (artifactImport) |
 
 Degraded-morning arc canon (price-feed -> risk-evaluation -> morning-brief):
 feed expected 6:15, arrived 6:42; SPP row malformed -> QUARANTINED (not
@@ -55,15 +57,14 @@ v2.0.0 names the ladder).
 
 ## Remaining to author
 
-1. THE CAPSTONE (the only remaining hard item; biggest engine work): solo
-   rebuild outside the app. Learner recreates intake -> clean -> variance ->
-   brief with local files and any tool (PowerShell, Python, Power Automate),
-   then imports the four produced files; the app runs the existing validators
-   against them. Requires an artifact-import surface (file picker ->
-   validateAnswer per file). Specced at CURRICULUM_MASTER_PLAN.md Part 3.3;
-   Module 1 Hard is complete when the capstone ships.
+1. THE CAPSTONE - DONE (2026-07-02). lesson-approval-decision-hard ships the
+   artifactImport interaction/validator (SPEC_ARTIFACT_IMPORT.md): the learner
+   rebuilds intake -> clean-prices -> variance -> risk-evaluation outside the
+   app in any tool, then imports the four produced files; the app runs the
+   existing frozen easy-tier validators against each and mints the composite
+   rebuilt-pipeline.json. Module 1 Hard is complete.
 2. Optional, decide later: variance-check-hard was folded into
    risk-evaluation-hard (compute + classify under quarantine in one lesson);
    clean-price-data and the routing decision likewise have no separate hard
    drill. Add them only if a distinct design skill emerges that the current
-   seven do not cover.
+   eight do not cover.

@@ -232,3 +232,12 @@ Short record of product and implementation decisions. Keep entries factual and b
 - No-scroll HARD RULE honored: the tallest Exercise state (open paste textarea coexisting with the wrong-answer readiness card) overflowed by ~107px, so `handleValidate` now closes any open paste before grading and the paste textarea was trimmed to 3 rows. Verified at 1280x800 that the pre-validate paste-open, wrong-answer, and passed states all satisfy `scrollHeight === clientHeight === 800`; the Takeaway (allowed to scroll) shows the composite artifact.
 - Lint contract extended additively: `artifactImport` added to `VALID_INTERACTIONS`/`VALID_VALIDATORS` with a shape rule (nonempty `imports`, each with `key`/`label` and a JSON-validator `type`); a regression fixture was added where each import value is the raw file text as a string.
 
+## 2026-07-02 (module-01 wrap - MODULE 1 COMPLETE)
+
+- Module 1 is COMPLETE across all three tiers: Easy 17/17, Medium 17/17, Hard 8/8. This closes work-queue item 2 (Module 1 wrap) from the autonomous build plan.
+- Full-path playthrough verified live at 1280x800 per VERIFICATION_PLAYBOOK: (a) Easy fresh tier gates to the single intro root (`analyst-notes`); the intro lesson plays Intro -> Exercise -> Takeaway, wrong and correct states both hold `scrollHeight === clientHeight === 800`, completion records the `analyst-notes` artifact and unlocks exactly its two children (`trader-flag`, `price-feed`). (b) Medium fresh tier gates to its single root, stats read 0 of 17. (c) Hard fresh tier gates to its two collapsed roots (Market Intake Record + Price Feed), stats read 0 of 8 - the capstone is counted. Test progress/artifacts cleared afterward.
+- Docs synced: README Current Status, LESSON_DESIGN_FRAMEWORK sections 6-7 (living handoff), all three curriculum/module-01 tier `_OVERVIEW.md` files, and this log.
+- Wrote the Module 1 portfolio case study at `curriculum/module-01/CASE_STUDY.md` (the workflow, the three-tier depth model, the engine capabilities Module 1 forced into existence, and what a learner can demonstrably do after finishing).
+- Tagged a release for the demoable Module 1 build. The app is demoable before Module 2 starts. Per AUTONOMY_CHARTER the per-module PR is opened as the owner review artifact and is NOT self-merged.
+- NEXT (per the fixed queue): the multi-project engine (SPEC_MULTI_PROJECT.md) before authoring Module 2 (Beacon Invoice Desk) via MODULE_AUTHORING_PLAYBOOK.md.
+

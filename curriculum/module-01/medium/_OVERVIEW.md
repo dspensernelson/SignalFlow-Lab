@@ -1,6 +1,7 @@
 # Module 1 Medium - Handle the Mess - Overview
 
-Status (2026-07-01, second pass): ALL 17 LESSONS BUILT AND PLAYABLE.
+Status (2026-07-02): ALL 17 LESSONS BUILT AND PLAYABLE. Module 1 is COMPLETE
+across all three tiers (Easy 17, Medium 17, Hard 8).
 Verified live: medium quizzes and the medium brief hold the no-scroll rule in
 wrong-answer states; the brief renders with its Data Notes section.
 Medium lessons live in src/data/lessons/ as `lesson-<node>-medium.json`,
