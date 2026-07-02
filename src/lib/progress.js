@@ -92,6 +92,9 @@ export const BUILT_LESSON_IDS_BY_TIER = {
     'lesson-threshold-policy-hard',
     'lesson-price-feed-hard',
     'lesson-approval-route-hard',
+    'lesson-risk-evaluation-hard',
+    'lesson-morning-brief-hard',
+    'lesson-distribution-archive-hard',
   ],
 }
 

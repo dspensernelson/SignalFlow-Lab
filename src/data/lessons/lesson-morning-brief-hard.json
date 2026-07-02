@@ -1,0 +1,121 @@
+{
+  "id": "lesson-morning-brief-hard",
+  "nodeId": "morning-brief",
+  "title": "Ship the Degraded Brief",
+  "difficulty": "Hard",
+  "skill": "Degraded-mode output",
+  "clock": "6:52 AM",
+  "scenario": "It is 6:52 AM on the quarantine morning. The brief ships at 7:00 with a hub missing, a late feed on the record, and no approval - because nothing escalated under the ratified policy. Shipping degraded output well is a designed skill: the brief must carry its incident, label its gaps, and explain why no one signed it.",
+  "inputType": "text",
+  "inputLabel": "Degraded Assembly Rule",
+  "input": "Assembly rule for degraded runs: the brief renders from stored artifacts only, and adds an Incidents section sourced from the feed incident record. The headline comes from risk-evaluation.json (highest surviving classification). The approval line must state WHY no approval exists: no hub reached the escalation band of the ratified policy. The brief is explicitly marked degraded.",
+  "instructions": [
+    "Open the incident record and the risk record on the shelf.",
+    "Fill the headline from the highest surviving classification.",
+    "Fill the Incidents section from the incident record: timings, quarantined hub, brief mode.",
+    "Fill the policy version the no-approval line cites.",
+    "Validate to render market-brief.md."
+  ],
+  "interactionType": "templateSlots",
+  "starterAnswer": "{}",
+  "shelf": [
+    { "nodeId": "price-feed", "artifactName": "feed incident record", "producedBy": "Handle the Morning the Feed Breaks" },
+    { "nodeId": "risk-evaluation", "artifactName": "risk-evaluation.json", "producedBy": "Classify a Quarantined Morning" }
+  ],
+  "validation": {
+    "type": "templateSlots",
+    "template": "# Meridian Morning Market Brief - degraded run\nStatus: released without approval - no hub reached the escalation band of policy v{{policyVersion}}\n\n## Headline\n{{headlineHub}} moved {{headlineMovePct}} percent day-over-day - {{headlineStatus}} under the ratified thresholds.\n\n## Hub Summary\nERCOT peak 198, settled 149. MISO peak 81, settled 76.\n\n## Incidents\nFeed expected {{feedExpectedAt}}, arrived {{feedArrivedAt}}. {{quarantinedHub}} row quarantined (malformed) - values withheld, vendor notified.\nThis brief is marked {{briefMode}}: today's numbers are partial by design.\nPrepared by the Meridian workflow at 6:52 AM.",
+    "slots": [
+      {
+        "id": "policyVersion",
+        "label": "Policy version",
+        "numeric": false,
+        "accepted": ["2.0.0", "v2.0.0"],
+        "hint": "The ratified policy the risk record classified under."
+      },
+      {
+        "id": "headlineHub",
+        "label": "Headline hub",
+        "numeric": false,
+        "expected": "ERCOT",
+        "hint": "The highest surviving classification in risk-evaluation.json."
+      },
+      {
+        "id": "headlineMovePct",
+        "label": "Headline move (percent)",
+        "numeric": true,
+        "expected": 15.1,
+        "hint": "That hub's pctMove in risk-evaluation.json."
+      },
+      {
+        "id": "headlineStatus",
+        "label": "Headline status",
+        "numeric": false,
+        "expected": "routine",
+        "hint": "Its status in risk-evaluation.json - note that it did NOT escalate."
+      },
+      {
+        "id": "feedExpectedAt",
+        "label": "Feed expected at",
+        "numeric": false,
+        "accepted": ["6:15", "6:15 AM", "06:15"],
+        "hint": "expectedAt in the incident record."
+      },
+      {
+        "id": "feedArrivedAt",
+        "label": "Feed arrived at",
+        "numeric": false,
+        "accepted": ["6:42", "6:42 AM", "06:42"],
+        "hint": "arrivedAt in the incident record."
+      },
+      {
+        "id": "quarantinedHub",
+        "label": "Quarantined hub",
+        "numeric": false,
+        "expected": "SPP",
+        "hint": "malformedRowHub in the incident record."
+      },
+      {
+        "id": "briefMode",
+        "label": "Brief mode",
+        "numeric": false,
+        "expected": "degraded",
+        "hint": "briefMode in the incident record."
+      }
+    ]
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Assemble a degraded brief from stored artifacts: the ratified policy version, the highest surviving classification (hub, move, status) from the risk record, and the Incidents facts (expected/arrived times, quarantined hub, brief mode) from the feed incident record. The status line explains why no approval exists.",
+  "successMessage": "Degraded brief rendered. It ships on time, tells the whole truth, and explains its own missing signature.",
+  "intro": {
+    "heading": "Before you assemble: shipping degraded is a skill",
+    "sections": [
+      {
+        "title": "The brief carries its incident",
+        "body": "On a normal morning the incident record would live in a log nobody reads. Degraded-mode design puts it IN the deliverable: the reader learns about the late feed and the quarantined hub in the same glance as the prices."
+      },
+      {
+        "title": "Explain the missing signature",
+        "body": "A brief with no approval line invites the worst assumption. This one states the reason: nothing reached the ratified escalation band. An absent control, explained, is a working system; an absent control, unexplained, is a finding."
+      },
+      {
+        "title": "The whole hard tier converges here",
+        "body": "The incident record (feed failure), the degraded classifications (quarantine), and the ratified thresholds (your redesign) all meet in this one document. Assembly on a bad morning is where design quality becomes visible."
+      }
+    ],
+    "jsonExample": "{\n  \"headlineHub\": \"ERCOT\",\n  \"headlineStatus\": \"routine\",\n  \"briefMode\": \"degraded\"\n}",
+    "skill": "Degraded-mode output",
+    "artifactName": "market-brief.md"
+  },
+  "takeaway": {
+    "heading": "Degraded brief shipped",
+    "points": [
+      "You shipped on time with partial data - and the document itself says which parts are partial and why.",
+      "The missing approval is explained by rule, not left as an ominous blank.",
+      "Incident facts flowed from the incident record into the deliverable: failures surface where readers actually look.",
+      "This is the last mile of resilience: detection, quarantine, honest classification, and now honest publication.",
+      "The workflow can now deliver trustworthy output on exactly the mornings that used to produce either silence or fiction."
+    ],
+    "artifactName": "market-brief.md"
+  }
+}

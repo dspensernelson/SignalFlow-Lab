@@ -40,6 +40,9 @@ import lessonIntakeHard from './data/lessons/lesson-intake-hard.json'
 import lessonThresholdPolicyHard from './data/lessons/lesson-threshold-policy-hard.json'
 import lessonPriceFeedHard from './data/lessons/lesson-price-feed-hard.json'
 import lessonApprovalRouteHard from './data/lessons/lesson-approval-route-hard.json'
+import lessonRiskEvaluationHard from './data/lessons/lesson-risk-evaluation-hard.json'
+import lessonMorningBriefHard from './data/lessons/lesson-morning-brief-hard.json'
+import lessonDistributionArchiveHard from './data/lessons/lesson-distribution-archive-hard.json'
 import ProjectCanvas from './components/ProjectCanvas'
 import LessonWorkspace from './components/LessonWorkspace'
 import ArtifactViewer from './components/ArtifactViewer'
@@ -101,6 +104,9 @@ const LESSONS = {
   'lesson-threshold-policy-hard': lessonThresholdPolicyHard,
   'lesson-price-feed-hard': lessonPriceFeedHard,
   'lesson-approval-route-hard': lessonApprovalRouteHard,
+  'lesson-risk-evaluation-hard': lessonRiskEvaluationHard,
+  'lesson-morning-brief-hard': lessonMorningBriefHard,
+  'lesson-distribution-archive-hard': lessonDistributionArchiveHard,
 }
 
 export default function App() {
