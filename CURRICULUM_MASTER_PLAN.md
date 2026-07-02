@@ -175,7 +175,7 @@ ENGINE_ADDITIONS_SPEC.md; every other lesson reuses the four original
 validators unchanged. Remaining Easy work is polish only (Wave D deltas in
 curriculum/module-01/easy/BUILT_LESSON_AUDITS.md).
 
-### 3.2 Module 1 Medium - "Handle the mess" (7 of 17 built; canon + status in curriculum/module-01/medium/_OVERVIEW.md)
+### 3.2 Module 1 Medium - "Handle the mess" - COMPLETE (17 of 17 built; canon + status in curriculum/module-01/medium/_OVERVIEW.md)
 
 Same map plus three new exception-path nodes. Planned deltas per area:
 
@@ -200,7 +200,7 @@ Same map plus three new exception-path nodes. Planned deltas per area:
 New validator work for Medium: null-tolerant expected values and an
 enumerated-exception-code check (additive; specify before building).
 
-### 3.3 Module 1 Hard - "Own the design" (3 built; status + remaining in curriculum/module-01/hard/_OVERVIEW.md)
+### 3.3 Module 1 Hard - "Own the design" (7 built - the full curated drill set; only the solo-rebuild capstone remains; status in curriculum/module-01/hard/_OVERVIEW.md)
 
 Same map plus versioning/failure overlays:
 

@@ -77,19 +77,30 @@ Short record of product and implementation decisions. Keep entries factual and b
   secondary builder today; module AUTHORING is delegable with owner gates at
   charter, map, and wrap (per the playbook).
 
-## 2026-07-02 (forced lesson ordering + formatting pass)
+## 2026-07-02 (initial linear gating, superseded same day; formatting pass)
 
-- PRODUCT DECISION (owner): lessons are now FORCE-ORDERED. Exactly one lesson
-  is READY at a time; completing it unlocks the next, following the
+- SUPERSEDED: the bullet below describes the FIRST gating implementation this
+  session (a strict linear chain, one READY lesson at a time). It was
+  replaced the same day by the branching-tree redesign in the entry above
+  ("unlock tree + Phase 0 industrialization") per an explicit product
+  correction: the board should open gradually as a tree (one intro lesson
+  fanning out 2-3 at a time), not a single forced chain. Current gating is
+  LESSON_PREREQS in src/lib/progress.js; do not reintroduce the linear model.
+  Kept here for history rather than deleted.
+- (Historical) PRODUCT DECISION (owner): lessons are now FORCE-ORDERED. Exactly
+  one lesson is READY at a time; completing it unlocks the next, following the
   pedagogical path from NODE_AUDIT item 7 (LESSON_PATH in progress.js). Each
   tier walks the same path filtered to its built lessons. This implements the
   doctrine's "completed artifacts unlock downstream tasks" for real, and it
   supersedes the old all-nodes-READY behavior. Locking is DERIVED, never
   stored: completed/in-progress statuses pass through, so existing saved
   progress keeps its completions.
-- Locked lessons explain themselves: the node panel names the blocking lesson
-  ("Complete X to unlock"); the map shows a single Start button (the
-  frontier), which also resolves the 17-buttons visual-noise critique.
+- Locked lessons explain themselves: the node panel names the blocking
+  lesson(s) ("Complete X to unlock"); the map shows only the unlocked
+  frontier's Start buttons (1 at the very start, 2-3 as the tree fans out),
+  which also resolves the 17-buttons visual-noise critique. (Under the
+  superseded linear model this was always exactly one button; under the
+  current branching tree it is 1-3 depending on how far the tree has opened.)
 - Formatting/coloration: node cards show the lesson type instead of truncated
   mono filenames (filenames stay in the detail panel); the lesson-header
   clock chip went from amber to neutral (amber is reserved for
