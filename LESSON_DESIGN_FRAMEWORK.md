@@ -305,11 +305,12 @@ tiers, ten-year horizons) is CURRICULUM_MASTER_PLAN.md.
 
 ### Open work, in priority order
 
-1. THE CAPSTONE - the last piece of Module 1: solo rebuild outside the app,
-   validated by an artifact-import surface (file picker -> validateAnswer per
-   imported file). Specced in CURRICULUM_MASTER_PLAN.md Part 3.3 and
-   curriculum/module-01/hard/_OVERVIEW.md. Spec first, at
-   ENGINE_ADDITIONS_SPEC fidelity.
+1. THE CAPSTONE - DONE (2026-07-01). `lesson-approval-decision-hard` ships the
+   `artifactImport` interaction/validator per SPEC_ARTIFACT_IMPORT.md: the
+   learner rebuilds the four core pipeline files outside the app and proves it
+   by import; each file is graded by the frozen easy-tier JSON validator that
+   built it, and a full pass mints the composite `rebuilt-pipeline.json`. Hard
+   tier is now 8/8. No-scroll verified live in the wrong-answer state.
 2. Module 1 wrap: node-split decisions (NODE_AUDIT items 2-3), Module 1 case
    study, tagged release. Then Module 2 (Beacon Invoice Desk) STRICTLY via
    MODULE_AUTHORING_PLAYBOOK.md - multi-project engine support specced first.

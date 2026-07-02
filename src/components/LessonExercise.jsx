@@ -1,6 +1,7 @@
 import CopilotPromptCard from './CopilotPromptCard'
 import ChoiceCheckExercise from './ChoiceCheckExercise'
 import TemplateSlotsExercise from './TemplateSlotsExercise'
+import ArtifactImportExercise from './ArtifactImportExercise'
 import { Button } from './ui'
 
 // The editor renders one JSON field per line; these constants match the
@@ -91,6 +92,19 @@ export default function LessonExercise({
   if (lesson.interactionType === 'templateSlots') {
     return (
       <TemplateSlotsExercise
+        lesson={lesson}
+        answer={answer}
+        onAnswerChange={onAnswerChange}
+        onValidate={onValidate}
+        results={results}
+        passed={passed}
+        onContinue={onContinue}
+      />
+    )
+  }
+  if (lesson.interactionType === 'artifactImport') {
+    return (
+      <ArtifactImportExercise
         lesson={lesson}
         answer={answer}
         onAnswerChange={onAnswerChange}

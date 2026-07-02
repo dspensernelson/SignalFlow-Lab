@@ -34,8 +34,8 @@ const nodes = JSON.parse(readFileSync(path.join(root, 'src', 'data', 'workflowNo
 const canon = JSON.parse(readFileSync(path.join(root, 'curriculum', 'module-01', 'canon.json'), 'utf8'))
 const progressSource = readFileSync(path.join(root, 'src', 'lib', 'progress.js'), 'utf8')
 
-const VALID_INTERACTIONS = ['jsonEditor', 'choiceCheck', 'templateSlots']
-const VALID_VALIDATORS = ['jsonFields', 'jsonPolicy', 'jsonRows', 'jsonDeltas', 'choiceCheck', 'templateSlots']
+const VALID_INTERACTIONS = ['jsonEditor', 'choiceCheck', 'templateSlots', 'artifactImport']
+const VALID_VALIDATORS = ['jsonFields', 'jsonPolicy', 'jsonRows', 'jsonDeltas', 'choiceCheck', 'templateSlots', 'artifactImport']
 const VALID_DIFFICULTIES = ['Beginner', 'Intermediate', 'Medium', 'Hard']
 
 // Extract BUILT_LESSON_IDS_BY_TIER from progress.js source (progress.js
@@ -168,6 +168,27 @@ for (const file of files.sort()) {
       if (!item.nodeId || !item.artifactName || !item.producedBy) err(id, 'each shelf entry needs nodeId, artifactName, producedBy')
       else if (!nodes.some((n) => n.id === item.nodeId)) err(id, `shelf nodeId "${item.nodeId}" not on the map`)
     })
+  } else if (lesson.interactionType === 'artifactImport') {
+    const imports = lesson.validation?.imports
+    const jsonValidators = ['jsonFields', 'jsonPolicy', 'jsonRows', 'jsonDeltas']
+    if (!Array.isArray(imports) || imports.length === 0) {
+      err(id, 'artifactImport needs a nonempty validation.imports array')
+    } else {
+      imports.forEach((imp, i) => {
+        if (!imp.key || !imp.label) err(id, `import ${i + 1} needs key and label`)
+        if (!imp.validation || !jsonValidators.includes(imp.validation.type)) {
+          err(id, `import "${imp.key ?? i + 1}" validation.type must be one of ${jsonValidators.join(', ')}`)
+        }
+      })
+    }
+    if (typeof lesson.starterAnswer !== 'string') err(id, 'artifactImport lessons need a starterAnswer string')
+    else {
+      try {
+        JSON.parse(lesson.starterAnswer)
+      } catch {
+        err(id, 'starterAnswer is not valid JSON')
+      }
+    }
   } else {
     // jsonEditor
     const guide = lesson.fieldGuide

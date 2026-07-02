@@ -592,6 +592,60 @@ function templateSlots(answer, validation) {
   }
 }
 
+// Capstone composition validator. Additive: it does NOT touch any existing
+// validator - it COMPOSES them. The learner rebuilds the pipeline OUTSIDE the
+// app (any tool) and proves it by importing the files their rebuild produced;
+// each file is graded by the EXISTING easy-tier validator for that artifact.
+// The answer is a JSON string of { key: rawFileText }, where each rawFileText
+// is the raw text of one imported file. On pass, the artifact maps each key to
+// its parsed artifact plus rebuiltOutside: true.
+function artifactImport(answer, validation) {
+  let parsed
+  try {
+    parsed = JSON.parse(answer)
+  } catch {
+    parsed = {}
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) parsed = {}
+
+  const { imports = [] } = validation
+  const results = []
+  const artifact = {}
+
+  imports.forEach((imp) => {
+    const rawText = parsed[imp.key]
+    const hasText = typeof rawText === 'string' && rawText.trim().length > 0
+    if (!hasText) {
+      results.push({
+        id: `import-${imp.key}`,
+        label: imp.label,
+        passed: false,
+        message: `Import ${imp.label} before validating.`,
+      })
+      return
+    }
+    // Grade the imported file with the EXISTING validator for that artifact.
+    const inner = validateAnswer(rawText, imp.validation)
+    inner.results.forEach((r) => {
+      results.push({
+        id: `${imp.key}:${r.id}`,
+        label: `${imp.label} - ${r.label}`,
+        passed: r.passed,
+        message: r.message,
+      })
+    })
+    if (inner.passed) artifact[imp.key] = inner.artifact
+  })
+
+  const passed = results.length > 0 && results.every((r) => r.passed)
+
+  return {
+    passed,
+    results,
+    artifact: passed ? { ...artifact, rebuiltOutside: true } : null,
+  }
+}
+
 const validators = {
   jsonFields,
   jsonPolicy,
@@ -599,6 +653,7 @@ const validators = {
   jsonDeltas,
   choiceCheck,
   templateSlots,
+  artifactImport,
   // Stubs for future build passes.
   csvColumns: null,
   ruleBuilder: null,
