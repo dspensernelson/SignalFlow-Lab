@@ -1,0 +1,111 @@
+{
+  "id": "lesson-prior-day-brief-template-medium",
+  "nodeId": "prior-day-brief-template",
+  "title": "Change a Template Everyone Depends On",
+  "difficulty": "Medium",
+  "skill": "Template change management",
+  "clock": "6:48 AM",
+  "scenario": "It is 6:48 AM. This messy morning produced exceptions the brief has no section for: a dropped MISO row and a missing WAUE forecast. The deputy wants a Data Notes section added to the template. Adding a section sounds trivial - it is not, because a template is an interface two audiences depend on.",
+  "inputType": "text",
+  "inputLabel": "Change Request + Current Template",
+  "input": "Change request (Deputy Desk Manager, 6:47 AM): \"Add a Data Notes section to the brief so exception days are visible to readers.\"\n\nCurrent template v1.0.0 (owner: Desk Manager):\n# Meridian Morning Market Brief - <day>\nStatus / Headline / Hub Summary / Operations\n\nRemember: readers scan the same spots daily, and tomorrow's baseline extraction parses the brief by its sections.",
+  "instructions": [
+    "Treat the template as a governed, versioned interface.",
+    "Answer the four change-management questions.",
+    "Validate to record the change assessment."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "What KIND of change is adding a Data Notes section?",
+        "options": [
+          { "id": "a", "text": "A cosmetic tweak any run can make on the fly" },
+          { "id": "b", "text": "A governed structure change: version bump plus owner sign-off" },
+          { "id": "c", "text": "A per-day decision - add the section only when exceptions exist" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The template is versioned and owned (v1.0.0, Desk Manager). Changing the sections changes the interface every reader and parser depends on - that is a governance act, not a tweak."
+      },
+      {
+        "id": "q2",
+        "prompt": "Should Data Notes appear every day, or only on exception days?",
+        "options": [
+          { "id": "a", "text": "Every day - printing 'none' on quiet days keeps the structure identical across runs" },
+          { "id": "b", "text": "Only on exception days - why waste a line?" },
+          { "id": "c", "text": "Alternate days, to keep readers alert" }
+        ],
+        "correctOptionId": "a",
+        "explain": "A section that comes and goes breaks both audiences: readers lose their scanning spot and parsers lose their anchor. 'Data Notes: none' is a feature - it is the quiet-path logging principle, applied to structure."
+      },
+      {
+        "id": "q3",
+        "prompt": "Who approves this change, and what version does the template become?",
+        "options": [
+          { "id": "a", "text": "The deputy who requested it; version stays 1.0.0" },
+          { "id": "b", "text": "Nobody - templates are not code; just edit it" },
+          { "id": "c", "text": "The Desk Manager (owner); version becomes 1.1.0" }
+        ],
+        "correctOptionId": "c",
+        "explain": "Requesting is not approving - the OWNER signs off on structure changes. An added section on a 1.0.0 template is 1.1.0, same versioning logic as the threshold policy change."
+      },
+      {
+        "id": "q4",
+        "prompt": "What must be checked BEFORE the new section ships?",
+        "options": [
+          { "id": "a", "text": "Whether tomorrow's baseline extraction still finds its sections after the structure changes" },
+          { "id": "b", "text": "Whether the section name sounds professional" },
+          { "id": "c", "text": "Nothing - additions cannot break anything" }
+        ],
+        "correctOptionId": "a",
+        "explain": "The input's last line names the silent consumer: the parser that seeds tomorrow's baseline. Structure changes are exactly like schema changes - additions can still break positional or brittle consumers, so you check them first."
+      }
+    ],
+    "artifactOnPass": {
+      "source": "prior-day-brief-template",
+      "changeRequested": "add Data Notes section",
+      "changeKind": "governed structure change",
+      "cadence": "every day, 'none' when empty",
+      "approver": "Desk Manager (owner)",
+      "newVersion": "1.1.0",
+      "preShipCheck": "downstream brief parsing (baseline extraction) still works"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Assess a template change request as change management: classify the change, decide the section's cadence, name the approver and new version, and identify the downstream consumer to check before shipping.",
+  "successMessage": "Change assessed. The template can evolve without breaking the readers or the parser that depend on it.",
+  "intro": {
+    "heading": "Before you judge: templates are interfaces",
+    "sections": [
+      {
+        "title": "Two audiences, one structure",
+        "body": "Humans scan the brief by its sections; tomorrow's automation parses it by them. Any structure change is therefore an interface change with two consumer groups - which is why it gets governance, not a quick edit."
+      },
+      {
+        "title": "Constant structure beats clever structure",
+        "body": "A conditional section optimizes for the writer; a constant section with 'none' optimizes for every reader and parser forever. The quiet-path principle from the routing layer shows up again here, as structure."
+      },
+      {
+        "title": "Additions can still break consumers",
+        "body": "It feels safe to only ADD. But brittle consumers - a parser expecting Operations to be the last section, a reader's muscle memory - can break on additions too. Interface changes are checked, not assumed safe."
+      }
+    ],
+    "jsonExample": "{\n  \"changeKind\": \"governed structure change\",\n  \"cadence\": \"every day, none when empty\",\n  \"newVersion\": \"1.1.0\"\n}",
+    "skill": "Template change management",
+    "artifactName": "source-profile-brief-template.json"
+  },
+  "takeaway": {
+    "heading": "Template change managed",
+    "points": [
+      "You treated a 'small' template edit as what it is: a versioned interface change with an owner and consumers.",
+      "You chose constant structure (Data Notes every day) so quiet days stay provably quiet in the brief itself.",
+      "You separated requester from approver - the deputy asks, the owner signs.",
+      "You named the pre-ship check: the silent parser that seeds tomorrow's baseline.",
+      "The workflow can now evolve its output structure without breaking either audience that depends on it."
+    ],
+    "artifactName": "source-profile-brief-template.json"
+  }
+}

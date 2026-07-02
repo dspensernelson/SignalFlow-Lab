@@ -45,7 +45,7 @@
       },
       {
         "title": "Material variance is a judgement, made explicit",
-        "body": "Not every move matters. A materiality rule turns a raw delta into a yes/no flag using an agreed threshold. Here a hub is material when its actual is 10 or more away from forecast."
+        "body": "Not every move matters. A materiality rule turns a raw delta into a yes/no flag using an agreed threshold. Here a hub is material when its actual is 10 or more away from forecast. Note: this rule belongs to Variance Check; the Threshold Policy's percent bands belong to Risk Evaluation. Two steps, two owned rules."
       },
       {
         "title": "Why derived values should be stored, not recomputed",
@@ -92,7 +92,8 @@
       "You computed derived deltas - vsForecast and vsPriorDay - from clean actuals and two reference inputs.",
       "Deltas can be negative, and that direction is part of the signal you pass on.",
       "An explicit material flag turns a raw number into a decision-ready judgement using an agreed threshold.",
-      "This artifact sits in Phase 3, the Evaluation Layer, and Risk Evaluation reuses variance-summary.json instead of recomputing it."
+      "This artifact sits in Phase 3, the Evaluation Layer, and Risk Evaluation reuses variance-summary.json instead of recomputing it.",
+      "The workflow can now judge how far each hub moved from forecast and prior day."
     ],
     "artifactName": "variance-summary.json"
   }

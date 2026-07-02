@@ -26,9 +26,20 @@ import lessonVarianceCheckMedium from './data/lessons/lesson-variance-check-medi
 import lessonRiskEvaluationMedium from './data/lessons/lesson-risk-evaluation-medium.json'
 import lessonApprovalDecisionMedium from './data/lessons/lesson-approval-decision-medium.json'
 import lessonApprovalRouteMedium from './data/lessons/lesson-approval-route-medium.json'
+import lessonAnalystNotesMedium from './data/lessons/lesson-analyst-notes-medium.json'
+import lessonTraderFlagMedium from './data/lessons/lesson-trader-flag-medium.json'
+import lessonPriceFeedMedium from './data/lessons/lesson-price-feed-medium.json'
+import lessonForecastDataMedium from './data/lessons/lesson-forecast-data-medium.json'
+import lessonPriorDayReferenceMedium from './data/lessons/lesson-prior-day-reference-medium.json'
+import lessonPriorDayBriefTemplateMedium from './data/lessons/lesson-prior-day-brief-template-medium.json'
+import lessonApprovalTemplateMedium from './data/lessons/lesson-approval-template-medium.json'
+import lessonRoutineUpdatePathMedium from './data/lessons/lesson-routine-update-path-medium.json'
+import lessonMorningBriefMedium from './data/lessons/lesson-morning-brief-medium.json'
+import lessonDistributionArchiveMedium from './data/lessons/lesson-distribution-archive-medium.json'
 import lessonIntakeHard from './data/lessons/lesson-intake-hard.json'
 import lessonThresholdPolicyHard from './data/lessons/lesson-threshold-policy-hard.json'
 import lessonPriceFeedHard from './data/lessons/lesson-price-feed-hard.json'
+import lessonApprovalRouteHard from './data/lessons/lesson-approval-route-hard.json'
 import ProjectCanvas from './components/ProjectCanvas'
 import LessonWorkspace from './components/LessonWorkspace'
 import ArtifactViewer from './components/ArtifactViewer'
@@ -75,10 +86,21 @@ const LESSONS = {
   'lesson-risk-evaluation-medium': lessonRiskEvaluationMedium,
   'lesson-approval-decision-medium': lessonApprovalDecisionMedium,
   'lesson-approval-route-medium': lessonApprovalRouteMedium,
+  'lesson-analyst-notes-medium': lessonAnalystNotesMedium,
+  'lesson-trader-flag-medium': lessonTraderFlagMedium,
+  'lesson-price-feed-medium': lessonPriceFeedMedium,
+  'lesson-forecast-data-medium': lessonForecastDataMedium,
+  'lesson-prior-day-reference-medium': lessonPriorDayReferenceMedium,
+  'lesson-prior-day-brief-template-medium': lessonPriorDayBriefTemplateMedium,
+  'lesson-approval-template-medium': lessonApprovalTemplateMedium,
+  'lesson-routine-update-path-medium': lessonRoutineUpdatePathMedium,
+  'lesson-morning-brief-medium': lessonMorningBriefMedium,
+  'lesson-distribution-archive-medium': lessonDistributionArchiveMedium,
   // Hard tier variants (`${taskId}-hard`).
   'lesson-intake-hard': lessonIntakeHard,
   'lesson-threshold-policy-hard': lessonThresholdPolicyHard,
   'lesson-price-feed-hard': lessonPriceFeedHard,
+  'lesson-approval-route-hard': lessonApprovalRouteHard,
 }
 
 export default function App() {

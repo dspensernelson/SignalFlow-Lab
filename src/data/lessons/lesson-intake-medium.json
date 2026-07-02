@@ -8,7 +8,7 @@
   "scenario": "It is 6:15 AM. Two overnight notes arrived and they do not agree. On top of that, neither note says how generation performed. Real intake is not extraction - it is deciding what is trustworthy, and being honest about what is missing.",
   "inputType": "text",
   "inputLabel": "Two Notes, One Record",
-  "input": "[5:40 AM] Overnight Desk Analyst:\nERCOT spiked overnight. Peak around $192/MWh, settled near $145. Trader flagged the spike for review - need approval before we act.\n\n[6:05 AM] Overnight Desk Analyst:\nCorrection after final settlement: ERCOT peak confirmed at $192/MWh, settled at $141/MWh. No word yet on generation performance.\n\nDesk rule: when notes conflict, the LATER note is authoritative. When a required fact is missing from every source, record null - never guess.",
+  "input": "[5:40 AM] Overnight Desk Analyst:\nERCOT spiked overnight. Peak around $204/MWh, settled near $155. Trader flagged the spike for review - need approval before we act.\n\n[6:05 AM] Overnight Desk Analyst:\nCorrection after final settlement: ERCOT peak confirmed at $204/MWh, settled at $151/MWh. No word yet on generation performance.\n\nDesk rule: when notes conflict, the LATER note is authoritative. When a required fact is missing from every source, record null - never guess.",
   "instructions": [
     "Compare the two notes field by field and apply the desk rule.",
     "Where the later note corrects the earlier one, use the correction.",
@@ -26,8 +26,8 @@
       "approvalRequired": true
     },
     "acceptedValues": {
-      "peakPrice": ["192", "$192", "192/MWh", "$192/MWh"],
-      "settledPrice": ["141", "$141", "141/MWh", "$141/MWh"],
+      "peakPrice": ["204", "$204", "204/MWh", "$204/MWh"],
+      "settledPrice": ["151", "$151", "151/MWh", "$151/MWh"],
       "generationFlag": ["null"],
       "authoritativeNoteTime": ["6:05", "6:05 AM", "06:05"]
     }
@@ -65,7 +65,7 @@
   "takeaway": {
     "heading": "Intake built from conflict",
     "points": [
-      "You resolved a source conflict using a governed rule (later wins), not intuition.",
+      "You resolved a source conflict using a governed rule (later wins), not intuition - the corrected settled price (151) matches what the feed will confirm.",
       "You recorded an explicit null instead of a guess - downstream steps now KNOW generation status is unknown, rather than believing a fabrication.",
       "You captured provenance (authoritativeNoteTime), so the record can defend itself under questioning.",
       "The flag survived the correction: an unretracted escalation stays true.",

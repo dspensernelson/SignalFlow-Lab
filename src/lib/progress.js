@@ -76,11 +76,22 @@ export const BUILT_LESSON_IDS_BY_TIER = {
     'lesson-risk-evaluation-medium',
     'lesson-approval-decision-medium',
     'lesson-approval-route-medium',
+    'lesson-analyst-notes-medium',
+    'lesson-trader-flag-medium',
+    'lesson-price-feed-medium',
+    'lesson-forecast-data-medium',
+    'lesson-prior-day-reference-medium',
+    'lesson-prior-day-brief-template-medium',
+    'lesson-approval-template-medium',
+    'lesson-routine-update-path-medium',
+    'lesson-morning-brief-medium',
+    'lesson-distribution-archive-medium',
   ],
   hard: [
     'lesson-intake-hard',
     'lesson-threshold-policy-hard',
     'lesson-price-feed-hard',
+    'lesson-approval-route-hard',
   ],
 }
 

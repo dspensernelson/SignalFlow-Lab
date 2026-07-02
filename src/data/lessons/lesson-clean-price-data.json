@@ -83,7 +83,8 @@
       "You normalized messy price strings into a numeric JSON table.",
       "Type coercion turned values like \"$187/MWh\" into the number 187 that automation can compute on.",
       "This artifact sits in Phase 2, the Data Structure Layer, of the Meridian workflow map.",
-      "Risk Evaluation and the Morning Brief reuse clean-prices.json downstream."
+      "Risk Evaluation and the Morning Brief reuse clean-prices.json downstream.",
+      "The workflow can now perform deterministic calculations on trusted numeric prices."
     ],
     "artifactName": "clean-prices.json"
   }

@@ -1,0 +1,110 @@
+{
+  "id": "lesson-analyst-notes-medium",
+  "nodeId": "analyst-notes",
+  "title": "Judge Conflicting Sources",
+  "difficulty": "Medium",
+  "skill": "Source authority under conflict",
+  "clock": "6:05 AM",
+  "scenario": "It is 6:05 AM. The overnight source is not one note this morning - it is two, and they disagree. Before intake touches anything, make the judgment calls a source conflict demands: who wins, what happens to the loser, and what to do about the fact neither note mentions.",
+  "inputType": "text",
+  "inputLabel": "Two Notes (timestamps matter)",
+  "input": "[5:40 AM] Overnight Desk Analyst:\nERCOT spiked overnight. Peak around $204/MWh, settled near $155. Trader flagged the spike for review.\n\n[6:05 AM] Overnight Desk Analyst:\nCorrection after final settlement: ERCOT peak confirmed at $204/MWh, settled at $151/MWh. No word yet on generation performance.\n\nDesk rule on file: when notes conflict, the later note is authoritative. Every note is captured with its timestamp.",
+  "instructions": [
+    "Read both notes and the desk rule.",
+    "Answer the four judgment questions.",
+    "Validate to record the conflict profile."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "The notes disagree on the settled price (155 vs 151). What decides which value wins?",
+        "options": [
+          { "id": "a", "text": "The governed desk rule: the later note is authoritative" },
+          { "id": "b", "text": "The higher price, to be safe" },
+          { "id": "c", "text": "Whichever value the reader finds more plausible" }
+        ],
+        "correctOptionId": "a",
+        "explain": "The input states the rule on file. Conflicts are resolved by governance decided in advance - not by caution or plausibility in the moment."
+      },
+      {
+        "id": "q2",
+        "prompt": "What makes the later-wins rule safe to AUTOMATE?",
+        "options": [
+          { "id": "a", "text": "Analysts never correct themselves twice" },
+          { "id": "b", "text": "Every note is captured with a timestamp, so later is machine-decidable" },
+          { "id": "c", "text": "The rule only runs when a human is watching" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Re-read the last line of the input: a rule is only automatable when the fact it depends on (arrival order) is captured as data."
+      },
+      {
+        "id": "q3",
+        "prompt": "Neither note reports generation performance. What should intake record?",
+        "options": [
+          { "id": "a", "text": "Yesterday's generation status, as the best available guess" },
+          { "id": "b", "text": "Nothing - omit the field entirely and hope nobody notices" },
+          { "id": "c", "text": "An explicit null: checked, and unknown" }
+        ],
+        "correctOptionId": "c",
+        "explain": "A guess is an undetectable lie and a silently omitted field is ambiguous. An explicit null tells downstream steps the fact was checked and is genuinely unknown."
+      },
+      {
+        "id": "q4",
+        "prompt": "After the correction, what happens to the 5:40 note?",
+        "options": [
+          { "id": "a", "text": "Delete it so nobody uses the wrong number" },
+          { "id": "b", "text": "Retain it unchanged - superseded sources are audit evidence" },
+          { "id": "c", "text": "Edit it in place so both notes agree" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Provenance means keeping what actually happened. Deleting or editing history makes the correction itself unexplainable later."
+      }
+    ],
+    "artifactOnPass": {
+      "source": "analyst-notes",
+      "conflictObserved": "settled price: 155 (5:40) vs 151 (6:05)",
+      "authorityRule": "later note wins (governed desk rule, timestamp-decidable)",
+      "missingFact": "generation performance -> recorded as explicit null",
+      "supersededNote": "retained unchanged for audit",
+      "firstConsumer": "market-intake-record"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Judge this source conflict: which note wins and under what rule, what makes the rule automatable, what to record when a fact is stated nowhere, and what happens to the superseded note.",
+  "successMessage": "Conflict judged. Intake can now build the record knowing which source wins and why.",
+  "intro": {
+    "heading": "Before you judge: conflict is the normal case",
+    "sections": [
+      {
+        "title": "Sources disagree constantly",
+        "body": "Corrections, retractions, and follow-ups are how human sources actually behave. A workflow that assumes one clean note per morning breaks the first time reality arrives twice."
+      },
+      {
+        "title": "Authority is decided before the conflict",
+        "body": "Later-wins is not obvious - a desk could reasonably rule that only a NAMED correction supersedes. What matters is that the rule was agreed in advance and depends on captured data (timestamps), so a machine can apply it."
+      },
+      {
+        "title": "Three fates for information",
+        "body": "This morning produces all three: a value that wins (151), a value that is superseded but retained (155), and a fact that is absent and recorded as null. Knowing which is which IS the inspection skill at this tier."
+      }
+    ],
+    "jsonExample": "{\n  \"authorityRule\": \"later note wins\",\n  \"missingFact\": \"generation -> null\",\n  \"supersededNote\": \"retained for audit\"\n}",
+    "skill": "Source authority under conflict",
+    "artifactName": "source-profile-analyst-notes.json"
+  },
+  "takeaway": {
+    "heading": "Conflict profile recorded",
+    "points": [
+      "You resolved a source conflict with a governed, timestamp-decidable rule instead of judgment in the moment.",
+      "You assigned the three fates correctly: winning value, retained superseded value, explicit null.",
+      "You kept the superseded note as audit evidence - history stays intact even when it is wrong.",
+      "The intake build on this tier applies exactly these judgments to produce the record.",
+      "The workflow can now decide which source to trust before any extraction happens."
+    ],
+    "artifactName": "source-profile-analyst-notes.json"
+  }
+}

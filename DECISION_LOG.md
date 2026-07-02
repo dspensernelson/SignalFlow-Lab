@@ -55,6 +55,30 @@ Short record of product and implementation decisions. Keep entries factual and b
 - Deferred per NODE_AUDIT: distribution-archive node split and risk-evaluation
   split stay single nodes through Module 1 Easy; revisit before Medium.
 
+## 2026-07-01 (medium-complete pass)
+
+- Medium tier is COMPLETE: all 17 lessons built, smoke-tested, and verified
+  live (no-scroll held for the medium quizzes and the 11-slot medium brief).
+- Canon correction: intake-medium prices now MATCH the feed (peak 204,
+  settled 151; the note conflict is 155 vs 151). The original 192/141 draft
+  accidentally contradicted clean-prices-medium.
+- Decision: exceptions stay FIELDS inside existing artifacts at Medium
+  (droppedRowHub / missingForecastHub in the brief and closeout records); no
+  new Intake Exceptions node. Revisit only if a future module needs exception
+  queues.
+- Medium design threads made deliberate: template lesson approves the Data
+  Notes section the brief renders; approval-template-medium adds the delegate
+  that approval-route-medium uses; routine-update-path-medium logs the
+  version-flipped outcome (13.9 routine under v1.1.0, escalation under
+  v1.0.0).
+- Wave D polish applied to the four original lessons (capability statements;
+  dual-materiality note in variance-check).
+- Hard gained approval-route-hard (silence-driven escalation ladder with
+  rung timestamps and an exhausted-ladder fallback): hard is 4 built.
+- Note: production JS bundle passed 500 kB (all lesson JSON statically
+  imported). Acceptable now; dynamic import per tier is the natural split
+  later.
+
 ## 2026-07-01 (module-01-tiers implementation pass)
 
 - Built all 13 remaining Module 1 Easy lessons: Easy is now 17/17 playable.

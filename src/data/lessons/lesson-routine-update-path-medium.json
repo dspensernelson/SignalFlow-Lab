@@ -1,0 +1,76 @@
+{
+  "id": "lesson-routine-update-path-medium",
+  "nodeId": "routine-update-path",
+  "title": "Log an Outcome the Old Rule Would Have Escalated",
+  "difficulty": "Medium",
+  "skill": "Version-aware logging",
+  "clock": "6:40 AM",
+  "scenario": "Day-3's biggest move was 13.9 percent. Under the OLD policy (escalate at 12) that morning goes to the manager; under v1.1.0 (escalate at 14) it is routine. When a rule change flips an outcome, the log must say WHICH version decided - or next month's audit will look like a control failure.",
+  "inputType": "text",
+  "inputLabel": "Decision Log Extract + Logging Standard",
+  "input": "From decision-log.json:\nday-3: biggest day-over-day move 13.9 percent. Escalation threshold: 14 percent (Threshold Policy v1.1.0). escalationRequired: false. Route: routine-update-path.\n\nDesk logging standard for rule-sensitive outcomes: when an outcome would have differed under the previous policy version, the log entry must cite the deciding version AND the version under which the outcome would have flipped. The workflow writes the entry itself.",
+  "instructions": [
+    "Record the day, the move, and the outcome.",
+    "Cite the policy version that decided it.",
+    "Record the version under which this morning WOULD have escalated.",
+    "The workflow is the logger. Return one JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["day", "biggestMovePct", "outcome", "decidedByPolicyVersion", "wouldHaveEscalatedUnder", "briefReleased", "loggedBy"],
+    "expected": {
+      "day": "day-3",
+      "outcome": "routine"
+    },
+    "acceptedValues": {
+      "biggestMovePct": ["13.9", "13.9%"],
+      "decidedByPolicyVersion": ["1.1.0", "v1.1.0"],
+      "wouldHaveEscalatedUnder": ["1.0.0", "v1.0.0"],
+      "briefReleased": ["true"],
+      "loggedBy": ["workflow", "the workflow", "automation", "meridian workflow"]
+    }
+  },
+  "copilotPrompt": "Write a version-aware routine log entry as JSON with day, biggestMovePct, outcome, decidedByPolicyVersion, wouldHaveEscalatedUnder, briefReleased, and loggedBy. The move was 13.9; policy v1.1.0 (threshold 14) makes it routine; under v1.0.0 (threshold 12) it would have escalated.",
+  "successMessage": "Version-aware entry logged. When the auditor asks why 13.9 skipped approval, the record answers with the rule that was in force.",
+  "intro": {
+    "heading": "Before you build: outcomes depend on versions",
+    "sections": [
+      {
+        "title": "The flipped-outcome problem",
+        "body": "Last quarter, 13.9 escalated. This quarter it does not. Same number, different outcome - and unless the log cites the version, the change looks like an error or a bypassed control rather than a governed rule change doing its job."
+      },
+      {
+        "title": "Cite the counterfactual",
+        "body": "Recording wouldHaveEscalatedUnder is unusual and deliberate: rule-sensitive outcomes carry their own context. The desk standard asks for it exactly because these are the entries auditors question."
+      },
+      {
+        "title": "The quiet path, grown up",
+        "body": "The Easy tier taught that no-action gets logged. This tier upgrades the lesson: no-action gets logged WITH the rule that made it no-action. Logs that cite their rules survive rule changes."
+      }
+    ],
+    "jsonExample": "{\n  \"outcome\": \"routine\",\n  \"decidedByPolicyVersion\": \"1.1.0\",\n  \"wouldHaveEscalatedUnder\": \"1.0.0\"\n}",
+    "skill": "Version-aware logging",
+    "artifactName": "routine-log.json"
+  },
+  "fieldGuide": [
+    { "field": "day", "meaning": "Which morning this entry covers.", "type": "string", "hint": "From the decision log extract." },
+    { "field": "biggestMovePct", "meaning": "The biggest move measured.", "type": "string", "hint": "From the extract." },
+    { "field": "outcome", "meaning": "The outcome word for this branch.", "type": "string", "hint": "This is the routine path." },
+    { "field": "decidedByPolicyVersion", "meaning": "The policy version that decided the outcome.", "type": "string", "hint": "Named in the extract." },
+    { "field": "wouldHaveEscalatedUnder", "meaning": "The version under which this outcome flips.", "type": "string", "hint": "The previous policy - its threshold was 12." },
+    { "field": "briefReleased", "meaning": "Whether the brief went out.", "type": "boolean", "hint": "Routine mornings release." },
+    { "field": "loggedBy", "meaning": "Who wrote the entry.", "type": "string", "hint": "No human is on this path." }
+  ],
+  "takeaway": {
+    "heading": "Version-aware outcome logged",
+    "points": [
+      "You logged not just what happened but which rule version made it happen - the difference between a defensible outcome and an apparent control gap.",
+      "You recorded the counterfactual (would have escalated under 1.0.0), pre-answering the exact question an auditor will ask.",
+      "The changeNote you wrote in the policy lesson and this log entry now corroborate each other - governance artifacts referencing each other is what an audit TRAIL means.",
+      "The workflow can now survive rule changes with its history intact and explainable."
+    ],
+    "artifactName": "routine-log.json"
+  }
+}

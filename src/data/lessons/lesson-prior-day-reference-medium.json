@@ -1,0 +1,110 @@
+{
+  "id": "lesson-prior-day-reference-medium",
+  "nodeId": "prior-day-reference",
+  "title": "Baselines for a Hub That Is One Day Old",
+  "difficulty": "Medium",
+  "skill": "Baseline coverage & loop fragility",
+  "clock": "6:18 AM",
+  "scenario": "It is 6:18 AM. The prior-day baseline covers all three hubs - including WAUE, which the forecast model still does not know. Why does one reference have the new hub while the other does not? The answer teaches how baselines actually get their coverage, and what makes the daily loop fragile.",
+  "inputType": "text",
+  "inputLabel": "Prior-Day Baseline (complete)",
+  "input": "Prior-day prices per hub (from yesterday's archived brief):\nERCOT: 176\nSPP: 97\nWAUE: 59\n\nContext: WAUE joined the desk last month, and each day's archive has included it since its first day of trading. The forecast model, by contrast, adds hubs on the model owner's release schedule and does not have WAUE yet.",
+  "instructions": [
+    "Compare this reference's coverage with the forecast's.",
+    "Answer the four coverage questions.",
+    "Validate to record the assessment."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "Why does the baseline have WAUE when the forecast does not?",
+        "options": [
+          { "id": "a", "text": "Baselines self-populate from whatever the workflow processed yesterday; the forecast needs its owner to ship a model change" },
+          { "id": "b", "text": "Someone typed the WAUE baseline in manually this morning" },
+          { "id": "c", "text": "Coincidence - reference coverage is random" }
+        ],
+        "correctOptionId": "a",
+        "explain": "The input contrasts the two mechanisms: the archive includes whatever ran (automatic coverage), while the model grows on a release schedule (owned coverage). Different reference types acquire keys differently."
+      },
+      {
+        "id": "q2",
+        "prompt": "What single event would have left WAUE without a baseline today?",
+        "options": [
+          { "id": "a", "text": "The trader not flagging anything yesterday" },
+          { "id": "b", "text": "Yesterday's run failing to archive its brief" },
+          { "id": "c", "text": "The forecast model adding WAUE early" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The baseline is yesterday's archive, one day older. No archive, no baseline - the loop's output side is exactly as fragile as its retention step."
+      },
+      {
+        "id": "q3",
+        "prompt": "If a hub ever lacks a prior-day value, what is the honest behavior?",
+        "options": [
+          { "id": "a", "text": "Use the oldest available price from any past day" },
+          { "id": "b", "text": "Use the forecast as a stand-in baseline" },
+          { "id": "c", "text": "Exclude that hub's day-over-day computation and surface the gap - same discipline as the forecast hole" }
+        ],
+        "correctOptionId": "c",
+        "explain": "One rule covers every reference gap on this map: compute what you can defend, exclude what you cannot, and make the gap visible. Stand-ins manufacture untraceable numbers."
+      },
+      {
+        "id": "q4",
+        "prompt": "Which of today's computations does WAUE's baseline enable?",
+        "options": [
+          { "id": "a", "text": "Its vsForecast delta in Variance Check" },
+          { "id": "b", "text": "Its day-over-day percent move and risk classification" },
+          { "id": "c", "text": "None - new hubs are excluded from everything" }
+        ],
+        "correctOptionId": "b",
+        "explain": "WAUE's 63 against a baseline of 59 gives the day-over-day move the threshold policy classifies. The forecast comparison stays excluded; the baseline comparison works."
+      }
+    ],
+    "artifactOnPass": {
+      "source": "prior-day-reference",
+      "coverageMechanism": "self-populates from yesterday's archived run",
+      "contrastWith": "forecast coverage grows on the model owner's release schedule",
+      "fragilePoint": "a single missed archive breaks tomorrow's baseline",
+      "gapBehavior": "exclude and surface, same as forecast gaps",
+      "enablesToday": "WAUE day-over-day move and risk classification"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Explain why the self-populating baseline covers a new hub the release-scheduled forecast does not, what single failure breaks the baseline, the honest gap behavior, and what the baseline enables today.",
+  "successMessage": "Coverage understood. You can now predict which reference will have a key before you look.",
+  "intro": {
+    "heading": "Before you judge: two ways references grow",
+    "sections": [
+      {
+        "title": "Self-populating vs owned coverage",
+        "body": "The baseline covers WAUE automatically because baselines are recycled output - whatever ran yesterday is covered today. The forecast needs a human owner to ship a change. Knowing which kind of reference you are looking at tells you where its gaps will be."
+      },
+      {
+        "title": "The loop is exactly as strong as retention",
+        "body": "Self-populating coverage has a price: one missed archive and tomorrow starts blind. The Easy tier taught the loop exists; this tier teaches where it snaps."
+      },
+      {
+        "title": "One gap discipline everywhere",
+        "body": "Forecast hole, baseline hole - same rule: exclude, surface, never fabricate. Consistency across gap types is what makes the workflow's behavior predictable under any partial failure."
+      }
+    ],
+    "jsonExample": "{\n  \"coverageMechanism\": \"self-populating\",\n  \"fragilePoint\": \"missed archive\",\n  \"gapBehavior\": \"exclude and surface\"\n}",
+    "skill": "Baseline coverage & loop fragility",
+    "artifactName": "source-profile-prior-day-reference.json"
+  },
+  "takeaway": {
+    "heading": "Coverage mechanics recorded",
+    "points": [
+      "You explained a coverage asymmetry (baseline has WAUE, forecast does not) from the two references' growth mechanisms.",
+      "You located the loop's single point of fragility: the retention step at the end of each run.",
+      "You applied one consistent gap discipline across reference types.",
+      "You scoped what the baseline enables today: WAUE gets classified even while its forecast comparison waits.",
+      "The workflow can now reason about WHERE its references will have holes, not just react when they do."
+    ],
+    "artifactName": "source-profile-prior-day-reference.json"
+  }
+}
