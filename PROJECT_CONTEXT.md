@@ -45,7 +45,8 @@ The historical MVP was accepted against `signalflow-lab-mvp-spec-v2.md`: one com
   `jsonEditor` (validators `jsonFields`, `jsonPolicy`, `jsonRows`,
   `jsonDeltas`), `choiceCheck` (inspection/interpretation quizzes), and
   `templateSlots` (assembly with an artifact shelf; stores a rendered string
-  artifact). Medium has 7 built lessons; hard has 3.
+  artifact). Medium is COMPLETE at 17 of 17 built. Hard has 7 built (the
+  full curated drill set); only the solo-rebuild capstone remains.
 - Lesson flow follows Intro -> Exercise -> Takeaway.
 - Curriculum sources of truth: `CURRICULUM_MASTER_PLAN.md` (modules/tiers),
   `curriculum/module-01/<tier>/_OVERVIEW.md` (canon data + status per tier).

@@ -1,9 +1,10 @@
 # Node Audit - Meridian Morning Market Brief
 
-> **STATUS UPDATE (2026-07-01, module-01-tiers).** This audit was written when
+> **STATUS UPDATE (2026-07-02, module-01-tiers).** This audit was written when
 > 4 lessons were interactive. As of the module-01-tiers branch, **all 17 nodes
 > are `[NOW]` at the Easy tier** (built from curriculum/module-01/easy/), and
-> difficulty tiers exist (Medium 7 built, Hard 3 built - see the per-tier
+> Medium is COMPLETE (17 of 17 built) and Hard has 7 built - the full curated
+> drill set, with only the solo-rebuild capstone remaining (see the per-tier
 > overviews in curriculum/module-01/). The per-node `[INTENT]`/`[LATER]`
 > markers below are preserved as the pre-build record; the analysis, lesson
 > types, governance notes, and open risks remain the curriculum source of
