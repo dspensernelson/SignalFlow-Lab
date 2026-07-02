@@ -7,6 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "lint:lessons": "node scripts/lint-lessons.mjs",
+    "test:lessons": "node scripts/validate-lessons.mjs",
+    "check": "npm run lint && npm run lint:lessons && npm run test:lessons && npm run build",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -1,0 +1,192 @@
+{
+  "_comment": "Per-lesson regression fixtures for scripts/validate-lessons.mjs. Each entry has a `correct` answer (must pass validation and store an artifact) and a `wrong` answer (must fail with no artifact). choiceCheck lessons need no fixture: the runner derives answers from the questions. Answers are the parsed form; the runner JSON-stringifies them before calling validateAnswer.",
+
+  "lesson-intake": {
+    "correct": { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": "$142/MWh", "generationFlag": "Wind underperformed", "approvalRequired": true },
+    "wrong": { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": "$142/MWh", "generationFlag": "Wind underperformed", "approvalRequired": false }
+  },
+  "lesson-threshold-policy": {
+    "correct": { "policyName": "ERCOT Hub Threshold Policy", "version": "1.0.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "routineThreshold": 5, "escalationThreshold": 12 },
+    "wrong": { "policyName": "ERCOT Hub Threshold Policy", "version": "1.0.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "routineThreshold": 12, "escalationThreshold": 5 }
+  },
+  "lesson-clean-price-data": {
+    "correct": [
+      { "hub": "ERCOT", "peakPrice": 187, "settledPrice": 142 },
+      { "hub": "SPP", "peakPrice": 96, "settledPrice": 88 },
+      { "hub": "MISO", "peakPrice": 74, "settledPrice": 70 }
+    ],
+    "wrong": [
+      { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": 142 },
+      { "hub": "SPP", "peakPrice": 96, "settledPrice": 88 },
+      { "hub": "MISO", "peakPrice": 74, "settledPrice": 70 }
+    ]
+  },
+  "lesson-variance-check": {
+    "correct": [
+      { "hub": "ERCOT", "vsForecast": 17, "vsPriorDay": 22, "material": true },
+      { "hub": "SPP", "vsForecast": 0, "vsPriorDay": 4, "material": false },
+      { "hub": "MISO", "vsForecast": -6, "vsPriorDay": -4, "material": false }
+    ],
+    "wrong": [
+      { "hub": "ERCOT", "vsForecast": 10, "vsPriorDay": 22 },
+      { "hub": "SPP", "vsForecast": 0, "vsPriorDay": 4 },
+      { "hub": "MISO", "vsForecast": -6, "vsPriorDay": -4 }
+    ]
+  },
+  "lesson-risk-evaluation": {
+    "correct": [
+      { "hub": "ERCOT", "pctMove": 13.3, "status": "escalate" },
+      { "hub": "SPP", "pctMove": 4.3, "status": "normal" },
+      { "hub": "MISO", "pctMove": -5.1, "status": "routine" }
+    ],
+    "wrong": [
+      { "hub": "ERCOT", "pctMove": 13.3, "status": "routine" },
+      { "hub": "SPP", "pctMove": 4.3, "status": "normal" },
+      { "hub": "MISO", "pctMove": -5.1, "status": "routine" }
+    ]
+  },
+  "lesson-approval-template": {
+    "correct": { "templateName": "Brief Approval Request", "version": "1.0.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "subjectFormat": "APPROVAL NEEDED: <hub> <move>% - morning brief", "responseDeadlineMinutes": 30 },
+    "wrong": { "templateName": "Brief Approval Request", "version": "1.0.0", "owner": "", "approver": "Desk Manager", "subjectFormat": "APPROVAL NEEDED", "responseDeadlineMinutes": "30" }
+  },
+  "lesson-approval-decision": {
+    "correct": [
+      { "day": "day-1", "biggestMovePct": 13.3, "escalationRequired": true, "route": "approval-route" },
+      { "day": "day-2", "biggestMovePct": 12, "escalationRequired": true, "route": "approval-route" },
+      { "day": "day-3", "biggestMovePct": 11.9, "escalationRequired": false, "route": "routine-update-path" }
+    ],
+    "wrong": [
+      { "day": "day-1", "biggestMovePct": 13.3, "escalationRequired": true, "route": "approval-route" },
+      { "day": "day-2", "biggestMovePct": 12, "escalationRequired": false, "route": "routine-update-path" },
+      { "day": "day-3", "biggestMovePct": 11.9, "escalationRequired": false, "route": "routine-update-path" }
+    ]
+  },
+  "lesson-approval-route": {
+    "correct": { "hub": "ERCOT", "movePct": "13.3", "sentTo": "Desk Manager", "decision": "Approved", "decidedBy": "Desk Manager", "decidedAt": "6:41 AM" },
+    "wrong": { "hub": "ERCOT", "movePct": "13.3", "sentTo": "Desk Manager", "decision": "rejected", "decidedBy": "Desk Manager", "decidedAt": "6:41 AM" }
+  },
+  "lesson-routine-update-path": {
+    "correct": { "day": "day-3", "biggestMovePct": 11.9, "threshold": 12, "outcome": "routine", "briefReleased": true, "loggedBy": "workflow" },
+    "wrong": { "day": "day-3", "biggestMovePct": 11.9, "threshold": 12, "outcome": "routine", "briefReleased": false, "loggedBy": "Desk Manager" }
+  },
+  "lesson-distribution-archive": {
+    "correct": { "deliveredTo": "Trading Desk DL", "sendTime": "7:00 AM", "archiveFolder": "briefs-archive", "retentionDays": 30, "seedsTomorrowBaseline": true },
+    "wrong": { "deliveredTo": "Trading Desk DL", "sendTime": "7:00 AM", "archiveFolder": "briefs-archive", "retentionDays": 30, "seedsTomorrowBaseline": false }
+  },
+  "lesson-morning-brief": {
+    "correct": { "briefDay": "day-1", "approvalStatus": "Approved", "approvedBy": "Desk Manager", "approvedAt": "6:41 AM", "headlineHub": "ERCOT", "headlineMovePct": "13.3", "peakPrice": "187", "settledPrice": "142", "operationsNote": "Wind underperformed" },
+    "wrong": { "briefDay": "day-1", "approvalStatus": "Approved", "approvedBy": "Desk Manager", "approvedAt": "6:41 AM", "headlineHub": "ERCOT", "headlineMovePct": "13", "peakPrice": "187", "settledPrice": "", "operationsNote": "Wind underperformed" }
+  },
+
+  "lesson-intake-medium": {
+    "correct": { "hub": "ERCOT", "peakPrice": "$204/MWh", "settledPrice": "151", "generationFlag": null, "approvalRequired": true, "authoritativeNoteTime": "6:05 AM" },
+    "wrong": { "hub": "ERCOT", "peakPrice": "$204/MWh", "settledPrice": "155", "generationFlag": "Wind underperformed", "approvalRequired": true, "authoritativeNoteTime": "5:40 AM" }
+  },
+  "lesson-clean-price-data-medium": {
+    "correct": [
+      { "hub": "ERCOT", "peakPrice": 204, "settledPrice": 151 },
+      { "hub": "SPP", "peakPrice": 98.5, "settledPrice": 90 },
+      { "hub": "WAUE", "peakPrice": 63, "settledPrice": 58 }
+    ],
+    "wrong": [
+      { "hub": "ERCOT", "peakPrice": 204, "settledPrice": 151 },
+      { "hub": "SPP", "peakPrice": "98.5 /MWh", "settledPrice": 90 },
+      { "hub": "WAUE", "peakPrice": 63, "settledPrice": 58 }
+    ]
+  },
+  "lesson-threshold-policy-medium": {
+    "correct": { "policyName": "ERCOT Hub Threshold Policy", "version": "1.1.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "routineThreshold": 6, "escalationThreshold": 14, "changeNote": "Raised bands from 5/12; six of eight escalations last quarter were noise." },
+    "wrong": { "policyName": "ERCOT Hub Threshold Policy", "version": "1.1.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "routineThreshold": 14, "escalationThreshold": 6, "changeNote": "" }
+  },
+  "lesson-variance-check-medium": {
+    "correct": [
+      { "hub": "ERCOT", "vsForecast": 16, "vsPriorDay": 28 },
+      { "hub": "SPP", "vsForecast": -1.5, "vsPriorDay": 1.5 }
+    ],
+    "wrong": [
+      { "hub": "ERCOT", "vsForecast": 16, "vsPriorDay": 28 },
+      { "hub": "SPP", "vsForecast": 1.5, "vsPriorDay": 1.5 }
+    ]
+  },
+  "lesson-risk-evaluation-medium": {
+    "correct": [
+      { "hub": "ERCOT", "pctMove": 15.9, "status": "escalate" },
+      { "hub": "SPP", "pctMove": 1.5, "status": "normal" },
+      { "hub": "WAUE", "pctMove": 6.8, "status": "routine" }
+    ],
+    "wrong": [
+      { "hub": "ERCOT", "pctMove": 15.9, "status": "escalate" },
+      { "hub": "SPP", "pctMove": 1.5, "status": "normal" },
+      { "hub": "WAUE", "pctMove": 6.8, "status": "normal" }
+    ]
+  },
+  "lesson-approval-decision-medium": {
+    "correct": [
+      { "day": "day-1", "biggestMovePct": 15.9, "escalationRequired": true, "route": "approval-route" },
+      { "day": "day-2", "biggestMovePct": -14, "escalationRequired": true, "route": "approval-route" },
+      { "day": "day-3", "biggestMovePct": 13.9, "escalationRequired": false, "route": "routine-update-path" },
+      { "day": "day-4", "biggestMovePct": -5.8, "escalationRequired": false, "route": "routine-update-path" }
+    ],
+    "wrong": [
+      { "day": "day-1", "biggestMovePct": 15.9, "escalationRequired": true, "route": "approval-route" },
+      { "day": "day-2", "biggestMovePct": -14, "escalationRequired": false, "route": "routine-update-path" },
+      { "day": "day-3", "biggestMovePct": 13.9, "escalationRequired": false, "route": "routine-update-path" },
+      { "day": "day-4", "biggestMovePct": -5.8, "escalationRequired": false, "route": "routine-update-path" }
+    ]
+  },
+  "lesson-approval-route-medium": {
+    "correct": { "hub": "ERCOT", "movePct": "15.9", "sentTo": "Desk Manager", "decision": "Approved", "decidedBy": "Deputy Desk Manager", "decidedAt": "6:47 AM", "substitution": true, "substitutionReason": "out-of-office" },
+    "wrong": { "hub": "ERCOT", "movePct": "15.9", "sentTo": "Deputy Desk Manager", "decision": "Approved", "decidedBy": "Deputy Desk Manager", "decidedAt": "6:47 AM", "substitution": false, "substitutionReason": "" }
+  },
+  "lesson-approval-template-medium": {
+    "correct": { "templateName": "Brief Approval Request", "version": "1.1.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "delegate": "Deputy Desk Manager", "subjectFormat": "APPROVAL NEEDED: <hub> <move>% - morning brief", "responseDeadlineMinutes": 30, "changeNote": "Added delegate after an unreachable approver stalled a brief." },
+    "wrong": { "templateName": "Brief Approval Request", "version": "1.1.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "delegate": "", "subjectFormat": "APPROVAL NEEDED", "responseDeadlineMinutes": "30", "changeNote": "x" }
+  },
+  "lesson-routine-update-path-medium": {
+    "correct": { "day": "day-3", "biggestMovePct": 13.9, "outcome": "routine", "decidedByPolicyVersion": "1.1.0", "wouldHaveEscalatedUnder": "1.0.0", "briefReleased": true, "loggedBy": "workflow" },
+    "wrong": { "day": "day-3", "biggestMovePct": 13.9, "outcome": "routine", "decidedByPolicyVersion": "1.0.0", "wouldHaveEscalatedUnder": "1.1.0", "briefReleased": true, "loggedBy": "workflow" }
+  },
+  "lesson-morning-brief-medium": {
+    "correct": { "briefDay": "day-1", "approvalStatus": "approved", "approvedBy": "Deputy Desk Manager", "approvedAt": "6:47 AM", "substitutionReason": "out-of-office", "headlineHub": "ERCOT", "headlineMovePct": "15.9", "peakPrice": "204", "settledPrice": "151", "droppedHub": "MISO", "missingForecastHub": "WAUE" },
+    "wrong": { "briefDay": "day-1", "approvalStatus": "approved", "approvedBy": "Desk Manager", "approvedAt": "6:47 AM", "substitutionReason": "out-of-office", "headlineHub": "ERCOT", "headlineMovePct": "15.9", "peakPrice": "204", "settledPrice": "151", "droppedHub": "WAUE", "missingForecastHub": "MISO" }
+  },
+  "lesson-distribution-archive-medium": {
+    "correct": { "deliveredTo": "Trading Desk DL", "sendTime": "7:00 AM", "archiveFolder": "briefs-archive", "retentionDays": 30, "droppedRowHub": "MISO", "missingForecastHub": "WAUE", "exceptionsReportedTo": "Risk Desk Lead", "seedsTomorrowBaseline": true },
+    "wrong": { "deliveredTo": "Trading Desk DL", "sendTime": "7:00 AM", "archiveFolder": "briefs-archive", "retentionDays": 30, "droppedRowHub": "MISO", "missingForecastHub": "WAUE", "exceptionsReportedTo": "Desk Manager", "seedsTomorrowBaseline": true }
+  },
+
+  "lesson-intake-hard": {
+    "correct": { "schemaVersion": "2.0.0", "hub": "ERCOT", "peakPrice": 187, "settledPrice": 142, "priceUnit": "USD/MWh", "operatingSignal": "Wind underperformed", "approvalRequired": true, "migratedFrom": "1.0.0" },
+    "wrong": { "schemaVersion": "2.0.0", "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": 142, "priceUnit": "USD/MWh", "operatingSignal": "Wind underperformed", "approvalRequired": true, "migratedFrom": "1.0.0" }
+  },
+  "lesson-threshold-policy-hard": {
+    "correct": { "policyName": "ERCOT Hub Threshold Policy", "version": "2.0.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "routineThreshold": 6, "escalationThreshold": 16, "rationale": "At 16, 5 of 60 days escalate; at 6, 23 of 60 days are noted." },
+    "wrong": { "policyName": "ERCOT Hub Threshold Policy", "version": "2.0.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "routineThreshold": "6", "escalationThreshold": 16, "rationale": "" }
+  },
+  "lesson-price-feed-hard": {
+    "correct": { "incidentType": "late-feed", "expectedAt": "6:15 AM", "detectedAt": "6:20 AM", "arrivedAt": "6:42 AM", "malformedRowHub": "SPP", "malformedRowAction": "quarantined", "briefMode": "degraded", "notified": "Risk Desk Lead" },
+    "wrong": { "incidentType": "late-feed", "expectedAt": "6:15 AM", "detectedAt": "6:20 AM", "arrivedAt": "6:42 AM", "malformedRowHub": "SPP", "malformedRowAction": "dropped", "briefMode": "normal", "notified": "Risk Desk Lead" }
+  },
+  "lesson-approval-route-hard": {
+    "correct": { "requestSentAt": "6:30 AM", "rung1At": "6:40 AM", "rung1To": "Deputy Desk Manager", "rung2At": "6:50 AM", "rung2To": "Desk Head", "decision": "Approved", "decidedBy": "Desk Head", "decidedAt": "6:55 AM", "rungsUsed": 2, "exhaustedFallback": "release unapproved with incident" },
+    "wrong": { "requestSentAt": "6:30 AM", "rung1At": "6:40 AM", "rung1To": "Desk Head", "rung2At": "6:50 AM", "rung2To": "Deputy Desk Manager", "decision": "Approved", "decidedBy": "Desk Head", "decidedAt": "6:55 AM", "rungsUsed": 3, "exhaustedFallback": "hold the brief" }
+  },
+  "lesson-risk-evaluation-hard": {
+    "correct": [
+      { "hub": "ERCOT", "pctMove": 15.1, "status": "routine", "degraded": true },
+      { "hub": "MISO", "pctMove": 5.2, "status": "normal", "degraded": true }
+    ],
+    "wrong": [
+      { "hub": "ERCOT", "pctMove": 15.1, "status": "escalate", "degraded": true },
+      { "hub": "MISO", "pctMove": 5.2, "status": "normal", "degraded": false }
+    ]
+  },
+  "lesson-morning-brief-hard": {
+    "correct": { "policyVersion": "2.0.0", "headlineHub": "ERCOT", "headlineMovePct": "15.1", "headlineStatus": "routine", "feedExpectedAt": "6:15 AM", "feedArrivedAt": "6:42 AM", "quarantinedHub": "SPP", "briefMode": "degraded" },
+    "wrong": { "policyVersion": "1.0.0", "headlineHub": "ERCOT", "headlineMovePct": "15.1", "headlineStatus": "escalate", "feedExpectedAt": "6:15 AM", "feedArrivedAt": "6:42 AM", "quarantinedHub": "MISO", "briefMode": "normal" }
+  },
+  "lesson-distribution-archive-hard": {
+    "correct": { "policyName": "Brief Retention Policy", "version": "1.0.0", "owner": "Risk Desk Lead", "approver": "Desk Head", "briefRetentionDays": 120, "incidentRetentionDays": 365, "rationale": "120 exceeds the 90-day floor; incidents at 365 outlive briefs for postmortems; both within the ceiling." },
+    "wrong": { "policyName": "Brief Retention Policy", "version": "1.0.0", "owner": "Risk Desk Lead", "approver": "Desk Head", "briefRetentionDays": 365, "incidentRetentionDays": 120, "rationale": "" }
+  }
+}
