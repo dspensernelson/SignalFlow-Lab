@@ -168,12 +168,69 @@ export function clearStorage(tier = loadTier()) {
   localStorage.removeItem(keyFor(ARTIFACTS_KEY, tier))
 }
 
-// Resolves the visual status of a workflow node from stored progress + its type.
+// The forced lesson order (the pedagogical path from NODE_AUDIT item 7).
+// Exactly one lesson is READY at a time: completing it unlocks the next.
+// Each tier walks this same path filtered to the lessons built for that tier.
+export const LESSON_PATH = [
+  'analyst-notes',
+  'trader-flag',
+  'market-intake-record',
+  'price-feed',
+  'forecast-data',
+  'prior-day-reference',
+  'clean-price-data',
+  'threshold-policy',
+  'variance-check',
+  'risk-evaluation',
+  'approval-template',
+  'approval-decision',
+  'approval-route',
+  'routine-update-path',
+  'prior-day-brief-template',
+  'morning-brief',
+  'distribution-archive',
+]
+
+// The path a given tier actually walks: LESSON_PATH filtered to built lessons.
+export function tierPath(tier = loadTier()) {
+  return LESSON_PATH.filter((id) => {
+    const node = nodes.find((n) => n.id === id)
+    return node && isBuildable(node, tier)
+  })
+}
+
+// Resolves the visual status of a workflow node from stored progress + its
+// type + its position on the tier's lesson path. Completed and in-progress
+// statuses always pass through; an unstarted lesson is READY only when every
+// earlier lesson on the path is complete, otherwise it is LOCKED.
 export function deriveNodeStatus(node, progress) {
-  if (isBuildable(node)) return progress[node.id] || STATUS.READY
+  const tier = loadTier()
+  if (isBuildable(node, tier)) {
+    const stored = progress[node.id]
+    if (stored === STATUS.COMPLETE || stored === STATUS.IN_PROGRESS) return stored
+    const path = tierPath(tier)
+    const idx = path.indexOf(node.id)
+    if (idx === -1) return stored || STATUS.READY
+    const unlocked = path.slice(0, idx).every((id) => progress[id] === STATUS.COMPLETE)
+    return unlocked ? STATUS.READY : STATUS.LOCKED
+  }
   if (node.type === 'source' || node.type === 'reference') return STATUS.CONTEXT
   // Task-shaped node (artifact/process/decision/handoff/output/archive) not built yet.
   return STATUS.LOCKED
+}
+
+// For a locked lesson, names the earliest incomplete lesson blocking it (so
+// the UI can say "complete X first"). Returns the blocking node or null.
+export function getUnlockRequirement(node, progress, tier = loadTier()) {
+  if (!isBuildable(node, tier)) return null
+  const path = tierPath(tier)
+  const idx = path.indexOf(node.id)
+  if (idx <= 0) return null
+  const blockingId = path
+    .slice(0, idx)
+    .find((id) => progress[id] !== STATUS.COMPLETE)
+  if (!blockingId) return null
+  return nodes.find((n) => n.id === blockingId) || null
 }
 
 // Phase status mirrors the status of its statusSource node, if any.
@@ -184,14 +241,15 @@ export function derivePhaseStatus(phase, progress) {
   return deriveNodeStatus(node, progress)
 }
 
-// Default selected node: an in-progress buildable node, else the first buildable node.
+// Default selected node: the in-progress lesson, else the path frontier (the
+// first not-yet-complete lesson), else the start of the path.
 export function getDefaultSelectedNodeId(progress) {
-  const inProgress = nodes.find(
-    (n) => isBuildable(n) && progress[n.id] === STATUS.IN_PROGRESS
-  )
-  if (inProgress) return inProgress.id
-  const buildable = nodes.find((n) => isBuildable(n))
-  return buildable ? buildable.id : nodes[0].id
+  const path = tierPath()
+  const inProgress = path.find((id) => progress[id] === STATUS.IN_PROGRESS)
+  if (inProgress) return inProgress
+  const frontier = path.find((id) => progress[id] !== STATUS.COMPLETE)
+  if (frontier) return frontier
+  return path[0] || nodes[0].id
 }
 
 export function startNode(progress, nodeId) {

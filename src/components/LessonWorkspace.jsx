@@ -44,7 +44,7 @@ export default function LessonWorkspace({ lesson, onPass, onReturnToCanvas }) {
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-2xl font-semibold text-sf-text">{lesson.title}</h1>
             {lesson.clock && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-sf-warning bg-sf-progress-weak px-2.5 py-0.5 text-xs font-medium text-sf-progress-text">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-sf-border bg-sf-surface-subtle px-2.5 py-0.5 text-xs font-medium text-sf-muted">
                 <Icon name="clock" size={12} />
                 {lesson.clock}
               </span>

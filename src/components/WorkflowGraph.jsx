@@ -310,8 +310,10 @@ export default function WorkflowGraph({
                 </div>
                 <span className="mt-1 text-sm font-semibold leading-tight">{node.label}</span>
                 <div className="mt-auto flex items-center justify-between gap-1.5">
-                  {node.artifactName ? (
-                    <span className="truncate font-mono text-[10px] text-sf-muted">{node.artifactName}</span>
+                  {/* Filenames live in the detail panel; truncated mono text on
+                      cards read as clutter. Show the lesson kind instead. */}
+                  {node.lesson?.type ? (
+                    <span className="text-[10px] capitalize text-sf-muted">{node.lesson.type}</span>
                   ) : (
                     <span />
                   )}

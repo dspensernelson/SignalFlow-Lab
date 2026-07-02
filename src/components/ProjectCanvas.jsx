@@ -1,9 +1,21 @@
 import WorkflowGraph from './WorkflowGraph'
 import NodeDetail from './NodeDetail'
-import { STATUS, TIERS, isBuildable, deriveNodeStatus } from '../lib/progress'
+import {
+  STATUS,
+  TIERS,
+  isBuildable,
+  deriveNodeStatus,
+  getUnlockRequirement,
+} from '../lib/progress'
 import { Logo, ThemeToggle, StatItem, Button, Icon } from './ui'
 
 const TIER_LABELS = { easy: 'Easy', medium: 'Medium', hard: 'Hard' }
+
+const TIER_HINTS = {
+  easy: 'Easy — operate the pattern: guided build of the full workflow. Each tier keeps its own progress.',
+  medium: 'Medium — handle the mess: conflicting sources, gaps, and exceptions. Each tier keeps its own progress.',
+  hard: 'Hard — own the design: failures, migrations, and redesigns. Each tier keeps its own progress.',
+}
 
 // Compact segmented control for the difficulty tier. Same map, three depths:
 // easy operates the pattern, medium handles the mess, hard owns the design.
@@ -14,12 +26,16 @@ function TierSwitch({ value, onChange }) {
       aria-label="Difficulty tier"
       className="inline-flex items-center rounded-full border border-sf-border bg-sf-surface-subtle p-0.5"
     >
+      <span className="pl-2 pr-1 text-[9px] font-semibold uppercase tracking-sf-wide text-sf-subtle">
+        Tier
+      </span>
       {TIERS.map((t) => (
         <button
           key={t}
           type="button"
           onClick={() => onChange(t)}
           aria-pressed={value === t}
+          title={TIER_HINTS[t]}
           className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
             value === t
               ? 'bg-sf-surface text-sf-text shadow-sf-sm'
@@ -58,6 +74,10 @@ export default function ProjectCanvas({
   const selectedNode = nodesById[selectedNodeId]
   const selectedPhase = selectedNode ? phasesById[selectedNode.phaseId] : null
   const selectedStatus = selectedNode ? deriveNodeStatus(selectedNode, progress) : null
+  const unlockAfter =
+    selectedNode && selectedStatus === STATUS.LOCKED && isBuildable(selectedNode)
+      ? getUnlockRequirement(selectedNode, progress)
+      : null
 
   const buildableNodes = nodes.filter(isBuildable)
   const completeCount = buildableNodes.filter(
@@ -146,6 +166,7 @@ export default function ProjectCanvas({
                 phase={selectedPhase}
                 nodesById={nodesById}
                 edges={edges}
+                unlockAfterLabel={unlockAfter ? unlockAfter.label : null}
                 onSelect={onSelect}
                 onStart={onStart}
                 onContinue={onContinue}

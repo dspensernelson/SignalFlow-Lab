@@ -25,6 +25,9 @@ Where things stand if you are picking this back up:
   threshold design from history, feed-failure handling, escalation ladder,
   classify-under-quarantine, degraded brief, retention design). Only the
   solo-rebuild capstone remains: `curriculum/module-01/hard/_OVERVIEW.md`.
+- **Lessons are force-ordered**: one lesson is READY at a time and completing
+  it unlocks the next (LESSON_PATH in src/lib/progress.js; locking is derived,
+  never stored). Locked nodes name the lesson that unlocks them.
 - **No-scroll hard rule** verified live at 1280x800 in wrong-answer states for
   the new interaction types (and previously for the original four lessons).
 - **Branches/PRs**: PR #1 = `takeaway-workflow-diagram` -> `main` (redesign +

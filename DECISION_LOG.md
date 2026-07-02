@@ -55,6 +55,29 @@ Short record of product and implementation decisions. Keep entries factual and b
 - Deferred per NODE_AUDIT: distribution-archive node split and risk-evaluation
   split stay single nodes through Module 1 Easy; revisit before Medium.
 
+## 2026-07-02 (forced lesson ordering + formatting pass)
+
+- PRODUCT DECISION (owner): lessons are now FORCE-ORDERED. Exactly one lesson
+  is READY at a time; completing it unlocks the next, following the
+  pedagogical path from NODE_AUDIT item 7 (LESSON_PATH in progress.js). Each
+  tier walks the same path filtered to its built lessons. This implements the
+  doctrine's "completed artifacts unlock downstream tasks" for real, and it
+  supersedes the old all-nodes-READY behavior. Locking is DERIVED, never
+  stored: completed/in-progress statuses pass through, so existing saved
+  progress keeps its completions.
+- Locked lessons explain themselves: the node panel names the blocking lesson
+  ("Complete X to unlock"); the map shows a single Start button (the
+  frontier), which also resolves the 17-buttons visual-noise critique.
+- Formatting/coloration: node cards show the lesson type instead of truncated
+  mono filenames (filenames stay in the detail panel); the lesson-header
+  clock chip went from amber to neutral (amber is reserved for
+  attention/in-progress states); the tier switch gained a "Tier" label and
+  per-tier tooltips noting separate progress.
+- Deliberately NOT changed: quiz/template text sizes and card paddings (the
+  no-scroll rule leaves zero slack in the tallest states), and the below-map
+  dead space (node positions are data-driven; a map-layout pass is its own
+  work item).
+
 ## 2026-07-01 (hard-tier curation pass)
 
 - Hard tier is complete as a CURATED set of 7 design/failure drills; only
