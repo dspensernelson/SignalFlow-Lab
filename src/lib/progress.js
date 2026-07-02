@@ -168,9 +168,9 @@ export function clearStorage(tier = loadTier()) {
   localStorage.removeItem(keyFor(ARTIFACTS_KEY, tier))
 }
 
-// The forced lesson order (the pedagogical path from NODE_AUDIT item 7).
-// Exactly one lesson is READY at a time: completing it unlocks the next.
-// Each tier walks this same path filtered to the lessons built for that tier.
+// Display/reading order of the lessons (the pedagogical path from NODE_AUDIT
+// item 7). Used for default selection and docs; unlocking is governed by the
+// prerequisite tree below, not by this order.
 export const LESSON_PATH = [
   'analyst-notes',
   'trader-flag',
@@ -191,7 +191,32 @@ export const LESSON_PATH = [
   'distribution-archive',
 ]
 
-// The path a given tier actually walks: LESSON_PATH filtered to built lessons.
+// The unlock TREE: one intro lesson (analyst-notes) fans out 2-3 lessons at a
+// time so the board opens gradually. A lesson unlocks when ALL its
+// prerequisites are complete. The shape mirrors the workflow's two entry
+// branches (human-signal path, numeric path) converging through evaluation
+// and routing into assembly.
+export const LESSON_PREREQS = {
+  'analyst-notes': [],
+  'trader-flag': ['analyst-notes'],
+  'price-feed': ['analyst-notes'],
+  'market-intake-record': ['trader-flag'],
+  'clean-price-data': ['price-feed'],
+  'forecast-data': ['price-feed'],
+  'prior-day-reference': ['forecast-data'],
+  'threshold-policy': ['market-intake-record'],
+  'variance-check': ['clean-price-data', 'forecast-data', 'prior-day-reference'],
+  'risk-evaluation': ['variance-check', 'threshold-policy'],
+  'approval-template': ['threshold-policy'],
+  'approval-decision': ['risk-evaluation'],
+  'approval-route': ['approval-decision', 'approval-template'],
+  'routine-update-path': ['approval-decision'],
+  'prior-day-brief-template': ['risk-evaluation'],
+  'morning-brief': ['approval-route', 'routine-update-path', 'prior-day-brief-template'],
+  'distribution-archive': ['morning-brief'],
+}
+
+// The lessons a given tier actually contains: LESSON_PATH filtered to built.
 export function tierPath(tier = loadTier()) {
   return LESSON_PATH.filter((id) => {
     const node = nodes.find((n) => n.id === id)
@@ -199,19 +224,37 @@ export function tierPath(tier = loadTier()) {
   })
 }
 
+// A tier may not build every node (hard is a curated set). Effective
+// prerequisites skip unbuilt lessons transitively: if a prereq is not built
+// in this tier, its own prereqs are required instead. So hard-tier lessons
+// gate on the nearest built ancestors and unreachable prereqs collapse away.
+export function effectivePrereqs(nodeId, tier = loadTier(), seen = new Set()) {
+  const result = new Set()
+  for (const prereqId of LESSON_PREREQS[nodeId] || []) {
+    if (seen.has(prereqId)) continue
+    seen.add(prereqId)
+    const prereqNode = nodes.find((n) => n.id === prereqId)
+    if (prereqNode && isBuildable(prereqNode, tier)) {
+      result.add(prereqId)
+    } else {
+      effectivePrereqs(prereqId, tier, seen).forEach((id) => result.add(id))
+    }
+  }
+  return Array.from(result)
+}
+
 // Resolves the visual status of a workflow node from stored progress + its
-// type + its position on the tier's lesson path. Completed and in-progress
-// statuses always pass through; an unstarted lesson is READY only when every
-// earlier lesson on the path is complete, otherwise it is LOCKED.
+// type + the unlock tree. Completed and in-progress statuses always pass
+// through; an unstarted lesson is READY only when every effective
+// prerequisite is complete, otherwise it is LOCKED.
 export function deriveNodeStatus(node, progress) {
   const tier = loadTier()
   if (isBuildable(node, tier)) {
     const stored = progress[node.id]
     if (stored === STATUS.COMPLETE || stored === STATUS.IN_PROGRESS) return stored
-    const path = tierPath(tier)
-    const idx = path.indexOf(node.id)
-    if (idx === -1) return stored || STATUS.READY
-    const unlocked = path.slice(0, idx).every((id) => progress[id] === STATUS.COMPLETE)
+    const unlocked = effectivePrereqs(node.id, tier).every(
+      (id) => progress[id] === STATUS.COMPLETE
+    )
     return unlocked ? STATUS.READY : STATUS.LOCKED
   }
   if (node.type === 'source' || node.type === 'reference') return STATUS.CONTEXT
@@ -219,18 +262,15 @@ export function deriveNodeStatus(node, progress) {
   return STATUS.LOCKED
 }
 
-// For a locked lesson, names the earliest incomplete lesson blocking it (so
-// the UI can say "complete X first"). Returns the blocking node or null.
+// For a locked lesson, the incomplete prerequisite lessons blocking it (so
+// the UI can say "complete X and Y first"). Returns an array of nodes.
 export function getUnlockRequirement(node, progress, tier = loadTier()) {
-  if (!isBuildable(node, tier)) return null
-  const path = tierPath(tier)
-  const idx = path.indexOf(node.id)
-  if (idx <= 0) return null
-  const blockingId = path
-    .slice(0, idx)
-    .find((id) => progress[id] !== STATUS.COMPLETE)
-  if (!blockingId) return null
-  return nodes.find((n) => n.id === blockingId) || null
+  if (!isBuildable(node, tier)) return []
+  return effectivePrereqs(node.id, tier)
+    .filter((id) => progress[id] !== STATUS.COMPLETE)
+    .map((id) => nodes.find((n) => n.id === id))
+    .filter(Boolean)
+    .sort((a, b) => LESSON_PATH.indexOf(a.id) - LESSON_PATH.indexOf(b.id))
 }
 
 // Phase status mirrors the status of its statusSource node, if any.

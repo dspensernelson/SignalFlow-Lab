@@ -77,7 +77,7 @@ export default function ProjectCanvas({
   const unlockAfter =
     selectedNode && selectedStatus === STATUS.LOCKED && isBuildable(selectedNode)
       ? getUnlockRequirement(selectedNode, progress)
-      : null
+      : []
 
   const buildableNodes = nodes.filter(isBuildable)
   const completeCount = buildableNodes.filter(
@@ -166,7 +166,7 @@ export default function ProjectCanvas({
                 phase={selectedPhase}
                 nodesById={nodesById}
                 edges={edges}
-                unlockAfterLabel={unlockAfter ? unlockAfter.label : null}
+                unlockAfterLabels={unlockAfter.map((n) => n.label)}
                 onSelect={onSelect}
                 onStart={onStart}
                 onContinue={onContinue}
