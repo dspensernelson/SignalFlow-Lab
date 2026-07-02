@@ -129,7 +129,7 @@ export default function NodeDetail({
   phase,
   nodesById,
   edges,
-  unlockAfterLabel,
+  unlockAfterLabels = [],
   onSelect,
   onStart,
   onContinue,
@@ -218,10 +218,10 @@ export default function NodeDetail({
 
         {buildable && status === STATUS.LOCKED && (
           <p className="rounded-lg bg-sf-surface-subtle px-2.5 py-1.5 text-[11px] leading-snug text-sf-body">
-            Locked — the workflow is built in order.
-            {unlockAfterLabel
-              ? ` Complete "${unlockAfterLabel}" to unlock this lesson.`
-              : ' Complete the earlier lessons on the path to unlock it.'}
+            Locked — the board opens up as you build.
+            {unlockAfterLabels.length > 0
+              ? ` Complete ${unlockAfterLabels.map((l) => `"${l}"`).join(' and ')} to unlock this lesson.`
+              : ' Complete its upstream lessons to unlock it.'}
           </p>
         )}
 
