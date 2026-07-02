@@ -113,3 +113,41 @@ location.reload();
 - Repeat spot checks in dark mode (localStorage signalflow_theme = 'dark').
 - IMPORTANT: clear all test progress/artifacts before handing back - stale
   test state reads as bugs to the next person (it did to us).
+
+## Project switch (multi-project engine)
+
+The header project name is a real dropdown (registry order = build order).
+Only projects with data are selectable; "planned" projects render disabled
+with "Coming soon". Switching projects behaves like switching tiers: swap the
+working set, return to canvas, default selection = that project's unlock
+frontier.
+
+1. Legacy keys are sacred. Module 1 must keep its original un-namespaced
+   storage keys byte-for-byte:
+
+   ```js
+   // seed a legacy value, switch away and back, confirm nothing is lost
+   localStorage.setItem('signalflow_progress', JSON.stringify({ __seed: 'm01' }));
+   location.reload();
+   // after reload: Object.keys(localStorage) shows signalflow_progress /
+   // signalflow_tier / signalflow_artifacts (+ _<tier> suffix for non-easy).
+   // NO signalflow_progress__module-01 style keys for module-01.
+   ```
+
+   New projects (module-02+) namespace as `signalflow_progress__<id>[_tier]`,
+   `signalflow_artifacts__<id>[_tier]`, `signalflow_tier__<id>`. Active project
+   lives under `signalflow_project` (default module-01 when unset).
+
+2. Switcher content: open the dropdown; the active/complete project is
+   selected and labeled, and at least one planned project is disabled with
+   "Coming soon". Disabled options cannot be chosen.
+
+3. Independence: switch tiers within a project, switch to another project and
+   back - each project remembers its own tier and progress; unlock frontier is
+   correct per project.
+
+4. No page scroll on the Exercise screen still holds with the header dropdown
+   present (verify document.documentElement.scrollHeight === clientHeight at
+   1280x800 in the wrong-answer state).
+
+5. Console clean throughout; clear test state before handing back.

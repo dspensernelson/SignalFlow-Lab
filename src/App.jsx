@@ -1,7 +1,4 @@
 import { useEffect, useState } from 'react'
-import nodes from './data/workflowNodes.json'
-import phases from './data/phases.json'
-import edges from './data/workflowEdges.json'
 import lessonIntake from './data/lessons/lesson-intake.json'
 import lessonThresholdPolicy from './data/lessons/lesson-threshold-policy.json'
 import lessonCleanPriceData from './data/lessons/lesson-clean-price-data.json'
@@ -61,6 +58,7 @@ import {
   saveTier,
   tierLessonId,
 } from './lib/progress'
+import { PROJECTS, getProjectData, loadProject, saveProject } from './lib/projects'
 import { loadTheme, saveTheme, applyTheme } from './lib/theme'
 
 // Only built lessons are wired here. Other lessonIds resolve to undefined.
@@ -112,6 +110,7 @@ const LESSONS = {
 }
 
 export default function App() {
+  const [project, setProject] = useState(() => loadProject())
   const [tier, setTier] = useState(() => loadTier())
   const [progress, setProgress] = useState(() => loadProgress())
   const [artifacts, setArtifacts] = useState(() => loadArtifacts())
@@ -123,6 +122,9 @@ export default function App() {
   const [notice, setNotice] = useState(null)
   const [theme, setTheme] = useState(() => loadTheme())
 
+  // The active project's workflow map (nodes/phases/edges) drives the canvas.
+  const { nodes, phases, edges } = getProjectData(project)
+
   // Apply and persist the theme whenever it changes.
   useEffect(() => {
     applyTheme(theme)
@@ -133,14 +135,15 @@ export default function App() {
     setTheme(next === 'dark' || next === 'light' ? next : theme === 'dark' ? 'light' : 'dark')
   }
 
-  // Persist progress and artifacts whenever they change.
+  // Persist progress and artifacts whenever they change, scoped to the active
+  // tier + project so switching never writes to the wrong storage key.
   useEffect(() => {
-    saveProgress(progress)
-  }, [progress])
+    saveProgress(progress, tier, project)
+  }, [progress, tier, project])
 
   useEffect(() => {
-    saveArtifacts(artifacts)
-  }, [artifacts])
+    saveArtifacts(artifacts, tier, project)
+  }, [artifacts, tier, project])
 
   function handleSelect(nodeId) {
     setSelectedNodeId(nodeId)
@@ -151,14 +154,32 @@ export default function App() {
   // variants and progress/artifacts load from the tier's own storage keys.
   function handleTierChange(nextTier) {
     if (nextTier === tier) return
-    saveTier(nextTier)
+    saveTier(nextTier, project)
     setTier(nextTier)
-    const freshProgress = loadProgress(nextTier)
+    const freshProgress = loadProgress(nextTier, project)
     setProgress(freshProgress)
-    setArtifacts(loadArtifacts(nextTier))
+    setArtifacts(loadArtifacts(nextTier, project))
     setActiveLessonId(null)
     setNotice(null)
-    setSelectedNodeId(getDefaultSelectedNodeId(freshProgress))
+    setSelectedNodeId(getDefaultSelectedNodeId(freshProgress, project))
+    setView('canvas')
+  }
+
+  // Switching projects swaps the entire working set: map data, lesson registry,
+  // unlock tree, and per-project progress/artifacts/tier storage. Behaves like a
+  // tier switch - return to canvas on that project's own frontier.
+  function handleProjectChange(nextProject) {
+    if (nextProject === project) return
+    saveProject(nextProject)
+    setProject(nextProject)
+    const nextTier = loadTier(nextProject)
+    setTier(nextTier)
+    const freshProgress = loadProgress(nextTier, nextProject)
+    setProgress(freshProgress)
+    setArtifacts(loadArtifacts(nextTier, nextProject))
+    setActiveLessonId(null)
+    setNotice(null)
+    setSelectedNodeId(getDefaultSelectedNodeId(freshProgress, nextProject))
     setView('canvas')
   }
 
@@ -216,13 +237,13 @@ export default function App() {
     )
     if (!confirmed) return
 
-    clearStorage()
-    const fresh = loadProgress() // rebuilds and persists the initial state
+    clearStorage(tier, project)
+    const fresh = loadProgress(tier, project) // rebuilds and persists the initial state
     setProgress(fresh)
     setArtifacts({})
     setActiveLessonId(null)
     setNotice(null)
-    setSelectedNodeId(getDefaultSelectedNodeId(fresh))
+    setSelectedNodeId(getDefaultSelectedNodeId(fresh, project))
     setView('canvas')
   }
 
@@ -266,6 +287,9 @@ export default function App() {
         theme={theme}
         tier={tier}
         onTierChange={handleTierChange}
+        projects={PROJECTS}
+        project={project}
+        onProjectChange={handleProjectChange}
         onToggleTheme={toggleTheme}
         onSelect={handleSelect}
         onStart={openLesson}

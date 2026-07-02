@@ -4,10 +4,18 @@ SignalFlow Lab is a local React learning app for practicing workplace automation
 
 The first project is **Meridian Morning Market Brief**, a fictional energy-market workflow that turns messy overnight market inputs into an approval-ready 7:00 AM brief.
 
-## Current Status (2026-07-02, module-01-tiers - MODULE 1 COMPLETE)
+## Current Status (2026-07-02, module-01-tiers - MODULE 1 COMPLETE + MULTI-PROJECT ENGINE)
 
 Where things stand if you are picking this back up:
 
+- **The app is multi-project** (SPEC_MULTI_PROJECT.md). A registry
+  (`src/data/projects.json`, order = build order) drives a header project
+  dropdown; each project owns `src/data/projects/<id>/` plus its
+  `BUILT_LESSONS` block in `src/lib/projects.js`. Module 1 keeps its legacy
+  un-namespaced storage keys byte-for-byte; new projects namespace under
+  `__<id>`. Planned projects render disabled ("Coming soon"). Both lint
+  scripts iterate registry projects with data (canon at
+  `curriculum/<id>/canon.json`).
 - **Module 1 is COMPLETE across all three tiers** (Easy 17/17, Medium 17/17,
   Hard 8/8). The hard-tier solo-rebuild capstone
   (`lesson-approval-decision-hard`) shipped the new `artifactImport`
@@ -47,7 +55,7 @@ Where things stand if you are picking this back up:
   `AUTONOMY_CHARTER.md` carries the owner's standing approvals across every
   decision gate. A builder starts at `BUILDER_KICKOFF.md` and works the
   fixed queue: Module 1 capstone (DONE) -> Module 1 wrap (DONE) ->
-  multi-project engine -> modules 2-10 in order -> stop. Parked questions go
+  multi-project engine (DONE) -> modules 2-10 in order -> stop. Parked questions go
   to `OPEN_QUESTIONS.md`; CI runs `npm run check` on every push.
 
 ## Current Product Model

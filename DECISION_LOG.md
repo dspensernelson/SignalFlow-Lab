@@ -2,6 +2,38 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-02 (multi-project engine - SPEC_MULTI_PROJECT.md)
+
+- Shipped the multi-project engine that unblocks Modules 2-10. A registry
+  `src/data/projects.json` (array order = build order; one active) lists all
+  ten projects; only those with data on disk are selectable.
+- Per-project data moved to `src/data/projects/<id>/` (workflowNodes.json,
+  phases.json, workflowEdges.json, lessonMeta.json). module-01's files were
+  relocated via `git mv` (byte-identical). `workflowNode.schema.json` stays in
+  `src/data/` (doc-only).
+- `src/lib/projects.js` is the new project layer: registry access, active-
+  project persistence under `signalflow_project` (default module-01), static
+  per-project data map, and `BUILT_LESSONS[projectId][tier]` (module-01's
+  built-lesson lists moved here verbatim).
+- `src/lib/progress.js` is now project-aware. Storage rule: module-01 keeps
+  ALL legacy keys byte-for-byte (`signalflow_progress`, `signalflow_tier`,
+  `signalflow_artifacts`, `+_<tier>` for non-easy); every other project
+  namespaces as `signalflow_progress__<id>[_tier]` etc. The progress model and
+  gating are unchanged - additive only.
+- Header project name became a real dropdown (ProjectCanvas): active/complete
+  project selected; planned projects disabled with "Coming soon". Switching a
+  project behaves like switching a tier (swap working set, return to canvas,
+  default = that project's unlock frontier). App.jsx, ArtifactViewer.jsx and
+  LessonWorkflowStrip.jsx now resolve nodes/edges via getProjectData(project).
+- `scripts/lint-map.mjs` and `scripts/lint-lessons.mjs` iterate every registry
+  project with data (canon path `curriculum/<id>/canon.json`); fixtures stay
+  global (lesson ids are unique). Gate stays green: 42 lessons, 0 errors, 58
+  canon assertions, 16 derivations, 42 lesson tests pass, build clean.
+- Verified live at 1280x800: seeded legacy key survives switch-away-and-back;
+  switcher shows module-01 complete + disabled planned modules; per-project
+  tier independence; no-scroll wrong-answer state intact; console clean.
+- VERIFICATION_PLAYBOOK.md gained a project-switch check section (same PR).
+
 ## 2026-06-25
 
 - Use React + Vite for the local app scaffold.
