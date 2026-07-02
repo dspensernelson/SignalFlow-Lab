@@ -1,0 +1,116 @@
+{
+  "id": "lesson-run-approval",
+  "nodeId": "run-approval",
+  "title": "Approve the Payment Run",
+  "difficulty": "Beginner",
+  "skill": "Control approval",
+  "clock": "2:30 PM",
+  "scenario": "It is 2:30 PM. The batch is assembled and the cutoff is 3:00 PM. Before money moves, one human puts their name on it: the AP Manager approves the run. Even in an automated desk, releasing funds is the moment that needs a person accountable. Learn what run approval confirms and why it stays human.",
+  "inputType": "text",
+  "inputLabel": "Run Approval",
+  "input": "Payment Batch: 1 invoice, total 1220.00, 0 held, cutoff 3:00 PM. The AP Manager reviews the batch control totals and approves the run at 2:30 PM. Approval confirms the batch is complete and the totals are right; it is the single point where a human authorizes funds to leave Beacon.",
+  "instructions": [
+    "Read run approval as the human control point before funds move.",
+    "Answer the four questions about who approves and what the approval confirms.",
+    "Validate to mint the run-approval record."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "Who approves the payment run?",
+        "options": [
+          { "id": "a", "text": "The AP Clerk who processed the invoices" },
+          { "id": "b", "text": "The AP Manager" },
+          { "id": "c", "text": "The vendor" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Separation of duties: the Clerk processes invoices, the Manager approves the run. The person releasing funds is not the person who prepared them."
+      },
+      {
+        "id": "q2",
+        "prompt": "What does the approval confirm?",
+        "options": [
+          { "id": "a", "text": "That the batch is complete and its control totals are correct" },
+          { "id": "b", "text": "That each invoice is re-typed from scratch" },
+          { "id": "c", "text": "That the vendor received the goods" }
+        ],
+        "correctOptionId": "a",
+        "explain": "The Manager checks the batch's count and total - the control figures - and confirms nothing was dropped or added. The line-level checks already happened upstream."
+      },
+      {
+        "id": "q3",
+        "prompt": "Why keep a human here when everything upstream was automatic?",
+        "options": [
+          { "id": "a", "text": "Because releasing funds is the highest-risk action and needs a named, accountable person" },
+          { "id": "b", "text": "Because the software cannot add numbers" },
+          { "id": "c", "text": "To slow the process down on purpose" }
+        ],
+        "correctOptionId": "a",
+        "explain": "Automation handles the judgment that can be encoded. Authorizing money to leave the company is deliberately kept human so there is always someone accountable for the release."
+      },
+      {
+        "id": "q4",
+        "prompt": "The approval happens at 2:30 PM against a 3:00 PM cutoff. Why does timing matter?",
+        "options": [
+          { "id": "a", "text": "It does not; approval can happen any time" },
+          { "id": "b", "text": "Approval must land before the cutoff or the run misses today's payment window" },
+          { "id": "c", "text": "The vendor sets the time" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The run has to be approved before the 3:00 PM cutoff to be delivered today. Approving at 2:30 leaves margin; miss the cutoff and payment slips to the next run."
+      }
+    ],
+    "artifactOnPass": {
+      "handoff": "run-approval",
+      "approvedBy": "AP Manager",
+      "approvedAt": "day-1 2:30 PM",
+      "confirms": "batch complete and control totals correct",
+      "invoiceCount": 1,
+      "batchTotal": 1220,
+      "cutoff": "3:00 PM",
+      "nextStep": "payment-run"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Explain run approval in a payables workflow: who approves it, what the approval confirms about the batch, why the release of funds stays human, and why the approval must beat the cutoff.",
+  "successMessage": "Run approved. The AP Manager authorized the batch at 2:30 PM - funds are cleared to release before the 3:00 PM cutoff.",
+  "intro": {
+    "heading": "Before the run: one human on the release",
+    "sections": [
+      {
+        "title": "The moment money moves",
+        "body": "Everything before this was preparation. Run approval is the single point where funds are authorized to leave Beacon - the highest-risk action of the day, deliberately kept human."
+      },
+      {
+        "title": "Separation of duties",
+        "body": "The AP Clerk prepared the invoices; the AP Manager approves the run. The person releasing money is never the person who prepared it - a foundational financial control."
+      },
+      {
+        "title": "Confirm the controls, not the lines",
+        "body": "The Manager checks the batch count and total, confirming nothing was dropped or slipped in. The line-level matching already happened upstream and is not re-litigated here."
+      },
+      {
+        "title": "Beat the cutoff",
+        "body": "Approval at 2:30 PM clears the 3:00 PM cutoff with margin. Miss the cutoff and the whole run waits for the next window - so timing is part of the control."
+      }
+    ],
+    "jsonExample": "{\n  \"approvedBy\": \"AP Manager\",\n  \"approvedAt\": \"day-1 2:30 PM\",\n  \"batchTotal\": 1220\n}",
+    "skill": "Control approval",
+    "artifactName": "run-approval.json"
+  },
+  "takeaway": {
+    "heading": "Run approved",
+    "points": [
+      "You answered the four questions: who approves, what it confirms, why it stays human, and why timing matters.",
+      "Run approval is the one point where a named person authorizes funds to leave the company.",
+      "The AP Manager confirms the batch control totals, not the line-level checks already done upstream.",
+      "Approving at 2:30 PM clears the 3:00 PM cutoff, so the run ships today - captured in run-approval.json.",
+      "The workflow can now release a day of payments under a single accountable human approval."
+    ],
+    "artifactName": "run-approval.json"
+  }
+}

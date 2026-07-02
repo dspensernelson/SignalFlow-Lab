@@ -1,0 +1,114 @@
+{
+  "id": "lesson-payment-archive",
+  "nodeId": "payment-archive",
+  "title": "Archive the Payment Run",
+  "difficulty": "Beginner",
+  "skill": "Retention and the loop",
+  "clock": "3:05 PM",
+  "scenario": "It is 3:05 PM. The run is delivered, the vendor is notified, the desk is quiet. One step remains, and it is the one that makes tomorrow possible: archive today's run. Archiving is not just filing - it seeds the payment history so tomorrow's duplicate check knows INV-58831 was already paid. Close the loop.",
+  "inputType": "text",
+  "inputLabel": "Payment Archive",
+  "input": "Today's run: INV-58831 (V-1042, 1220.00), paid day-1. Archiving stores the run for audit retention AND appends its invoices to the payment history using the identity key (vendor id + invoice number + total). Tomorrow's duplicate check reads that history - so today's output becomes tomorrow's guardrail.",
+  "instructions": [
+    "Read the archive as both an audit record and the seed for tomorrow's duplicate baseline.",
+    "Answer the four questions about retention and the temporal loop.",
+    "Validate to mint the payment-archive record."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "Besides audit retention, what does archiving the run do?",
+        "options": [
+          { "id": "a", "text": "Nothing else - it just files the run" },
+          { "id": "b", "text": "It appends the run's invoices to the payment history" },
+          { "id": "c", "text": "It deletes the invoice records" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The archive seeds the payment history with today's payments. That is what makes the duplicate check work tomorrow - it can only catch a repeat if today's payment is recorded."
+      },
+      {
+        "id": "q2",
+        "prompt": "Which workflow step reads what this archive seeds?",
+        "options": [
+          { "id": "a", "text": "Tomorrow's Duplicate Check, via the Payment History" },
+          { "id": "b", "text": "The Invoice Inbox" },
+          { "id": "c", "text": "The PO Register" }
+        ],
+        "correctOptionId": "a",
+        "explain": "Follow the map's temporal loop: archive seeds payment history, and payment history feeds the duplicate check on the next run. Today's output is tomorrow's reference."
+      },
+      {
+        "id": "q3",
+        "prompt": "What identity is stored so a future duplicate can be caught?",
+        "options": [
+          { "id": "a", "text": "The invoice date only" },
+          { "id": "b", "text": "Vendor id + invoice number + invoice total" },
+          { "id": "c", "text": "The PO number only" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The same identity key the duplicate check uses is what the archive writes, so tomorrow a re-submitted INV-58831 for V-1042 at 1220.00 is recognized as already paid."
+      },
+      {
+        "id": "q4",
+        "prompt": "Why does the archive point back to a reference node instead of forward to a new step?",
+        "options": [
+          { "id": "a", "text": "It is a mistake in the map" },
+          { "id": "b", "text": "The workflow is a daily cycle - its output feeds the next day's inputs" },
+          { "id": "c", "text": "Archives always point backward for no reason" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The desk runs every day. The archive does not end the story - it feeds payment history, which is a reference for the next run. That backward edge is the loop that makes the workflow repeatable."
+      }
+    ],
+    "artifactOnPass": {
+      "archive": "payment-archive",
+      "runDate": "day-1",
+      "retainedFor": "audit",
+      "seedsPaymentHistory": true,
+      "identityKey": "vendorId + invoiceNumber + invoiceTotal",
+      "readNextBy": "duplicate-check (next run)"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Explain what archiving a payment run does beyond retention: how it seeds the payment history, which future step reads it, what identity key it stores, and why the archive closes a daily loop back to a reference node.",
+  "successMessage": "Run archived. Today's payment is now tomorrow's guardrail - the loop is closed and the desk is ready to run again.",
+  "intro": {
+    "heading": "Before you close: seed tomorrow",
+    "sections": [
+      {
+        "title": "Archiving is not just filing",
+        "body": "The archive keeps the run for audit, yes - but it also appends today's invoices to the payment history. That second job is what makes the desk repeatable, not just complete."
+      },
+      {
+        "title": "The temporal loop",
+        "body": "On the map, this archive points back to a reference node, not forward. The workflow is a daily cycle: today's output becomes an input to tomorrow's run. That backward edge is the loop."
+      },
+      {
+        "title": "Same identity, next day",
+        "body": "The archive stores each payment by vendor id + invoice number + total - the exact key the duplicate check uses. So a re-submitted INV-58831 tomorrow is caught as already paid."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A payment-archive record: retained for audit, seeding the payment history. It is the final artifact - and the one that lets the whole desk run clean again tomorrow."
+      }
+    ],
+    "jsonExample": "{\n  \"archive\": \"payment-archive\",\n  \"seedsPaymentHistory\": true,\n  \"readNextBy\": \"duplicate-check\"\n}",
+    "skill": "Retention and the loop",
+    "artifactName": "payment-archive.json"
+  },
+  "takeaway": {
+    "heading": "Run archived",
+    "points": [
+      "You answered the four questions: what archiving does beyond retention, who reads it next, the identity stored, and why the loop points backward.",
+      "The archive seeds the payment history with today's payments, so tomorrow's duplicate check can catch a repeat.",
+      "It stores each payment by vendor id + invoice number + total - the same key the duplicate check reads.",
+      "On the map the archive points back to a reference node: today's output is tomorrow's guardrail, closing the daily loop.",
+      "The workflow can now run again tomorrow, protected from paying today's invoices a second time."
+    ],
+    "artifactName": "payment-archive.json"
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "id": "lesson-payment-history",
+  "nodeId": "payment-history",
+  "title": "Inspect the Payment History",
+  "difficulty": "Beginner",
+  "skill": "Baseline reference",
+  "clock": "10:40 AM",
+  "scenario": "It is 10:40 AM. Before paying INV-58831, the desk asks a blunt question: have we paid this already? The Payment History is the record of every invoice already paid. Inspect it - and learn how yesterday's run becomes today's guardrail against paying the same bill twice.",
+  "inputType": "text",
+  "inputLabel": "Payment History (day-0 baseline)",
+  "input": "Paid invoices as of the day-0 run: INV-58790 | V-1042 Northwind Fasteners | 980.00 | day-0. (Plus other vendors' prior payments.) Identity key for a paid invoice = vendor id + invoice number + invoice total. INV-58831 does not appear here.",
+  "instructions": [
+    "Read the Payment History as the record of what has already been paid.",
+    "Answer the four questions against the history and the workflow map.",
+    "Validate to mint the payment-history source profile."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "What is the Payment History used to prevent?",
+        "options": [
+          { "id": "a", "text": "Paying a price above tolerance" },
+          { "id": "b", "text": "Paying the same invoice twice" },
+          { "id": "c", "text": "Receiving the wrong quantity" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Duplicate payment is one of the most common and expensive AP errors. The history is the record the duplicate check compares each new invoice against."
+      },
+      {
+        "id": "q2",
+        "prompt": "What is the identity key that decides whether two invoices are the same?",
+        "options": [
+          { "id": "a", "text": "The invoice date alone" },
+          { "id": "b", "text": "Vendor id + invoice number + invoice total" },
+          { "id": "c", "text": "The PO number alone" }
+        ],
+        "correctOptionId": "b",
+        "explain": "A single field is too weak - vendors reuse numbers and totals recur. Combining vendor, invoice number, and total gives a reliable identity for a specific bill."
+      },
+      {
+        "id": "q3",
+        "prompt": "INV-58831 is not in the history. What does that tell the duplicate check?",
+        "options": [
+          { "id": "a", "text": "It has not been paid before - not a duplicate" },
+          { "id": "b", "text": "It must be paid immediately, skipping the match" },
+          { "id": "c", "text": "It is invalid and should be rejected" }
+        ],
+        "correctOptionId": "a",
+        "explain": "Absence from the paid history means this exact bill has not gone out before. It still must pass the three-way match - the duplicate check only rules out double payment."
+      },
+      {
+        "id": "q4",
+        "prompt": "Where does the Payment History get updated from each day?",
+        "options": [
+          { "id": "a", "text": "The Invoice Inbox" },
+          { "id": "b", "text": "The Payment Archive, when the run is archived" },
+          { "id": "c", "text": "The vendor portal" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Follow the map's temporal loop: when today's run is archived, it seeds the history, so tomorrow's duplicate check sees today's payments. Yesterday's output is today's guardrail."
+      }
+    ],
+    "artifactOnPass": {
+      "source": "payment-history",
+      "asOf": "day-0",
+      "identityKey": "vendorId + invoiceNumber + invoiceTotal",
+      "prevents": "duplicate payment",
+      "seededBy": "payment-archive",
+      "firstConsumer": "duplicate-check"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Explain how a payment history prevents duplicate payment: what identity key decides whether two invoices are the same, what absence from the history means, and how the history is seeded each day.",
+  "successMessage": "Payment History inspected. You now hold the baseline that stops the desk paying a bill twice.",
+  "intro": {
+    "heading": "Before you match: guard against double payment",
+    "sections": [
+      {
+        "title": "Yesterday guards today",
+        "body": "The Payment History is every invoice already paid. Checking a new invoice against it is how the desk avoids the classic, costly mistake of paying the same bill twice."
+      },
+      {
+        "title": "Identity needs three fields",
+        "body": "Vendor id, invoice number, and total together identify a specific bill. Any one alone is too weak - numbers get reused and totals recur across unrelated invoices."
+      },
+      {
+        "title": "Absence means clear",
+        "body": "INV-58831 is not in the history, so it has not been paid before. That clears the duplicate check - but it still has to pass the three-way match on its own merits."
+      },
+      {
+        "title": "The temporal loop",
+        "body": "When today's run is archived it seeds the history. That is the loop on the map: an output that becomes tomorrow's reference. You inspect it today; you will close the loop at the archive step."
+      }
+    ],
+    "jsonExample": "{\n  \"source\": \"payment-history\",\n  \"identityKey\": \"vendorId + invoiceNumber + invoiceTotal\"\n}",
+    "skill": "Baseline reference",
+    "artifactName": "source-profile-payment-history.json"
+  },
+  "takeaway": {
+    "heading": "Payment History inspected",
+    "points": [
+      "You answered the four questions: what it prevents, the identity key, what absence means, and how it is seeded.",
+      "The history is the baseline the duplicate check reads to stop the desk paying a bill twice.",
+      "Identity is vendor id + invoice number + total together - no single field is strong enough.",
+      "The history is seeded by the Payment Archive, so yesterday's run becomes today's guardrail - the map's temporal loop.",
+      "The workflow can now tell whether an invoice has already been paid before it pays again."
+    ],
+    "artifactName": "source-profile-payment-history.json"
+  }
+}

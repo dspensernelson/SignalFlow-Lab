@@ -1,0 +1,115 @@
+{
+  "id": "lesson-auto-approve-path",
+  "nodeId": "auto-approve-path",
+  "title": "Log the Auto-Approval",
+  "difficulty": "Beginner",
+  "skill": "Straight-through handoff",
+  "clock": "11:35 AM",
+  "scenario": "It is 11:35 AM. The match decision routed INV-58831 to auto-approve. No human will look at it - and that is the point of a clean pipeline. But 'no human looked' is not the same as 'no record exists.' Learn what the auto-approve path must log so an automatic approval is still fully accountable.",
+  "inputType": "text",
+  "inputLabel": "Auto-Approve Path",
+  "input": "Match decision: route auto-approve (within tolerance, quantities matched, not a duplicate). The auto-approve path releases INV-58831 toward the payment batch without human review, and writes an auto-approval log entry: invoice, why it qualified, the policy version applied, and the timestamp.",
+  "instructions": [
+    "Read the auto-approve path as a straight-through handoff, not a rubber stamp.",
+    "Answer the four questions about accountability without a human.",
+    "Validate to mint the auto-approval log entry."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "What does the auto-approve path do with INV-58831?",
+        "options": [
+          { "id": "a", "text": "Holds it for a manager to sign" },
+          { "id": "b", "text": "Releases it toward the payment batch without human review" },
+          { "id": "c", "text": "Sends it back to the vendor" }
+        ],
+        "correctOptionId": "b",
+        "explain": "A clean match earns straight-through processing: the invoice moves toward payment automatically. That speed is the payoff of getting the earlier checks right."
+      },
+      {
+        "id": "q2",
+        "prompt": "If no human approves it, how is the approval still accountable?",
+        "options": [
+          { "id": "a", "text": "It is not - automatic approvals cannot be audited" },
+          { "id": "b", "text": "The path logs why it qualified and which policy version it applied" },
+          { "id": "c", "text": "The vendor keeps the record instead" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Accountability comes from the log, not a signature. Recording the qualifying reasons and the policy version means an auditor can reconstruct exactly why the system approved it."
+      },
+      {
+        "id": "q3",
+        "prompt": "Why record the tolerance policy version in the log?",
+        "options": [
+          { "id": "a", "text": "So a later auditor knows which rule was in force at the time" },
+          { "id": "b", "text": "It has no purpose; the version never changes" },
+          { "id": "c", "text": "To bill the vendor for the check" }
+        ],
+        "correctOptionId": "a",
+        "explain": "Policies change. Stamping v1.0.0 into the log freezes which rule approved this invoice, so a decision made today still makes sense after the policy is revised."
+      },
+      {
+        "id": "q4",
+        "prompt": "Where does the invoice go next from here?",
+        "options": [
+          { "id": "a", "text": "The Payment Batch" },
+          { "id": "b", "text": "The Invoice Inbox" },
+          { "id": "c", "text": "The Vendor Master" }
+        ],
+        "correctOptionId": "a",
+        "explain": "Auto-approved invoices flow to the Payment Batch, where the day's approved payments are gathered before the run. The exception queue joins there too, from the other path."
+      }
+    ],
+    "artifactOnPass": {
+      "handoff": "auto-approve-path",
+      "invoiceNumber": "INV-58831",
+      "review": "straight-through (no human)",
+      "qualifiedBecause": "within tolerance, quantities matched, not a duplicate",
+      "policyVersion": "1.0.0",
+      "loggedAt": "day-1 11:35 AM",
+      "nextStep": "payment-batch"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Explain what an auto-approve path must log so an automatic approval is accountable without a human: what it does with the invoice, why the qualifying reasons and policy version are recorded, and where the invoice goes next.",
+  "successMessage": "Auto-approval logged. INV-58831 moves toward the batch - and the record explains exactly why, no signature needed.",
+  "intro": {
+    "heading": "Before you batch: accountable automation",
+    "sections": [
+      {
+        "title": "Straight-through is the reward",
+        "body": "A clean match earns automatic release - the invoice moves toward payment with no human in the loop. Speed on the clean cases is the whole reason to invest in the checks."
+      },
+      {
+        "title": "Automatic is not unaccountable",
+        "body": "No human signed, but a record still must exist. The path logs the invoice, why it qualified, and which policy it applied - accountability lives in the log, not a signature."
+      },
+      {
+        "title": "Freeze the rule that was applied",
+        "body": "Stamping the tolerance policy version (v1.0.0) into the log means a future auditor knows which rule was in force. When the policy changes, today's decision still makes sense."
+      },
+      {
+        "title": "What you produce here",
+        "body": "An auto-approval log entry: the invoice, the qualifying reasons, the policy version, and the timestamp - the evidence that a machine approval was justified."
+      }
+    ],
+    "jsonExample": "{\n  \"handoff\": \"auto-approve-path\",\n  \"review\": \"straight-through (no human)\",\n  \"policyVersion\": \"1.0.0\"\n}",
+    "skill": "Straight-through handoff",
+    "artifactName": "auto-approval-log.json"
+  },
+  "takeaway": {
+    "heading": "Auto-approval logged",
+    "points": [
+      "You answered the four questions: what the path does, how it stays accountable, why the policy version is logged, and where the invoice goes next.",
+      "A clean match earns straight-through release - the invoice moves toward payment with no human review.",
+      "Accountability comes from the log: the qualifying reasons and the policy version, not a signature.",
+      "Stamping the policy version freezes which rule approved this invoice for any future audit.",
+      "The workflow can now approve clean invoices automatically while keeping a full, auditable record."
+    ],
+    "artifactName": "auto-approval-log.json"
+  }
+}

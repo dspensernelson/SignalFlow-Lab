@@ -1,0 +1,136 @@
+{
+  "id": "lesson-duplicate-check",
+  "nodeId": "duplicate-check",
+  "title": "Run the Duplicate Check",
+  "subtitle": "Compare the invoice against everything already paid",
+  "clock": "11:00 AM",
+  "difficulty": "Beginner",
+  "skill": "Deduplication logic",
+  "scenario": "It is 11:00 AM. Two records are on your desk: the Invoice Record for INV-58831 and the Payment History. Before the desk spends a cent, run the check that compares them: has this exact bill been paid before? Produce the duplicate-check record that clears it - or would flag it.",
+  "inputType": "text",
+  "input": "Invoice Record: INV-58831, vendor V-1042, total 1220.00. Payment History (day-0): INV-58790 (V-1042, 980.00) and other vendors' prior payments. Identity key = vendor id + invoice number + invoice total. Compare the invoice's identity against every paid invoice.",
+  "instructions": [
+    "Restate the invoice's identity: vendor id, invoice number, invoice total.",
+    "Decide whether that identity appears in the Payment History (foundInHistory).",
+    "Set isDuplicate from that finding, and record the decision.",
+    "Return one valid JSON object. Use true/false for the flags."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"invoiceNumber\": \"\",\n  \"vendorId\": \"\",\n  \"invoiceTotal\": 0,\n  \"foundInHistory\": false,\n  \"isDuplicate\": false,\n  \"decision\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": [
+      "invoiceNumber",
+      "vendorId",
+      "invoiceTotal",
+      "foundInHistory",
+      "isDuplicate",
+      "decision"
+    ],
+    "expected": {
+      "invoiceNumber": "INV-58831",
+      "vendorId": "V-1042",
+      "invoiceTotal": 1220,
+      "foundInHistory": false,
+      "isDuplicate": false
+    },
+    "acceptedValues": {
+      "decision": ["clear", "not duplicate", "not-duplicate", "proceed", "pass"]
+    }
+  },
+  "copilotPrompt": "Produce a duplicate-check JSON record for this invoice: invoiceNumber, vendorId, invoiceTotal, foundInHistory, isDuplicate, and decision. Compare the identity key (vendor + invoice number + total) against the payment history.",
+  "successMessage": "Duplicate check complete. INV-58831 is not in the history - cleared to continue matching.",
+  "validateLabel": "Run Check",
+  "editorHelper": "Compare the invoice's identity to the paid history and record the result.",
+  "intro": {
+    "heading": "Before you pay: is this already paid?",
+    "sections": [
+      {
+        "title": "The cheapest error to prevent",
+        "body": "Paying the same invoice twice is common and expensive. The duplicate check runs before the money moves, comparing this invoice's identity against everything already paid."
+      },
+      {
+        "title": "Identity, not a single field",
+        "body": "The check uses vendor id + invoice number + total together. INV-58831 for V-1042 at 1220.00 is a specific bill; no single field would identify it reliably."
+      },
+      {
+        "title": "Clear, then keep matching",
+        "body": "INV-58831 is absent from the history, so foundInHistory is false and isDuplicate is false. Clearing the duplicate check does not skip the three-way match - it just rules out double payment."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A small duplicate-check record: the identity you compared, whether it was found, the resulting flag, and the decision. It is the evidence the desk did check."
+      }
+    ],
+    "jsonExample": "{\n  \"foundInHistory\": false,\n  \"isDuplicate\": false,\n  \"decision\": \"clear\"\n}",
+    "skill": "Deduplication logic",
+    "artifactName": "duplicate-check.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "invoiceNumber",
+      "meaning": "The invoice number being checked.",
+      "type": "string",
+      "example": "\"INV-58831\"",
+      "group": "Identity",
+      "lookFor": "which invoice?",
+      "hint": "Copy it from the Invoice Record."
+    },
+    {
+      "field": "vendorId",
+      "meaning": "The vendor id being checked.",
+      "type": "string",
+      "example": "\"V-1042\"",
+      "group": "Identity",
+      "lookFor": "which vendor?",
+      "hint": "Part of the identity key, from the Invoice Record."
+    },
+    {
+      "field": "invoiceTotal",
+      "meaning": "The invoice total being checked.",
+      "type": "number",
+      "example": "1220",
+      "group": "Identity",
+      "lookFor": "what total?",
+      "hint": "The third part of the identity key. Store the number only."
+    },
+    {
+      "field": "foundInHistory",
+      "meaning": "Whether that identity appears in the Payment History.",
+      "type": "boolean",
+      "example": "false",
+      "group": "Result",
+      "lookFor": "was it already paid?",
+      "hint": "INV-58831 is not in the day-0 history, so this is false."
+    },
+    {
+      "field": "isDuplicate",
+      "meaning": "Whether this invoice is a duplicate of an already-paid one.",
+      "type": "boolean",
+      "example": "false",
+      "group": "Result",
+      "lookFor": "duplicate?",
+      "hint": "Follows directly from foundInHistory - not found means not a duplicate."
+    },
+    {
+      "field": "decision",
+      "meaning": "The routing decision from the check.",
+      "type": "string",
+      "example": "\"clear\"",
+      "group": "Result",
+      "lookFor": "clear or flag?",
+      "hint": "Not a duplicate means the invoice is clear to keep matching."
+    }
+  ],
+  "takeaway": {
+    "heading": "Duplicate check complete",
+    "points": [
+      "You compared the invoice's identity - vendor id + invoice number + total - against the paid history.",
+      "INV-58831 is absent, so foundInHistory and isDuplicate are both false and the decision is clear.",
+      "The flags are stored as true/false so the match decision can route on them without re-reading prose.",
+      "The duplicate-check record is saved as evidence the desk checked before paying.",
+      "The workflow can now rule out paying any invoice twice before it reaches the match decision."
+    ],
+    "artifactName": "duplicate-check.json"
+  }
+}

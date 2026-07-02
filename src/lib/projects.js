@@ -17,6 +17,11 @@ import module01Phases from '../data/projects/module-01/phases.json'
 import module01Edges from '../data/projects/module-01/workflowEdges.json'
 import module01LessonMeta from '../data/projects/module-01/lessonMeta.json'
 
+import module02Nodes from '../data/projects/module-02/workflowNodes.json'
+import module02Phases from '../data/projects/module-02/phases.json'
+import module02Edges from '../data/projects/module-02/workflowEdges.json'
+import module02LessonMeta from '../data/projects/module-02/lessonMeta.json'
+
 export const PROJECT_KEY = 'signalflow_project'
 export const DEFAULT_PROJECT = 'module-01'
 
@@ -34,6 +39,12 @@ const PROJECT_DATA = {
     phases: module01Phases,
     edges: module01Edges,
     lessonMeta: module01LessonMeta,
+  },
+  'module-02': {
+    nodes: module02Nodes,
+    phases: module02Phases,
+    edges: module02Edges,
+    lessonMeta: module02LessonMeta,
   },
 }
 
@@ -90,6 +101,29 @@ export const BUILT_LESSONS = {
       'lesson-distribution-archive-hard',
       'lesson-approval-decision-hard',
     ],
+  },
+  'module-02': {
+    easy: [
+      'lesson-invoice-inbox',
+      'lesson-vendor-master',
+      'lesson-po-register',
+      'lesson-invoice-record',
+      'lesson-receipt-log',
+      'lesson-tolerance-policy',
+      'lesson-payment-history',
+      'lesson-duplicate-check',
+      'lesson-three-way-match',
+      'lesson-match-decision',
+      'lesson-auto-approve-path',
+      'lesson-exception-queue',
+      'lesson-payment-batch',
+      'lesson-run-approval',
+      'lesson-payment-run',
+      'lesson-remittance-advice',
+      'lesson-payment-archive',
+    ],
+    medium: [],
+    hard: [],
   },
 }
 

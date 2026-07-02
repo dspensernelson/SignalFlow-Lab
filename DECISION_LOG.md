@@ -2,6 +2,37 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-02 (module-02 Beacon - Steps 3-6 Easy tier built)
+
+- Authored the full Module 2 Easy tier: all 17 lessons (one per map node),
+  playbook Steps 3 (node audit), 4 (canon), 5-6 (build). `npm run check` green:
+  59 lessons linted (0 errors/warnings), 59 lesson fixtures pass, 69 canon
+  assertions + 18 derivations recomputed, build clean.
+- Validator spread (Easy = the clean pattern): choiceCheck x9 for inspection/
+  governance/handoff nodes (learners inspect references they do not own and log
+  handoffs), jsonEditor/jsonFields x6 for the build/transformation/decision
+  nodes (invoice-record, tolerance-policy, duplicate-check, three-way-match,
+  match-decision, payment-batch), templateSlots x2 for the assembly outputs
+  (payment-run.md, remittance-advice.md). Row-based validators (jsonRows/
+  jsonDeltas) are deliberately deferred to Medium, where multiple invoices and
+  failing cases make multi-row natural.
+- Canon enforcement: variance (20.00) and variancePct (1.67) in three-way-match
+  are recomputed by canon derivations from invoiceTotal 1220 / poTotal 1200;
+  shared numbers (invoice total, quantity, unit price, tolerance 2%/$25, the
+  duplicate/tolerance flags) are pinned by 11 canon assertions so no lesson can
+  drift from curriculum/module-02/easy/_OVERVIEW.md.
+- module-02 flipped from "planned" to "active" in src/data/projects.json (now
+  selectable in the project switcher). Verified live at 1280x800: Beacon canvas
+  renders its own map/goal/clock; a choiceCheck Exercise in the validated
+  wrong-answer state measures document scrollHeight === clientHeight (800 ===
+  800) - the no-scroll HARD RULE holds.
+- CANVAS FIX (product): ProjectCanvas had three hardcoded Module-1 strings (the
+  goal paragraph, the "6:15 AM CT" clock badge, and the project-name fallback).
+  Made the goal and clock project-aware by reading `goal` and `clock` from the
+  projects.json registry entry (fallback to the Meridian defaults), so each
+  module shows its own header copy. Added goal+clock to module-01 and module-02
+  registry entries.
+
 ## 2026-07-02 (module-02 Beacon - Step 2 map gate)
 
 - Authored the Module 2 (Beacon Invoice Desk) workflow map per its ratified

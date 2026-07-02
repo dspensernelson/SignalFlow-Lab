@@ -1,0 +1,159 @@
+{
+  "id": "lesson-three-way-match",
+  "nodeId": "three-way-match",
+  "title": "Run the Three-Way Match",
+  "subtitle": "Reconcile the invoice, the PO, and the receipt",
+  "clock": "11:15 AM",
+  "difficulty": "Beginner",
+  "skill": "Reconciliation math",
+  "scenario": "It is 11:15 AM. Three trusted records are lined up: the Invoice ($1,220 for 500 bolts), the PO ($1,200 for 500 ordered), and the Receipt (500 received). Now do the reconciliation the whole desk turns on - compute the price variance, compare it to the tolerance band, confirm the quantities, and declare the result.",
+  "inputType": "text",
+  "input": "Invoice total: 1220.00. PO total: 1200.00. Ordered: 500. Received: 500. Tolerance Policy v1.0.0: price variance allowed within the LARGER of 2% of the PO (2% of 1200.00 = 24.00) or 25.00; quantity must match exactly.",
+  "instructions": [
+    "Compute the price variance: invoice total minus PO total.",
+    "Compute the variance percent: variance over PO total, times 100, rounded to 2 decimals.",
+    "Compute the tolerance band: the larger of 2% of the PO (24.00) and 25.00.",
+    "Set qtyMatch (received equals ordered) and withinTolerance (variance within the band and within 2%).",
+    "Declare matchResult, and return one valid JSON object. Use numbers for the amounts."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"invoiceTotal\": 0,\n  \"poTotal\": 0,\n  \"variance\": 0,\n  \"variancePct\": 0,\n  \"toleranceBand\": 0,\n  \"qtyMatch\": false,\n  \"withinTolerance\": false,\n  \"matchResult\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": [
+      "invoiceTotal",
+      "poTotal",
+      "variance",
+      "variancePct",
+      "toleranceBand",
+      "qtyMatch",
+      "withinTolerance",
+      "matchResult"
+    ],
+    "expected": {
+      "invoiceTotal": 1220,
+      "poTotal": 1200,
+      "variance": 20,
+      "variancePct": 1.67,
+      "toleranceBand": 25,
+      "qtyMatch": true,
+      "withinTolerance": true
+    },
+    "acceptedValues": {
+      "matchResult": ["matched", "match", "pass", "clean match", "clean"]
+    }
+  },
+  "copilotPrompt": "Compute a three-way match JSON record: invoiceTotal, poTotal, variance (invoice minus PO), variancePct (variance / PO * 100, 2 decimals), toleranceBand (larger of 2% of PO or 25), qtyMatch, withinTolerance, and matchResult. Use numbers.",
+  "successMessage": "Three-way match complete. Variance 20.00 is within the 25.00 band - a clean, matched line.",
+  "validateLabel": "Run Match",
+  "editorHelper": "Reconcile the three records and declare the result.",
+  "intro": {
+    "heading": "Before you pay: reconcile all three",
+    "sections": [
+      {
+        "title": "Three records must agree",
+        "body": "Order, delivery, and bill each come from a different owner. The three-way match is where they finally meet: only when all three line up does the desk agree to pay."
+      },
+      {
+        "title": "Price variance is arithmetic",
+        "body": "Invoice 1220.00 minus PO 1200.00 is a 20.00 variance, or 1.67% of the PO. These are computed, not judged - which is exactly why they can be automated."
+      },
+      {
+        "title": "Compare to the written band",
+        "body": "The Tolerance Policy allows the larger of 2% of the PO (24.00) or 25.00, so the band is 25.00. A 20.00 variance sits inside it, and 1.67% is inside 2% - the price leg passes."
+      },
+      {
+        "title": "Quantity is exact",
+        "body": "Received 500 equals ordered 500, so qtyMatch is true with no tolerance. Price within band plus an exact quantity match makes this a clean, matched line."
+      }
+    ],
+    "jsonExample": "{\n  \"variance\": 20,\n  \"variancePct\": 1.67,\n  \"withinTolerance\": true\n}",
+    "skill": "Reconciliation math",
+    "artifactName": "three-way-match.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "invoiceTotal",
+      "meaning": "The amount the invoice asks for.",
+      "type": "number",
+      "example": "1220",
+      "group": "Inputs",
+      "lookFor": "the invoice total?",
+      "hint": "From the Invoice Record - store the number only."
+    },
+    {
+      "field": "poTotal",
+      "meaning": "The amount the PO agreed to.",
+      "type": "number",
+      "example": "1200",
+      "group": "Inputs",
+      "lookFor": "the PO total?",
+      "hint": "From the PO Register - store the number only."
+    },
+    {
+      "field": "variance",
+      "meaning": "Invoice total minus PO total.",
+      "type": "number",
+      "example": "20",
+      "group": "Computed",
+      "lookFor": "the dollar gap?",
+      "hint": "1220 minus 1200. A positive number means the invoice is higher."
+    },
+    {
+      "field": "variancePct",
+      "meaning": "The variance as a percent of the PO total, to 2 decimals.",
+      "type": "number",
+      "example": "1.67",
+      "group": "Computed",
+      "lookFor": "the percent gap?",
+      "hint": "20 / 1200 * 100 = 1.666..., rounded to 1.67."
+    },
+    {
+      "field": "toleranceBand",
+      "meaning": "The larger of 2% of the PO and the absolute floor.",
+      "type": "number",
+      "example": "25",
+      "group": "Computed",
+      "lookFor": "which limit applies?",
+      "hint": "2% of 1200 is 24; the floor is 25; the larger is 25."
+    },
+    {
+      "field": "qtyMatch",
+      "meaning": "Whether received equals ordered.",
+      "type": "boolean",
+      "example": "true",
+      "group": "Result",
+      "lookFor": "quantities equal?",
+      "hint": "500 received equals 500 ordered, so true."
+    },
+    {
+      "field": "withinTolerance",
+      "meaning": "Whether the price variance is inside the band and inside 2%.",
+      "type": "boolean",
+      "example": "true",
+      "group": "Result",
+      "lookFor": "price acceptable?",
+      "hint": "20 is within 25 and 1.67% is within 2%, so true."
+    },
+    {
+      "field": "matchResult",
+      "meaning": "The overall outcome of the match.",
+      "type": "string",
+      "example": "\"matched\"",
+      "group": "Result",
+      "lookFor": "matched or exception?",
+      "hint": "Price within tolerance and an exact quantity match makes this matched."
+    }
+  ],
+  "takeaway": {
+    "heading": "Three-way match complete",
+    "points": [
+      "You reconciled three independently owned records - invoice, PO, and receipt - into one result.",
+      "The price variance (20.00) and percent (1.67) are computed from the totals, not judged by eye.",
+      "The tolerance band is the larger of 2% of the PO (24.00) and 25.00, so 25.00 - and the 20.00 variance sits inside it.",
+      "Quantity matches exactly and price is within tolerance, so the line is matched.",
+      "The workflow can now decide, on numbers alone, whether an invoice line is clean or an exception."
+    ],
+    "artifactName": "three-way-match.json"
+  }
+}

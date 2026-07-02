@@ -53,6 +53,8 @@ function TierSwitch({ value, onChange }) {
 const PROJECT_GOAL =
   'Build a workplace automation that turns messy overnight market inputs into an approval-ready 7:00 AM brief. The map below is the real dependency graph — phases on the left feed objects that get reused, evaluated, and routed downstream. Click any node to see how that piece gets built and reused.'
 
+const PROJECT_CLOCK = '6:15 AM CT'
+
 const PROJECT_STATUS_LABELS = { complete: 'Complete', active: 'Active', planned: 'Coming soon' }
 
 // Header dropdown for switching modules (projects). "planned" projects render
@@ -144,6 +146,8 @@ export default function ProjectCanvas({
 }) {
   const activeProject = projects?.find((p) => p.id === project)
   const projectName = activeProject?.name || 'Meridian Morning Market Brief'
+  const projectGoal = activeProject?.goal || PROJECT_GOAL
+  const projectClock = activeProject?.clock || PROJECT_CLOCK
   const nodesById = Object.fromEntries(nodes.map((n) => [n.id, n]))
   const phasesById = Object.fromEntries(phases.map((p) => [p.id, p]))
   const selectedNode = nodesById[selectedNodeId]
@@ -187,7 +191,7 @@ export default function ProjectCanvas({
           <div className="flex items-center gap-2.5">
             <span className="hidden items-center gap-1.5 rounded-full border border-sf-border bg-sf-surface-subtle px-2.5 py-1 text-xs font-medium text-sf-muted md:inline-flex">
               <Icon name="clock" size={13} />
-              6:15 AM CT
+              {projectClock}
             </span>
             {onTierChange && <TierSwitch value={tier} onChange={onTierChange} />}
             <ThemeToggle value={theme} onChange={onToggleTheme} />
@@ -202,7 +206,7 @@ export default function ProjectCanvas({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-semibold text-sf-text">{projectName}</h1>
-            <p className="max-w-4xl text-sm text-sf-muted">{PROJECT_GOAL}</p>
+            <p className="max-w-4xl text-sm text-sf-muted">{projectGoal}</p>
           </div>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 sm:justify-end">
             <StatItem

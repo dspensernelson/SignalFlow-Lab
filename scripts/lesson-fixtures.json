@@ -202,5 +202,38 @@
       "variance-check": "[{\"hub\":\"ERCOT\",\"vsForecast\":17,\"vsPriorDay\":22,\"material\":true},{\"hub\":\"SPP\",\"vsForecast\":0,\"vsPriorDay\":4,\"material\":false},{\"hub\":\"MISO\",\"vsForecast\":-6,\"vsPriorDay\":-4,\"material\":false}]",
       "risk-evaluation": "[{\"hub\":\"ERCOT\",\"pctMove\":13.3,\"status\":\"escalate\"},{\"hub\":\"SPP\",\"pctMove\":4.3,\"status\":\"normal\"},{\"hub\":\"MISO\",\"pctMove\":-5.1,\"status\":\"routine\"}]"
     }
+  },
+
+  "lesson-invoice-record": {
+    "correct": { "invoiceNumber": "INV-58831", "vendorId": "V-1042", "poNumber": "PO-7742", "quantity": 500, "unitPrice": 2.44, "invoiceTotal": 1220 },
+    "wrong": { "invoiceNumber": "INV-58831", "vendorId": "V-1042", "poNumber": "PO-7742", "quantity": 500, "unitPrice": 2.44, "invoiceTotal": 1200 }
+  },
+  "lesson-tolerance-policy": {
+    "correct": { "version": "1.0.0", "priceTolerancePct": 2, "priceToleranceAbs": 25, "toleranceBasis": "larger", "qtyTolerance": 0, "approvedBy": "Controller", "effective": "day-0" },
+    "wrong": { "version": "1.0.0", "priceTolerancePct": 2, "priceToleranceAbs": 25, "toleranceBasis": "smaller", "qtyTolerance": 0, "approvedBy": "Controller", "effective": "day-0" }
+  },
+  "lesson-duplicate-check": {
+    "correct": { "invoiceNumber": "INV-58831", "vendorId": "V-1042", "invoiceTotal": 1220, "foundInHistory": false, "isDuplicate": false, "decision": "clear" },
+    "wrong": { "invoiceNumber": "INV-58831", "vendorId": "V-1042", "invoiceTotal": 1220, "foundInHistory": false, "isDuplicate": true, "decision": "clear" }
+  },
+  "lesson-three-way-match": {
+    "correct": { "invoiceTotal": 1220, "poTotal": 1200, "variance": 20, "variancePct": 1.67, "toleranceBand": 25, "qtyMatch": true, "withinTolerance": true, "matchResult": "matched" },
+    "wrong": { "invoiceTotal": 1220, "poTotal": 1200, "variance": 20, "variancePct": 1.67, "toleranceBand": 25, "qtyMatch": true, "withinTolerance": false, "matchResult": "matched" }
+  },
+  "lesson-match-decision": {
+    "correct": { "withinTolerance": true, "qtyMatch": true, "isDuplicate": false, "route": "auto-approve" },
+    "wrong": { "withinTolerance": true, "qtyMatch": true, "isDuplicate": false, "route": "exception-queue" }
+  },
+  "lesson-payment-batch": {
+    "correct": { "batchDate": "day-1", "cutoff": "3:00 PM", "invoiceCount": 1, "batchTotal": 1220, "heldCount": 0 },
+    "wrong": { "batchDate": "day-1", "cutoff": "3:00 PM", "invoiceCount": 1, "batchTotal": 1200, "heldCount": 0 }
+  },
+  "lesson-payment-run": {
+    "correct": { "runDate": "day-1", "approvedBy": "AP Manager", "approvedAt": "2:30 PM", "cutoff": "3:00 PM", "invoiceCount": "1", "runTotal": "1220", "payToName": "Northwind Fasteners", "vendorId": "V-1042", "bankOnFile": "ACH ...4021", "deliveredTo": "Payables DL" },
+    "wrong": { "runDate": "day-1", "approvedBy": "AP Manager", "approvedAt": "2:30 PM", "cutoff": "3:00 PM", "invoiceCount": "1", "runTotal": "1200", "payToName": "Northwind Fasteners", "vendorId": "V-1042", "bankOnFile": "ACH ...4021", "deliveredTo": "Payables DL" }
+  },
+  "lesson-remittance-advice": {
+    "correct": { "vendorName": "Northwind Fasteners", "remitTo": "4400 Commerce Way, Tacoma WA 98402", "vendorId": "V-1042", "invoiceNumber": "INV-58831", "amountPaid": "1220", "paidDate": "day-1", "payMethod": "ACH" },
+    "wrong": { "vendorName": "Northwind Fasteners", "remitTo": "4400 Commerce Way, Tacoma WA 98402", "vendorId": "V-1042", "invoiceNumber": "INV-58831", "amountPaid": "1200", "paidDate": "day-1", "payMethod": "ACH" }
   }
 }
