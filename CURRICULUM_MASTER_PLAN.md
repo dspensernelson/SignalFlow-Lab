@@ -345,3 +345,87 @@ run npm run lint and npm run build, and verify the Exercise screen does not
 page-scroll at innerHeight >= 800 after validating a WRONG answer.
 Lesson script: curriculum/module-01/easy/<file>.md
 ```
+
+---
+
+## Part 8 - Execution sequence from 2026-07 (from here to the end)
+
+Written after Module 1 reached Easy 17/17, Medium 17/17, Hard 7/7 drills, with
+tiers and forced lesson ordering live. This sequence supersedes the coarser
+milestones in Part 5 where they overlap. The gating insight from building
+Module 1: IMPLEMENTATION is already delegable, AUTHORING is not - so the next
+work is the five artifacts that make authoring checkable, before any Module 2
+content exists.
+
+### Phase 0 - Industrialize (before any new content; ~sessions, not months)
+
+0.1 Commit the regression harness: scripts/validate-lessons.mjs + one fixtures
+    file per lesson (correct answer + wrong answer), run as
+    `npm run test:lessons`. Every future change must keep it green.
+0.2 Canon as data: curriculum/module-01/<tier>/canon.json holding every number,
+    role, time, and artifact name; plus scripts/lint-lessons.mjs that
+    cross-checks each lesson JSON against canon and the authoring checklist
+    (one primary concept, capability statement last, honest difficulty label,
+    ASCII, validator config well-formed).
+0.3 MODULE_AUTHORING_PLAYBOOK.md: the repeatable procedure scenario -> map
+    (15-18 nodes, one true fork, one temporal loop, fan-in ordering, one
+    concept per node) -> NODE_AUDIT -> canon.json -> lesson scripts -> build
+    waves, with an acceptance gate per step and explicit stop-and-ask-owner
+    points.
+0.4 DECISION_BOUNDARIES.md: what a builder may never decide alone (doctrine,
+    scenario selection, node taxonomy, new interaction types, validator
+    changes, map shape).
+0.5 Verification playbook: the no-scroll eval snippets and artifact-seeding
+    recipes as a committed script/doc, so live verification is not tribal.
+
+### Phase 1 - Finish Module 1 (the capstone)
+
+1.1 Spec the artifact-import surface at ENGINE_ADDITIONS_SPEC fidelity
+    (file picker -> validateAnswer per imported file; storage; UI states).
+1.2 Build the solo-rebuild capstone lesson + runbook. Module 1 Hard is then
+    COMPLETE and Module 1 is the finished proof of the whole pedagogy.
+1.3 Module 1 wrap: decide the deferred node splits (NODE_AUDIT items 2-3),
+    write the Module 1 case study (portfolio artifact), and cut a tagged
+    release.
+
+### Phase 2 - Prove the engine is domain-agnostic (Module 2)
+
+2.1 Engine: multi-project support, specced first (project registry, per-module
+    node/edge/phase data, per-module+tier storage namespacing, project
+    switcher).
+2.2 Author Module 2 (Beacon Invoice Desk) STRICTLY through the playbook -
+    this run is as much a test of the playbook as of the module. Fix the
+    playbook wherever it was ambiguous.
+2.3 Module 2 Easy built and verified; Medium/Hard authored with the same
+    tier method (canon per tier, judgment/design postures).
+2.4 Housekeeping now due: per-module dynamic imports (bundle passed 500 kB
+    with one module; it will not survive ten), and the rich-intro migration
+    (bring all lessons to lesson-intake's intro dialect).
+
+### Phase 3 - Cadence (Modules 3-9)
+
+One module at a time, always: playbook -> owner gate on the map/audit ->
+canon -> scripts -> waves -> tiers -> case study -> release. Each module also
+lands its signature engine need (M3 parallel task states, M4 queue/routing UI,
+M5 calendar/dependency view, M7 event/trigger simulation, M8 immutable
+records, M9 fan-out preview) - each specced before built. Expected steady
+state: a module per 1-2 quarters of nights-and-weekends once the pipeline is
+warm; H3/H4 dates in Part 5 remain the honest outer envelope.
+
+### Phase 4 - The summit (Module 10 + capstone mode)
+
+Watchtower (incident response), then the final proof of transfer:
+design-your-own-workflow mode - the learner gets a plain-language business
+brief and builds a map, canon, and artifacts the engine validates with the
+same machinery. Full-curriculum export ("everything I built") closes the
+portfolio story. Optional exits (open-sourcing, client training, authoring
+UI) stay optional, per the charter.
+
+### Standing rules for every phase
+
+- Every unit of work leaves the app demoable (no half-migrations).
+- Tests and lint green before every commit; live no-scroll verification for
+  any exercise-surface change.
+- New engine capability = spec first, at ENGINE_ADDITIONS_SPEC fidelity.
+- Owner gates: scenario choice, map shape, doctrine changes, tier curation.
+- DECISION_LOG entry for anything that changes product behavior.

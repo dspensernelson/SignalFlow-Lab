@@ -15,7 +15,7 @@ const TYPE_LABEL = {
 
 const STATUS_BADGE = {
   [STATUS.CONTEXT]: { label: 'Context', tone: 'context' },
-  [STATUS.LOCKED]: { label: 'Upcoming', tone: 'locked' },
+  [STATUS.LOCKED]: { label: 'Locked', tone: 'locked' },
   [STATUS.READY]: { label: 'Ready', tone: 'ready' },
   [STATUS.IN_PROGRESS]: { label: 'In progress', tone: 'progress' },
   [STATUS.COMPLETE]: { label: 'Complete', tone: 'complete' },
@@ -129,6 +129,7 @@ export default function NodeDetail({
   phase,
   nodesById,
   edges,
+  unlockAfterLabel,
   onSelect,
   onStart,
   onContinue,
@@ -213,6 +214,15 @@ export default function NodeDetail({
               Restart
             </Button>
           </div>
+        )}
+
+        {buildable && status === STATUS.LOCKED && (
+          <p className="rounded-lg bg-sf-surface-subtle px-2.5 py-1.5 text-[11px] leading-snug text-sf-body">
+            Locked — the workflow is built in order.
+            {unlockAfterLabel
+              ? ` Complete "${unlockAfterLabel}" to unlock this lesson.`
+              : ' Complete the earlier lessons on the path to unlock it.'}
+          </p>
         )}
 
         {!buildable && lesson && (
