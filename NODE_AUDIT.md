@@ -11,8 +11,12 @@
 > truth. Items resolved since the audit: item 8 (concept-overlap pairs are
 > disambiguated in the built lesson copy), item 9 (Approval Decision stores
 > decision-log.json; Routine Update Path stores routine-log.json), item 10
-> (price-feed and forecast-data have fixtures). Items still open: items 2-4
-> (node splits and the temporal-edge rendering check).
+> (price-feed and forecast-data have fixtures). Items 2-3 (node splits) are
+> SETTLED per AUTONOMY_CHARTER.md section 6: dual-nature nodes stay single,
+> clarified in lesson copy, permanently. Item 4 is resolved: the temporal
+> edge (distribution-archive -> prior-day-reference, "seeds tomorrow") is
+> now in workflowEdges.json and renders; scripts/lint-map.mjs enforces its
+> presence. No audit items remain open.
 >
 > **Purpose of this document.** A per-node curriculum audit of every workflow node currently on the Meridian map. It checks each node against the Product Doctrine (the map is the curriculum; **every node is a lesson**; artifacts are the unit of progress; connections reveal context; governance is part of automation) and the Selected Node Panel Contract.
 >

@@ -207,7 +207,35 @@ for (const [tier, ids] of Object.entries(TIER_IDS)) {
   })
 }
 
-// 5. Canon assertions
+// 5a. Canon derivations: recompute derived numbers from their sources so an
+// internally-consistent-but-wrong figure cannot ship.
+for (const d of canon.derivations || []) {
+  const lesson = lessonsById[d.lesson]
+  if (!lesson) {
+    errors++
+    console.log(`ERROR canon derivation targets missing lesson "${d.lesson}"`)
+    continue
+  }
+  let expected
+  if (d.op === 'delta') expected = d.a - d.b
+  else if (d.op === 'pctMove') expected = ((d.a - d.b) / d.b) * 100
+  else {
+    errors++
+    console.log(`ERROR canon derivation for ${d.lesson}: unknown op "${d.op}"`)
+    continue
+  }
+  if (typeof d.round === 'number') {
+    const f = Math.pow(10, d.round)
+    expected = Math.round(expected * f) / f
+  }
+  const actual = resolvePath(lesson, d.path)
+  if (actual !== expected) {
+    errors++
+    console.log(`ERROR canon derivation: ${d.lesson} ${d.path} should be ${expected} (${d.op} of ${d.a}, ${d.b}) - actual: ${JSON.stringify(actual)}`)
+  }
+}
+
+// 5b. Canon assertions
 for (const a of canon.assertions) {
   const lesson = lessonsById[a.lesson]
   if (!lesson) {
@@ -225,5 +253,5 @@ for (const a of canon.assertions) {
   }
 }
 
-console.log(`\n${files.length} lessons linted: ${errors} errors, ${warnings} warnings (${canon.assertions.length} canon assertions)`)
+console.log(`\n${files.length} lessons linted: ${errors} errors, ${warnings} warnings (${canon.assertions.length} canon assertions, ${(canon.derivations || []).length} derivations recomputed)`)
 process.exit(errors === 0 ? 0 : 1)

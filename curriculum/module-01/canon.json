@@ -1,6 +1,24 @@
 {
-  "_comment": "Machine-checkable canon for Module 1, enforced by scripts/lint-lessons.mjs. Each assertion resolves a path inside a lesson JSON and compares it to the canonical value. Paths support dot segments, [index], and [key=value] finders. Ops: equals (strict for numbers/booleans, string-compare otherwise) and includes (array must contain the value). The prose canon lives in curriculum/module-01/<tier>/_OVERVIEW.md; THIS file is what prevents cross-lesson drift. When authoring or editing a lesson that states a shared number, add or update an assertion here.",
+  "_comment": "Machine-checkable canon for Module 1, enforced by scripts/lint-lessons.mjs. Each assertion resolves a path inside a lesson JSON and compares it to the canonical value. Paths support dot segments, [index], and [key=value] finders. Ops: equals (strict for numbers/booleans, string-compare otherwise) and includes (array must contain the value). Derivations RECOMPUTE derived numbers from their source values so an internally-consistent-but-wrong figure cannot ship: op delta = a - b; op pctMove = (a - b) / b * 100, rounded to `round` decimals. The prose canon lives in curriculum/module-01/<tier>/_OVERVIEW.md; THIS file is what prevents cross-lesson drift. When authoring or editing a lesson that states a shared or derived number, add or update entries here.",
   "module": "module-01",
+  "derivations": [
+    { "lesson": "lesson-variance-check", "path": "validation.expectedRows[hub=ERCOT].vsForecast", "op": "delta", "a": 187, "b": 170 },
+    { "lesson": "lesson-variance-check", "path": "validation.expectedRows[hub=ERCOT].vsPriorDay", "op": "delta", "a": 187, "b": 165 },
+    { "lesson": "lesson-variance-check", "path": "validation.expectedRows[hub=SPP].vsForecast", "op": "delta", "a": 96, "b": 96 },
+    { "lesson": "lesson-variance-check", "path": "validation.expectedRows[hub=MISO].vsForecast", "op": "delta", "a": 74, "b": 80 },
+    { "lesson": "lesson-risk-evaluation", "path": "validation.expectedRows[hub=ERCOT].pctMove", "op": "pctMove", "a": 187, "b": 165, "round": 1 },
+    { "lesson": "lesson-risk-evaluation", "path": "validation.expectedRows[hub=SPP].pctMove", "op": "pctMove", "a": 96, "b": 92, "round": 1 },
+    { "lesson": "lesson-risk-evaluation", "path": "validation.expectedRows[hub=MISO].pctMove", "op": "pctMove", "a": 74, "b": 78, "round": 1 },
+    { "lesson": "lesson-variance-check-medium", "path": "validation.expectedRows[hub=ERCOT].vsForecast", "op": "delta", "a": 204, "b": 188 },
+    { "lesson": "lesson-variance-check-medium", "path": "validation.expectedRows[hub=ERCOT].vsPriorDay", "op": "delta", "a": 204, "b": 176 },
+    { "lesson": "lesson-variance-check-medium", "path": "validation.expectedRows[hub=SPP].vsForecast", "op": "delta", "a": 98.5, "b": 100 },
+    { "lesson": "lesson-variance-check-medium", "path": "validation.expectedRows[hub=SPP].vsPriorDay", "op": "delta", "a": 98.5, "b": 97 },
+    { "lesson": "lesson-risk-evaluation-medium", "path": "validation.expectedRows[hub=ERCOT].pctMove", "op": "pctMove", "a": 204, "b": 176, "round": 1 },
+    { "lesson": "lesson-risk-evaluation-medium", "path": "validation.expectedRows[hub=SPP].pctMove", "op": "pctMove", "a": 98.5, "b": 97, "round": 1 },
+    { "lesson": "lesson-risk-evaluation-medium", "path": "validation.expectedRows[hub=WAUE].pctMove", "op": "pctMove", "a": 63, "b": 59, "round": 1 },
+    { "lesson": "lesson-risk-evaluation-hard", "path": "validation.expectedRows[hub=ERCOT].pctMove", "op": "pctMove", "a": 198, "b": 172, "round": 1 },
+    { "lesson": "lesson-risk-evaluation-hard", "path": "validation.expectedRows[hub=MISO].pctMove", "op": "pctMove", "a": 81, "b": 77, "round": 1 }
+  ],
   "assertions": [
     { "lesson": "lesson-intake", "path": "validation.expected.hub", "op": "equals", "value": "ERCOT" },
     { "lesson": "lesson-intake", "path": "validation.acceptedValues.peakPrice", "op": "includes", "value": "187" },

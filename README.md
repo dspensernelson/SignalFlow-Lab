@@ -40,9 +40,14 @@ Where things stand if you are picking this back up:
   curriculum docs). PR #2 = `module-01-tiers` -> `takeaway-workflow-diagram`
   (all implementation above). The live Vercel site is from an earlier build;
   redeploy is intentionally out of scope.
-- **Next candidates**: the Hard solo-rebuild capstone (needs an
-  artifact-import surface - the last piece of Module 1), then the deferred
-  node splits (NODE_AUDIT items 2-3) and Module 2 scoping.
+- **Autonomous build is armed**: all nine remaining module charters are
+  ratified (`curriculum/charters/`), the two blocking engine specs are
+  pre-approved (`SPEC_ARTIFACT_IMPORT.md`, `SPEC_MULTI_PROJECT.md`), and
+  `AUTONOMY_CHARTER.md` carries the owner's standing approvals across every
+  decision gate. A builder starts at `BUILDER_KICKOFF.md` and works the
+  fixed queue: Module 1 capstone -> Module 1 wrap -> multi-project engine
+  -> modules 2-10 in order -> stop. Parked questions go to
+  `OPEN_QUESTIONS.md`; CI runs `npm run check` on every push.
 
 ## Current Product Model
 
@@ -73,6 +78,11 @@ Individually: `npm run lint`, `npm run lint:lessons`, `npm run test:lessons`,
 
 ## Key Docs
 
+- `BUILDER_KICKOFF.md` - the autonomous builder's entry point (read order, startup ritual, the fixed work queue).
+- `AUTONOMY_CHARTER.md` - standing owner approvals: the North Star, gate-by-gate decisions, the tie-breaker rule, and the PARK protocol.
+- `curriculum/charters/` - ratified charters for modules 2-10.
+- `SPEC_ARTIFACT_IMPORT.md` / `SPEC_MULTI_PROJECT.md` - the two pre-approved engine changes.
+- `OPEN_QUESTIONS.md` - the owner's asynchronous inbox for parked decisions.
 - `CURRICULUM_MASTER_PLAN.md` - the 10-module / 3-tier long-range plan, learning theory, engine roadmap, and the execution sequence (Part 8).
 - `MODULE_AUTHORING_PLAYBOOK.md` - the gated procedure for authoring any new module (scenario -> map -> audit -> canon -> scripts -> waves).
 - `DECISION_BOUNDARIES.md` - owner-only vs builder decisions and the stop-and-ask protocol.
