@@ -55,6 +55,24 @@ Short record of product and implementation decisions. Keep entries factual and b
 - Deferred per NODE_AUDIT: distribution-archive node split and risk-evaluation
   split stay single nodes through Module 1 Easy; revisit before Medium.
 
+## 2026-07-01 (hard-tier curation pass)
+
+- Hard tier is complete as a CURATED set of 7 design/failure drills; only
+  the solo-rebuild capstone remains before Module 1 Hard is done.
+- DECIDED: the five inspection-type nodes get no hard variant (their content
+  does not deepen into design work), and variance-check-hard is folded into
+  risk-evaluation-hard (compute + classify under quarantine in one drill).
+- DECIDED: hard lessons are standalone drills, not one continuous morning.
+  Three share the degraded-morning arc (price-feed -> risk-evaluation ->
+  morning-brief); its canon (SPP quarantined, ERCOT 15.1 routine under
+  ratified v2.0.0 bands 6/16) lives in curriculum/module-01/hard/_OVERVIEW.md.
+- New lessons: risk-evaluation-hard (degraded-status propagation on every
+  row), morning-brief-hard (incident in the deliverable; explained missing
+  approval), distribution-archive-hard (retention designed from constraints;
+  ordering rule: explainers outlive the explained).
+- Verified live: hard shows 0 of 7; degraded brief renders and passes;
+  no-scroll holds in the all-slots-failed state; no console errors.
+
 ## 2026-07-01 (medium-complete pass)
 
 - Medium tier is COMPLETE: all 17 lessons built, smoke-tested, and verified

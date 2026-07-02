@@ -1,0 +1,74 @@
+{
+  "id": "lesson-risk-evaluation-hard",
+  "nodeId": "risk-evaluation",
+  "title": "Classify a Quarantined Morning",
+  "difficulty": "Hard",
+  "skill": "Computing under quarantine & status propagation",
+  "clock": "6:45 AM",
+  "scenario": "The feed arrived 27 minutes late and the SPP row is in quarantine. The brief still ships at 7:00. Classify what survived - and stamp every row with the degraded status, because a consumer who cannot tell a partial run from a full one will trust it like a full one.",
+  "inputType": "text",
+  "inputLabel": "Quarantine Notice + Surviving Data + Ratified Policy",
+  "input": "From the feed incident (see price-feed incident record): feed arrived 6:42; the SPP row was malformed and is QUARANTINED - held for the vendor, not dropped, expected back tomorrow. This run is DEGRADED.\n\nSurviving rows (actual vs prior day):\nERCOT: actual 198, prior day 172\nMISO: actual 81, prior day 77\n\nThreshold Policy v2.0.0, as ratified by the desk from the historical redesign: routine at 6 percent or more, escalate at 16 percent or more (day-over-day, size of move). Desk rounding: 1 decimal.\n\nPropagation rule: on a degraded run, every emitted row carries degraded: true so downstream consumers inherit the warning with the data.",
+  "instructions": [
+    "Compute each surviving hub's pctMove: (actual - priorDay) / priorDay * 100, rounded to 1 decimal.",
+    "Classify against the RATIFIED v2.0.0 bands: 6 and 16.",
+    "SPP is quarantined, not dropped: emit no SPP row, and do not invent one.",
+    "Stamp every row with degraded: true per the propagation rule.",
+    "Return a JSON array, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n]",
+  "validation": {
+    "type": "jsonDeltas",
+    "keyField": "hub",
+    "requiredFields": ["hub", "pctMove", "status", "degraded"],
+    "numericFields": ["pctMove"],
+    "expectedRows": [
+      { "hub": "ERCOT", "pctMove": 15.1, "status": "routine", "degraded": true },
+      { "hub": "MISO", "pctMove": 5.2, "status": "normal", "degraded": true }
+    ]
+  },
+  "copilotPrompt": "Classify a degraded run: compute pctMove = (actual - priorDay) / priorDay * 100 rounded to 1 decimal for ERCOT (198/172) and MISO (81/77), classify with bands 6 (routine) and 16 (escalate), omit the quarantined SPP row, and stamp every row degraded: true. Return a JSON array of { hub, pctMove, status, degraded }.",
+  "successMessage": "Degraded run classified. Every row carries its warning label - partial data that admits it is partial stays trustworthy.",
+  "intro": {
+    "heading": "Before you build: partial runs must say so",
+    "sections": [
+      {
+        "title": "Degraded is a status, not an apology",
+        "body": "The run is incomplete by DESIGN - the runbook chose quarantine over guessing. Propagating degraded: true on every row turns that choice into data, so the brief and any later consumer can label what they show."
+      },
+      {
+        "title": "Quarantined is not dropped",
+        "body": "Medium tier dropped a poisoned row for good. Quarantine is different: the SPP row is held as evidence and expected back once the vendor fixes it. Today's job is to leave a hole shaped exactly like SPP - visible, temporary, uninvented."
+      },
+      {
+        "title": "The redesigned policy changes the story",
+        "body": "ERCOT moved 15.1 percent - under the OLD 12-percent rule that escalates; under the ratified v2.0.0 (escalate at 16) it is routine. A big-looking number that does not escalate is the redesign working as intended: the desk chose rarer escalations, on evidence."
+      },
+      {
+        "title": "No escalation, no approval",
+        "body": "With both survivors below 16, this brief will release without a sign-off - on a morning with an active incident. That is correct under the rules, and it is exactly why the degraded stamp matters: the label does the warning work the approval will not."
+      }
+    ],
+    "jsonExample": "[\n  { \"hub\": \"PJM\", \"pctMove\": 4.8, \"status\": \"normal\", \"degraded\": true }\n]",
+    "skill": "Computing under quarantine & status propagation",
+    "artifactName": "risk-evaluation.json"
+  },
+  "fieldGuide": [
+    { "field": "hub", "meaning": "One row per SURVIVING hub.", "type": "string", "hint": "Two hubs survived. The third is quarantined, not yours to invent." },
+    { "field": "pctMove", "meaning": "Desk-formula move, rounded to 1 decimal.", "type": "number", "hint": "Round the final result only." },
+    { "field": "status", "meaning": "Classification under ratified v2.0.0.", "type": "string", "hint": "Bands are 6 and 16 now - check the intro's ERCOT story." },
+    { "field": "degraded", "meaning": "The propagated run status.", "type": "boolean", "hint": "The propagation rule applies to every row." }
+  ],
+  "takeaway": {
+    "heading": "Quarantined morning classified",
+    "points": [
+      "You computed and classified only what survived, leaving a visible SPP-shaped hole instead of an invented row.",
+      "Every row carries degraded: true - the run's condition travels WITH the data, not in a log nobody joins against.",
+      "You watched the redesigned policy change an outcome: 15.1 percent is routine under ratified v2.0.0, where the old rule would have escalated.",
+      "The degraded brief you assemble next inherits both the classifications and the warning label.",
+      "The workflow can now classify honestly on a partial run and make sure every consumer knows it was partial."
+    ],
+    "artifactName": "risk-evaluation.json"
+  }
+}

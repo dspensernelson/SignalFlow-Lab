@@ -21,19 +21,19 @@ Where things stand if you are picking this back up:
   notes, explicit nulls, dropped rows, policy v1.1.0 at 6/14, negative
   boundary case, out-of-office delegation, exception-surfacing brief). Canon:
   `curriculum/module-01/medium/_OVERVIEW.md`.
-- **Hard tier: 4 built** (intake schema v2 migration, threshold design from
-  history, feed-failure handling, silence-driven escalation ladder). Remaining
-  work incl. the solo-rebuild capstone:
-  `curriculum/module-01/hard/_OVERVIEW.md`.
+- **Hard tier: 7 built - the full curated drill set** (schema v2 migration,
+  threshold design from history, feed-failure handling, escalation ladder,
+  classify-under-quarantine, degraded brief, retention design). Only the
+  solo-rebuild capstone remains: `curriculum/module-01/hard/_OVERVIEW.md`.
 - **No-scroll hard rule** verified live at 1280x800 in wrong-answer states for
   the new interaction types (and previously for the original four lessons).
 - **Branches/PRs**: PR #1 = `takeaway-workflow-diagram` -> `main` (redesign +
   curriculum docs). PR #2 = `module-01-tiers` -> `takeaway-workflow-diagram`
   (all implementation above). The live Vercel site is from an earlier build;
   redeploy is intentionally out of scope.
-- **Next candidates**: remaining Hard lessons (degraded variance/risk,
-  degraded morning-brief, retention design) and the Hard solo-rebuild
-  capstone (needs an artifact-import surface). Wave D polish is APPLIED.
+- **Next candidates**: the Hard solo-rebuild capstone (needs an
+  artifact-import surface - the last piece of Module 1), then the deferred
+  node splits (NODE_AUDIT items 2-3) and Module 2 scoping.
 
 ## Current Product Model
 
