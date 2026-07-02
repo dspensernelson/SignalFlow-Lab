@@ -1,0 +1,119 @@
+{
+  "id": "lesson-remittance-advice",
+  "nodeId": "remittance-advice",
+  "title": "Send the Remittance Advice",
+  "difficulty": "Beginner",
+  "skill": "Assembly from artifacts",
+  "clock": "3:00 PM",
+  "scenario": "It is 3:00 PM. The run is out the door - but the vendor does not see Beacon's internal records. They need a plain note: what did you pay us for, how much, and how? Assemble the remittance advice by looking up each value in an artifact. The vendor's address comes from the master, never from the invoice.",
+  "inputType": "text",
+  "inputLabel": "Assembly Rule",
+  "input": "Assembly rule: every slot value must come from a stored artifact. The vendor name, id, and remit-to address are in the vendor master. The invoice number is in the invoice record. The amount paid is the run total from the payment run. Paid on day-1 via ACH to the account on file.",
+  "instructions": [
+    "Open each artifact on the shelf as you need it - do not work from memory.",
+    "Fill the vendor slots from the vendor master (name, id, remit-to).",
+    "Fill the invoice number from the invoice record and the amount from the payment run.",
+    "Fill the paid date and method.",
+    "Validate to render remittance-advice.md."
+  ],
+  "interactionType": "templateSlots",
+  "starterAnswer": "{}",
+  "shelf": [
+    { "nodeId": "vendor-master", "artifactName": "vendor-master-record.json", "producedBy": "Govern the Vendor Master" },
+    { "nodeId": "invoice-record", "artifactName": "invoice-record.json", "producedBy": "Create the Invoice Record" },
+    { "nodeId": "payment-run", "artifactName": "payment-run.md", "producedBy": "Assemble the Payment Run" }
+  ],
+  "validation": {
+    "type": "templateSlots",
+    "template": "# Remittance Advice - {{vendorName}}\n\nTo: {{remitTo}}\nVendor id: {{vendorId}}\n\nBeacon Manufacturing has paid the following:\n\nInvoice {{invoiceNumber}} - {{amountPaid}}\nPaid on {{paidDate}} via {{payMethod}} to the account on file.\n\nQuestions? Contact the Beacon accounts-payable desk.",
+    "slots": [
+      {
+        "id": "vendorName",
+        "label": "Vendor name",
+        "numeric": false,
+        "expected": "Northwind Fasteners",
+        "hint": "The legal name in the vendor master."
+      },
+      {
+        "id": "remitTo",
+        "label": "Remit-to address",
+        "numeric": false,
+        "accepted": ["4400 Commerce Way, Tacoma WA 98402", "4400 Commerce Way Tacoma WA 98402", "4400 Commerce Way"],
+        "hint": "The remit-to in the vendor master - read it here, never from the invoice."
+      },
+      {
+        "id": "vendorId",
+        "label": "Vendor id",
+        "numeric": false,
+        "expected": "V-1042",
+        "hint": "The vendor id in the vendor master."
+      },
+      {
+        "id": "invoiceNumber",
+        "label": "Invoice number",
+        "numeric": false,
+        "expected": "INV-58831",
+        "hint": "The invoiceNumber in the invoice record."
+      },
+      {
+        "id": "amountPaid",
+        "label": "Amount paid",
+        "numeric": true,
+        "expected": 1220,
+        "hint": "The run total from payment-run.md - do not recompute it."
+      },
+      {
+        "id": "paidDate",
+        "label": "Paid date",
+        "numeric": false,
+        "accepted": ["day-1", "today"],
+        "hint": "The run was delivered on day-1."
+      },
+      {
+        "id": "payMethod",
+        "label": "Payment method",
+        "numeric": false,
+        "accepted": ["ACH", "ACH transfer", "ach"],
+        "hint": "The account on file is an ACH account."
+      }
+    ]
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Assemble a vendor remittance advice by looking up values in stored artifacts: vendor name, id, and remit-to address from the vendor master; invoice number from the invoice record; amount paid from the payment run. Read the address from the master, not the invoice.",
+  "successMessage": "Remittance advice rendered. The vendor gets a clear note - and its address came from the governed master, not the document.",
+  "intro": {
+    "heading": "Before you close: tell the vendor",
+    "sections": [
+      {
+        "title": "The vendor's view",
+        "body": "The vendor never sees Beacon's internal records. The remittance advice is their receipt: which invoice was paid, how much, and by what method - a plain note assembled from trusted artifacts."
+      },
+      {
+        "title": "Address from the master",
+        "body": "The remit-to address is read from the governed vendor master, never from the incoming invoice. Even at the friendly last step, external documents do not set where Beacon sends things."
+      },
+      {
+        "title": "Amount from the run",
+        "body": "The amount paid is the payment run's total - looked up, not re-added. A remittance that disagreed with the actual run would confuse the vendor and break reconciliation."
+      },
+      {
+        "title": "Assembly, again",
+        "body": "Like the payment run, this is pure lookup. Every value on the note traces to an artifact you built, which is what lets the desk send it automatically and trust it."
+      }
+    ],
+    "jsonExample": "{\n  \"vendorName\": \"Northwind Fasteners\",\n  \"invoiceNumber\": \"INV-58831\",\n  \"amountPaid\": 1220\n}",
+    "skill": "Assembly from artifacts",
+    "artifactName": "remittance-advice.md"
+  },
+  "takeaway": {
+    "heading": "Remittance advice sent",
+    "points": [
+      "You assembled the vendor's remittance note entirely by looking up values in artifacts you built.",
+      "The remit-to address came from the governed vendor master, never the invoice - the fraud control holds to the last step.",
+      "The amount paid is the payment run's total, looked up rather than re-added, so the note and the run agree.",
+      "remittance-advice.md is stored as a rendered document the desk can send the vendor automatically.",
+      "The workflow can now notify the vendor of every payment with a fully traceable remittance advice."
+    ],
+    "artifactName": "remittance-advice.md"
+  }
+}

@@ -41,6 +41,24 @@ import lessonRiskEvaluationHard from './data/lessons/lesson-risk-evaluation-hard
 import lessonMorningBriefHard from './data/lessons/lesson-morning-brief-hard.json'
 import lessonDistributionArchiveHard from './data/lessons/lesson-distribution-archive-hard.json'
 import lessonApprovalDecisionHard from './data/lessons/lesson-approval-decision-hard.json'
+// Module 2 (Beacon Invoice Desk) - Easy tier
+import lessonInvoiceInbox from './data/lessons/lesson-invoice-inbox.json'
+import lessonVendorMaster from './data/lessons/lesson-vendor-master.json'
+import lessonPoRegister from './data/lessons/lesson-po-register.json'
+import lessonInvoiceRecord from './data/lessons/lesson-invoice-record.json'
+import lessonReceiptLog from './data/lessons/lesson-receipt-log.json'
+import lessonTolerancePolicy from './data/lessons/lesson-tolerance-policy.json'
+import lessonPaymentHistory from './data/lessons/lesson-payment-history.json'
+import lessonDuplicateCheck from './data/lessons/lesson-duplicate-check.json'
+import lessonThreeWayMatch from './data/lessons/lesson-three-way-match.json'
+import lessonMatchDecision from './data/lessons/lesson-match-decision.json'
+import lessonAutoApprovePath from './data/lessons/lesson-auto-approve-path.json'
+import lessonExceptionQueue from './data/lessons/lesson-exception-queue.json'
+import lessonPaymentBatch from './data/lessons/lesson-payment-batch.json'
+import lessonRunApproval from './data/lessons/lesson-run-approval.json'
+import lessonPaymentRun from './data/lessons/lesson-payment-run.json'
+import lessonRemittanceAdvice from './data/lessons/lesson-remittance-advice.json'
+import lessonPaymentArchive from './data/lessons/lesson-payment-archive.json'
 import ProjectCanvas from './components/ProjectCanvas'
 import LessonWorkspace from './components/LessonWorkspace'
 import ArtifactViewer from './components/ArtifactViewer'
@@ -107,6 +125,24 @@ const LESSONS = {
   'lesson-morning-brief-hard': lessonMorningBriefHard,
   'lesson-distribution-archive-hard': lessonDistributionArchiveHard,
   'lesson-approval-decision-hard': lessonApprovalDecisionHard,
+  // Module 2 (Beacon Invoice Desk) - Easy tier
+  'lesson-invoice-inbox': lessonInvoiceInbox,
+  'lesson-vendor-master': lessonVendorMaster,
+  'lesson-po-register': lessonPoRegister,
+  'lesson-invoice-record': lessonInvoiceRecord,
+  'lesson-receipt-log': lessonReceiptLog,
+  'lesson-tolerance-policy': lessonTolerancePolicy,
+  'lesson-payment-history': lessonPaymentHistory,
+  'lesson-duplicate-check': lessonDuplicateCheck,
+  'lesson-three-way-match': lessonThreeWayMatch,
+  'lesson-match-decision': lessonMatchDecision,
+  'lesson-auto-approve-path': lessonAutoApprovePath,
+  'lesson-exception-queue': lessonExceptionQueue,
+  'lesson-payment-batch': lessonPaymentBatch,
+  'lesson-run-approval': lessonRunApproval,
+  'lesson-payment-run': lessonPaymentRun,
+  'lesson-remittance-advice': lessonRemittanceAdvice,
+  'lesson-payment-archive': lessonPaymentArchive,
 }
 
 export default function App() {

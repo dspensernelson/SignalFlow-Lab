@@ -1,0 +1,141 @@
+{
+  "id": "lesson-payment-run",
+  "nodeId": "payment-run",
+  "title": "Assemble the Payment Run",
+  "difficulty": "Beginner",
+  "skill": "Assembly from artifacts",
+  "clock": "2:45 PM",
+  "scenario": "It is 2:45 PM. Fifteen minutes to the cutoff, and here is the payoff of the whole desk: every value the payment run needs already lives in an artifact you built. Fill each slot by LOOKING IT UP on the shelf - the batch, the vendor master, the approval. If you catch yourself recalculating a total, stop: the pipeline already did it.",
+  "inputType": "text",
+  "inputLabel": "Assembly Rule",
+  "input": "Assembly rule: every slot value must come from a stored artifact. The invoice count and run total are in payment-batch.json. The pay-to name, vendor id, and bank on file are in the vendor master. The approver and approval time are in run-approval.json. The run date is day-1; funds are delivered to the Payables DL at the 3:00 PM cutoff.",
+  "instructions": [
+    "Open each artifact on the shelf as you need it - do not work from memory.",
+    "Fill the header slots from the run approval (approver, time, cutoff).",
+    "Fill the batch slots from the payment batch (count, total).",
+    "Fill the pay-to slots from the vendor master (name, id, bank).",
+    "Validate to render payment-run.md."
+  ],
+  "interactionType": "templateSlots",
+  "starterAnswer": "{}",
+  "shelf": [
+    { "nodeId": "payment-batch", "artifactName": "payment-batch.json", "producedBy": "Assemble the Payment Batch" },
+    { "nodeId": "vendor-master", "artifactName": "vendor-master-record.json", "producedBy": "Govern the Vendor Master" },
+    { "nodeId": "run-approval", "artifactName": "run-approval.json", "producedBy": "Approve the Payment Run" },
+    { "nodeId": "invoice-record", "artifactName": "invoice-record.json", "producedBy": "Create the Invoice Record" }
+  ],
+  "validation": {
+    "type": "templateSlots",
+    "template": "# Beacon Payment Run - {{runDate}}\n\nApproved by {{approvedBy}} at {{approvedAt}} (cutoff {{cutoff}}).\n\n## Batch\nInvoices in run: {{invoiceCount}}\nRun total: {{runTotal}}\n\n## Pay To\n{{payToName}} ({{vendorId}})\nBank on file: {{bankOnFile}}\n\nDelivered to {{deliveredTo}} at the cutoff.",
+    "slots": [
+      {
+        "id": "runDate",
+        "label": "Run date",
+        "numeric": false,
+        "accepted": ["day-1", "today"],
+        "hint": "Today's run - day-1."
+      },
+      {
+        "id": "approvedBy",
+        "label": "Approved by",
+        "numeric": false,
+        "expected": "AP Manager",
+        "hint": "The approvedBy field in run-approval.json."
+      },
+      {
+        "id": "approvedAt",
+        "label": "Approved at",
+        "numeric": false,
+        "accepted": ["2:30 PM", "2:30", "2:30 p.m.", "14:30"],
+        "hint": "The approvedAt time in run-approval.json."
+      },
+      {
+        "id": "cutoff",
+        "label": "Cutoff",
+        "numeric": false,
+        "accepted": ["3:00 PM", "3:00", "3:00 p.m.", "15:00", "3 PM"],
+        "hint": "The payment cutoff - 3:00 PM."
+      },
+      {
+        "id": "invoiceCount",
+        "label": "Invoices in run",
+        "numeric": true,
+        "expected": 1,
+        "hint": "The invoiceCount in payment-batch.json."
+      },
+      {
+        "id": "runTotal",
+        "label": "Run total",
+        "numeric": true,
+        "expected": 1220,
+        "hint": "The batchTotal in payment-batch.json - do not recompute it."
+      },
+      {
+        "id": "payToName",
+        "label": "Pay to (name)",
+        "numeric": false,
+        "expected": "Northwind Fasteners",
+        "hint": "The legal name in the vendor master."
+      },
+      {
+        "id": "vendorId",
+        "label": "Vendor id",
+        "numeric": false,
+        "expected": "V-1042",
+        "hint": "The vendor id in the vendor master."
+      },
+      {
+        "id": "bankOnFile",
+        "label": "Bank on file",
+        "numeric": false,
+        "accepted": ["ACH ...4021", "ACH ...4021 (verified day-0)", "...4021", "ACH 4021"],
+        "hint": "The bank on file in the vendor master - read it, never from the invoice."
+      },
+      {
+        "id": "deliveredTo",
+        "label": "Delivered to",
+        "numeric": false,
+        "expected": "Payables DL",
+        "hint": "The run is delivered to the Payables DL."
+      }
+    ]
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Assemble a payment run by looking up values in stored artifacts: count and total from the payment batch, approver and time from the run approval, and pay-to name, vendor id, and bank from the vendor master. Do not recompute the total.",
+  "successMessage": "Payment run rendered. Every value traces to an artifact - the run assembled in minutes because the pipeline did the work.",
+  "intro": {
+    "heading": "Before delivery: lookup, not recompute",
+    "sections": [
+      {
+        "title": "The highest fan-in on the desk",
+        "body": "The payment run pulls from more artifacts than anything else - which is why it is nearly last. Assembly is cheap only because the batch, the vendor master, and the approval already exist as trusted objects."
+      },
+      {
+        "title": "Never recompute the total",
+        "body": "The run total is in the payment batch. If assembly re-added the invoices and rounded differently, the run and the batch would disagree - two sources of truth. Assembly reads; it does not derive."
+      },
+      {
+        "title": "Bank details come from the master",
+        "body": "The pay-to name and bank are read from the governed vendor master, never from the invoice. That single rule is the fraud control that stops payment redirection at the last step."
+      },
+      {
+        "title": "Traceability is the quality bar",
+        "body": "The run is release-ready when every value traces to an artifact: totals to the batch, approver to the approval, bank to the master. That property, not formatting, is what makes it trustworthy."
+      }
+    ],
+    "jsonExample": "{\n  \"invoiceCount\": 1,\n  \"runTotal\": 1220,\n  \"payToName\": \"Northwind Fasteners\"\n}",
+    "skill": "Assembly from artifacts",
+    "artifactName": "payment-run.md"
+  },
+  "takeaway": {
+    "heading": "Payment run assembled",
+    "points": [
+      "You produced the day's payment run without deriving a single value - every slot was a lookup into an artifact you built.",
+      "The run is fully traceable: totals to the batch, approver to the run approval, pay-to details to the vendor master.",
+      "The bank on file came from the governed master, never the invoice - the last-step fraud control.",
+      "payment-run.md is stored as a rendered document, delivered to the Payables DL at the cutoff.",
+      "The workflow can now assemble a release-ready payment run entirely from upstream artifacts."
+    ],
+    "artifactName": "payment-run.md"
+  }
+}

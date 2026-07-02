@@ -1,0 +1,125 @@
+{
+  "id": "lesson-payment-batch",
+  "nodeId": "payment-batch",
+  "title": "Assemble the Payment Batch",
+  "subtitle": "Gather the day's approved invoices against the cutoff",
+  "clock": "2:00 PM",
+  "difficulty": "Beginner",
+  "skill": "Batch assembly",
+  "scenario": "It is 2:00 PM. The cutoff is 3:00 PM. Approved invoices need to be gathered into one payment batch the AP Manager can approve in a single action. Today that is one clean invoice - INV-58831, auto-approved at $1,220 - with nothing held in exceptions. Build the batch record.",
+  "inputType": "text",
+  "input": "Approved for payment: INV-58831 (V-1042, 1220.00), auto-approved. Exception queue: 0 held. Batch date: day-1. Payment cutoff: 3:00 PM. A batch gathers the approved invoices, counts them, and totals them so the run can be approved and released in one step.",
+  "instructions": [
+    "Record the batch date and the payment cutoff.",
+    "Count the approved invoices in the batch and total their amounts.",
+    "Record how many invoices are held in exceptions (not in this batch).",
+    "Return one valid JSON object. Use numbers for the count and total."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"batchDate\": \"\",\n  \"cutoff\": \"\",\n  \"invoiceCount\": 0,\n  \"batchTotal\": 0,\n  \"heldCount\": 0\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": [
+      "batchDate",
+      "cutoff",
+      "invoiceCount",
+      "batchTotal",
+      "heldCount"
+    ],
+    "expected": {
+      "batchDate": "day-1",
+      "invoiceCount": 1,
+      "batchTotal": 1220,
+      "heldCount": 0
+    },
+    "acceptedValues": {
+      "cutoff": ["3:00 PM", "3:00pm", "3:00 p.m.", "15:00", "3 PM", "3pm"]
+    }
+  },
+  "copilotPrompt": "Produce a payment-batch JSON record: batchDate, cutoff, invoiceCount, batchTotal, and heldCount. Include only approved invoices; count and total them; record how many are held in exceptions.",
+  "successMessage": "Payment batch assembled. One approved invoice, $1,220.00 total, nothing held - ready for run approval.",
+  "validateLabel": "Assemble Batch",
+  "editorHelper": "Gather the approved invoices into one countable, totaled batch.",
+  "intro": {
+    "heading": "Before the run: gather what is approved",
+    "sections": [
+      {
+        "title": "One approval, many invoices",
+        "body": "A batch lets the AP Manager approve a whole day of payments in a single action instead of one by one. Today it holds one invoice, but the shape is the same at any volume."
+      },
+      {
+        "title": "Only what is approved",
+        "body": "The batch includes auto-approved invoices and any exceptions a human resolved. Anything still in the exception queue is held out - heldCount records that it was consciously excluded, not lost."
+      },
+      {
+        "title": "Count and total",
+        "body": "The invoice count and batch total are the control figures the run approval checks. They must recompute from the included invoices - one invoice at 1220.00 gives a count of 1 and a total of 1220."
+      },
+      {
+        "title": "The cutoff is real",
+        "body": "The batch is assembled against the 3:00 PM cutoff. Anything approved after the cutoff waits for tomorrow's batch - a deadline the whole desk works toward."
+      }
+    ],
+    "jsonExample": "{\n  \"invoiceCount\": 1,\n  \"batchTotal\": 1220,\n  \"heldCount\": 0\n}",
+    "skill": "Batch assembly",
+    "artifactName": "payment-batch.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "batchDate",
+      "meaning": "The day the batch is for.",
+      "type": "string",
+      "example": "\"day-1\"",
+      "group": "Header",
+      "lookFor": "which day?",
+      "hint": "Today's date - day-1."
+    },
+    {
+      "field": "cutoff",
+      "meaning": "The payment cutoff time the batch is assembled against.",
+      "type": "string",
+      "example": "\"3:00 PM\"",
+      "group": "Header",
+      "lookFor": "the deadline?",
+      "hint": "The 3:00 PM cutoff stated in the scenario."
+    },
+    {
+      "field": "invoiceCount",
+      "meaning": "How many approved invoices are in the batch.",
+      "type": "number",
+      "example": "1",
+      "group": "Control",
+      "lookFor": "how many invoices?",
+      "hint": "Only INV-58831 is approved today, so 1."
+    },
+    {
+      "field": "batchTotal",
+      "meaning": "The sum of the batch's invoice totals.",
+      "type": "number",
+      "example": "1220",
+      "group": "Control",
+      "lookFor": "the batch total?",
+      "hint": "One invoice at 1220.00 gives a total of 1220."
+    },
+    {
+      "field": "heldCount",
+      "meaning": "How many invoices are held in exceptions and excluded.",
+      "type": "number",
+      "example": "0",
+      "group": "Control",
+      "lookFor": "how many held?",
+      "hint": "The exception queue is empty today, so 0."
+    }
+  ],
+  "takeaway": {
+    "heading": "Payment batch assembled",
+    "points": [
+      "You gathered the day's approved invoices into one batch the AP Manager can approve in a single action.",
+      "The batch includes only approved invoices; heldCount records that nothing sat unresolved in exceptions.",
+      "The count (1) and total (1220) are control figures the run approval will re-check.",
+      "The batch is built against the real 3:00 PM cutoff, saved as payment-batch.json.",
+      "The workflow can now present a day of approved payments as one approvable, totaled batch."
+    ],
+    "artifactName": "payment-batch.json"
+  }
+}

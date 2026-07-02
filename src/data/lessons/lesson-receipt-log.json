@@ -1,0 +1,115 @@
+{
+  "id": "lesson-receipt-log",
+  "nodeId": "receipt-log",
+  "title": "Inspect the Receipt Log",
+  "difficulty": "Beginner",
+  "skill": "Evidence of delivery",
+  "clock": "10:20 AM",
+  "scenario": "It is 10:20 AM. The invoice says 500 bolts; the PO agreed to 500. But were they actually delivered? The Receipt Log is the Receiving Desk's record of what physically arrived. Inspect the receipt for PO-7742 - the third leg of the match - and learn why a payment needs proof of delivery, not just a bill.",
+  "inputType": "text",
+  "inputLabel": "Receipt Log - PO-7742",
+  "input": "Goods receipt against PO-7742 | Quantity received: 500 | Receipt date: day-1 | Status: accepted | Posted by: Receiving Desk. This confirms the goods on PO-7742 arrived and were accepted - the physical event behind the invoice.",
+  "instructions": [
+    "Read the Receipt Log as evidence the goods arrived, independent of the invoice.",
+    "Answer the four questions against the receipt and the workflow map.",
+    "Validate to mint the receipt source profile."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "What does the Receipt Log prove that the invoice cannot?",
+        "options": [
+          { "id": "a", "text": "The price Beacon agreed to pay" },
+          { "id": "b", "text": "That the goods physically arrived and were accepted" },
+          { "id": "c", "text": "The vendor's bank account" }
+        ],
+        "correctOptionId": "b",
+        "explain": "An invoice is a request for payment; a receipt is evidence of delivery. Paying without a receipt means paying for goods that may never have shown up."
+      },
+      {
+        "id": "q2",
+        "prompt": "Who posts the receipt?",
+        "options": [
+          { "id": "a", "text": "The Receiving Desk, when goods arrive" },
+          { "id": "b", "text": "The AP Clerk, from the invoice" },
+          { "id": "c", "text": "The vendor, in the portal" }
+        ],
+        "correctOptionId": "a",
+        "explain": "Separation of duties: the people who receive goods post the receipt, independent of the people who pay. That independence is what makes the receipt trustworthy evidence."
+      },
+      {
+        "id": "q3",
+        "prompt": "The receipt shows 500 received and the PO ordered 500. What does that satisfy?",
+        "options": [
+          { "id": "a", "text": "The price tolerance" },
+          { "id": "b", "text": "The quantity match (received equals ordered)" },
+          { "id": "c", "text": "The duplicate check" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The quantity leg of the three-way match asks: did we receive what we ordered? 500 received equals 500 ordered, so the quantity match passes cleanly."
+      },
+      {
+        "id": "q4",
+        "prompt": "Which step combines this receipt with the invoice and the PO?",
+        "options": [
+          { "id": "a", "text": "Remittance Advice" },
+          { "id": "b", "text": "Three-Way Match" },
+          { "id": "c", "text": "Payment Archive" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The three-way match reads all three legs - invoice, PO, and receipt - and only agrees when order, delivery, and bill line up. The receipt is the delivery leg."
+      }
+    ],
+    "artifactOnPass": {
+      "source": "receipt-log",
+      "poNumber": "PO-7742",
+      "quantityReceived": 500,
+      "status": "accepted",
+      "postedBy": "Receiving Desk",
+      "proves": "delivery",
+      "firstConsumer": "three-way-match"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Explain why a payables workflow needs a goods receipt: what it proves that an invoice cannot, who posts it and why that independence matters, and which step combines it with the invoice and PO.",
+  "successMessage": "Receipt inspected. You now hold proof the goods arrived - the third leg the match needs.",
+  "intro": {
+    "heading": "Before you match: prove delivery",
+    "sections": [
+      {
+        "title": "A bill is not a delivery",
+        "body": "The invoice asks to be paid; the receipt proves the goods actually arrived. The desk pays against evidence of delivery, not against a request alone."
+      },
+      {
+        "title": "Separation of duties",
+        "body": "The Receiving Desk posts receipts; the AP desk pays. Because different people record delivery and payment, neither can quietly fabricate the other - a core financial control."
+      },
+      {
+        "title": "The third leg of the match",
+        "body": "Order (PO), delivery (receipt), and bill (invoice) are three independent records. The three-way match only agrees when all three line up. This receipt is the delivery leg."
+      },
+      {
+        "title": "What you produce here",
+        "body": "Passing the inspection mints a receipt source profile: the quantity received, the accepted status, and who posted it - the evidence the match will read."
+      }
+    ],
+    "jsonExample": "{\n  \"source\": \"receipt-log\",\n  \"quantityReceived\": 500,\n  \"proves\": \"delivery\"\n}",
+    "skill": "Evidence of delivery",
+    "artifactName": "source-profile-receipt-log.json"
+  },
+  "takeaway": {
+    "heading": "Receipt inspected",
+    "points": [
+      "You answered the four questions: what the receipt proves, who posts it, the quantity match, and its first consumer.",
+      "A receipt is evidence of delivery - the desk pays against it, not against the invoice alone.",
+      "Separation of duties keeps receiving and paying independent, which is what makes the receipt trustworthy.",
+      "Your receipt source profile is stored - 500 received against 500 ordered, accepted, ready to match.",
+      "The workflow can now confirm the goods on every invoice were actually delivered."
+    ],
+    "artifactName": "source-profile-receipt-log.json"
+  }
+}
