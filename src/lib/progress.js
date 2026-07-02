@@ -95,6 +95,7 @@ export const BUILT_LESSON_IDS_BY_TIER = {
     'lesson-risk-evaluation-hard',
     'lesson-morning-brief-hard',
     'lesson-distribution-archive-hard',
+    'lesson-approval-decision-hard',
   ],
 }
 

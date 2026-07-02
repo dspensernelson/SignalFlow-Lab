@@ -43,6 +43,7 @@ import lessonApprovalRouteHard from './data/lessons/lesson-approval-route-hard.j
 import lessonRiskEvaluationHard from './data/lessons/lesson-risk-evaluation-hard.json'
 import lessonMorningBriefHard from './data/lessons/lesson-morning-brief-hard.json'
 import lessonDistributionArchiveHard from './data/lessons/lesson-distribution-archive-hard.json'
+import lessonApprovalDecisionHard from './data/lessons/lesson-approval-decision-hard.json'
 import ProjectCanvas from './components/ProjectCanvas'
 import LessonWorkspace from './components/LessonWorkspace'
 import ArtifactViewer from './components/ArtifactViewer'
@@ -107,6 +108,7 @@ const LESSONS = {
   'lesson-risk-evaluation-hard': lessonRiskEvaluationHard,
   'lesson-morning-brief-hard': lessonMorningBriefHard,
   'lesson-distribution-archive-hard': lessonDistributionArchiveHard,
+  'lesson-approval-decision-hard': lessonApprovalDecisionHard,
 }
 
 export default function App() {

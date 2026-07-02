@@ -188,5 +188,19 @@
   "lesson-distribution-archive-hard": {
     "correct": { "policyName": "Brief Retention Policy", "version": "1.0.0", "owner": "Risk Desk Lead", "approver": "Desk Head", "briefRetentionDays": 120, "incidentRetentionDays": 365, "rationale": "120 exceeds the 90-day floor; incidents at 365 outlive briefs for postmortems; both within the ceiling." },
     "wrong": { "policyName": "Brief Retention Policy", "version": "1.0.0", "owner": "Risk Desk Lead", "approver": "Desk Head", "briefRetentionDays": 365, "incidentRetentionDays": 120, "rationale": "" }
+  },
+  "lesson-approval-decision-hard": {
+    "correct": {
+      "market-intake-record": "{\"hub\":\"ERCOT\",\"peakPrice\":\"$187/MWh\",\"settledPrice\":\"$142/MWh\",\"generationFlag\":\"Wind underperformed\",\"approvalRequired\":true}",
+      "clean-price-data": "[{\"hub\":\"ERCOT\",\"peakPrice\":187,\"settledPrice\":142},{\"hub\":\"SPP\",\"peakPrice\":96,\"settledPrice\":88},{\"hub\":\"MISO\",\"peakPrice\":74,\"settledPrice\":70}]",
+      "variance-check": "[{\"hub\":\"ERCOT\",\"vsForecast\":17,\"vsPriorDay\":22,\"material\":true},{\"hub\":\"SPP\",\"vsForecast\":0,\"vsPriorDay\":4,\"material\":false},{\"hub\":\"MISO\",\"vsForecast\":-6,\"vsPriorDay\":-4,\"material\":false}]",
+      "risk-evaluation": "[{\"hub\":\"ERCOT\",\"pctMove\":13.3,\"status\":\"escalate\"},{\"hub\":\"SPP\",\"pctMove\":4.3,\"status\":\"normal\"},{\"hub\":\"MISO\",\"pctMove\":-5.1,\"status\":\"routine\"}]"
+    },
+    "wrong": {
+      "market-intake-record": "{\"hub\":\"ERCOT\",\"peakPrice\":\"$187/MWh\",\"settledPrice\":\"$142/MWh\",\"generationFlag\":\"Wind underperformed\",\"approvalRequired\":false}",
+      "clean-price-data": "[{\"hub\":\"ERCOT\",\"peakPrice\":187,\"settledPrice\":142},{\"hub\":\"SPP\",\"peakPrice\":96,\"settledPrice\":88},{\"hub\":\"MISO\",\"peakPrice\":74,\"settledPrice\":70}]",
+      "variance-check": "[{\"hub\":\"ERCOT\",\"vsForecast\":17,\"vsPriorDay\":22,\"material\":true},{\"hub\":\"SPP\",\"vsForecast\":0,\"vsPriorDay\":4,\"material\":false},{\"hub\":\"MISO\",\"vsForecast\":-6,\"vsPriorDay\":-4,\"material\":false}]",
+      "risk-evaluation": "[{\"hub\":\"ERCOT\",\"pctMove\":13.3,\"status\":\"escalate\"},{\"hub\":\"SPP\",\"pctMove\":4.3,\"status\":\"normal\"},{\"hub\":\"MISO\",\"pctMove\":-5.1,\"status\":\"routine\"}]"
+    }
   }
 }
