@@ -2,6 +2,38 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-02 (module-02 Beacon - Step 2 map gate)
+
+- Authored the Module 2 (Beacon Invoice Desk) workflow map per its ratified
+  charter and MODULE_AUTHORING_PLAYBOOK.md Step 2. Data lives in
+  src/data/projects/module-02/ (workflowNodes.json, workflowEdges.json,
+  phases.json, lessonMeta.json). `npm run lint:map` green (17 nodes, 21 edges,
+  0 errors/warnings); full `npm run check` green (no regression to module-01).
+- Phases (5, per charter spine): Capture -> Reference Data -> Matching ->
+  Exceptions and Approval -> Payment and Archive.
+- The fork: match-decision (the single decision node) routes within-tolerance
+  AND non-duplicate invoices to auto-approve-path, everything else to
+  exception-queue.
+- MAP DEVIATION (allowed at the gate; charter permits adding 1-2 nodes): added
+  a 17th node payment-history (type reference) between the archive and the
+  duplicate check. The charter's loop was payment-archive -> duplicate-check,
+  but duplicate-check is a process; the map lint (and the doctrine) require the
+  temporal loop to be archive -> reference/source. payment-history is the
+  paid-invoice baseline the duplicate check reads, exactly mirroring Meridian's
+  distribution-archive -> prior-day-reference -> variance-check. Loop is now
+  payment-archive (archive) -> payment-history (reference) -> duplicate-check.
+- Unlock tree (lessonMeta.LESSON_PREREQS): root invoice-inbox fans to
+  vendor-master + po-register + invoice-record; two entry branches (document
+  path, reference-data path) converge at three-way-match; all 17 task nodes
+  reachable and acyclic; LESSON_PATH is a valid topological order.
+- Lesson-type spread across the 17 nodes covers 7 of 8 types (inspection,
+  build, governance, transformation, decision, handoff, assembly; only
+  interpretation is unused) - meets the Step 3 >= 6 guardrail.
+- module-02 stays status "planned" in src/data/projects.json (disabled "Coming
+  soon" in the switcher) until its Easy tier is built; the lint scripts key off
+  the on-disk data dir, so the map is validated now. Canon (Step 4) and lessons
+  (Steps 5-6) come next.
+
 ## 2026-07-02 (multi-project engine - SPEC_MULTI_PROJECT.md)
 
 - Shipped the multi-project engine that unblocks Modules 2-10. A registry
