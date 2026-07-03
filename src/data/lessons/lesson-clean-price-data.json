@@ -35,7 +35,7 @@
     "sections": [
       {
         "title": "What normalization is",
-        "body": "Normalization means reshaping messy values into one consistent form. Here, every price becomes a plain number so any later step can compare or calculate without re-parsing text."
+        "body": "Normalization means reshaping messy values into one consistent form. Here, every price becomes a plain number so any later step can compare or calculate without re-parsing text. (Domain note: a hub is a regional power-trading point; $/MWh is the price of one megawatt-hour of electricity; the settled price is the final cleared price for the day.)"
       },
       {
         "title": "Type coercion",

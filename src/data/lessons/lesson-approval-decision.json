@@ -91,7 +91,7 @@
       "You encoded the fork as an explicit condition referencing the governed threshold, not a judgment call.",
       "You proved the boundary: exactly 12.0 escalates, because the rule says OR MORE.",
       "All three evaluations are logged, so 'why did day-3 skip approval?' has an on-the-record answer.",
-      "Today (day-1) routes to Approval Route - that handoff is your next lesson; day-3 shows why the quiet path also needs a log.",
+      "Today (day-1) routes to Approval Route - that handoff is the Approval Route task; day-3 shows why the quiet path also needs a log.",
       "The workflow can now route the morning brief through the correct approval path."
     ],
     "artifactName": "decision-log.json"

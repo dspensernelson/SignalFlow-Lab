@@ -13,7 +13,7 @@
     "Compute the price variance: invoice total minus PO total.",
     "Compute the variance percent: variance over PO total, times 100, rounded to 2 decimals.",
     "Compute the tolerance band: the larger of 2% of the PO (24.00) and 25.00.",
-    "Set qtyMatch (received equals ordered) and withinTolerance (variance within the band and within 2%).",
+    "Set qtyMatch (received equals ordered) and withinTolerance (variance within the band).",
     "Declare matchResult, and return one valid JSON object. Use numbers for the amounts."
   ],
   "interactionType": "jsonEditor",
@@ -60,7 +60,7 @@
       },
       {
         "title": "Compare to the written band",
-        "body": "The Tolerance Policy allows the larger of 2% of the PO (24.00) or 25.00, so the band is 25.00. A 20.00 variance sits inside it, and 1.67% is inside 2% - the price leg passes."
+        "body": "The Tolerance Policy allows the larger of 2% of the PO (24.00) or 25.00, so the band is 25.00. Under larger-of, that single band is the whole test: a 20.00 variance sits inside 25.00, so the price leg passes."
       },
       {
         "title": "Quantity is exact",
@@ -128,12 +128,12 @@
     },
     {
       "field": "withinTolerance",
-      "meaning": "Whether the price variance is inside the band and inside 2%.",
+      "meaning": "Whether the price variance is inside the tolerance band.",
       "type": "boolean",
       "example": "true",
       "group": "Result",
       "lookFor": "price acceptable?",
-      "hint": "20 is within 25 and 1.67% is within 2%, so true."
+      "hint": "20 is within the 25.00 band, so true."
     },
     {
       "field": "matchResult",

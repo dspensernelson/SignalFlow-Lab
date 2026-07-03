@@ -1,14 +1,16 @@
 # Verification Playbook
 
 How to PROVE a change works, beyond `npm run check`. The check pipeline
-(eslint + lesson lint + lesson tests + build) catches data and logic drift;
-this playbook covers what only a live browser can prove: layout, the
-no-scroll rule, gating behavior, and end-to-end lesson flow. Keep ASCII-only.
+(eslint + lint:map + lesson lint + lesson tests + build) catches data and
+logic drift; this playbook covers what only a live browser can prove: layout,
+the no-scroll rule, gating behavior, and end-to-end lesson flow. Keep
+ASCII-only. (lint:map was added after this playbook first shipped; the
+check script is the source of truth for the exact step list.)
 
 ## The pipeline first
 
 ```powershell
-npm run check   # eslint + lint:lessons + test:lessons + build - all green
+npm run check   # eslint + lint:map + lint:lessons + test:lessons + build - all green
 ```
 
 Run it before every commit. A lesson without a fixture in
@@ -30,6 +32,12 @@ Reset to a clean learner state (browser console):
 localStorage.setItem('signalflow_tier','easy'); // or medium / hard
 location.reload();
 ```
+
+Those keys are module-01's legacy un-namespaced keys. Every other project
+(e.g. module-02) namespaces its keys with a `__<projectId>` suffix, so a full
+reset for that project targets `signalflow_progress__module-02` and friends;
+its data lives under src/data/projects/<projectId>/ (each project has its own
+Invoice Inbox / intake root node).
 
 ## The no-scroll check (NON-NEGOTIABLE, per changed exercise surface)
 

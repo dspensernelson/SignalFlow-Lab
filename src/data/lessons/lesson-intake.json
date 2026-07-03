@@ -89,7 +89,7 @@
     "sections": [
       {
         "title": "What this record does",
-        "body": "The Market Intake Record turns overnight analyst notes into the first structured object the workflow can trust."
+        "body": "The Market Intake Record turns overnight analyst notes into the first structured object the workflow can trust. (Domain note: a hub is a regional power-trading point; $/MWh is the price of one megawatt-hour of electricity; the settled price is the final cleared price for the day.)"
       },
       {
         "title": "Why the note is not enough",

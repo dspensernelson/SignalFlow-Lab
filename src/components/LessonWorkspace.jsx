@@ -12,7 +12,7 @@ const STEPS = [
   { id: 'takeaway', label: 'Takeaway' },
 ]
 
-export default function LessonWorkspace({ lesson, onPass, onReturnToCanvas }) {
+export default function LessonWorkspace({ lesson, tier, onPass, onReturnToCanvas }) {
   const [step, setStep] = useState('intro')
   const [answer, setAnswer] = useState(lesson.starterAnswer)
   const [results, setResults] = useState([])
@@ -52,7 +52,7 @@ export default function LessonWorkspace({ lesson, onPass, onReturnToCanvas }) {
           </div>
           {lesson.subtitle && <p className="text-sm text-sf-body">{lesson.subtitle}</p>}
           <p className="text-xs text-sf-subtle">
-            {lesson.difficulty} &middot; {lesson.skill}
+            {tier ? `${tier.charAt(0).toUpperCase()}${tier.slice(1)} tier` : lesson.difficulty} &middot; {lesson.skill}
           </p>
         </div>
 

@@ -324,6 +324,7 @@ export default function App() {
     return (
       <LessonWorkspace
         lesson={lesson}
+        tier={tier}
         onPass={handlePass}
         onReturnToCanvas={returnToCanvas}
       />

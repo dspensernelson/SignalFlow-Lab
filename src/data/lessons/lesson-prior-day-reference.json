@@ -93,7 +93,7 @@
       },
       {
         "title": "Baseline vs template (coming later)",
-        "body": "Two things carry over from yesterday: this baseline (DATA - the numbers) and the brief template (STRUCTURE - the sections). Lesson 15 covers the other one; keeping them distinct matters."
+        "body": "Two things carry over from yesterday: this baseline (DATA - the numbers) and the brief template (STRUCTURE - the sections). The Prior Day Brief Template task covers the other one; keeping them distinct matters."
       }
     ],
     "jsonExample": "{\n  \"kind\": \"baseline\",\n  \"originatesFrom\": \"distribution-archive\",\n  \"firstConsumer\": \"variance-check\"\n}",

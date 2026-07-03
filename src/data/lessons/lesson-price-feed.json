@@ -93,7 +93,7 @@
         "body": "This feed drops nightly before 6:15 AM. Schedules matter because everything downstream inherits them: a late feed is a late brief."
       },
       {
-        "title": "Same rows, next lesson",
+        "title": "Same rows, the Clean Price Data step",
         "body": "These are the exact rows the Clean Price Data step normalizes. Inspection and transformation are two different skills applied to one input - first understand it, then fix it."
       }
     ],
