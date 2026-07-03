@@ -341,13 +341,18 @@ CURRICULUM_MASTER_PLAN.md.
    data on disk (canon at curriculum/<id>/canon.json). Verified live at
    1280x800: legacy keys survive switch-away-and-back, switcher shows
    module-01 complete + disabled planned modules, per-project tier
-   independence, no-scroll wrong-answer state intact, console clean. NEXT:
-   Module 2 (Beacon Invoice Desk), built STRICTLY via
-   MODULE_AUTHORING_PLAYBOOK.md. STATUS (2026-07-02): Module 2 Easy tier (17
-   lessons) and Medium tier (17 lessons) are DONE and pushed to the
-   module-02-beacon branch; the Hard tier is the current frontier.
-4. Housekeeping: bundle >500 kB (dynamic import per tier when it matters);
-   rich-intro migration for the 40 lessons still on the simple dialect.
+   independence, no-scroll wrong-answer state intact, console clean. STATUS
+   (2026-07-03): Module 2 (Beacon Invoice Desk) is COMPLETE across all three
+   tiers (Easy 17, Medium 17, Hard 5 curated design drills) on the
+   module-02-beacon branch; the jsonEditor Exercise workbench got a structural
+   no-scroll fix (columns bounded to the viewport, only the source narrative
+   scrolls internally) so long-evidence design drills fit at 1280x800. NEXT:
+   Module 3 (Harbor Onboarding), built STRICTLY via
+   MODULE_AUTHORING_PLAYBOOK.md; its FIRST task is F7 per-project
+   code-splitting (React.lazy) before authoring, since the bundle is ~787 kB.
+4. Housekeeping: bundle >500 kB (dynamic import per tier/project - do it at the
+   start of Module 3); rich-intro migration for the lessons still on the simple
+   dialect.
 
 DONE (Phase 0, 2026-07-02): unlock TREE (one intro fans the board open;
 LESSON_PREREQS), regression harness (`npm run test:lessons`, 41/41), lesson
