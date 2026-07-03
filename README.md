@@ -4,9 +4,21 @@ SignalFlow Lab is a local React learning app for practicing workplace automation
 
 The first project is **Meridian Morning Market Brief**, a fictional energy-market workflow that turns messy overnight market inputs into an approval-ready 7:00 AM brief.
 
-## Current Status (2026-07-02, module-01-tiers - MODULE 1 COMPLETE + MULTI-PROJECT ENGINE)
+## Current Status (2026-07-03, module-02-beacon - MODULE 2 COMPLETE, all three tiers)
 
 Where things stand if you are picking this back up:
+
+- **Module 2 (Beacon Invoice Desk) is COMPLETE across all three tiers** (Easy
+  17/17, Medium 17/17, Hard 5/5). Easy operates the AP pipeline on a clean
+  invoice; Medium handles the mess (duplicate, out-of-tolerance price, unknown
+  vendor, missing receipt); Hard is 5 curated design drills - author the
+  tolerance band from 90 days of history, design the duplicate-detection rule,
+  run a bank-detail change as a BEC fraud control, work the tolerance boundary,
+  and ship a degraded pay-nothing run when the PO register is down. No new
+  interaction types were needed. The jsonEditor Exercise workbench got a
+  structural no-scroll fix (columns bounded to the viewport; only the source
+  narrative scrolls internally) so long-evidence design drills fit at 1280x800.
+  Canon/overviews: `curriculum/module-02/{easy,medium,hard}/_OVERVIEW.md`.
 
 - **The app is multi-project** (SPEC_MULTI_PROJECT.md). A registry
   (`src/data/projects.json`, order = build order) drives a header project
@@ -55,7 +67,8 @@ Where things stand if you are picking this back up:
   `AUTONOMY_CHARTER.md` carries the owner's standing approvals across every
   decision gate. A builder starts at `BUILDER_KICKOFF.md` and works the
   fixed queue: Module 1 capstone (DONE) -> Module 1 wrap (DONE) ->
-  multi-project engine (DONE) -> modules 2-10 in order -> stop. Parked questions go
+  multi-project engine (DONE) -> Module 2 (DONE, all tiers) -> modules 3-10 in
+  order -> stop. Parked questions go
   to `OPEN_QUESTIONS.md`; CI runs `npm run check` on every push.
 
 ## Current Product Model
