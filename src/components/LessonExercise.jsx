@@ -250,15 +250,15 @@ export default function LessonExercise({
   return (
     <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-12">
       {/* Left: source + three-state fields-to-capture checklist */}
-      <div className="flex flex-col gap-3 lg:col-span-5">
-        <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
+      <div className="flex flex-col gap-3 lg:col-span-5 lg:max-h-[calc(100vh-13rem)] lg:min-h-0 lg:overflow-hidden">
+        <div className="flex flex-col rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm lg:min-h-0">
           <h3 className="text-sm font-semibold uppercase tracking-sf-wide text-sf-subtle">
             {came ? 'What came in' : lesson.inputLabel || 'Source Note'}
           </h3>
           {came?.noteTitle && (
             <p className="mt-2 text-xs font-semibold text-sf-body">{came.noteTitle}</p>
           )}
-          <pre className="mt-1 whitespace-pre-wrap rounded-md bg-sf-surface-subtle p-3 text-sm text-sf-body">
+          <pre className="mt-1 whitespace-pre-wrap rounded-md bg-sf-surface-subtle p-3 text-sm text-sf-body lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
             {lesson.input}
           </pre>
           {came?.flagCue && (
@@ -271,7 +271,7 @@ export default function LessonExercise({
           )}
         </div>
 
-        <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
+        <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm lg:flex-none">
           <h3 className="text-sm font-semibold uppercase tracking-sf-wide text-sf-subtle">
             Fields to capture
           </h3>
@@ -322,7 +322,7 @@ export default function LessonExercise({
       </div>
 
       {/* Right: workspace + readiness + optional helper */}
-      <div className="flex flex-col gap-3 lg:col-span-7">
+      <div className="flex flex-col gap-3 lg:col-span-7 lg:max-h-[calc(100vh-13rem)] lg:min-h-0 lg:overflow-y-auto">
         <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
           <label htmlFor="answer-editor" className="font-mono text-sm font-semibold text-sf-body">
             {editorLabel}

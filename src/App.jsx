@@ -77,6 +77,12 @@ import lessonRunApprovalMedium from './data/lessons/lesson-run-approval-medium.j
 import lessonPaymentRunMedium from './data/lessons/lesson-payment-run-medium.json'
 import lessonRemittanceAdviceMedium from './data/lessons/lesson-remittance-advice-medium.json'
 import lessonPaymentArchiveMedium from './data/lessons/lesson-payment-archive-medium.json'
+// Module 2 (Beacon Invoice Desk) - Hard tier
+import lessonTolerancePolicyHard from './data/lessons/lesson-tolerance-policy-hard.json'
+import lessonDuplicateCheckHard from './data/lessons/lesson-duplicate-check-hard.json'
+import lessonVendorMasterHard from './data/lessons/lesson-vendor-master-hard.json'
+import lessonThreeWayMatchHard from './data/lessons/lesson-three-way-match-hard.json'
+import lessonPaymentRunHard from './data/lessons/lesson-payment-run-hard.json'
 import ProjectCanvas from './components/ProjectCanvas'
 import LessonWorkspace from './components/LessonWorkspace'
 import ArtifactViewer from './components/ArtifactViewer'
@@ -179,6 +185,12 @@ const LESSONS = {
   'lesson-payment-run-medium': lessonPaymentRunMedium,
   'lesson-remittance-advice-medium': lessonRemittanceAdviceMedium,
   'lesson-payment-archive-medium': lessonPaymentArchiveMedium,
+  // Module 2 (Beacon Invoice Desk) - Hard tier
+  'lesson-tolerance-policy-hard': lessonTolerancePolicyHard,
+  'lesson-duplicate-check-hard': lessonDuplicateCheckHard,
+  'lesson-vendor-master-hard': lessonVendorMasterHard,
+  'lesson-three-way-match-hard': lessonThreeWayMatchHard,
+  'lesson-payment-run-hard': lessonPaymentRunHard,
 }
 
 export default function App() {

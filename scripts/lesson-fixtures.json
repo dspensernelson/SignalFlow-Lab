@@ -308,5 +308,35 @@
   "lesson-remittance-advice-medium": {
     "correct": { "vendorName": "Northwind Fasteners", "remitTo": "4400 Commerce Way, Tacoma WA 98402", "vendorId": "V-1042", "invoiceNumber": "INV-59001", "amountPaid": "1200", "paidDate": "day-1", "payMethod": "ACH" },
     "wrong": { "vendorName": "Northwind Fasteners", "remitTo": "4400 Commerce Way, Tacoma WA 98402", "vendorId": "V-1042", "invoiceNumber": "INV-59001", "amountPaid": "1220", "paidDate": "day-1", "payMethod": "ACH" }
+  },
+  "lesson-tolerance-policy-hard": {
+    "correct": { "policyName": "Beacon Price Tolerance Policy", "version": "2.0.0", "owner": "AP Manager", "approver": "Controller", "priceTolerancePct": 2, "priceToleranceAbs": 25, "toleranceBasis": "larger", "qtyTolerance": 0, "rationale": "84 of 90 benign variances fell under both 25 and 2%; all 6 overcharges exceeded both. Larger-of lets the 25 floor pass small-PO drift and the 2% leg catch large-PO overcharges." },
+    "wrong": { "policyName": "Beacon Price Tolerance Policy", "version": "2.0.0", "owner": "AP Manager", "approver": "Controller", "priceTolerancePct": 2, "priceToleranceAbs": 25, "toleranceBasis": "larger", "qtyTolerance": "0", "rationale": "" }
+  },
+  "lesson-duplicate-check-hard": {
+    "correct": { "ruleName": "Beacon Duplicate Detection Rule", "version": "1.0.0", "owner": "AP Manager", "approver": "Controller", "identityKey": "vendorId + invoiceNumber + invoiceTotal", "lookbackDays": 90, "exactMatchAction": "auto-reject as duplicate", "partialMatchAction": "route to human review", "rationale": "Exact key hit is a certain duplicate and auto-rejects; the resend under a new number shares vendor and total so a partial match routes to a human, as do the split shipment and altered total. 90 days covers the longest billing cycle." },
+    "wrong": { "ruleName": "Beacon Duplicate Detection Rule", "version": "1.0.0", "owner": "AP Manager", "approver": "Controller", "identityKey": "vendorId + invoiceNumber + invoiceTotal", "lookbackDays": "90", "exactMatchAction": "auto-reject as duplicate", "partialMatchAction": "route to human review", "rationale": "" }
+  },
+  "lesson-vendor-master-hard": {
+    "correct": { "changeType": "bank-detail", "vendorId": "V-1042", "requestChannel": "email", "verificationMethod": "callback", "verificationContact": "number on file", "secondApprover": "AP Manager", "paymentsHeld": "true", "status": "pending-verification" },
+    "wrong": { "changeType": "bank-detail", "vendorId": "V-1042", "requestChannel": "email", "verificationMethod": "reply to email", "verificationContact": "number in the request email", "secondApprover": "AP Clerk", "paymentsHeld": "no", "status": "applied" }
+  },
+  "lesson-three-way-match-hard": {
+    "correct": [
+      { "invoiceNumber": "INV-59101", "poTotal": 1200, "invoiceTotal": 1224.5, "variance": 24.5, "variancePct": 2.04, "toleranceBand": 25, "withinTolerance": true },
+      { "invoiceNumber": "INV-59102", "poTotal": 1200, "invoiceTotal": 1225, "variance": 25, "variancePct": 2.08, "toleranceBand": 25, "withinTolerance": true },
+      { "invoiceNumber": "INV-59103", "poTotal": 1200, "invoiceTotal": 1225.5, "variance": 25.5, "variancePct": 2.13, "toleranceBand": 25, "withinTolerance": false },
+      { "invoiceNumber": "INV-59104", "poTotal": 2000, "invoiceTotal": 2045, "variance": 45, "variancePct": 2.25, "toleranceBand": 40, "withinTolerance": false }
+    ],
+    "wrong": [
+      { "invoiceNumber": "INV-59101", "poTotal": 1200, "invoiceTotal": 1224.5, "variance": 24.5, "variancePct": 2.04, "toleranceBand": 25, "withinTolerance": false },
+      { "invoiceNumber": "INV-59102", "poTotal": 1200, "invoiceTotal": 1225, "variance": 25, "variancePct": 2.08, "toleranceBand": 25, "withinTolerance": true },
+      { "invoiceNumber": "INV-59103", "poTotal": 1200, "invoiceTotal": 1225.5, "variance": 25.5, "variancePct": 2.13, "toleranceBand": 25, "withinTolerance": false },
+      { "invoiceNumber": "INV-59104", "poTotal": 2000, "invoiceTotal": 2045, "variance": 45, "variancePct": 2.25, "toleranceBand": 40, "withinTolerance": false }
+    ]
+  },
+  "lesson-payment-run-hard": {
+    "correct": { "cutoff": "3:00 PM", "paidCount": "0", "heldCount": "6", "outageAt": "1:45 PM", "detectedAt": "1:50 PM", "ticketId": "INC-4471", "runMode": "degraded", "approvedBy": "AP Manager", "approvedAt": "2:30 PM" },
+    "wrong": { "cutoff": "3:00 PM", "paidCount": "6", "heldCount": "0", "outageAt": "1:45 PM", "detectedAt": "1:50 PM", "ticketId": "INC-4471", "runMode": "normal", "approvedBy": "AP Manager", "approvedAt": "2:30 PM" }
   }
 }

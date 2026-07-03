@@ -8,7 +8,15 @@
     { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59002].variancePct", "op": "pctMove", "a": 1230, "b": 1140, "round": 2 },
     { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59005].variance", "op": "delta", "a": 1000, "b": 992 },
     { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59005].variancePct", "op": "pctMove", "a": 1000, "b": 992, "round": 2 },
-    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59001].variance", "op": "delta", "a": 1200, "b": 1200 }
+    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59001].variance", "op": "delta", "a": 1200, "b": 1200 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59101].variance", "op": "delta", "a": 1224.5, "b": 1200 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59101].variancePct", "op": "pctMove", "a": 1224.5, "b": 1200, "round": 2 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59102].variance", "op": "delta", "a": 1225, "b": 1200 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59102].variancePct", "op": "pctMove", "a": 1225, "b": 1200, "round": 2 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59103].variance", "op": "delta", "a": 1225.5, "b": 1200 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59103].variancePct", "op": "pctMove", "a": 1225.5, "b": 1200, "round": 2 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59104].variance", "op": "delta", "a": 2045, "b": 2000 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59104].variancePct", "op": "pctMove", "a": 2045, "b": 2000, "round": 2 }
   ],
   "assertions": [
     { "lesson": "lesson-invoice-record", "path": "validation.expected.invoiceTotal", "op": "equals", "value": 1220 },
@@ -38,6 +46,18 @@
     { "lesson": "lesson-match-decision-medium", "path": "validation.expectedRows[invoiceNumber=INV-59005].reason", "op": "equals", "value": "missing receipt" },
     { "lesson": "lesson-payment-batch-medium", "path": "validation.expected.batchTotal", "op": "equals", "value": 1200 },
     { "lesson": "lesson-payment-batch-medium", "path": "validation.expected.heldCount", "op": "equals", "value": 4 },
-    { "lesson": "lesson-payment-batch-medium", "path": "validation.expected.invoiceCount", "op": "equals", "value": 1 }
+    { "lesson": "lesson-payment-batch-medium", "path": "validation.expected.invoiceCount", "op": "equals", "value": 1 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59101].poTotal", "op": "equals", "value": 1200 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59101].invoiceTotal", "op": "equals", "value": 1224.5 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59101].toleranceBand", "op": "equals", "value": 25 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59101].withinTolerance", "op": "equals", "value": true },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59102].invoiceTotal", "op": "equals", "value": 1225 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59102].withinTolerance", "op": "equals", "value": true },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59103].invoiceTotal", "op": "equals", "value": 1225.5 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59103].withinTolerance", "op": "equals", "value": false },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59104].poTotal", "op": "equals", "value": 2000 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59104].invoiceTotal", "op": "equals", "value": 2045 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59104].toleranceBand", "op": "equals", "value": 40 },
+    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59104].withinTolerance", "op": "equals", "value": false }
   ]
 }
