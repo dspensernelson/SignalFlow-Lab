@@ -141,7 +141,13 @@ export const BUILT_LESSONS = {
       'lesson-remittance-advice-medium',
       'lesson-payment-archive-medium',
     ],
-    hard: [],
+    hard: [
+      'lesson-tolerance-policy-hard',
+      'lesson-duplicate-check-hard',
+      'lesson-vendor-master-hard',
+      'lesson-three-way-match-hard',
+      'lesson-payment-run-hard',
+    ],
   },
 }
 

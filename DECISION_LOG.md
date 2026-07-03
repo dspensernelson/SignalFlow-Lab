@@ -2,6 +2,43 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-03 (module-02 Beacon - Step 7 Hard tier built)
+
+- Built the Module 2 (Beacon Invoice Desk) HARD tier: 5 design drills that move
+  the learner from applying rules to authoring them.
+  - tolerance-policy-hard (jsonPolicy): design the price-tolerance band from 90
+    days of variance history (84 benign under both legs, 6 overcharges over
+    both); larger-of rule, v2.0.0, rationale must cite the data.
+  - duplicate-check-hard (jsonPolicy): design the duplicate-detection rule from
+    4 near-miss cases (true dup / resend-new-number / split-shipment / altered
+    total); identity key + lookback + exact-vs-partial actions.
+  - vendor-master-hard (jsonFields): change a vendor's bank details safely - a
+    BEC fraud drill (verify by callback on the on-file number, dual approval,
+    hold payments, status pending-verification).
+  - three-way-match-hard (jsonDeltas): a 4-row tolerance-boundary battery that
+    exercises the $25 floor vs 2% leg at and just past the inclusive edge.
+  - payment-run-hard (templateSlots): ship a degraded pay-nothing run when the
+    PO register is down (incident section, AP Manager sign-off).
+- DECISION - no-scroll fix is STRUCTURAL, not content-gutting. Hard design
+  drills legitimately need a long evidence narrative AND an 8-9 field guide, so
+  the Exercise left column overflowed the page (measured left column 729px vs a
+  ~643px grid budget; the source narrative alone was 364px). Rather than delete
+  the evidence, the shared jsonEditor workbench (LessonExercise.jsx) now bounds
+  each Exercise column to the viewport and lets ONLY the raw source narrative
+  scroll internally; the live field-guide checklist, the editor, and the
+  readiness callout stay fixed and fully visible. The change is additive
+  (height caps on the lg breakpoint only), so short Module 1 lessons are
+  unchanged and the previously borderline Module 1 threshold-policy-hard (484px
+  source) is now robustly no-scroll too.
+- VERIFIED live @1280x800 in the wrong-answer (tallest) state:
+  document.documentElement.scrollHeight === clientHeight === 800 for all five
+  new Hard lessons and for Module 1 threshold-policy-hard (regression check).
+- Canon: added the three-way-match-hard boundary rows (variance deltas +
+  variancePct pctMove round-2) as derivations/assertions. `npm run check` green
+  (81 lessons linted, 98 canon assertions, 31 derivations, 81 fixtures ok,
+  build clean). F7 per-project code-splitting still deferred to the Module 3
+  block (bundle ~787 kB).
+
 ## 2026-07-02 (PM audit AUDIT_REPORT_2026-07-02.md - findings worked)
 
 - Acted on the 2026-07-02 PM audit (verdict: shippable, no blockers). Copy and

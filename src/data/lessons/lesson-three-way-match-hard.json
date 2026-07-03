@@ -1,0 +1,81 @@
+{
+  "id": "lesson-three-way-match-hard",
+  "nodeId": "three-way-match",
+  "title": "Work the Tolerance Boundary",
+  "difficulty": "Hard",
+  "skill": "Reasoning at the edge of a rule",
+  "clock": "11:20 AM",
+  "scenario": "Clean invoices are easy. Today's four all land within a dollar or two of the band, where the larger-of rule earns its keep. One is rescued by the dollar floor even though it breaks the 2% leg; one sits exactly on the line; one is a hair over; and one on a big PO fails because the percentage leg, not the dollar floor, is now the larger number. Compute each and let the boundary decide.",
+  "inputType": "text",
+  "inputLabel": "Four boundary invoices",
+  "input": "Tolerance band per invoice = the LARGER of 2% of the PO or 25.00; the boundary is inclusive (a variance equal to the band passes).\n- INV-59101: invoice 1224.50 vs PO 1200.00. (2% of 1200 = 24.00, so the band is the larger of 24.00 and 25.00.)\n- INV-59102: invoice 1225.00 vs PO 1200.00.\n- INV-59103: invoice 1225.50 vs PO 1200.00.\n- INV-59104: invoice 2045.00 vs PO 2000.00. (2% of 2000 = 40.00, so the band is the larger of 40.00 and 25.00.)",
+  "instructions": [
+    "For each invoice compute variance = invoice total - PO total.",
+    "Compute variancePct = variance / PO total * 100, rounded to 2 decimals.",
+    "Set toleranceBand = the larger of 2% of the PO and 25.00 (25 for the 1200 POs, 40 for the 2000 PO).",
+    "Set withinTolerance true when variance is at or below the band - note INV-59101 passes on the 25 floor even though its percent is over 2%.",
+    "Return a JSON array of the four rows with numbers as numbers, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"invoiceNumber\": \"INV-59101\", \"poTotal\": 1200, \"invoiceTotal\": 1224.5, \"variance\": 0, \"variancePct\": 0, \"toleranceBand\": 0, \"withinTolerance\": false },\n  { \"invoiceNumber\": \"INV-59102\", \"poTotal\": 1200, \"invoiceTotal\": 1225, \"variance\": 0, \"variancePct\": 0, \"toleranceBand\": 0, \"withinTolerance\": false },\n  { \"invoiceNumber\": \"INV-59103\", \"poTotal\": 1200, \"invoiceTotal\": 1225.5, \"variance\": 0, \"variancePct\": 0, \"toleranceBand\": 0, \"withinTolerance\": false },\n  { \"invoiceNumber\": \"INV-59104\", \"poTotal\": 2000, \"invoiceTotal\": 2045, \"variance\": 0, \"variancePct\": 0, \"toleranceBand\": 0, \"withinTolerance\": false }\n]",
+  "validation": {
+    "type": "jsonDeltas",
+    "keyField": "invoiceNumber",
+    "requiredFields": ["invoiceNumber", "poTotal", "invoiceTotal", "variance", "variancePct", "toleranceBand", "withinTolerance"],
+    "numericFields": ["poTotal", "invoiceTotal", "variance", "variancePct", "toleranceBand"],
+    "expectedRows": [
+      { "invoiceNumber": "INV-59101", "poTotal": 1200, "invoiceTotal": 1224.5, "variance": 24.5, "variancePct": 2.04, "toleranceBand": 25, "withinTolerance": true },
+      { "invoiceNumber": "INV-59102", "poTotal": 1200, "invoiceTotal": 1225, "variance": 25, "variancePct": 2.08, "toleranceBand": 25, "withinTolerance": true },
+      { "invoiceNumber": "INV-59103", "poTotal": 1200, "invoiceTotal": 1225.5, "variance": 25.5, "variancePct": 2.13, "toleranceBand": 25, "withinTolerance": false },
+      { "invoiceNumber": "INV-59104", "poTotal": 2000, "invoiceTotal": 2045, "variance": 45, "variancePct": 2.25, "toleranceBand": 40, "withinTolerance": false }
+    ]
+  },
+  "copilotPrompt": "For four boundary invoices compute variance (invoice - PO), variancePct (variance / PO * 100 to 2 decimals), toleranceBand (larger of 2% of PO or 25), and withinTolerance (variance at or below the band, inclusive). Note INV-59101 passes on the 25 dollar floor despite being over 2%, and INV-59104 fails because on a 2000 PO the 2% leg (40) is the larger band. Return a JSON array with numbers.",
+  "successMessage": "Boundary worked. INV-59101 rides the dollar floor, INV-59102 sits exactly on the line and passes, INV-59103 is a hair over, and INV-59104 fails on the percentage leg the larger PO exposes.",
+  "validateLabel": "Run Match",
+  "editorHelper": "One row per boundary invoice - the larger-of rule decides.",
+  "intro": {
+    "heading": "Before you compute: the boundary is where the rule is real",
+    "sections": [
+      {
+        "title": "Larger-of has two legs, and either can win",
+        "body": "On a 1200 PO, 2% is 24.00, so the 25.00 dollar floor is larger and becomes the band. On a 2000 PO, 2% is 40.00, so the percentage is larger and becomes the band. The same rule produces a different band per invoice - you must compute which leg wins before you judge the variance."
+      },
+      {
+        "title": "The dollar floor can rescue an over-2% variance",
+        "body": "INV-59101's variance is 24.50 - that is 2.04% of the PO, over the 2% leg. A percentage-only rule would reject it. But larger-of picks the 25.00 floor, and 24.50 is under 25.00, so it passes. This is exactly why the floor exists: to spare small benign gaps the percentage would wrongly catch."
+      },
+      {
+        "title": "Inclusive means the line itself passes",
+        "body": "INV-59102's variance is exactly 25.00, equal to the band. The policy boundary is inclusive, so it passes - equal to the band is within the band. A rule that rejected the exact line would be arbitrary; being explicit about inclusive-or-exclusive is part of designing it."
+      },
+      {
+        "title": "A larger PO changes which leg protects it",
+        "body": "INV-59104's 45.00 variance would pass under a flat 25 floor, but on a 2000 PO the 2% leg is 40.00 and wins the larger-of, so 45.00 is over. The percentage leg is what catches proportionally large overcharges the flat floor would miss."
+      }
+    ],
+    "jsonExample": "[\n  { \"invoiceNumber\": \"INV-59101\", \"variance\": 24.5, \"variancePct\": 2.04, \"toleranceBand\": 25, \"withinTolerance\": true }\n]",
+    "skill": "Reasoning at the edge of a rule",
+    "artifactName": "three-way-match.json"
+  },
+  "fieldGuide": [
+    { "field": "invoiceNumber", "meaning": "The invoice being matched.", "type": "string", "hint": "Copy the INV-##### exactly; it is the row key." },
+    { "field": "poTotal", "meaning": "The PO total, as a number.", "type": "number", "hint": "1200 for the first three, 2000 for INV-59104." },
+    { "field": "invoiceTotal", "meaning": "The invoice total, as a number.", "type": "number", "hint": "Read it straight from the invoice line." },
+    { "field": "variance", "meaning": "Invoice total minus PO total.", "type": "number", "hint": "24.5, 25, 25.5, and 45." },
+    { "field": "variancePct", "meaning": "Variance as a percent of PO, to 2 decimals.", "type": "number", "hint": "24.5/1200*100 = 2.04; 45/2000*100 = 2.25." },
+    { "field": "toleranceBand", "meaning": "The larger of 2% of PO and 25.", "type": "number", "hint": "25 for the 1200 POs; 40 for the 2000 PO." },
+    { "field": "withinTolerance", "meaning": "Whether variance is at or below the band.", "type": "boolean", "hint": "true for INV-59101 and INV-59102; false for the other two." }
+  ],
+  "takeaway": {
+    "heading": "You worked the rule where it bites",
+    "points": [
+      "You computed the band per invoice instead of assuming one number - larger-of makes the band depend on the PO, and either leg can be the one that wins.",
+      "You saw the dollar floor rescue a variance that broke the 2% leg, and the percentage leg catch an overcharge the flat floor would have missed.",
+      "You treated the boundary as inclusive on purpose: a variance equal to the band passes, and that choice is part of the policy, not an accident.",
+      "Edge cases are where a rule is actually defined; anyone can classify an obvious pass or fail, but the boundary is the test of whether you understand the design.",
+      "The workflow can now be trusted at the margin, where sloppy tolerance logic quietly pays overcharges or rejects clean invoices."
+    ],
+    "artifactName": "three-way-match.json"
+  }
+}
