@@ -308,6 +308,12 @@ CURRICULUM_MASTER_PLAN.md.
 
 ### Open work, in priority order
 
+0. AUDIT FINDINGS (2026-07-02): the PM audited all progress to date -
+   AUDIT_REPORT_2026-07-02.md has ten findings with fixes and a suggested
+   order of work. Highest learning-impact item: F1, the three-way-match
+   lesson contradicts its own larger-of tolerance rule. Work the report's
+   "Suggested order of work" alongside the queue below.
+
 1. THE CAPSTONE - DONE (2026-07-01). `lesson-approval-decision-hard` ships the
    `artifactImport` interaction/validator per SPEC_ARTIFACT_IMPORT.md: the
    learner rebuilds the four core pipeline files outside the app and proves it
