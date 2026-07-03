@@ -59,6 +59,24 @@ import lessonRunApproval from './data/lessons/lesson-run-approval.json'
 import lessonPaymentRun from './data/lessons/lesson-payment-run.json'
 import lessonRemittanceAdvice from './data/lessons/lesson-remittance-advice.json'
 import lessonPaymentArchive from './data/lessons/lesson-payment-archive.json'
+// Module 2 (Beacon Invoice Desk) - Medium tier
+import lessonInvoiceInboxMedium from './data/lessons/lesson-invoice-inbox-medium.json'
+import lessonInvoiceRecordMedium from './data/lessons/lesson-invoice-record-medium.json'
+import lessonVendorMasterMedium from './data/lessons/lesson-vendor-master-medium.json'
+import lessonPoRegisterMedium from './data/lessons/lesson-po-register-medium.json'
+import lessonReceiptLogMedium from './data/lessons/lesson-receipt-log-medium.json'
+import lessonTolerancePolicyMedium from './data/lessons/lesson-tolerance-policy-medium.json'
+import lessonPaymentHistoryMedium from './data/lessons/lesson-payment-history-medium.json'
+import lessonDuplicateCheckMedium from './data/lessons/lesson-duplicate-check-medium.json'
+import lessonThreeWayMatchMedium from './data/lessons/lesson-three-way-match-medium.json'
+import lessonMatchDecisionMedium from './data/lessons/lesson-match-decision-medium.json'
+import lessonExceptionQueueMedium from './data/lessons/lesson-exception-queue-medium.json'
+import lessonAutoApprovePathMedium from './data/lessons/lesson-auto-approve-path-medium.json'
+import lessonPaymentBatchMedium from './data/lessons/lesson-payment-batch-medium.json'
+import lessonRunApprovalMedium from './data/lessons/lesson-run-approval-medium.json'
+import lessonPaymentRunMedium from './data/lessons/lesson-payment-run-medium.json'
+import lessonRemittanceAdviceMedium from './data/lessons/lesson-remittance-advice-medium.json'
+import lessonPaymentArchiveMedium from './data/lessons/lesson-payment-archive-medium.json'
 import ProjectCanvas from './components/ProjectCanvas'
 import LessonWorkspace from './components/LessonWorkspace'
 import ArtifactViewer from './components/ArtifactViewer'
@@ -143,6 +161,24 @@ const LESSONS = {
   'lesson-payment-run': lessonPaymentRun,
   'lesson-remittance-advice': lessonRemittanceAdvice,
   'lesson-payment-archive': lessonPaymentArchive,
+  // Module 2 (Beacon Invoice Desk) - Medium tier
+  'lesson-invoice-inbox-medium': lessonInvoiceInboxMedium,
+  'lesson-invoice-record-medium': lessonInvoiceRecordMedium,
+  'lesson-vendor-master-medium': lessonVendorMasterMedium,
+  'lesson-po-register-medium': lessonPoRegisterMedium,
+  'lesson-receipt-log-medium': lessonReceiptLogMedium,
+  'lesson-tolerance-policy-medium': lessonTolerancePolicyMedium,
+  'lesson-payment-history-medium': lessonPaymentHistoryMedium,
+  'lesson-duplicate-check-medium': lessonDuplicateCheckMedium,
+  'lesson-three-way-match-medium': lessonThreeWayMatchMedium,
+  'lesson-match-decision-medium': lessonMatchDecisionMedium,
+  'lesson-exception-queue-medium': lessonExceptionQueueMedium,
+  'lesson-auto-approve-path-medium': lessonAutoApprovePathMedium,
+  'lesson-payment-batch-medium': lessonPaymentBatchMedium,
+  'lesson-run-approval-medium': lessonRunApprovalMedium,
+  'lesson-payment-run-medium': lessonPaymentRunMedium,
+  'lesson-remittance-advice-medium': lessonRemittanceAdviceMedium,
+  'lesson-payment-archive-medium': lessonPaymentArchiveMedium,
 }
 
 export default function App() {

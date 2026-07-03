@@ -1,0 +1,99 @@
+{
+  "id": "lesson-duplicate-check-medium",
+  "nodeId": "duplicate-check",
+  "title": "Dedupe the Batch Against History",
+  "subtitle": "Flag the already-paid invoice before it can pay again",
+  "clock": "11:00 AM",
+  "difficulty": "Intermediate",
+  "skill": "Duplicate detection",
+  "scenario": "It is 11:00 AM. Before matching, run the batch against payment history. For each invoice, decide whether its identity key already appears in the paid records - and flag the one repeat so it can be held. A duplicate always wins over a clean match.",
+  "inputType": "text",
+  "inputLabel": "Batch vs Payment History",
+  "input": "Identity key = vendorId + invoiceNumber + invoiceTotal. Paid on day-0: INV-58962 (V-1042, 640.00), INV-58790 (V-1108, 980.00). Today's batch: INV-59001 (V-1042, 1200.00), INV-59002 (V-1108, 1230.00), INV-58962 (V-1042, 640.00), INV-59004 (V-1205, 1200.00), INV-59005 (V-1042, 1000.00).",
+  "instructions": [
+    "For each invoice, check whether its identity key appears in payment history.",
+    "Set foundInHistory to true only for the invoice that matches a paid record.",
+    "Set isDuplicate to the same value - a match in history means a duplicate.",
+    "Only INV-58962 should be flagged; the rest are clear.",
+    "Return a JSON array of the five rows, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"invoiceNumber\": \"INV-59001\", \"foundInHistory\": false, \"isDuplicate\": false },\n  { \"invoiceNumber\": \"INV-59002\", \"foundInHistory\": false, \"isDuplicate\": false },\n  { \"invoiceNumber\": \"INV-58962\", \"foundInHistory\": false, \"isDuplicate\": false },\n  { \"invoiceNumber\": \"INV-59004\", \"foundInHistory\": false, \"isDuplicate\": false },\n  { \"invoiceNumber\": \"INV-59005\", \"foundInHistory\": false, \"isDuplicate\": false }\n]",
+  "validation": {
+    "type": "jsonRows",
+    "keyField": "invoiceNumber",
+    "rowFields": ["invoiceNumber", "foundInHistory", "isDuplicate"],
+    "numericFields": [],
+    "expectedRows": [
+      { "invoiceNumber": "INV-59001", "foundInHistory": false, "isDuplicate": false },
+      { "invoiceNumber": "INV-59002", "foundInHistory": false, "isDuplicate": false },
+      { "invoiceNumber": "INV-58962", "foundInHistory": true, "isDuplicate": true },
+      { "invoiceNumber": "INV-59004", "foundInHistory": false, "isDuplicate": false },
+      { "invoiceNumber": "INV-59005", "foundInHistory": false, "isDuplicate": false }
+    ]
+  },
+  "copilotPrompt": "For each invoice in a batch, check whether its identity key (vendor + number + total) appears in payment history. Return an array with invoiceNumber, foundInHistory, and isDuplicate. Only INV-58962 is a repeat.",
+  "successMessage": "Dedupe complete. INV-58962 is flagged as a duplicate; the other four are clear to match.",
+  "validateLabel": "Run Dedupe",
+  "editorHelper": "One row per invoice - only the repeat gets flagged.",
+  "intro": {
+    "heading": "Before you match: catch the repeat first",
+    "sections": [
+      {
+        "title": "Dedupe runs before matching",
+        "body": "There is no point matching an invoice that was already paid. The duplicate check is the first gate: it compares each invoice's identity to the paid history and pulls any repeat out of the flow."
+      },
+      {
+        "title": "Match on the full identity key",
+        "body": "A repeat is vendor id + invoice number + invoice total, together. INV-58962 in today's batch matches a day-0 paid record on all three, so it is a duplicate. The other four do not appear in history at all."
+      },
+      {
+        "title": "A duplicate always wins",
+        "body": "Even if a duplicate's price and receipt were perfect, it must not pay again. Flagging isDuplicate here guarantees the match decision routes it to an exception no matter what else is true about it."
+      }
+    ],
+    "jsonExample": "[\n  { \"invoiceNumber\": \"INV-58962\", \"foundInHistory\": true, \"isDuplicate\": true }\n]",
+    "skill": "Duplicate detection",
+    "artifactName": "duplicate-check.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "invoiceNumber",
+      "meaning": "The invoice being checked.",
+      "type": "string",
+      "example": "\"INV-58962\"",
+      "group": "Identity",
+      "lookFor": "which invoice?",
+      "hint": "Copy the INV-##### number exactly; it is the row key."
+    },
+    {
+      "field": "foundInHistory",
+      "meaning": "Whether this invoice's identity key appears in payment history.",
+      "type": "boolean",
+      "example": "true",
+      "group": "Result",
+      "lookFor": "already paid?",
+      "hint": "true only for INV-58962; the other four are not in history."
+    },
+    {
+      "field": "isDuplicate",
+      "meaning": "Whether the invoice is a duplicate (same as foundInHistory here).",
+      "type": "boolean",
+      "example": "true",
+      "group": "Result",
+      "lookFor": "flag it?",
+      "hint": "A match in history means a duplicate - set it the same as foundInHistory."
+    }
+  ],
+  "takeaway": {
+    "heading": "Duplicate check complete",
+    "points": [
+      "You ran the whole batch against payment history before any matching.",
+      "INV-58962 matched a day-0 paid record on the full identity key, so it is flagged as a duplicate.",
+      "The other four invoices are not in history and are clear to move to the match.",
+      "Flagging isDuplicate guarantees the repeat is routed to an exception - a duplicate always wins.",
+      "The workflow can now stop an already-paid invoice before it reaches the payment run."
+    ],
+    "artifactName": "duplicate-check.json"
+  }
+}

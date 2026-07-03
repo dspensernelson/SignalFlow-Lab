@@ -235,5 +235,78 @@
   "lesson-remittance-advice": {
     "correct": { "vendorName": "Northwind Fasteners", "remitTo": "4400 Commerce Way, Tacoma WA 98402", "vendorId": "V-1042", "invoiceNumber": "INV-58831", "amountPaid": "1220", "paidDate": "day-1", "payMethod": "ACH" },
     "wrong": { "vendorName": "Northwind Fasteners", "remitTo": "4400 Commerce Way, Tacoma WA 98402", "vendorId": "V-1042", "invoiceNumber": "INV-58831", "amountPaid": "1200", "paidDate": "day-1", "payMethod": "ACH" }
+  },
+
+  "lesson-invoice-record-medium": {
+    "correct": [
+      { "invoiceNumber": "INV-59001", "vendorId": "V-1042", "poNumber": "PO-7742", "invoiceTotal": 1200 },
+      { "invoiceNumber": "INV-59002", "vendorId": "V-1108", "poNumber": "PO-7751", "invoiceTotal": 1230 },
+      { "invoiceNumber": "INV-58962", "vendorId": "V-1042", "poNumber": "PO-7738", "invoiceTotal": 640 },
+      { "invoiceNumber": "INV-59004", "vendorId": "V-1205", "poNumber": "PO-7760", "invoiceTotal": 1200 },
+      { "invoiceNumber": "INV-59005", "vendorId": "V-1042", "poNumber": "PO-7763", "invoiceTotal": 1000 }
+    ],
+    "wrong": [
+      { "invoiceNumber": "INV-59001", "vendorId": "V-1042", "poNumber": "PO-7742", "invoiceTotal": 1200 },
+      { "invoiceNumber": "INV-59002", "vendorId": "V-1108", "poNumber": "PO-7751", "invoiceTotal": 1140 },
+      { "invoiceNumber": "INV-58962", "vendorId": "V-1042", "poNumber": "PO-7738", "invoiceTotal": 640 },
+      { "invoiceNumber": "INV-59004", "vendorId": "V-1205", "poNumber": "PO-7760", "invoiceTotal": 1200 },
+      { "invoiceNumber": "INV-59005", "vendorId": "V-1042", "poNumber": "PO-7763", "invoiceTotal": 1000 }
+    ]
+  },
+  "lesson-duplicate-check-medium": {
+    "correct": [
+      { "invoiceNumber": "INV-59001", "foundInHistory": false, "isDuplicate": false },
+      { "invoiceNumber": "INV-59002", "foundInHistory": false, "isDuplicate": false },
+      { "invoiceNumber": "INV-58962", "foundInHistory": true, "isDuplicate": true },
+      { "invoiceNumber": "INV-59004", "foundInHistory": false, "isDuplicate": false },
+      { "invoiceNumber": "INV-59005", "foundInHistory": false, "isDuplicate": false }
+    ],
+    "wrong": [
+      { "invoiceNumber": "INV-59001", "foundInHistory": false, "isDuplicate": false },
+      { "invoiceNumber": "INV-59002", "foundInHistory": false, "isDuplicate": false },
+      { "invoiceNumber": "INV-58962", "foundInHistory": false, "isDuplicate": false },
+      { "invoiceNumber": "INV-59004", "foundInHistory": false, "isDuplicate": false },
+      { "invoiceNumber": "INV-59005", "foundInHistory": false, "isDuplicate": false }
+    ]
+  },
+  "lesson-three-way-match-medium": {
+    "correct": [
+      { "invoiceNumber": "INV-59001", "variance": 0, "variancePct": 0, "toleranceBand": 25, "withinTolerance": true, "qtyMatch": true },
+      { "invoiceNumber": "INV-59002", "variance": 90, "variancePct": 7.89, "toleranceBand": 25, "withinTolerance": false, "qtyMatch": true },
+      { "invoiceNumber": "INV-59005", "variance": 8, "variancePct": 0.81, "toleranceBand": 25, "withinTolerance": true, "qtyMatch": false }
+    ],
+    "wrong": [
+      { "invoiceNumber": "INV-59001", "variance": 0, "variancePct": 0, "toleranceBand": 25, "withinTolerance": true, "qtyMatch": true },
+      { "invoiceNumber": "INV-59002", "variance": 90, "variancePct": 7.89, "toleranceBand": 25, "withinTolerance": true, "qtyMatch": true },
+      { "invoiceNumber": "INV-59005", "variance": 8, "variancePct": 0.81, "toleranceBand": 25, "withinTolerance": true, "qtyMatch": false }
+    ]
+  },
+  "lesson-match-decision-medium": {
+    "correct": [
+      { "invoiceNumber": "INV-59001", "route": "auto-approve", "reason": "clean match" },
+      { "invoiceNumber": "INV-59002", "route": "exception", "reason": "price over tolerance" },
+      { "invoiceNumber": "INV-58962", "route": "exception", "reason": "duplicate" },
+      { "invoiceNumber": "INV-59004", "route": "exception", "reason": "vendor not in master" },
+      { "invoiceNumber": "INV-59005", "route": "exception", "reason": "missing receipt" }
+    ],
+    "wrong": [
+      { "invoiceNumber": "INV-59001", "route": "auto-approve", "reason": "clean match" },
+      { "invoiceNumber": "INV-59002", "route": "auto-approve", "reason": "clean match" },
+      { "invoiceNumber": "INV-58962", "route": "exception", "reason": "duplicate" },
+      { "invoiceNumber": "INV-59004", "route": "exception", "reason": "vendor not in master" },
+      { "invoiceNumber": "INV-59005", "route": "exception", "reason": "missing receipt" }
+    ]
+  },
+  "lesson-payment-batch-medium": {
+    "correct": { "batchDate": "day-1", "cutoff": "3:00 PM", "invoiceCount": 1, "batchTotal": 1200, "heldCount": 4 },
+    "wrong": { "batchDate": "day-1", "cutoff": "3:00 PM", "invoiceCount": 1, "batchTotal": 1200, "heldCount": 0 }
+  },
+  "lesson-payment-run-medium": {
+    "correct": { "runDate": "day-1", "approvedBy": "AP Manager", "approvedAt": "2:30 PM", "cutoff": "3:00 PM", "invoiceCount": "1", "runTotal": "1200", "heldCount": "4", "payToName": "Northwind Fasteners", "vendorId": "V-1042", "bankOnFile": "ACH ...4021", "deliveredTo": "Payables DL" },
+    "wrong": { "runDate": "day-1", "approvedBy": "AP Manager", "approvedAt": "2:30 PM", "cutoff": "3:00 PM", "invoiceCount": "1", "runTotal": "1220", "heldCount": "4", "payToName": "Northwind Fasteners", "vendorId": "V-1042", "bankOnFile": "ACH ...4021", "deliveredTo": "Payables DL" }
+  },
+  "lesson-remittance-advice-medium": {
+    "correct": { "vendorName": "Northwind Fasteners", "remitTo": "4400 Commerce Way, Tacoma WA 98402", "vendorId": "V-1042", "invoiceNumber": "INV-59001", "amountPaid": "1200", "paidDate": "day-1", "payMethod": "ACH" },
+    "wrong": { "vendorName": "Northwind Fasteners", "remitTo": "4400 Commerce Way, Tacoma WA 98402", "vendorId": "V-1042", "invoiceNumber": "INV-59001", "amountPaid": "1220", "paidDate": "day-1", "payMethod": "ACH" }
   }
 }

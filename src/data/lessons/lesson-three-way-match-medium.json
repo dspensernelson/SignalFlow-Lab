@@ -1,0 +1,124 @@
+{
+  "id": "lesson-three-way-match-medium",
+  "nodeId": "three-way-match",
+  "title": "Run the Three-Way Match on the Batch",
+  "subtitle": "Compute variance and tolerance for every matchable invoice",
+  "clock": "11:15 AM",
+  "difficulty": "Intermediate",
+  "skill": "Reconciliation math",
+  "scenario": "It is 11:15 AM. The duplicate is pulled and the unknown-vendor invoice is blocked, so three invoices reach the match: INV-59001, INV-59002, and INV-59005. For each, compute the price variance, compare it to the band, and check the receipt - then let the numbers declare which pass and which fail.",
+  "inputType": "text",
+  "inputLabel": "Matchable invoices",
+  "input": "Tolerance band per invoice = larger of 2% of the PO or 25.00; quantity must match exactly. INV-59001: invoice 1200.00 vs PO 1200.00, received 500 of 500. INV-59002: invoice 1230.00 vs PO 1140.00, received 300 of 300. INV-59005: invoice 1000.00 vs PO 992.00, NO receipt posted.",
+  "instructions": [
+    "For each invoice compute variance = invoice total - PO total.",
+    "Compute variancePct = variance / PO total * 100, rounded to 2 decimals.",
+    "Set toleranceBand = the larger of 2% of the PO and 25.00 (all three land at 25).",
+    "Set withinTolerance (variance within the band) and qtyMatch (received equals ordered - false when no receipt).",
+    "Return a JSON array of the three rows with numbers as numbers, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"invoiceNumber\": \"INV-59001\", \"variance\": 0, \"variancePct\": 0, \"toleranceBand\": 25, \"withinTolerance\": false, \"qtyMatch\": false },\n  { \"invoiceNumber\": \"INV-59002\", \"variance\": 0, \"variancePct\": 0, \"toleranceBand\": 25, \"withinTolerance\": false, \"qtyMatch\": false },\n  { \"invoiceNumber\": \"INV-59005\", \"variance\": 0, \"variancePct\": 0, \"toleranceBand\": 25, \"withinTolerance\": false, \"qtyMatch\": false }\n]",
+  "validation": {
+    "type": "jsonDeltas",
+    "keyField": "invoiceNumber",
+    "requiredFields": ["invoiceNumber", "variance", "variancePct", "toleranceBand", "withinTolerance", "qtyMatch"],
+    "numericFields": ["variance", "variancePct", "toleranceBand"],
+    "expectedRows": [
+      { "invoiceNumber": "INV-59001", "variance": 0, "variancePct": 0, "toleranceBand": 25, "withinTolerance": true, "qtyMatch": true },
+      { "invoiceNumber": "INV-59002", "variance": 90, "variancePct": 7.89, "toleranceBand": 25, "withinTolerance": false, "qtyMatch": true },
+      { "invoiceNumber": "INV-59005", "variance": 8, "variancePct": 0.81, "toleranceBand": 25, "withinTolerance": true, "qtyMatch": false }
+    ]
+  },
+  "copilotPrompt": "For three invoices compute variance (invoice - PO), variancePct (variance / PO * 100 to 2 decimals), toleranceBand (larger of 2% of PO or 25), withinTolerance, and qtyMatch. INV-59005 has no receipt so qtyMatch is false. Return a JSON array with numbers.",
+  "successMessage": "Batch matched. INV-59001 is clean, INV-59002 fails on price, INV-59005 fails on the missing receipt.",
+  "validateLabel": "Run Match",
+  "editorHelper": "One row per matchable invoice - the numbers decide.",
+  "intro": {
+    "heading": "Before the fork: reconcile every matchable invoice",
+    "sections": [
+      {
+        "title": "Only three invoices reach the match",
+        "body": "The duplicate (INV-58962) is already held and the unknown-vendor invoice (INV-59004) is blocked before matching. That leaves INV-59001, INV-59002, and INV-59005 to reconcile against their POs and receipts."
+      },
+      {
+        "title": "The math is the same, the outcomes differ",
+        "body": "Variance is invoice minus PO; the band is the larger of 2% or $25. INV-59001's gap is $0, INV-59002's is $90 (outside), and INV-59005's is $8 (inside). Same rule, three different results."
+      },
+      {
+        "title": "A missing receipt breaks the quantity leg",
+        "body": "INV-59005's price is fine, but with no posted receipt you cannot confirm the goods arrived, so qtyMatch is false. Price within tolerance plus an unconfirmed delivery is still not a clean match."
+      }
+    ],
+    "jsonExample": "[\n  { \"invoiceNumber\": \"INV-59002\", \"variance\": 90, \"variancePct\": 7.89, \"toleranceBand\": 25, \"withinTolerance\": false, \"qtyMatch\": true }\n]",
+    "skill": "Reconciliation math",
+    "artifactName": "three-way-match.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "invoiceNumber",
+      "meaning": "The invoice being matched.",
+      "type": "string",
+      "example": "\"INV-59002\"",
+      "group": "Identity",
+      "lookFor": "which invoice?",
+      "hint": "Copy the INV-##### number exactly; it is the row key."
+    },
+    {
+      "field": "variance",
+      "meaning": "Invoice total minus PO total.",
+      "type": "number",
+      "example": "90",
+      "group": "Computed",
+      "lookFor": "the dollar gap?",
+      "hint": "INV-59001 = 0, INV-59002 = 1230 - 1140 = 90, INV-59005 = 1000 - 992 = 8."
+    },
+    {
+      "field": "variancePct",
+      "meaning": "The variance as a percent of the PO total, to 2 decimals.",
+      "type": "number",
+      "example": "7.89",
+      "group": "Computed",
+      "lookFor": "the percent gap?",
+      "hint": "90/1140*100 = 7.89; 8/992*100 = 0.81; 0 stays 0."
+    },
+    {
+      "field": "toleranceBand",
+      "meaning": "The larger of 2% of the PO and the $25 floor.",
+      "type": "number",
+      "example": "25",
+      "group": "Computed",
+      "lookFor": "the allowed band?",
+      "hint": "2% of each PO is below 25, so the band is 25 for all three."
+    },
+    {
+      "field": "withinTolerance",
+      "meaning": "Whether the price variance is inside the band.",
+      "type": "boolean",
+      "example": "false",
+      "group": "Result",
+      "lookFor": "price acceptable?",
+      "hint": "INV-59001 and INV-59005 true; INV-59002 false (90 > 25)."
+    },
+    {
+      "field": "qtyMatch",
+      "meaning": "Whether received quantity equals ordered - false when no receipt.",
+      "type": "boolean",
+      "example": "false",
+      "group": "Result",
+      "lookFor": "delivery confirmed?",
+      "hint": "INV-59001 and INV-59002 true; INV-59005 false (no receipt posted)."
+    }
+  ],
+  "takeaway": {
+    "heading": "Batch matched",
+    "points": [
+      "You reconciled the three matchable invoices, computing variance and percent from the totals rather than judging by eye.",
+      "INV-59001 is a clean match: $0 variance, within tolerance, quantity confirmed.",
+      "INV-59002 fails on price - a $90 variance is well outside its $25 band.",
+      "INV-59005 fails on the missing receipt - price is fine but the quantity leg cannot be confirmed.",
+      "The workflow can now decide, on numbers alone, which invoices in the batch are clean and which are exceptions."
+    ],
+    "artifactName": "three-way-match.json"
+  }
+}
