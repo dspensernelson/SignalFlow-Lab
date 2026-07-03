@@ -323,11 +323,16 @@ CURRICULUM_MASTER_PLAN.md.
   hour (added Escape-to-close on the project dropdown; map nodes + radios were
   already accessible); S5 below-map dead space folded via tall-viewport (>=900px)
   map centering. See DECISION_LOG 2026-07-04. `npm run check` green.
-- G1 HUMAN MOMENTS - NEXT. First-run welcome card (3 bullets + CTA, once),
-  tier-completion card, "Download everything I built" export (JSON + markdown),
-  replace the builder-facing "N of N lessons defined" stat with current-tier
-  progress. No new page scroll.
-- G2 TRANSFER LAYER. realWorld takeaway beat (engine + lint-lessons + backfill
+- G1 HUMAN MOMENTS - DONE (2026-07-04). First-run welcome modal (3 bullets +
+  CTA, once ever via `signalflow_welcomed`); tier-completion modal (once per
+  completed tier via `signalflow_tier_celebrated_<tier>`, offering the export +
+  a next-tier nudge); "Download everything I built" export (JSON + markdown,
+  `src/lib/export.js`) reachable from a header Export button and the completion
+  modal; replaced the builder-facing "N of N lessons defined" stat with
+  current-tier progress ("<Tier> tier complete" / percent). Both moments are
+  fixed overlays (shared `ui/Modal.jsx`) so they add no page scroll; verified
+  live at 1280x800 and 1366x650. See DECISION_LOG 2026-07-04 (G1).
+- G2 TRANSFER LAYER - NEXT. realWorld takeaway beat (engine + lint-lessons + backfill
   Module 1+2), Module 2 solo-rebuild capstone via artifactImport (4 Beacon
   files), TOOL_MAP.md for modules 1+2, amend MODULE_AUTHORING_PLAYBOOK step 7
   and charters/_INDEX (per-module capstone MANDATORY, interaction budget

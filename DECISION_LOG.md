@@ -2,6 +2,38 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-04 (G1 - human moments)
+
+- First-run welcome modal: shown once ever (localStorage `signalflow_welcomed`).
+  3 bullets (live dependency map / trusted artifacts flow downstream / three
+  tier depths) + a "Start building" CTA. New shared overlay primitive
+  `src/components/ui/Modal.jsx` (scrim + centered card, Escape / scrim / X to
+  close, focus moves to card on open, height-bounded `max-h-[85vh]` so it never
+  grows the page).
+- Tier-completion modal: fires when every buildable node in the active tier is
+  complete, once per tier+project (localStorage `signalflow_tier_celebrated_<tier>`,
+  namespaced `__<project>` off Module 1). Offers "Download everything I built"
+  and a "Try the <next> tier" nudge (hidden on hard). Detection uses the
+  derive-during-render + adjust-on-prop-change pattern (a render-time tierKey
+  compare resets the closed latch), NOT a setState-in-effect - eslint
+  `react-hooks/set-state-in-effect` forbids the effect form.
+- Export (`src/lib/export.js`): `buildExport` gathers every complete node that
+  has a saved artifact into a JSON bundle (tool/project/tier/exportedAt/
+  artifacts[]) plus a readable markdown summary (per-artifact heading + fenced
+  body); `downloadText` triggers a Blob download. Reachable from a neutral
+  header Export button (disabled until >=1 task built) and from the completion
+  modal. Verified live: 17-artifact easy tier produced both files with correct
+  content.
+- Stat swap: replaced the builder-facing "N of N lessons defined" StatItem with
+  current-tier progress - value `<pct>%`, label "<Tier> tier complete". The
+  "tasks built" count stat is unchanged.
+- No new page scroll: both moments are fixed overlays; the canvas page baseline
+  scroll is unchanged. Verified at 1280x800 and 1366x650 (dialog height 255 <=
+  650, fits viewport, scrolls internally). `npm run check` green (81 lessons,
+  build ok, bundle ~795kB - F7 code-split is the G3 item).
+- `clearStorage` (Start Over) now also clears the tier-celebration flag so
+  re-completing a tier celebrates again.
+
 ## 2026-07-04 (G0 - verify and patch)
 
 - W3 (scroll affordance): added shared `src/components/ui/ScrollArea.jsx`

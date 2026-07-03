@@ -149,10 +149,56 @@ export function saveArtifacts(artifacts, tier = loadTier(), project = loadProjec
   localStorage.setItem(keyFor(ARTIFACTS_KEY, tier, project), JSON.stringify(artifacts))
 }
 
-// Clears progress and artifacts for the active tier + project only.
+// Clears progress and artifacts for the active tier + project only. Also clears
+// the tier-completion celebration flag so finishing again re-celebrates.
 export function clearStorage(tier = loadTier(), project = loadProject()) {
   localStorage.removeItem(keyFor(PROGRESS_KEY, tier, project))
   localStorage.removeItem(keyFor(ARTIFACTS_KEY, tier, project))
+  localStorage.removeItem(celebratedKey(tier, project))
+}
+
+// One-time "human moment" flags. The welcome card is app-global (shown once
+// ever); the tier-completion celebration is scoped per project + tier (shown
+// once per completed tier). Reads default to "already seen" if storage is
+// unavailable so we never nag on a broken/private-mode client.
+const WELCOME_KEY = 'signalflow_welcomed'
+
+export function hasSeenWelcome() {
+  try {
+    return localStorage.getItem(WELCOME_KEY) === '1'
+  } catch {
+    return true
+  }
+}
+
+export function markWelcomeSeen() {
+  try {
+    localStorage.setItem(WELCOME_KEY, '1')
+  } catch {
+    /* ignore: non-critical persistence */
+  }
+}
+
+function celebratedKey(tier, project) {
+  const p = hasProjectData(project) ? project : loadProject()
+  const base = p === DEFAULT_PROJECT ? 'signalflow_tier_celebrated' : `signalflow_tier_celebrated__${p}`
+  return `${base}_${tier}`
+}
+
+export function hasCelebratedTier(tier = loadTier(), project = loadProject()) {
+  try {
+    return localStorage.getItem(celebratedKey(tier, project)) === '1'
+  } catch {
+    return true
+  }
+}
+
+export function markTierCelebrated(tier = loadTier(), project = loadProject()) {
+  try {
+    localStorage.setItem(celebratedKey(tier, project), '1')
+  } catch {
+    /* ignore: non-critical persistence */
+  }
 }
 
 // Display/reading order of the lessons (the pedagogical path). Used for default
