@@ -3,7 +3,12 @@
   "module": "module-02",
   "derivations": [
     { "lesson": "lesson-three-way-match", "path": "validation.expected.variance", "op": "delta", "a": 1220, "b": 1200 },
-    { "lesson": "lesson-three-way-match", "path": "validation.expected.variancePct", "op": "pctMove", "a": 1220, "b": 1200, "round": 2 }
+    { "lesson": "lesson-three-way-match", "path": "validation.expected.variancePct", "op": "pctMove", "a": 1220, "b": 1200, "round": 2 },
+    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59002].variance", "op": "delta", "a": 1230, "b": 1140 },
+    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59002].variancePct", "op": "pctMove", "a": 1230, "b": 1140, "round": 2 },
+    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59005].variance", "op": "delta", "a": 1000, "b": 992 },
+    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59005].variancePct", "op": "pctMove", "a": 1000, "b": 992, "round": 2 },
+    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59001].variance", "op": "delta", "a": 1200, "b": 1200 }
   ],
   "assertions": [
     { "lesson": "lesson-invoice-record", "path": "validation.expected.invoiceTotal", "op": "equals", "value": 1220 },
@@ -16,6 +21,23 @@
     { "lesson": "lesson-match-decision", "path": "validation.expected.isDuplicate", "op": "equals", "value": false },
     { "lesson": "lesson-match-decision", "path": "validation.expected.withinTolerance", "op": "equals", "value": true },
     { "lesson": "lesson-tolerance-policy", "path": "validation.expected.priceTolerancePct", "op": "equals", "value": 2 },
-    { "lesson": "lesson-tolerance-policy", "path": "validation.expected.priceToleranceAbs", "op": "equals", "value": 25 }
+    { "lesson": "lesson-tolerance-policy", "path": "validation.expected.priceToleranceAbs", "op": "equals", "value": 25 },
+    { "lesson": "lesson-invoice-record-medium", "path": "validation.expectedRows[invoiceNumber=INV-59001].invoiceTotal", "op": "equals", "value": 1200 },
+    { "lesson": "lesson-invoice-record-medium", "path": "validation.expectedRows[invoiceNumber=INV-59002].invoiceTotal", "op": "equals", "value": 1230 },
+    { "lesson": "lesson-invoice-record-medium", "path": "validation.expectedRows[invoiceNumber=INV-58962].vendorId", "op": "equals", "value": "V-1042" },
+    { "lesson": "lesson-invoice-record-medium", "path": "validation.expectedRows[invoiceNumber=INV-59004].vendorId", "op": "equals", "value": "V-1205" },
+    { "lesson": "lesson-duplicate-check-medium", "path": "validation.expectedRows[invoiceNumber=INV-58962].isDuplicate", "op": "equals", "value": true },
+    { "lesson": "lesson-duplicate-check-medium", "path": "validation.expectedRows[invoiceNumber=INV-59001].isDuplicate", "op": "equals", "value": false },
+    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59002].withinTolerance", "op": "equals", "value": false },
+    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59005].qtyMatch", "op": "equals", "value": false },
+    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59001].withinTolerance", "op": "equals", "value": true },
+    { "lesson": "lesson-match-decision-medium", "path": "validation.expectedRows[invoiceNumber=INV-59001].route", "op": "equals", "value": "auto-approve" },
+    { "lesson": "lesson-match-decision-medium", "path": "validation.expectedRows[invoiceNumber=INV-59002].route", "op": "equals", "value": "exception" },
+    { "lesson": "lesson-match-decision-medium", "path": "validation.expectedRows[invoiceNumber=INV-58962].reason", "op": "equals", "value": "duplicate" },
+    { "lesson": "lesson-match-decision-medium", "path": "validation.expectedRows[invoiceNumber=INV-59004].reason", "op": "equals", "value": "vendor not in master" },
+    { "lesson": "lesson-match-decision-medium", "path": "validation.expectedRows[invoiceNumber=INV-59005].reason", "op": "equals", "value": "missing receipt" },
+    { "lesson": "lesson-payment-batch-medium", "path": "validation.expected.batchTotal", "op": "equals", "value": 1200 },
+    { "lesson": "lesson-payment-batch-medium", "path": "validation.expected.heldCount", "op": "equals", "value": 4 },
+    { "lesson": "lesson-payment-batch-medium", "path": "validation.expected.invoiceCount", "op": "equals", "value": 1 }
   ]
 }

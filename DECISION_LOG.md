@@ -2,6 +2,34 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-02 (module-02 Beacon - Step 7 Medium tier built)
+
+- Authored the full Module 2 Medium tier: all 17 lessons wired, fixtured, and
+  canon-checked. `npm run check` green: 76 lessons linted (0 errors/warnings),
+  76 fixtures pass, 86 canon assertions + 23 derivations recomputed, build
+  clean.
+- Medium theme = a MESSY BATCH of 5 invoices where only INV-59001 is clean. The
+  other four each carry one failure mode: INV-59002 price over tolerance,
+  INV-58962 duplicate (already paid day-0), INV-59004 unknown vendor (V-1205 not
+  in master), INV-59005 missing receipt (two-way only). Canon in
+  curriculum/module-02/medium/_OVERVIEW.md.
+- Validator spread now uses the row validators deferred from Easy: jsonRows x3
+  (invoice-record 5 rows, duplicate-check 5 rows, match-decision 5 rows),
+  jsonDeltas x1 (three-way-match, 3 matchable rows with per-row variance/pct/
+  band/withinTolerance/qtyMatch), jsonFields x1 (payment-batch), templateSlots
+  x2 (payment-run, remittance-advice), choiceCheck x10 for the inspection/
+  handoff nodes. Booleans in row validators are checked as required non-numeric
+  fields (normalize compare); numeric fields stay strict === on real numbers.
+- Canon enforcement uses the resolver's [key=value] row finder: three-way-match
+  variance/variancePct for INV-59002 (90 / 7.89) and INV-59005 (8 / 0.81) are
+  recomputed by derivations from their PO/invoice totals; 17 assertions pin the
+  per-row routes, reasons, duplicate flag, tolerance/qty outcomes, and the
+  batch's held/total/count so no Medium lesson can drift from the batch canon.
+- Verified live at 1280x800 in the wrong-answer (tallest) state: the 4-question
+  choiceCheck (invoice-inbox-medium) and the 5-row jsonRows editor
+  (invoice-record-medium) both measure document scrollHeight === clientHeight
+  (800 === 800) - the no-scroll HARD RULE holds on the new surfaces.
+
 ## 2026-07-02 (module-02 Beacon - Steps 3-6 Easy tier built)
 
 - Authored the full Module 2 Easy tier: all 17 lessons (one per map node),
