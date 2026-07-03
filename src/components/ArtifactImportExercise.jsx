@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import CopilotPromptCard from './CopilotPromptCard'
-import { Button } from './ui'
+import { Button, ScrollArea } from './ui'
 
 // Exercise workspace for interactionType "artifactImport" (the Module 1
 // solo-rebuild capstone). The learner rebuilds the pipeline OUTSIDE the app in
@@ -74,16 +74,21 @@ export default function ArtifactImportExercise({
   const failedCount = totalChecks - correctChecks
 
   return (
-    <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-12">
+    <div className="grid grid-cols-1 items-start gap-3 short:gap-2 lg:grid-cols-12">
       {/* Left: the rebuild runbook */}
-      <div className="flex flex-col gap-3 lg:col-span-5">
-        <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
+      <div className="flex flex-col gap-3 short:gap-2 lg:col-span-5">
+        <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm short:p-2">
           <h3 className="text-sm font-semibold uppercase tracking-sf-wide text-sf-subtle">
             {lesson.inputLabel || 'Rebuild runbook'}
           </h3>
-          <pre className="mt-1 max-h-[460px] overflow-y-auto whitespace-pre-wrap rounded-md bg-sf-surface-subtle p-3 text-xs leading-5 text-sf-body">
+          <ScrollArea
+            as="pre"
+            className="mt-1 max-h-[460px] short:max-h-[300px]"
+            viewportClassName="whitespace-pre-wrap rounded-md bg-sf-surface-subtle p-3 text-xs leading-5 text-sf-body"
+            hint="Scroll for more"
+          >
             {lesson.input}
-          </pre>
+          </ScrollArea>
         </div>
 
         <details className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
@@ -97,16 +102,16 @@ export default function ArtifactImportExercise({
       </div>
 
       {/* Right: the four imports + readiness */}
-      <div className="flex flex-col gap-3 lg:col-span-7">
-        <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
+      <div className="flex flex-col gap-3 short:gap-2 lg:col-span-7">
+        <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm short:p-2">
           <h3 className="text-sm font-semibold uppercase tracking-sf-wide text-sf-subtle">
             Import your rebuilt files
           </h3>
-          <p className="mt-1 text-xs text-sf-muted">
+          <p className="mt-1 text-xs text-sf-muted short:hidden">
             Upload the file your rebuild produced, or paste its contents. Any tool is allowed - the
             acceptance bar is the same as the app.
           </p>
-          <ul className="mt-2 flex flex-col gap-2">
+          <ul className="mt-2 flex flex-col gap-2 short:gap-1.5">
             {imports.map((imp) => {
               const rows = rowsFor(imp.key)
               const failed = rows.filter((r) => !r.passed)
@@ -133,7 +138,7 @@ export default function ArtifactImportExercise({
               return (
                 <li
                   key={imp.key}
-                  className="rounded-md border border-sf-border bg-sf-surface-subtle p-2.5"
+                  className="rounded-md border border-sf-border bg-sf-surface-subtle p-2.5 short:p-2"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-mono text-xs font-semibold text-sf-body">{imp.label}</span>

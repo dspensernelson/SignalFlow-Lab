@@ -35,23 +35,23 @@ export default function LessonWorkspace({ lesson, tier, onPass, onReturnToCanvas
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-5 text-left text-sf-text">
-      <header className="flex flex-col gap-2">
-        <div className="flex flex-col gap-1">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-5 text-left text-sf-text short:gap-2 short:py-2">
+      <header className="flex flex-col gap-2 short:gap-1">
+        <div className="flex flex-col gap-1 short:gap-0">
           <Button variant="link" size="sm" icon="arrow-left" onClick={onReturnToCanvas} className="w-fit">
             Back to Canvas
           </Button>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-semibold text-sf-text">{lesson.title}</h1>
+            <h1 className="text-2xl font-semibold text-sf-text short:text-lg">{lesson.title}</h1>
             {lesson.clock && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-sf-border bg-sf-surface-subtle px-2.5 py-0.5 text-xs font-medium text-sf-muted">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-sf-border bg-sf-surface-subtle px-2.5 py-0.5 text-xs font-medium text-sf-muted short:hidden">
                 <Icon name="clock" size={12} />
                 {lesson.clock}
               </span>
             )}
           </div>
-          {lesson.subtitle && <p className="text-sm text-sf-body">{lesson.subtitle}</p>}
-          <p className="text-xs text-sf-subtle">
+          {lesson.subtitle && <p className="text-sm text-sf-body short:hidden">{lesson.subtitle}</p>}
+          <p className="text-xs text-sf-subtle short:hidden">
             {tier ? `${tier.charAt(0).toUpperCase()}${tier.slice(1)} tier` : lesson.difficulty} &middot; {lesson.skill}
           </p>
         </div>

@@ -303,7 +303,7 @@ accepted MVP). README.md is the quick orientation.
 
 ---
 
-## 7. Where we are in the process / pick up here (updated 2026-07-02)
+## 7. Where we are in the process / pick up here (updated 2026-07-04)
 
 The design pass this document originally scoped is DONE and shipped well past
 it: the framework was applied, LESSON_AUTHORING_TEMPLATE.md exists, all 17
@@ -311,6 +311,30 @@ Easy lessons are built, the tier engine is live, and Module 1 is COMPLETE
 across all three tiers (Easy 17, Medium 17, Hard 8 - see section 6). The
 long-range plan (10 scenario-based modules x 3 tiers, ten-year horizons) is
 CURRICULUM_MASTER_PLAN.md.
+
+### GO-LIVE QUEUE (GO_LIVE_REVIEW.md Part 3) - runs BEFORE Module 3
+
+- G0 VERIFY AND PATCH - DONE (2026-07-04). W3 shared scroll affordance
+  (ScrollArea) on every internally-scrolling exercise panel; W2 compact mode
+  (tailwind `short` height variant) with wrong-answer no-scroll verified at
+  BOTH 1280x800 and 1366x650 for all four interaction types; VERIFICATION_
+  PLAYBOOK gained the 1366x650 + affordance checks; S4 dark sweep (fixed the
+  dark `--sf-text-subtle` AA miss, shared across both modules); S7 keyboard
+  hour (added Escape-to-close on the project dropdown; map nodes + radios were
+  already accessible); S5 below-map dead space folded via tall-viewport (>=900px)
+  map centering. See DECISION_LOG 2026-07-04. `npm run check` green.
+- G1 HUMAN MOMENTS - NEXT. First-run welcome card (3 bullets + CTA, once),
+  tier-completion card, "Download everything I built" export (JSON + markdown),
+  replace the builder-facing "N of N lessons defined" stat with current-tier
+  progress. No new page scroll.
+- G2 TRANSFER LAYER. realWorld takeaway beat (engine + lint-lessons + backfill
+  Module 1+2), Module 2 solo-rebuild capstone via artifactImport (4 Beacon
+  files), TOOL_MAP.md for modules 1+2, amend MODULE_AUTHORING_PLAYBOOK step 7
+  and charters/_INDEX (per-module capstone MANDATORY, interaction budget
+  SPEND-OR-JUSTIFY).
+- G3 SHIP. F7 per-project code-splitting; then PARK owner items in
+  OPEN_QUESTIONS (merge PR stack #1->#2->#3, ratify the gate-8 deploy
+  amendment). Deploy only after the owner acts.
 
 ### Open work, in priority order
 

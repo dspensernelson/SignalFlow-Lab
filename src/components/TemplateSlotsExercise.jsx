@@ -1,5 +1,5 @@
 import CopilotPromptCard from './CopilotPromptCard'
-import { Button, CodeBlock } from './ui'
+import { Button, CodeBlock, ScrollArea } from './ui'
 import { loadArtifacts } from '../lib/progress'
 
 // Exercise workspace for interactionType "templateSlots" (assembly lessons).
@@ -85,10 +85,15 @@ export default function TemplateSlotsExercise({
           <h3 className="text-sm font-semibold uppercase tracking-sf-wide text-sf-subtle">
             Artifact shelf
           </h3>
-          <p className="mt-1 text-xs text-sf-muted">
+          <p className="mt-1 text-xs text-sf-muted short:hidden">
             Look values up here - the pipeline already did the work.
           </p>
-          <div className="mt-2 flex max-h-72 flex-col gap-1.5 overflow-y-auto">
+          <ScrollArea
+            className="mt-2 max-h-72 short:max-h-48"
+            viewportClassName="flex flex-col gap-1.5"
+            fadeClass="from-sf-surface"
+            hint="Scroll for more artifacts"
+          >
             {shelf.map((item) => {
               const artifact = artifacts[item.nodeId]
               if (artifact === undefined || artifact === null) {
@@ -116,7 +121,7 @@ export default function TemplateSlotsExercise({
                 </details>
               )
             })}
-          </div>
+          </ScrollArea>
         </div>
 
         <details className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">

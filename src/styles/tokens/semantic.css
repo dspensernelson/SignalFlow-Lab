@@ -113,7 +113,10 @@
   --sf-text:         var(--sf-slate-100);
   --sf-text-body:    var(--sf-slate-300);
   --sf-text-muted:   var(--sf-slate-400);
-  --sf-text-subtle:  var(--sf-slate-500);
+  /* slate-500 (#64748b) fell to ~3.9:1 on the ink surfaces - below AA for the
+     small uppercase micro-labels. Nudged between slate-400/500 to clear 4.5:1
+     while staying dimmer than --sf-text-muted (dark-only override). */
+  --sf-text-subtle:  #7e8ca3;
   --sf-text-inverse: #ffffff;
 
   --sf-accent:        var(--sf-blue-500);

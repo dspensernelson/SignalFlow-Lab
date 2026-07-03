@@ -2,7 +2,7 @@ import CopilotPromptCard from './CopilotPromptCard'
 import ChoiceCheckExercise from './ChoiceCheckExercise'
 import TemplateSlotsExercise from './TemplateSlotsExercise'
 import ArtifactImportExercise from './ArtifactImportExercise'
-import { Button } from './ui'
+import { Button, ScrollArea } from './ui'
 
 // The editor renders one JSON field per line; these constants match the
 // textarea's padding (p-3 = 12px) and line-height (leading-6 = 24px) so each
@@ -251,16 +251,21 @@ export default function LessonExercise({
     <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-12">
       {/* Left: source + three-state fields-to-capture checklist */}
       <div className="flex flex-col gap-3 lg:col-span-5 lg:max-h-[calc(100vh-13rem)] lg:min-h-0 lg:overflow-hidden">
-        <div className="flex flex-col rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm lg:min-h-0">
+        <div className="flex flex-col rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm short:p-2 lg:min-h-0">
           <h3 className="text-sm font-semibold uppercase tracking-sf-wide text-sf-subtle">
             {came ? 'What came in' : lesson.inputLabel || 'Source Note'}
           </h3>
           {came?.noteTitle && (
             <p className="mt-2 text-xs font-semibold text-sf-body">{came.noteTitle}</p>
           )}
-          <pre className="mt-1 whitespace-pre-wrap rounded-md bg-sf-surface-subtle p-3 text-sm text-sf-body lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+          <ScrollArea
+            as="pre"
+            className="mt-1 lg:flex-1"
+            viewportClassName="whitespace-pre-wrap rounded-md bg-sf-surface-subtle p-3 text-sm text-sf-body"
+            hint="Scroll for more"
+          >
             {lesson.input}
-          </pre>
+          </ScrollArea>
           {came?.flagCue && (
             <div className="mt-3 flex flex-wrap items-center gap-2 rounded-md border border-sf-warning bg-sf-progress-weak px-3 py-2">
               <span className="inline-flex items-center rounded-full border border-sf-warning bg-sf-surface px-2 py-0.5 text-xs font-medium text-sf-progress-text">

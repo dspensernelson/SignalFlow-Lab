@@ -19,8 +19,15 @@ with fixtures in the same commit.
 
 ## Live verification setup
 
-Dev server: `npm run dev` (port 5173). Test at a 1280x800 viewport - the
-no-scroll rule is defined at innerHeight >= 800.
+Dev server: `npm run dev` (port 5173). Test at TWO mandatory viewports - the
+no-scroll rule must hold at BOTH:
+
+- 1280x800 - the baseline (no-scroll rule is defined at innerHeight >= 800).
+- 1366x650 - the short-laptop checkpoint. Below 720px innerHeight the app
+  enters compact mode (tailwind `short:` screen, max-height:719) which
+  collapses the lesson header to one line and steps paddings/source max-height
+  down. A surface that holds at 800 can still overflow at 650, so 650 is a
+  SEPARATE, MANDATORY pass - not optional.
 
 Reset to a clean learner state (browser console):
 
@@ -52,11 +59,23 @@ The tallest state is the WRONG-ANSWER state - always verify that one:
    clientH: document.documentElement.clientHeight })
 ```
 
-scrollH must equal clientH (800). If it exceeds: compact the SURFACE (grid
-the questions, tighten template line-height, move helper panels to the other
-column, trim template blank lines) - never truncate the feedback contract
-(inline chips + one Fix-this-next callout). Every new exercise surface built
-so far exceeded 800 on its first draft; budget for one compaction pass.
+scrollH must equal clientH. Run this at BOTH 1280x800 and 1366x650 (set the
+viewport, reload, redo the wrong answer, then measure). If it exceeds: compact
+the SURFACE (grid the questions, tighten template line-height, move helper
+panels to the other column, trim template blank lines, add `short:` padding/gap
+reductions) - never truncate the feedback contract (inline chips + one
+Fix-this-next callout). Every new exercise surface built so far exceeded on its
+first draft; budget for one compaction pass.
+
+### Scroll-affordance check (internally-scrolling panels)
+
+Any exercise panel that scrolls internally (source narrative, rebuild runbook)
+must use the shared `ScrollArea` component (src/components/ui/ScrollArea.jsx),
+not a bare `overflow-y-auto`. Verify the affordance: when content is clipped,
+a bottom fade + "Scroll for more" hint is visible; both vanish once scrolled to
+the end and reappear when scrolled back up. Prove it on a panel that actually
+clips (e.g. lesson-tolerance-policy-hard source, or the Module 1 capstone
+runbook at 1366x650).
 
 ## Gating checks (after touching progress.js or LESSON_PREREQS)
 
@@ -156,6 +175,6 @@ frontier.
 
 4. No page scroll on the Exercise screen still holds with the header dropdown
    present (verify document.documentElement.scrollHeight === clientHeight at
-   1280x800 in the wrong-answer state).
+   1280x800 AND 1366x650 in the wrong-answer state).
 
 5. Console clean throughout; clear test state before handing back.
