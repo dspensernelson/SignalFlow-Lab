@@ -3,6 +3,14 @@ export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
+      // Height-based variant for compact mode on short laptop viewports
+      // (e.g. 1366x650 = a 1366x768 laptop minus browser chrome).
+      screens: {
+        short: { raw: '(max-height: 719px)' },
+        // Tall viewports where the fixed-aspect canvas map would otherwise
+        // leave dead space; used to vertically center the map in its row.
+        tall: { raw: '(min-height: 900px)' },
+      },
       colors: {
         sf: {
           bg: 'var(--sf-bg)',

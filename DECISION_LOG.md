@@ -2,6 +2,56 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-04 (G0 - verify and patch)
+
+- W3 (scroll affordance): added shared `src/components/ui/ScrollArea.jsx`
+  (bottom fade + "Scroll for more" hint that vanishes at scroll-end,
+  ResizeObserver-driven). Wired into every internally-scrolling exercise
+  panel in the SHARED workbench components: LessonExercise jsonEditor source
+  `<pre>`, ArtifactImportExercise rebuild runbook, TemplateSlotsExercise
+  artifact shelf. Proven on tolerance-policy-hard (was hiding 137px with no
+  cue) and the Module 1 capstone runbook - affordance shows when clipped,
+  vanishes at end, reappears scrolling back up.
+- W2 (compact mode): added a tailwind height variant `short` (max-height:719)
+  for laptop viewports like 1366x650. Collapsed the lesson header to one line
+  (LessonWorkspace: title shrinks, clock pill / subtitle / tier line hidden),
+  stepped down paddings/gaps and source max-heights on ChoiceCheckExercise and
+  ArtifactImportExercise. VERIFIED wrong-answer no-scroll (scrollHeight ===
+  clientHeight) at BOTH 1280x800 AND 1366x650 for one lesson of each
+  interaction type: jsonEditor (tolerance-policy-hard), choiceCheck
+  (invoice-inbox), templateSlots (payment-run), artifactImport
+  (approval-decision-hard) - all 0 overflow. The quiz that page-scrolled 65px
+  in the audit now holds at 0.
+- VERIFICATION_PLAYBOOK: 1366x650 added as a MANDATORY second no-scroll
+  checkpoint (not optional), plus a scroll-affordance check for internally
+  scrolling panels.
+- S4 (dark sweep, both modules): all product surfaces use the `sf` theme
+  tokens (verified they flip correctly light<->dark). One genuine dark-only
+  AA miss found - `--sf-text-subtle` (slate-500) fell to ~3.9:1 on the ink
+  surfaces for the smallest uppercase micro-labels; nudged the dark override
+  to #7e8ca3 (>=4.5:1, still dimmer than --sf-text-muted). This is a shared
+  token, so it fixes both modules. NOT changed (pre-existing in BOTH themes,
+  not dark regressions, semantic-by-design): white-on-status-fill node action
+  badges (View/Continue, ~10px) and the node-type legend hues - logged here
+  for the owner rather than reworking the product-wide color language in a
+  dark sweep.
+- S7 (keyboard-only hour): map nodes already keyboard-operable (role=button,
+  tabIndex=0, Enter/Space, aria-pressed); quiz radios are native inputs (arrow
+  within group, Tab between). Gap found + FIXED: the custom project dropdown
+  (ProjectSwitch) had no Escape-to-close - added Escape handling that closes
+  the listbox and returns focus to the trigger. Logged (not blocking task
+  completion, deferred): the dropdown does not implement full listbox arrow-key
+  roving focus / aria-activedescendant; options are reachable via Tab.
+- S5 (below-map dead space at tall viewports): the canvas map keeps a fixed
+  wide aspect, so on tall viewports the detail aside runs ~164px taller than
+  the map, leaving a lopsided empty band directly below the map (142px of
+  extra dead space at 1440x1100, 342px at 1440x1300). The map is
+  width-constrained (cannot grow taller without cropping the wide layout), so
+  the fold-in vertically centers the map within its (now stretched) grid row.
+  Gated to a new `tall` variant (min-height:900) so laptops stay top-aligned
+  (no awkward heading-to-map gap); tall viewports get balanced margins.
+- `npm run check` green throughout (81 lessons, build ok).
+
 ## 2026-07-03 (final PM go-live audit)
 
 - Final PM review before human users: GO_LIVE_REVIEW.md (five measured

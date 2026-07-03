@@ -45,10 +45,10 @@ export default function ChoiceCheckExercise({
   }
 
   return (
-    <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-12">
+    <div className="grid grid-cols-1 items-start gap-3 short:gap-2 lg:grid-cols-12">
       {/* Left: the source material being inspected */}
       <div className="flex flex-col gap-3 lg:col-span-5">
-        <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
+        <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm short:p-2">
           <h3 className="text-sm font-semibold uppercase tracking-sf-wide text-sf-subtle">
             {lesson.inputLabel || 'Source Material'}
           </h3>
@@ -68,14 +68,14 @@ export default function ChoiceCheckExercise({
       </div>
 
       {/* Right: questions + bounded readiness feedback */}
-      <div className="flex flex-col gap-3 lg:col-span-7">
-        <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
+      <div className="flex flex-col gap-3 short:gap-2 lg:col-span-7">
+        <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm short:p-2">
           <h3 className="text-sm font-semibold uppercase tracking-sf-wide text-sf-subtle">
             Inspection questions
           </h3>
           {/* Two-per-row grid keeps 4-5 questions + readiness on screen at 800px
               (no-scroll rule), including the wrong-answer state. */}
-          <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-2">
+          <div className="mt-2 grid grid-cols-1 gap-2 short:gap-1 md:grid-cols-2">
             {questions.map((question, index) => {
               const result = resultByQuestion[question.id]
               const failed = Boolean(result && !result.passed)

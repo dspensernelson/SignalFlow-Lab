@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import WorkflowGraph from './WorkflowGraph'
 import NodeDetail from './NodeDetail'
 import {
@@ -62,11 +62,24 @@ const PROJECT_STATUS_LABELS = { complete: 'Complete', active: 'Active', planned:
 // switch (App swaps the whole working set and returns to the canvas).
 function ProjectSwitch({ projects, value, onChange }) {
   const [open, setOpen] = useState(false)
+  const triggerRef = useRef(null)
   const active = projects.find((p) => p.id === value) || projects[0]
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      onKeyDown={(e) => {
+        // Escape closes the listbox and returns focus to the trigger, so a
+        // keyboard user is never trapped tabbing through every option.
+        if (e.key === 'Escape' && open) {
+          e.stopPropagation()
+          setOpen(false)
+          triggerRef.current?.focus()
+        }
+      }}
+    >
       <button
         type="button"
+        ref={triggerRef}
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -227,8 +240,13 @@ export default function ProjectCanvas({
           <h2 className="mb-3 text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">
             Workflow Map
           </h2>
-          <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:gap-6">
-            <div>
+          <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:items-stretch lg:gap-6">
+            {/* The map keeps a fixed wide aspect, so on tall viewports the
+                detail aside runs taller than the map. On tall viewports only,
+                center the map in its (stretched) grid row instead of
+                top-aligning it, folding the below-map dead space into balanced
+                margins. Laptop heights stay top-aligned (no awkward gap). */}
+            <div className="lg:flex lg:h-full lg:flex-col tall:lg:justify-center">
               <WorkflowGraph
                 nodes={nodes}
                 phases={phases}
