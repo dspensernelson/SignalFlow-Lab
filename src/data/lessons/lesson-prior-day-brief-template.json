@@ -107,7 +107,7 @@
       "You separated the fixed part of a recurring output (sections) from the flowing part (values).",
       "You can now tell the two midnight-crossing inputs apart: baseline carries data, template carries structure.",
       "You saw structure as an interface serving two audiences: human readers and downstream parsing.",
-      "The very next lesson renders today's artifacts into exactly these sections.",
+      "The Morning Brief task renders today's artifacts into exactly these sections.",
       "The workflow can now assemble the daily output against a consistent brief structure."
     ],
     "artifactName": "source-profile-brief-template.json"

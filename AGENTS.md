@@ -1,5 +1,8 @@
 ## Imported Claude Cowork project instructions
 
+> Entry point: start at BUILDER_KICKOFF.md, obey AUTONOMY_CHARTER.md, and run
+> `npm run check` before every commit. See .github/copilot-instructions.md.
+
 ## HARD RULE: No-scroll Exercise/workbench screens (NON-NEGOTIABLE)
 
 On lesson Exercise/workbench screens, the learner must be able to see the

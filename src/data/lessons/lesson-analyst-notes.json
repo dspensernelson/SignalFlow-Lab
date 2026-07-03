@@ -10,7 +10,7 @@
   "inputLabel": "Overnight Analyst Note",
   "input": "Checked overnight prices. ERCOT hub spiked around 2am, hit $187/MWh briefly then settled near $142/MWh. Wind generation underperformed, about 60% of forecast. Gas prices up slightly. Trader flagged the hub spike for review. No action taken yet. Need approval if we move on this.",
   "instructions": [
-    "Read the note as a source, not as content to extract - extraction is the next lesson.",
+    "Read the note as a source, not as content to extract - extraction is the Market Intake Record task.",
     "Answer the four source questions against the note and the workflow map.",
     "Validate to mint the source profile."
   ],

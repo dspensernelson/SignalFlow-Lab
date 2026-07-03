@@ -2,6 +2,40 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-02 (PM audit AUDIT_REPORT_2026-07-02.md - findings worked)
+
+- Acted on the 2026-07-02 PM audit (verdict: shippable, no blockers). Copy and
+  docs pass covering F1-F6, F8, F9, plus the F4 product decision.
+- F1 (three-way-match easy taught the tolerance boundary wrong): removed the
+  contradictory "and within 2%" language so the copy matches the larger-of
+  rule where the band is the whole price test. No canon-asserted value changed.
+- F2/F3 (positional lesson references): replaced "next lesson" / "previous
+  lesson" / "Lesson 15" copy with named-task references (Market Intake Record,
+  Approval Route, Morning Brief, Clean Price Data, Approval Template) across
+  Module 1, matching Module 2's name-the-task convention.
+- F4 (difficulty vs tier vocabulary collision): DECISION - adopt a single
+  learner-facing vocabulary, the tier. The lesson header now shows the active
+  tier ("Easy tier / Medium tier / Hard tier"), not the per-lesson difficulty
+  word (Beginner/Intermediate). The `difficulty` field stays in lesson JSON and
+  is still validated by lint VALID_DIFFICULTIES (backward compatible); it is
+  simply no longer surfaced as a competing scale. LessonWorkspace now takes a
+  `tier` prop from App.
+- F5 (undefined domain terms): added one-line hub / $-per-MWh / settled glosses
+  to the intake and clean-price-data INTROS only (not Exercise screens).
+- F6 (cross-module distractor): invoice-inbox q3 option c "A trader to approve
+  each email" -> "The Controller to read each email first" (Beacon-native).
+  correctOptionId unchanged.
+- F8: added .github/copilot-instructions.md (start at BUILDER_KICKOFF.md, obey
+  AUTONOMY_CHARTER.md, run `npm run check`) + a pointer line atop AGENTS.md.
+- F9 (doc staleness): refreshed LESSON_DESIGN_FRAMEWORK.md section 6 key files
+  (per-project src/data/projects/<id>/ roots, __<id> storage-key namespacing,
+  `npm run check` build block) and section 7 item 3 (Module 2 Easy+Medium DONE,
+  Hard is the current frontier); VERIFICATION_PLAYBOOK.md (lint:map in the
+  pipeline, per-project namespaced reset keys).
+- Deferred: F7 (per-project code-splitting) scheduled as the first task of the
+  Module 3 block; F1(c) 24.50/2.04% boundary drill folded into the Module 2
+  Hard tier build; F10 = the Module 2 Hard tier itself.
+
 ## 2026-07-02 (module-02 Beacon - Step 7 Medium tier built)
 
 - Authored the full Module 2 Medium tier: all 17 lessons wired, fixtured, and

@@ -47,7 +47,7 @@
         "options": [
           { "id": "a", "text": "Shared mailbox access, portal credentials, and document storage permission" },
           { "id": "b", "text": "Nothing - invoices are public records" },
-          { "id": "c", "text": "A trader to approve each email" }
+          { "id": "c", "text": "The Controller to read each email first" }
         ],
         "correctOptionId": "a",
         "explain": "The documents live in a shared mailbox and a vendor portal, and every original must be retained for audit. Reading them programmatically means access to those channels plus a retention policy. The lab simulates this with local document fixtures."

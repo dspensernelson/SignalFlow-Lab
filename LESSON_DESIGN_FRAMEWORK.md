@@ -257,7 +257,11 @@ State as of 2026-07-02 (branch module-01-tiers, PR #2 - MODULE 1 COMPLETE):
 Key files:
 - Lessons: src/data/lessons/*.json (easy schema below; -medium / -hard
   suffixes for tier variants)
-- Nodes / phases / edges: src/data/workflowNodes.json, phases.json, workflowEdges.json
+- Nodes / phases / edges: src/data/projects/<projectId>/workflowNodes.json,
+  phases.json, workflowEdges.json (per-project since the multi-project move;
+  module-01 data was git mv'd here byte-identical)
+- Project registry: src/data/projects.json + src/lib/projects.js
+  (PROJECT_DATA, BUILT_LESSONS[projectId][tier], active-project persistence)
 - Node schema (doc only): src/data/workflowNode.schema.json
 - Validators: src/lib/validators.js (jsonFields, jsonPolicy, jsonRows,
   jsonDeltas, choiceCheck, templateSlots, artifactImport - all additive and
@@ -271,7 +275,10 @@ Key files:
 - Components: LessonWorkspace (orchestrator), LessonIntro, LessonExercise, LessonTakeaway,
   FieldGuide, ValidationResults, WorkflowGraph, NodeDetail, ProjectCanvas, ArtifactViewer
 - Progress / artifacts / tiers: src/lib/progress.js; localStorage keys
-  `signalflow_progress[_tier]`, `signalflow_artifacts[_tier]`, `signalflow_tier`
+  `signalflow_progress[_tier]`, `signalflow_artifacts[_tier]`, `signalflow_tier`.
+  module-01 keeps these legacy un-namespaced keys byte-for-byte; every other
+  project namespaces its keys with a `__<projectId>` suffix. Active project is
+  persisted under `signalflow_project`.
 - Gotcha recorded the hard way: progress.js helpers take an optional tier
   param defaulting to the active tier; isBuildable validates that param
   because Array#filter passes an index as the second argument
@@ -287,8 +294,7 @@ Lesson JSON schema (as used by the 4 built lessons):
 Build/validate commands:
 ```powershell
 npm run dev      # port 5173, falls back to 5174
-npm run lint
-npm run build
+npm run check    # the full gate: lint + lint:map + lint:lessons + test:lessons + build
 ```
 
 Governing docs: PRODUCT_DOCTRINE.md, PROJECT_CONTEXT.md, PROCESS_MAP_CURRICULUM_DIRECTION.md,
@@ -337,7 +343,9 @@ CURRICULUM_MASTER_PLAN.md.
    module-01 complete + disabled planned modules, per-project tier
    independence, no-scroll wrong-answer state intact, console clean. NEXT:
    Module 2 (Beacon Invoice Desk), built STRICTLY via
-   MODULE_AUTHORING_PLAYBOOK.md.
+   MODULE_AUTHORING_PLAYBOOK.md. STATUS (2026-07-02): Module 2 Easy tier (17
+   lessons) and Medium tier (17 lessons) are DONE and pushed to the
+   module-02-beacon branch; the Hard tier is the current frontier.
 4. Housekeeping: bundle >500 kB (dynamic import per tier when it matters);
    rich-intro migration for the 40 lessons still on the simple dialect.
 

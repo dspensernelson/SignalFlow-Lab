@@ -106,7 +106,7 @@
     "points": [
       "You converted a chat exchange into approval-route.json - the response is now a fact in the system, not a fact in a thread.",
       "The record holds the five audit facts: who was asked, about what, what they decided, who decided, and when.",
-      "The governed template from the previous lesson is what made the request instant to read and answer.",
+      "The governed template from the Approval Template task is what made the request instant to read and answer.",
       "The Morning Brief will print its approval line straight from this record - and the manager's ops note foreshadows the brief's Operations section.",
       "The workflow can now capture a human approval response as an auditable record."
     ],
