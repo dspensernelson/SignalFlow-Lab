@@ -7,7 +7,13 @@ import {
   isBuildable,
   deriveNodeStatus,
   getUnlockRequirement,
+  hasSeenWelcome,
+  markWelcomeSeen,
+  hasCelebratedTier,
+  markTierCelebrated,
 } from '../lib/progress'
+import { buildExport, downloadText } from '../lib/export'
+import { WelcomeModal, TierCompleteModal } from './HumanMoments'
 import { Logo, ThemeToggle, StatItem, Button, Icon } from './ui'
 
 const TIER_LABELS = { easy: 'Easy', medium: 'Medium', hard: 'Hard' }
@@ -142,6 +148,7 @@ export default function ProjectCanvas({
   phases,
   edges,
   progress,
+  artifacts = {},
   selectedNodeId,
   theme,
   tier = 'easy',
@@ -175,11 +182,62 @@ export default function ProjectCanvas({
   const completeCount = buildableNodes.filter(
     (n) => progress[n.id] === STATUS.COMPLETE
   ).length
-  const lessonsDefined = nodes.filter((n) => n.lesson && n.lesson.intent).length
+  const tierPct = buildableNodes.length
+    ? Math.round((completeCount / buildableNodes.length) * 100)
+    : 0
+  const tierComplete = buildableNodes.length > 0 && completeCount === buildableNodes.length
   const anyProgress = buildableNodes.some(
     (n) =>
       progress[n.id] === STATUS.IN_PROGRESS || progress[n.id] === STATUS.COMPLETE
   )
+
+  // One-time "human moments": the welcome card (once ever) and the
+  // tier-completion celebration (once per completed tier, per project).
+  const [showWelcome, setShowWelcome] = useState(() => !hasSeenWelcome())
+  const [celebrateClosed, setCelebrateClosed] = useState(false)
+
+  // Reset the "closed" latch whenever the working set (project/tier) changes, so
+  // finishing a different tier still celebrates. Adjust-state-on-prop-change via
+  // a render-time compare (no effect, no cascading renders).
+  const tierKey = `${project}:${tier}`
+  const [prevTierKey, setPrevTierKey] = useState(tierKey)
+  if (tierKey !== prevTierKey) {
+    setPrevTierKey(tierKey)
+    setCelebrateClosed(false)
+  }
+
+  const showCelebrate =
+    tierComplete && !celebrateClosed && !hasCelebratedTier(tier, project)
+
+  function dismissWelcome() {
+    markWelcomeSeen()
+    setShowWelcome(false)
+  }
+
+  function dismissCelebrate() {
+    markTierCelebrated(tier, project)
+    setCelebrateClosed(true)
+  }
+
+  function handleExport() {
+    const payload = buildExport({
+      projectName,
+      tier,
+      tierLabel: TIER_LABELS[tier],
+      nodes,
+      progress,
+      artifacts,
+    })
+    downloadText(`${payload.base}.json`, payload.json, 'application/json')
+    downloadText(`${payload.base}.md`, payload.markdown, 'text/markdown')
+  }
+
+  const nextTier = TIERS[TIERS.indexOf(tier) + 1] || null
+  function handleNextTier() {
+    dismissCelebrate()
+    if (nextTier && onTierChange) onTierChange(nextTier)
+  }
+
 
   return (
     <div className="min-h-full text-left text-sf-text">
@@ -208,6 +266,16 @@ export default function ProjectCanvas({
             </span>
             {onTierChange && <TierSwitch value={tier} onChange={onTierChange} />}
             <ThemeToggle value={theme} onChange={onToggleTheme} />
+            <Button
+              variant="neutral"
+              size="sm"
+              icon="download"
+              onClick={handleExport}
+              disabled={completeCount === 0}
+              title="Download everything you built (JSON + markdown)"
+            >
+              Export
+            </Button>
             <Button variant="neutral" size="sm" icon="rotate-cw" onClick={onReset} disabled={!anyProgress}>
               Start Over
             </Button>
@@ -230,8 +298,8 @@ export default function ProjectCanvas({
             />
             <StatItem
               icon="workflow"
-              value={`${lessonsDefined} of ${nodes.length}`}
-              label="lessons defined"
+              value={`${tierPct}%`}
+              label={`${TIER_LABELS[tier]} tier complete`}
             />
           </div>
         </div>
@@ -278,6 +346,17 @@ export default function ProjectCanvas({
           </div>
         </section>
       </div>
+
+      <WelcomeModal open={showWelcome} onDismiss={dismissWelcome} />
+      <TierCompleteModal
+        open={showCelebrate}
+        tierLabel={TIER_LABELS[tier]}
+        builtCount={buildableNodes.length}
+        nextTierLabel={nextTier ? TIER_LABELS[nextTier] : null}
+        onExport={handleExport}
+        onNextTier={handleNextTier}
+        onDismiss={dismissCelebrate}
+      />
     </div>
   )
 }

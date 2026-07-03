@@ -368,6 +368,7 @@ export default function App() {
         phases={phases}
         edges={edges}
         progress={progress}
+        artifacts={artifacts}
         selectedNodeId={selectedNodeId}
         theme={theme}
         tier={tier}
