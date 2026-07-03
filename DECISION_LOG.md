@@ -2,6 +2,29 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-03 (final PM go-live audit)
+
+- Final PM review before human users: GO_LIVE_REVIEW.md (five measured
+  wounds + secondary cuts + the A-to-B ship plan), with the paste-ready
+  builder handoff in NEXT_SESSION_PROMPT.md. The go-live phases G0-G3 now
+  run BEFORE Module 3.
+- MEASURED defects driving the plan: (W2) at 1366x650 - a real laptop
+  viewport - even the smallest exercise page-scrolls by 65px in the
+  wrong-answer state (verification only ever ran at the 800px calibration
+  height); (W3) the bounded source panel hides 137px / 38% of
+  tolerance-policy-hard's design evidence with no scroll affordance; (W4)
+  a fully-completed tier produces no completion moment, first-run has no
+  onboarding, artifacts cannot be exported.
+- OWNER DIRECTIVE ratified (per the owner's stated bar - users must learn
+  to ACTUALLY build automations): per-module solo-rebuild capstone is
+  mandatory (Module 2 gets one retroactively); a "Do it for real" /
+  realWorld takeaway beat joins the lesson contract (lint-enforced,
+  backfilled); per-module TOOL_MAP.md appendices; the new-interaction
+  budget becomes spend-or-justify at the map gate.
+- Deploy amendment to gate 8 drafted in GO_LIVE_REVIEW Part 4 - awaiting
+  the owner's one-word ratification; merging the PR stack (#1 -> #2 -> #3)
+  remains an owner action and is a G3 prerequisite.
+
 ## 2026-07-03 (module-02 Beacon - Step 7 Hard tier built)
 
 - Built the Module 2 (Beacon Invoice Desk) HARD tier: 5 design drills that move
