@@ -338,8 +338,9 @@ CURRICULUM_MASTER_PLAN.md.
   enforced in lint-lessons, backfilled across all 81 Module 1+2 lessons.
   [done 2026-07-04] Module 2 solo-rebuild capstone (lesson-match-decision-hard,
   artifactImport, 4 Beacon spine files, mirrors approval-decision-hard).
-  [remaining] TOOL_MAP.md for modules 1+2, amend MODULE_AUTHORING_PLAYBOOK step 7
-  and charters/_INDEX (per-module capstone MANDATORY, interaction budget
+  [done 2026-07-04] TOOL_MAP.md for modules 1+2 (per-step Power Automate/Zapier/
+  Python mapping). [remaining] amend MODULE_AUTHORING_PLAYBOOK step 7 and
+  charters/_INDEX (per-module capstone MANDATORY, interaction budget
   SPEND-OR-JUSTIFY).
 - G3 SHIP. F7 per-project code-splitting; then PARK owner items in
   OPEN_QUESTIONS (merge PR stack #1->#2->#3, ratify the gate-8 deploy
