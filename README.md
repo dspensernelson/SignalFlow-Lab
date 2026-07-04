@@ -57,10 +57,11 @@ Where things stand if you are picking this back up:
   is the bar for every commit.
 - **No-scroll hard rule** verified live at 1280x800 in wrong-answer states for
   the new interaction types (and previously for the original four lessons).
-- **Branches/PRs**: PR #1 = `takeaway-workflow-diagram` -> `main` (redesign +
-  curriculum docs). PR #2 = `module-01-tiers` -> `takeaway-workflow-diagram`
-  (all implementation above). The live Vercel site is from an earlier build;
-  redeploy is intentionally out of scope.
+- **Shipped to main (2026-07-04)**: the stacked PRs #1/#2/#3 were merged - the
+  full reviewed history (reskin, Module 1 + 2 all tiers, multi-project engine,
+  go-live patch) is on `main`, green. The Gate 8 deploy amendment is ratified:
+  the app may deploy to the existing Vercel project from green `main`. Future
+  modules branch off `main`.
 - **Autonomous build is armed**: all nine remaining module charters are
   ratified (`curriculum/charters/`), the two blocking engine specs are
   pre-approved (`SPEC_ARTIFACT_IMPORT.md`, `SPEC_MULTI_PROJECT.md`), and

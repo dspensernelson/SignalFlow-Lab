@@ -2,6 +2,27 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-04 (owner ship actions - merge to main + deploy ratified)
+
+- OWNER RESOLVED both parked ship actions (OPEN_QUESTIONS moved to RESOLVED).
+- MERGE: the stacked PRs #1 <- #2 <- #3 were landed on main. Topology was
+  perfectly linear (main a clean ancestor of module-02-beacon; 39 commits;
+  all PRs MERGEABLE/CLEAN), so the mechanic was: retarget PR #2 and #3 to
+  base main, then fast-forward main to the module-02-beacon tip. Result -
+  the entire reviewed history (reskin, Module 1 all tiers, multi-project
+  engine, Module 2 all tiers, go-live patch G0-G3, the audits) is on main
+  with NO merge commits and full linear history; all three PRs closed as
+  merged. main is green (82 lessons, 98 assertions, 31 derivations, build
+  clean).
+- DEPLOY AMENDMENT ratified (gate 8): builder may deploy to the existing
+  Vercel project from green main only, after a merge, with a smoke test +
+  log. Vercel may auto-deploy main on push; that counts as the authorized
+  deploy and still requires the smoke test. README updated to reflect
+  merged-to-main and deploy-authorized state.
+- NEXT (builder): confirm/observe the production deploy of main, run the
+  live smoke test at both viewport checkpoints, then the anti-slop pass
+  (SLOP_AND_POLISH_REVIEW Q5), then Module 3. Future modules branch off main.
+
 ## 2026-07-04 (fifth PM review - slop-and-polish audit)
 
 - SLOP_AND_POLISH_REVIEW.md: fifth PM review at HEAD 70ea98e. Verdict -

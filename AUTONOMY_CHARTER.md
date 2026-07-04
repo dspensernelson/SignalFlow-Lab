@@ -86,13 +86,25 @@ changes are authorized: SPEC_MULTI_PROJECT.md and SPEC_ARTIFACT_IMPORT.md
 that touch storage keys, the progress model, or gating behavior beyond
 those specs are PROHIBITED - park instead.
 
-GATE 8 - Outward-facing: PROHIBITED, with two exceptions: pushing to the
-existing origin remote, and opening/updating PRs on the existing GitHub
-repo (one PR per module, using the module report format in
-MODULE_AUTHORING_PLAYBOOK.md step 8). No deploys, no new remotes, no
-publishing, no external services. PRs may be opened but NOT merged by the
-builder; unmerged PRs never block the next module (branch each module off
-the previous module's branch).
+GATE 8 - Outward-facing: PROHIBITED, with three exceptions: pushing to the
+existing origin remote; opening/updating PRs on the existing GitHub repo
+(one PR per module, using the module report format in
+MODULE_AUTHORING_PLAYBOOK.md step 8); and DEPLOYING the app to the existing
+Vercel project (signal-flow-lab) FROM main ONLY, after a merge, and only
+when `npm run check` is green on main. No other outward-facing action - no
+new remotes, no publishing, no other external services. Every deploy is
+followed by the production smoke test (VERIFICATION_PLAYBOOK end-to-end on
+the live URL at both viewport checkpoints) and logged in DECISION_LOG. PRs
+may be opened but NOT merged by the builder; merging remains an owner action.
+Unmerged PRs never block the next module (branch each module off the previous
+module's branch, or off main once the stack is merged).
+
+  DEPLOY AMENDMENT ratified 2026-07-04 by the owner (OPEN_QUESTIONS resolved;
+  parked recommendation option 1). Rationale: the deploy target is fixed and
+  main is gated green, so a deploy-from-green-main is safe and unblocks every
+  future module's ship step without a new owner decision each time. Note:
+  Vercel may auto-deploy main on push; that auto-deploy counts as the
+  authorized deploy and still requires the smoke test + log.
 
 GATE 9 - This charter: a builder may never amend AUTONOMY_CHARTER.md,
 DECISION_BOUNDARIES.md, or PRODUCT_DOCTRINE.md. If reality contradicts
