@@ -75,6 +75,14 @@
     { "field": "exhaustedFallback", "meaning": "What the policy does if the ladder runs out.", "type": "string", "hint": "The last sentence of the ladder policy." }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd look up who owns this decision (by desk, amount, or region) and send it to the right person instead of a catch-all inbox.",
+      "tools": {
+        "powerAutomate": "a lookup table + 'Start and wait for an approval' addressed to the resolved approver",
+        "zapier": "'Lookup Table' by Formatter to pick the approver, then send",
+        "python": "a routing map {region: approver} and a send call"
+      }
+    },
     "heading": "Ladder executed on the record",
     "points": [
       "You handled the realistic failure - silence - with a mechanism that converts non-response into scheduled action.",

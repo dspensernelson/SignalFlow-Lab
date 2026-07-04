@@ -95,6 +95,14 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd read the PDF invoice and type its header and line fields (vendor, number, amount, date) into structured columns.",
+      "tools": {
+        "powerAutomate": "AI Builder 'Extract information from invoices' into a Dataverse 'Create row'",
+        "zapier": "an OCR/parser step feeding 'Create Record'",
+        "python": "an OCR/LLM extract (pdfplumber + parsing) into a dict"
+      }
+    },
     "heading": "Invoice batch extracted",
     "points": [
       "You turned five documents into five structured invoice records with a consistent shape.",

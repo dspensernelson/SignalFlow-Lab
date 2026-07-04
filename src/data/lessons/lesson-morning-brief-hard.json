@@ -108,6 +108,14 @@
     "artifactName": "market-brief.md"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd assemble the final brief by dropping the cleaned numbers and the risk verdicts into the template, ready to send at 7:00.",
+      "tools": {
+        "powerAutomate": "'Create HTML table' + 'Compose' to build the body, then 'Send an email'",
+        "zapier": "a 'Formatter' build step feeding 'Send Outbound Email' / Gmail",
+        "python": "render the template with the day data, output HTML or markdown"
+      }
+    },
     "heading": "Degraded brief shipped",
     "points": [
       "You shipped on time with partial data - and the document itself says which parts are partial and why.",

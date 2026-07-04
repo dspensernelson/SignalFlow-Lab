@@ -102,6 +102,14 @@
     "artifactName": "source-profile-price-feed.json"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd download the overnight price file (a CSV or an emailed attachment) and load its rows into a table the workflow can read.",
+      "tools": {
+        "powerAutomate": "'When a file is created' (SharePoint/OneDrive) + Excel 'List rows in a table'",
+        "zapier": "'New File in Folder' (Dropbox/Drive) into a 'Create Spreadsheet Row(s)' step",
+        "python": "pandas.read_csv (or requests to the feed API) to load rows into a DataFrame"
+      }
+    },
     "heading": "Feed profiled",
     "points": [
       "You read the header as a contract and today's rows as evidence of what the contract leaves out.",

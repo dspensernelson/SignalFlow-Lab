@@ -86,6 +86,14 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd apply the rule - auto-approve if within tolerance, otherwise send to a person - so obvious cases don't wait on a human.",
+      "tools": {
+        "powerAutomate": "'Condition' -> either auto-complete or 'Start and wait for an approval'",
+        "zapier": "'Filter'/'Paths' that auto-pass clean cases and route the rest",
+        "python": "if within_tolerance: approve() else: escalate()"
+      }
+    },
     "heading": "Decision log built",
     "points": [
       "You encoded the fork as an explicit condition referencing the governed threshold, not a judgment call.",

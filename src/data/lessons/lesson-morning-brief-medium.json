@@ -132,6 +132,14 @@
     "artifactName": "market-brief.md"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd assemble the final brief by dropping the cleaned numbers and the risk verdicts into the template, ready to send at 7:00.",
+      "tools": {
+        "powerAutomate": "'Create HTML table' + 'Compose' to build the body, then 'Send an email'",
+        "zapier": "a 'Formatter' build step feeding 'Send Outbound Email' / Gmail",
+        "python": "render the template with the day data, output HTML or markdown"
+      }
+    },
     "heading": "Honest brief assembled",
     "points": [
       "You shipped a deliverable that reports its own gaps - the dropped row and the missing forecast are on the page, not buried in logs.",

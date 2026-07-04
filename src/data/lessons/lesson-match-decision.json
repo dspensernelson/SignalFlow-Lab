@@ -101,6 +101,14 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd stamp the result - matched or exception - so clean invoices move to pay and mismatches go to review.",
+      "tools": {
+        "powerAutomate": "'Switch'/'Condition' setting a match-status field",
+        "zapier": "'Paths' by match result",
+        "python": "return 'matched' or 'exception' with the failing reason"
+      }
+    },
     "heading": "Match decision made",
     "points": [
       "You encoded the workflow's one fork as a rule over three upstream booleans.",

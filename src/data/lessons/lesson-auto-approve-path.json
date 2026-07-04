@@ -102,6 +102,14 @@
     "artifactName": "auto-approval-log.json"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd let fully-matched, within-tolerance invoices approve automatically so only real problems reach a person.",
+      "tools": {
+        "powerAutomate": "the 'yes' branch that sets Approved and skips the review step",
+        "zapier": "the default Path that marks the invoice approved",
+        "python": "if matched and within tolerance: status = 'approved'"
+      }
+    },
     "heading": "Auto-approval logged",
     "points": [
       "You answered the four questions: what the path does, how it stays accountable, why the policy version is logged, and where the invoice goes next.",

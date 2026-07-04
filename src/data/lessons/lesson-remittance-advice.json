@@ -106,6 +106,14 @@
     "artifactName": "remittance-advice.md"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd email each vendor a remittance notice listing which invoices this payment covers.",
+      "tools": {
+        "powerAutomate": "'Send an email' per vendor with a 'Create HTML table' of paid invoices",
+        "zapier": "'Send Email' with merge fields per vendor",
+        "python": "render a remittance template per vendor and smtplib.send"
+      }
+    },
     "heading": "Remittance advice sent",
     "points": [
       "You assembled the vendor's remittance note entirely by looking up values in artifacts you built.",

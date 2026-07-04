@@ -102,6 +102,14 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd write a reusable message template with blanks (merge fields) so every approval request reads the same and just swaps the numbers.",
+      "tools": {
+        "powerAutomate": "a 'Compose' with dynamic content, or an approval email template with placeholders",
+        "zapier": "a step with {{merge fields}} in the message body",
+        "python": "an f-string or Jinja2 template filled from the record"
+      }
+    },
     "heading": "Approval template recorded",
     "points": [
       "You turned a desk agreement into a named, versioned request format with an owner.",

@@ -97,6 +97,14 @@
     "artifactName": "tolerance-policy.json"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd write the match tolerances down (e.g. 'price within 2%, quantity exact') in a config tab so the match check uses one agreed rule set.",
+      "tools": {
+        "powerAutomate": "Environment Variables or a config list holding the tolerance limits",
+        "zapier": "'Storage by Zapier' or a lookup table for the tolerances",
+        "python": "a tolerance config dict/JSON loaded at runtime"
+      }
+    },
     "heading": "Tolerance policy applied",
     "points": [
       "You applied one owned, versioned band consistently to two different price gaps.",

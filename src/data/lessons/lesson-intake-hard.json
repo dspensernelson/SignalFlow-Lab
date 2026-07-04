@@ -71,6 +71,14 @@
     { "field": "migratedFrom", "meaning": "The version this record came from.", "type": "string", "hint": "Rule 5." }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd open the analyst note and the trader flag side by side and copy both into one intake row, deciding which field wins when they disagree.",
+      "tools": {
+        "powerAutomate": "'Compose' + 'Join' to merge the two inputs, then 'Create item' for the record",
+        "zapier": "A multi-step Zap with a 'Formatter' merge feeding one 'Create Record'",
+        "python": "build one dict from both sources, {**note, **flag}, resolving conflicts explicitly"
+      }
+    },
     "heading": "Schema migrated without breakage",
     "points": [
       "You executed a breaking change as a disciplined mapping: rename, reshape, add, carry - every v2 field traceable to its origin.",

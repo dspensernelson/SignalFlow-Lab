@@ -68,6 +68,14 @@
     { "field": "withinTolerance", "meaning": "Whether variance is at or below the band.", "type": "boolean", "hint": "true for INV-59101 and INV-59102; false for the other two." }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd line up the invoice, the PO, and the receipt and confirm the three agree on item, quantity, and price.",
+      "tools": {
+        "powerAutomate": "join the three records and use a 'Condition' per field within tolerance",
+        "zapier": "a multi-step 'Lookup' + 'Filter' comparing the three sources",
+        "python": "compare invoice vs PO vs receipt field by field against tolerances"
+      }
+    },
     "heading": "You worked the rule where it bites",
     "points": [
       "You computed the band per invoice instead of assuming one number - larger-of makes the band depend on the PO, and either leg can be the one that wins.",

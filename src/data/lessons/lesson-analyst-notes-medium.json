@@ -97,6 +97,14 @@
     "artifactName": "source-profile-analyst-notes.json"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "By hand you'd copy the analyst's email or chat note and hand-key the ticker, direction, and rationale into named columns so later steps read fields, not prose.",
+      "tools": {
+        "powerAutomate": "Outlook 'When a new email arrives' trigger into a SharePoint 'Create item'",
+        "zapier": "Email Parser by Zapier extracts fields, then Google Sheets 'Create Row'",
+        "python": "imaplib/email to read the note, regex or an LLM call to extract fields into a dict"
+      }
+    },
     "heading": "Conflict profile recorded",
     "points": [
       "You resolved a source conflict with a governed, timestamp-decidable rule instead of judgment in the moment.",

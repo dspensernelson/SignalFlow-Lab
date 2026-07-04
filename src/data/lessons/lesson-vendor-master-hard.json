@@ -80,6 +80,14 @@
     { "field": "status", "meaning": "The state of the change.", "type": "string", "hint": "pending-verification - not applied yet." }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd match the invoice's vendor to your official vendor list and add or correct the master record if it is new or stale.",
+      "tools": {
+        "powerAutomate": "'Get items' to find the vendor, then 'Update/Create item' to maintain the master",
+        "zapier": "'Find or Create Record' in your vendor table",
+        "python": "upsert into the vendor table keyed by tax id or vendor id"
+      }
+    },
     "heading": "The change is verified, not just accepted",
     "points": [
       "You treated a bank-detail change as what it is - a payment instruction - and refused to apply it on the strength of the email that requested it.",

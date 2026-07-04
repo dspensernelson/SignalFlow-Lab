@@ -101,6 +101,14 @@
     "artifactName": "payment-archive.json"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd file the paid invoice, the match evidence, and the confirmation together in a dated folder for audit.",
+      "tools": {
+        "powerAutomate": "'Create file' in a dated library + 'Update item' to mark it archived",
+        "zapier": "'Upload File' to Drive + update the record's status",
+        "python": "write the bundle to storage/S3 with a timestamped key"
+      }
+    },
     "heading": "Run archived",
     "points": [
       "You answered the four questions: what archiving does beyond retention, who reads it next, the identity stored, and why the loop points backward.",

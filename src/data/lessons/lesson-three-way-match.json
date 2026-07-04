@@ -146,6 +146,14 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd line up the invoice, the PO, and the receipt and confirm the three agree on item, quantity, and price.",
+      "tools": {
+        "powerAutomate": "join the three records and use a 'Condition' per field within tolerance",
+        "zapier": "a multi-step 'Lookup' + 'Filter' comparing the three sources",
+        "python": "compare invoice vs PO vs receipt field by field against tolerances"
+      }
+    },
     "heading": "Three-way match complete",
     "points": [
       "You reconciled three independently owned records - invoice, PO, and receipt - into one result.",

@@ -69,6 +69,14 @@
     { "field": "rationale", "meaning": "Your defense, citing day counts.", "type": "string", "hint": "Count the days above each of your boundaries and say so." }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd write the threshold rules down in a shared doc or a config tab (e.g. 'flag if move > 8%') so the check reads one source of truth, not memory.",
+      "tools": {
+        "powerAutomate": "store limits in an Environment Variable or a SharePoint config list read at runtime",
+        "zapier": "keep thresholds in a 'Storage by Zapier' value or a lookup table",
+        "python": "a policy dict loaded from a JSON or YAML config at the top of the script"
+      }
+    },
     "heading": "You are now where rules come from",
     "points": [
       "You derived thresholds from a distribution and outcome constraints - the actual method behind every alerting rule, credit limit, and SLA you will ever meet.",

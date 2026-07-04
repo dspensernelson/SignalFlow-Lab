@@ -66,6 +66,14 @@
     { "field": "substitutionReason", "meaning": "Why the delegate decided.", "type": "string", "hint": "The automatic reply states it." }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd look up who owns this decision (by desk, amount, or region) and send it to the right person instead of a catch-all inbox.",
+      "tools": {
+        "powerAutomate": "a lookup table + 'Start and wait for an approval' addressed to the resolved approver",
+        "zapier": "'Lookup Table' by Formatter to pick the approver, then send",
+        "python": "a routing map {region: approver} and a send call"
+      }
+    },
     "heading": "Delegated approval captured",
     "points": [
       "You kept 'who was asked' and 'who answered' as separate facts - the difference IS the story of this approval.",

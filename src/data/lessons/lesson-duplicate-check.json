@@ -123,6 +123,14 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd compare the new invoice's key fields against recent ones and stop it if the vendor, number, and amount already appear.",
+      "tools": {
+        "powerAutomate": "'Get items' + 'Condition' on matching vendor/number/amount to flag duplicates",
+        "zapier": "'Find Record'; a 'Filter' halts the Zap on a match",
+        "python": "check membership on a (vendor, number, amount) key set"
+      }
+    },
     "heading": "Duplicate check complete",
     "points": [
       "You compared the invoice's identity - vendor id + invoice number + total - against the paid history.",

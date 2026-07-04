@@ -58,6 +58,14 @@
     { "field": "route", "meaning": "approval-route or routine-update-path.", "type": "string", "hint": "Follows directly from escalationRequired." }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd apply the rule - auto-approve if within tolerance, otherwise send to a person - so obvious cases don't wait on a human.",
+      "tools": {
+        "powerAutomate": "'Condition' -> either auto-complete or 'Start and wait for an approval'",
+        "zapier": "'Filter'/'Paths' that auto-pass clean cases and route the rest",
+        "python": "if within_tolerance: approve() else: escalate()"
+      }
+    },
     "heading": "The crash got caught",
     "points": [
       "You routed a negative boundary case correctly - the exact spot where 'if move >= threshold' silently fails in production.",

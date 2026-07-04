@@ -161,6 +161,14 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd open the analyst note and the trader flag side by side and copy both into one intake row, deciding which field wins when they disagree.",
+      "tools": {
+        "powerAutomate": "'Compose' + 'Join' to merge the two inputs, then 'Create item' for the record",
+        "zapier": "A multi-step Zap with a 'Formatter' merge feeding one 'Create Record'",
+        "python": "build one dict from both sources, {**note, **flag}, resolving conflicts explicitly"
+      }
+    },
     "heading": "Intake complete",
     "before": "The workflow only had a human analyst note.",
     "after": "The workflow has a structured Market Intake Record that downstream steps can reuse.",

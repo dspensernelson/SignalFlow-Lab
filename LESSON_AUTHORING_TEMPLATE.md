@@ -236,6 +236,28 @@ Suggested structure:
 
 The final point should be the Capability Statement whenever the component shape allows it.
 
+### Transfer beat (realWorld) - REQUIRED
+
+Every takeaway must carry a `takeaway.realWorld` beat so the learner can carry the
+skill off the platform. It answers "how would I rebuild this exact step at work?"
+and maps it to the three tools they are most likely to meet. The tier variants of
+a task share one mapping (the skill is the same at every depth).
+
+```json
+"realWorld": {
+  "soloRebuildPath": "How you'd rebuild THIS step by hand, with everyday tools (email, Excel, a form).",
+  "tools": {
+    "powerAutomate": "the concrete trigger/action or connector",
+    "zapier": "the concrete trigger/action or app step",
+    "python": "the concrete library or approach"
+  }
+}
+```
+
+Keep each line short and specific (name a real action/connector/library, not a
+generic "use automation"). `lint:lessons` fails if any of the four strings is
+missing or empty.
+
 ---
 
 ## Phase 4 - Implementation Contract
@@ -282,6 +304,8 @@ Takeaway:
 - `takeaway.points` include artifact produced, workflow location, downstream reuse, and
   capability statement
 - `takeaway.artifactName` matches the stored artifact
+- `takeaway.realWorld` carries `soloRebuildPath` plus `tools.powerAutomate`,
+  `tools.zapier`, and `tools.python` (all non-empty) - the transfer beat
 
 ### Component checklist
 

@@ -97,6 +97,14 @@
     "artifactName": "source-profile-receipt-log.json"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd check the goods-receipt log to confirm what was actually delivered before paying for it.",
+      "tools": {
+        "powerAutomate": "'Get items' from the receipts list filtered by PO and line",
+        "zapier": "'Find Record' in the receipts table",
+        "python": "query the receipts store by PO line"
+      }
+    },
     "heading": "Receipt log inspected",
     "points": [
       "You confirmed the receipt log is the independent third leg that proves goods arrived.",

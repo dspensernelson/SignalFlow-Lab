@@ -101,6 +101,14 @@
     "artifactName": "source-profile-invoice-inbox.json"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd triage the invoice inbox by hand - deciding which emails are real invoices, which are duplicates, and which are spam - before anything gets keyed.",
+      "tools": {
+        "powerAutomate": "Outlook trigger + Condition rules (or AI Builder) to classify each incoming invoice",
+        "zapier": "Email Parser + 'Filter' to keep only genuine invoices",
+        "python": "read the mailbox and classify by sender/subject rules into keep or skip"
+      }
+    },
     "heading": "Source profiled",
     "points": [
       "You answered the four source questions: producer, format, access, first consumer.",

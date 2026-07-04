@@ -128,6 +128,14 @@
     "artifactName": "payment-run.md"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd submit the approved batch to the bank or ERP and record each payment's confirmation.",
+      "tools": {
+        "powerAutomate": "an HTTP/connector call to the bank/ERP API, then log the response",
+        "zapier": "a 'Webhooks' POST to the payment API + 'Create Row' for confirmations",
+        "python": "POST the batch to the bank API and store the returned payment ids"
+      }
+    },
     "heading": "Payment run assembled",
     "points": [
       "You produced the day's payment run without deriving a single value - every slot was a lookup into an artifact you built.",

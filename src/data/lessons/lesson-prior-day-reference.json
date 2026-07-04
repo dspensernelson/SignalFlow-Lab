@@ -101,6 +101,14 @@
     "artifactName": "source-profile-prior-day-reference.json"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd look up yesterday's closing values (from your archive or a prior report) and stage them as the baseline this run compares against.",
+      "tools": {
+        "powerAutomate": "'Get items' filtered to yesterday's date from your SharePoint archive",
+        "zapier": "'Find Record' in Airtable filtered to the prior day",
+        "python": "query the store (SQL WHERE date = yesterday) or read the prior archive file"
+      }
+    },
     "heading": "Baseline traced",
     "points": [
       "You traced today's comparison numbers to yesterday's archived brief - the workflow consuming its previous self.",
