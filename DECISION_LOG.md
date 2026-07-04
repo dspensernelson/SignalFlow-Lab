@@ -2,6 +2,19 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-04 (G3 - F7 per-project code-splitting)
+
+- Split the lesson registry into per-project dynamic-import chunks
+  (src/data/lessons/module01Lessons.js and module02Lessons.js) loaded on demand
+  in App.jsx via LESSON_MODULE_LOADERS keyed by project; React.lazy now defers
+  LessonWorkspace and ArtifactViewer behind Suspense. Main bundle dropped from
+  ~834 kB to ~304 kB (gzip ~91 kB); each module's lessons (~230 kB) and the
+  workspace (~64 kB) load only when opened. The 500 kB chunk warning is gone.
+- Verified live (both modules): opening a lesson resolves its project chunk and
+  renders; project switch loads the other chunk; no-scroll holds (800 = 800).
+- G3 remaining (merge PR stack, ratify Gate 8 deploy amendment) parked in
+  OPEN_QUESTIONS.md as OWNER actions. Builder stops before deploy/merge.
+
 ## 2026-07-04 (G2.4 - doctrine: capstone mandatory, interaction budget)
 
 - MODULE_AUTHORING_PLAYBOOK.md Step 7 extended with Step 7a (MANDATORY Hard-tier

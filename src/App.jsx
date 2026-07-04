@@ -1,92 +1,10 @@
-import { useEffect, useState } from 'react'
-import lessonIntake from './data/lessons/lesson-intake.json'
-import lessonThresholdPolicy from './data/lessons/lesson-threshold-policy.json'
-import lessonCleanPriceData from './data/lessons/lesson-clean-price-data.json'
-import lessonVarianceCheck from './data/lessons/lesson-variance-check.json'
-import lessonRiskEvaluation from './data/lessons/lesson-risk-evaluation.json'
-import lessonApprovalTemplate from './data/lessons/lesson-approval-template.json'
-import lessonApprovalDecision from './data/lessons/lesson-approval-decision.json'
-import lessonApprovalRoute from './data/lessons/lesson-approval-route.json'
-import lessonRoutineUpdatePath from './data/lessons/lesson-routine-update-path.json'
-import lessonDistributionArchive from './data/lessons/lesson-distribution-archive.json'
-import lessonAnalystNotes from './data/lessons/lesson-analyst-notes.json'
-import lessonTraderFlag from './data/lessons/lesson-trader-flag.json'
-import lessonPriceFeed from './data/lessons/lesson-price-feed.json'
-import lessonForecastData from './data/lessons/lesson-forecast-data.json'
-import lessonPriorDayReference from './data/lessons/lesson-prior-day-reference.json'
-import lessonPriorDayBriefTemplate from './data/lessons/lesson-prior-day-brief-template.json'
-import lessonMorningBrief from './data/lessons/lesson-morning-brief.json'
-import lessonIntakeMedium from './data/lessons/lesson-intake-medium.json'
-import lessonCleanPriceDataMedium from './data/lessons/lesson-clean-price-data-medium.json'
-import lessonThresholdPolicyMedium from './data/lessons/lesson-threshold-policy-medium.json'
-import lessonVarianceCheckMedium from './data/lessons/lesson-variance-check-medium.json'
-import lessonRiskEvaluationMedium from './data/lessons/lesson-risk-evaluation-medium.json'
-import lessonApprovalDecisionMedium from './data/lessons/lesson-approval-decision-medium.json'
-import lessonApprovalRouteMedium from './data/lessons/lesson-approval-route-medium.json'
-import lessonAnalystNotesMedium from './data/lessons/lesson-analyst-notes-medium.json'
-import lessonTraderFlagMedium from './data/lessons/lesson-trader-flag-medium.json'
-import lessonPriceFeedMedium from './data/lessons/lesson-price-feed-medium.json'
-import lessonForecastDataMedium from './data/lessons/lesson-forecast-data-medium.json'
-import lessonPriorDayReferenceMedium from './data/lessons/lesson-prior-day-reference-medium.json'
-import lessonPriorDayBriefTemplateMedium from './data/lessons/lesson-prior-day-brief-template-medium.json'
-import lessonApprovalTemplateMedium from './data/lessons/lesson-approval-template-medium.json'
-import lessonRoutineUpdatePathMedium from './data/lessons/lesson-routine-update-path-medium.json'
-import lessonMorningBriefMedium from './data/lessons/lesson-morning-brief-medium.json'
-import lessonDistributionArchiveMedium from './data/lessons/lesson-distribution-archive-medium.json'
-import lessonIntakeHard from './data/lessons/lesson-intake-hard.json'
-import lessonThresholdPolicyHard from './data/lessons/lesson-threshold-policy-hard.json'
-import lessonPriceFeedHard from './data/lessons/lesson-price-feed-hard.json'
-import lessonApprovalRouteHard from './data/lessons/lesson-approval-route-hard.json'
-import lessonRiskEvaluationHard from './data/lessons/lesson-risk-evaluation-hard.json'
-import lessonMorningBriefHard from './data/lessons/lesson-morning-brief-hard.json'
-import lessonDistributionArchiveHard from './data/lessons/lesson-distribution-archive-hard.json'
-import lessonApprovalDecisionHard from './data/lessons/lesson-approval-decision-hard.json'
-// Module 2 (Beacon Invoice Desk) - Easy tier
-import lessonInvoiceInbox from './data/lessons/lesson-invoice-inbox.json'
-import lessonVendorMaster from './data/lessons/lesson-vendor-master.json'
-import lessonPoRegister from './data/lessons/lesson-po-register.json'
-import lessonInvoiceRecord from './data/lessons/lesson-invoice-record.json'
-import lessonReceiptLog from './data/lessons/lesson-receipt-log.json'
-import lessonTolerancePolicy from './data/lessons/lesson-tolerance-policy.json'
-import lessonPaymentHistory from './data/lessons/lesson-payment-history.json'
-import lessonDuplicateCheck from './data/lessons/lesson-duplicate-check.json'
-import lessonThreeWayMatch from './data/lessons/lesson-three-way-match.json'
-import lessonMatchDecision from './data/lessons/lesson-match-decision.json'
-import lessonAutoApprovePath from './data/lessons/lesson-auto-approve-path.json'
-import lessonExceptionQueue from './data/lessons/lesson-exception-queue.json'
-import lessonPaymentBatch from './data/lessons/lesson-payment-batch.json'
-import lessonRunApproval from './data/lessons/lesson-run-approval.json'
-import lessonPaymentRun from './data/lessons/lesson-payment-run.json'
-import lessonRemittanceAdvice from './data/lessons/lesson-remittance-advice.json'
-import lessonPaymentArchive from './data/lessons/lesson-payment-archive.json'
-// Module 2 (Beacon Invoice Desk) - Medium tier
-import lessonInvoiceInboxMedium from './data/lessons/lesson-invoice-inbox-medium.json'
-import lessonInvoiceRecordMedium from './data/lessons/lesson-invoice-record-medium.json'
-import lessonVendorMasterMedium from './data/lessons/lesson-vendor-master-medium.json'
-import lessonPoRegisterMedium from './data/lessons/lesson-po-register-medium.json'
-import lessonReceiptLogMedium from './data/lessons/lesson-receipt-log-medium.json'
-import lessonTolerancePolicyMedium from './data/lessons/lesson-tolerance-policy-medium.json'
-import lessonPaymentHistoryMedium from './data/lessons/lesson-payment-history-medium.json'
-import lessonDuplicateCheckMedium from './data/lessons/lesson-duplicate-check-medium.json'
-import lessonThreeWayMatchMedium from './data/lessons/lesson-three-way-match-medium.json'
-import lessonMatchDecisionMedium from './data/lessons/lesson-match-decision-medium.json'
-import lessonExceptionQueueMedium from './data/lessons/lesson-exception-queue-medium.json'
-import lessonAutoApprovePathMedium from './data/lessons/lesson-auto-approve-path-medium.json'
-import lessonPaymentBatchMedium from './data/lessons/lesson-payment-batch-medium.json'
-import lessonRunApprovalMedium from './data/lessons/lesson-run-approval-medium.json'
-import lessonPaymentRunMedium from './data/lessons/lesson-payment-run-medium.json'
-import lessonRemittanceAdviceMedium from './data/lessons/lesson-remittance-advice-medium.json'
-import lessonPaymentArchiveMedium from './data/lessons/lesson-payment-archive-medium.json'
-// Module 2 (Beacon Invoice Desk) - Hard tier
-import lessonTolerancePolicyHard from './data/lessons/lesson-tolerance-policy-hard.json'
-import lessonDuplicateCheckHard from './data/lessons/lesson-duplicate-check-hard.json'
-import lessonVendorMasterHard from './data/lessons/lesson-vendor-master-hard.json'
-import lessonThreeWayMatchHard from './data/lessons/lesson-three-way-match-hard.json'
-import lessonMatchDecisionHard from './data/lessons/lesson-match-decision-hard.json'
-import lessonPaymentRunHard from './data/lessons/lesson-payment-run-hard.json'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import ProjectCanvas from './components/ProjectCanvas'
-import LessonWorkspace from './components/LessonWorkspace'
-import ArtifactViewer from './components/ArtifactViewer'
+
+// F7: the lesson workspace and artifact viewer only render once a learner
+// leaves the canvas, so they load on demand rather than in the initial bundle.
+const LessonWorkspace = lazy(() => import('./components/LessonWorkspace'))
+const ArtifactViewer = lazy(() => import('./components/ArtifactViewer'))
 import {
   loadProgress,
   saveProgress,
@@ -104,95 +22,12 @@ import {
 import { PROJECTS, getProjectData, loadProject, saveProject } from './lib/projects'
 import { loadTheme, saveTheme, applyTheme } from './lib/theme'
 
-// Only built lessons are wired here. Other lessonIds resolve to undefined.
-const LESSONS = {
-  'lesson-intake': lessonIntake,
-  'lesson-threshold-policy': lessonThresholdPolicy,
-  'lesson-clean-price-data': lessonCleanPriceData,
-  'lesson-variance-check': lessonVarianceCheck,
-  'lesson-risk-evaluation': lessonRiskEvaluation,
-  'lesson-approval-template': lessonApprovalTemplate,
-  'lesson-approval-decision': lessonApprovalDecision,
-  'lesson-approval-route': lessonApprovalRoute,
-  'lesson-routine-update-path': lessonRoutineUpdatePath,
-  'lesson-distribution-archive': lessonDistributionArchive,
-  'lesson-analyst-notes': lessonAnalystNotes,
-  'lesson-trader-flag': lessonTraderFlag,
-  'lesson-price-feed': lessonPriceFeed,
-  'lesson-forecast-data': lessonForecastData,
-  'lesson-prior-day-reference': lessonPriorDayReference,
-  'lesson-prior-day-brief-template': lessonPriorDayBriefTemplate,
-  'lesson-morning-brief': lessonMorningBrief,
-  // Medium tier variants (resolved via tierLessonId: `${taskId}-medium`).
-  'lesson-intake-medium': lessonIntakeMedium,
-  'lesson-clean-price-data-medium': lessonCleanPriceDataMedium,
-  'lesson-threshold-policy-medium': lessonThresholdPolicyMedium,
-  'lesson-variance-check-medium': lessonVarianceCheckMedium,
-  'lesson-risk-evaluation-medium': lessonRiskEvaluationMedium,
-  'lesson-approval-decision-medium': lessonApprovalDecisionMedium,
-  'lesson-approval-route-medium': lessonApprovalRouteMedium,
-  'lesson-analyst-notes-medium': lessonAnalystNotesMedium,
-  'lesson-trader-flag-medium': lessonTraderFlagMedium,
-  'lesson-price-feed-medium': lessonPriceFeedMedium,
-  'lesson-forecast-data-medium': lessonForecastDataMedium,
-  'lesson-prior-day-reference-medium': lessonPriorDayReferenceMedium,
-  'lesson-prior-day-brief-template-medium': lessonPriorDayBriefTemplateMedium,
-  'lesson-approval-template-medium': lessonApprovalTemplateMedium,
-  'lesson-routine-update-path-medium': lessonRoutineUpdatePathMedium,
-  'lesson-morning-brief-medium': lessonMorningBriefMedium,
-  'lesson-distribution-archive-medium': lessonDistributionArchiveMedium,
-  // Hard tier variants (`${taskId}-hard`).
-  'lesson-intake-hard': lessonIntakeHard,
-  'lesson-threshold-policy-hard': lessonThresholdPolicyHard,
-  'lesson-price-feed-hard': lessonPriceFeedHard,
-  'lesson-approval-route-hard': lessonApprovalRouteHard,
-  'lesson-risk-evaluation-hard': lessonRiskEvaluationHard,
-  'lesson-morning-brief-hard': lessonMorningBriefHard,
-  'lesson-distribution-archive-hard': lessonDistributionArchiveHard,
-  'lesson-approval-decision-hard': lessonApprovalDecisionHard,
-  // Module 2 (Beacon Invoice Desk) - Easy tier
-  'lesson-invoice-inbox': lessonInvoiceInbox,
-  'lesson-vendor-master': lessonVendorMaster,
-  'lesson-po-register': lessonPoRegister,
-  'lesson-invoice-record': lessonInvoiceRecord,
-  'lesson-receipt-log': lessonReceiptLog,
-  'lesson-tolerance-policy': lessonTolerancePolicy,
-  'lesson-payment-history': lessonPaymentHistory,
-  'lesson-duplicate-check': lessonDuplicateCheck,
-  'lesson-three-way-match': lessonThreeWayMatch,
-  'lesson-match-decision': lessonMatchDecision,
-  'lesson-auto-approve-path': lessonAutoApprovePath,
-  'lesson-exception-queue': lessonExceptionQueue,
-  'lesson-payment-batch': lessonPaymentBatch,
-  'lesson-run-approval': lessonRunApproval,
-  'lesson-payment-run': lessonPaymentRun,
-  'lesson-remittance-advice': lessonRemittanceAdvice,
-  'lesson-payment-archive': lessonPaymentArchive,
-  // Module 2 (Beacon Invoice Desk) - Medium tier
-  'lesson-invoice-inbox-medium': lessonInvoiceInboxMedium,
-  'lesson-invoice-record-medium': lessonInvoiceRecordMedium,
-  'lesson-vendor-master-medium': lessonVendorMasterMedium,
-  'lesson-po-register-medium': lessonPoRegisterMedium,
-  'lesson-receipt-log-medium': lessonReceiptLogMedium,
-  'lesson-tolerance-policy-medium': lessonTolerancePolicyMedium,
-  'lesson-payment-history-medium': lessonPaymentHistoryMedium,
-  'lesson-duplicate-check-medium': lessonDuplicateCheckMedium,
-  'lesson-three-way-match-medium': lessonThreeWayMatchMedium,
-  'lesson-match-decision-medium': lessonMatchDecisionMedium,
-  'lesson-exception-queue-medium': lessonExceptionQueueMedium,
-  'lesson-auto-approve-path-medium': lessonAutoApprovePathMedium,
-  'lesson-payment-batch-medium': lessonPaymentBatchMedium,
-  'lesson-run-approval-medium': lessonRunApprovalMedium,
-  'lesson-payment-run-medium': lessonPaymentRunMedium,
-  'lesson-remittance-advice-medium': lessonRemittanceAdviceMedium,
-  'lesson-payment-archive-medium': lessonPaymentArchiveMedium,
-  // Module 2 (Beacon Invoice Desk) - Hard tier
-  'lesson-tolerance-policy-hard': lessonTolerancePolicyHard,
-  'lesson-duplicate-check-hard': lessonDuplicateCheckHard,
-  'lesson-vendor-master-hard': lessonVendorMasterHard,
-  'lesson-three-way-match-hard': lessonThreeWayMatchHard,
-  'lesson-match-decision-hard': lessonMatchDecisionHard,
-  'lesson-payment-run-hard': lessonPaymentRunHard,
+// F7: each project's lesson registry is its own dynamic-import chunk, so a
+// learner only downloads the lessons for the project they open. Projects with
+// no built lessons yet resolve to an empty map.
+const LESSON_MODULE_LOADERS = {
+  'module-01': () => import('./data/lessons/module01Lessons.js'),
+  'module-02': () => import('./data/lessons/module02Lessons.js'),
 }
 
 export default function App() {
@@ -207,9 +42,30 @@ export default function App() {
   const [activeLessonId, setActiveLessonId] = useState(null)
   const [notice, setNotice] = useState(null)
   const [theme, setTheme] = useState(() => loadTheme())
+  // Loaded lesson registry, stamped with the project it belongs to so a
+  // stale set from the previous project is ignored during a project swap.
+  const [lessonSet, setLessonSet] = useState(null)
 
   // The active project's workflow map (nodes/phases/edges) drives the canvas.
   const { nodes, phases, edges } = getProjectData(project)
+
+  // The lesson registry for the active project, or null while its chunk loads.
+  const lessons = lessonSet && lessonSet.project === project ? lessonSet.lessons : null
+
+  // Load the active project's lesson chunk on mount and whenever the project
+  // changes. State is only set asynchronously (after the chunk resolves) and
+  // is discarded if the project changed again in the meantime.
+  useEffect(() => {
+    let cancelled = false
+    const loader = LESSON_MODULE_LOADERS[project]
+    const pending = loader ? loader() : Promise.resolve({ default: {} })
+    pending.then((mod) => {
+      if (!cancelled) setLessonSet({ project, lessons: mod.default })
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [project])
 
   // Apply and persist the theme whenever it changes.
   useEffect(() => {
@@ -271,7 +127,12 @@ export default function App() {
 
   function openLesson(nodeId) {
     const node = nodes.find((n) => n.id === nodeId)
-    const lesson = node && LESSONS[tierLessonId(node.taskId, tier)]
+    if (!lessons) {
+      // The project's lesson chunk is still downloading; ask the learner to retry.
+      setNotice('Loading lessons...')
+      return
+    }
+    const lesson = node && lessons[tierLessonId(node.taskId, tier)]
 
     if (!lesson) {
       // NOTE: task-shaped nodes can be inspected, but only built lessons launch this pass.
@@ -334,25 +195,30 @@ export default function App() {
   }
 
   if (view === 'lesson' && activeLessonId) {
-    const lesson = LESSONS[activeLessonId]
+    const lesson = lessons && lessons[activeLessonId]
+    if (!lesson) return null
     return (
-      <LessonWorkspace
-        lesson={lesson}
-        tier={tier}
-        onPass={handlePass}
-        onReturnToCanvas={returnToCanvas}
-      />
+      <Suspense fallback={null}>
+        <LessonWorkspace
+          lesson={lesson}
+          tier={tier}
+          onPass={handlePass}
+          onReturnToCanvas={returnToCanvas}
+        />
+      </Suspense>
     )
   }
 
   if (view === 'artifact') {
     const node = nodes.find((n) => n.id === selectedNodeId)
     return (
-      <ArtifactViewer
-        node={node}
-        artifact={artifacts[selectedNodeId]}
-        onBack={returnToCanvas}
-      />
+      <Suspense fallback={null}>
+        <ArtifactViewer
+          node={node}
+          artifact={artifacts[selectedNodeId]}
+          onBack={returnToCanvas}
+        />
+      </Suspense>
     )
   }
 
