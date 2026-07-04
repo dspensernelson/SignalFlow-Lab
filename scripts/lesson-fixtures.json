@@ -204,6 +204,21 @@
     }
   },
 
+  "lesson-match-decision-hard": {
+    "correct": {
+      "invoice-record": "{\"invoiceNumber\":\"INV-58831\",\"vendorId\":\"V-1042\",\"poNumber\":\"PO-7742\",\"quantity\":500,\"unitPrice\":2.44,\"invoiceTotal\":1220}",
+      "duplicate-check": "{\"invoiceNumber\":\"INV-58831\",\"vendorId\":\"V-1042\",\"invoiceTotal\":1220,\"foundInHistory\":false,\"isDuplicate\":false,\"decision\":\"clear\"}",
+      "three-way-match": "{\"invoiceTotal\":1220,\"poTotal\":1200,\"variance\":20,\"variancePct\":1.67,\"toleranceBand\":25,\"qtyMatch\":true,\"withinTolerance\":true,\"matchResult\":\"matched\"}",
+      "match-decision": "{\"withinTolerance\":true,\"qtyMatch\":true,\"isDuplicate\":false,\"route\":\"auto-approve\"}"
+    },
+    "wrong": {
+      "invoice-record": "{\"invoiceNumber\":\"INV-58831\",\"vendorId\":\"V-1042\",\"poNumber\":\"PO-7742\",\"quantity\":500,\"unitPrice\":2.44,\"invoiceTotal\":1220}",
+      "duplicate-check": "{\"invoiceNumber\":\"INV-58831\",\"vendorId\":\"V-1042\",\"invoiceTotal\":1220,\"foundInHistory\":false,\"isDuplicate\":false,\"decision\":\"clear\"}",
+      "three-way-match": "{\"invoiceTotal\":1220,\"poTotal\":1200,\"variance\":20,\"variancePct\":1.67,\"toleranceBand\":25,\"qtyMatch\":true,\"withinTolerance\":true,\"matchResult\":\"matched\"}",
+      "match-decision": "{\"withinTolerance\":true,\"qtyMatch\":true,\"isDuplicate\":false,\"route\":\"exception-queue\"}"
+    }
+  },
+
   "lesson-invoice-record": {
     "correct": { "invoiceNumber": "INV-58831", "vendorId": "V-1042", "poNumber": "PO-7742", "quantity": 500, "unitPrice": 2.44, "invoiceTotal": 1220 },
     "wrong": { "invoiceNumber": "INV-58831", "vendorId": "V-1042", "poNumber": "PO-7742", "quantity": 500, "unitPrice": 2.44, "invoiceTotal": 1200 }

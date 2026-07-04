@@ -82,6 +82,7 @@ import lessonTolerancePolicyHard from './data/lessons/lesson-tolerance-policy-ha
 import lessonDuplicateCheckHard from './data/lessons/lesson-duplicate-check-hard.json'
 import lessonVendorMasterHard from './data/lessons/lesson-vendor-master-hard.json'
 import lessonThreeWayMatchHard from './data/lessons/lesson-three-way-match-hard.json'
+import lessonMatchDecisionHard from './data/lessons/lesson-match-decision-hard.json'
 import lessonPaymentRunHard from './data/lessons/lesson-payment-run-hard.json'
 import ProjectCanvas from './components/ProjectCanvas'
 import LessonWorkspace from './components/LessonWorkspace'
@@ -190,6 +191,7 @@ const LESSONS = {
   'lesson-duplicate-check-hard': lessonDuplicateCheckHard,
   'lesson-vendor-master-hard': lessonVendorMasterHard,
   'lesson-three-way-match-hard': lessonThreeWayMatchHard,
+  'lesson-match-decision-hard': lessonMatchDecisionHard,
   'lesson-payment-run-hard': lessonPaymentRunHard,
 }
 

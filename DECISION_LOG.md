@@ -2,6 +2,27 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-04 (G2.2 - Module 2 solo-rebuild capstone)
+
+- Added lesson-match-decision-hard, the Module 2 capstone, mirroring Module 1's
+  lesson-approval-decision-hard. It is an artifactImport lesson attached to the
+  match-decision node (the fork, late on the path, the Module 2 analog of the
+  approval-decision desk). The learner rebuilds the four spine artifacts of the
+  Beacon invoice desk outside the app - invoice-record.json (extract),
+  duplicate-check.json (dedupe), three-way-match.json (reconcile), and
+  match-decision.json (decide) - then imports each one.
+- Each import reuses the exact validator from its easy-tier lesson (all four are
+  jsonFields), so the acceptance bar does not move. Registered in App.jsx LESSONS
+  and projects.js BUILT_LESSONS['module-02'].hard (hard tier now 6 buildable
+  tasks). Added a lesson-fixtures.json entry so test:lessons exercises the real
+  validator (correct imports pass; a wrong route fails).
+- Added the required takeaway.realWorld beat (reuses the match-decision family
+  mapping). Verified live end to end: capstone gates behind duplicate-check +
+  three-way-match completion (real unlock tree), all four pasted artifacts
+  validate ("4 of 4 files imported and validated"), and the takeaway renders the
+  merged artifact plus the "Take this to work" panel.
+- `npm run check` green.
+
 ## 2026-07-04 (G2.1 - transfer beat)
 
 - Added a required `takeaway.realWorld` beat to every lesson: `soloRebuildPath`

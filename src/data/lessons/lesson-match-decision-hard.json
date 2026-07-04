@@ -1,0 +1,168 @@
+{
+  "id": "lesson-match-decision-hard",
+  "nodeId": "match-decision",
+  "title": "Rebuild the Beacon Match Yourself",
+  "difficulty": "Hard",
+  "skill": "Transfer: rebuild the pipeline in any tool",
+  "scenario": "The lab is behind you. Rebuild the four core artifacts of the Beacon invoice desk in any tool you choose - PowerShell, Python, Power Automate, a spreadsheet, or by hand - then import them here to prove the pattern is yours. Each file is graded by the same validator the lab used, so the acceptance bar does not move.",
+  "inputType": "text",
+  "inputLabel": "Rebuild runbook",
+  "input": "You have already built every step of the Beacon invoice desk inside the lab. The capstone proves you can do it WITHOUT the lab. Rebuild these four files in ANY tool, then import each one here. All four are single JSON objects.\n\n=== 1. invoice-record.json (one object) ===\nFrom invoice INV-58831 - Northwind Fasteners (vendor V-1042). Bills against PO-7742. 500 x M8 hex bolt @ $2.44 each. Invoice total $1,220.00.\nFields: invoiceNumber, vendorId, poNumber, quantity, unitPrice, invoiceTotal. Use numbers for quantity, unitPrice, and invoiceTotal.\n\n=== 2. duplicate-check.json (one object) ===\nIdentity = vendor id + invoice number + invoice total. Check INV-58831 / V-1042 / 1220.00 against the Payment History (INV-58790 for V-1042 at 980.00, plus other vendors) - it is not there.\nFields: invoiceNumber, vendorId, invoiceTotal, foundInHistory (false), isDuplicate (false), decision.\n\n=== 3. three-way-match.json (one object) ===\nInvoice total 1220.00, PO total 1200.00, ordered 500, received 500. Tolerance band = the larger of 2% of the PO (24.00) or 25.00.\nFields: invoiceTotal, poTotal, variance (invoice minus PO), variancePct (variance / PO * 100, 2 decimals), toleranceBand, qtyMatch, withinTolerance, matchResult.\n\n=== 4. match-decision.json (one object) ===\nRule: route to auto-approve only when withinTolerance AND qtyMatch AND not a duplicate; otherwise route to the exception queue.\nInputs: withinTolerance true, qtyMatch true, isDuplicate false. Fields: withinTolerance, qtyMatch, isDuplicate, route.\n\nRule: your tooling is free, the acceptance bar is not. Import all four, then validate.",
+  "instructions": [
+    "Rebuild each of the four files in any tool you like, outside the app.",
+    "Import invoice-record.json, duplicate-check.json, three-way-match.json, and match-decision.json.",
+    "Use the file picker, or paste each file's contents with 'Paste instead'.",
+    "Match the shapes the lab taught: every file is a single JSON object.",
+    "Validate - every file is graded by the validator that built it in the lab."
+  ],
+  "interactionType": "artifactImport",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "artifactImport",
+    "imports": [
+      {
+        "key": "invoice-record",
+        "label": "invoice-record.json",
+        "validation": {
+          "type": "jsonFields",
+          "requiredFields": [
+            "invoiceNumber",
+            "vendorId",
+            "poNumber",
+            "quantity",
+            "unitPrice",
+            "invoiceTotal"
+          ],
+          "expected": {
+            "invoiceNumber": "INV-58831",
+            "vendorId": "V-1042",
+            "poNumber": "PO-7742",
+            "quantity": 500,
+            "unitPrice": 2.44,
+            "invoiceTotal": 1220
+          }
+        }
+      },
+      {
+        "key": "duplicate-check",
+        "label": "duplicate-check.json",
+        "validation": {
+          "type": "jsonFields",
+          "requiredFields": [
+            "invoiceNumber",
+            "vendorId",
+            "invoiceTotal",
+            "foundInHistory",
+            "isDuplicate",
+            "decision"
+          ],
+          "expected": {
+            "invoiceNumber": "INV-58831",
+            "vendorId": "V-1042",
+            "invoiceTotal": 1220,
+            "foundInHistory": false,
+            "isDuplicate": false
+          },
+          "acceptedValues": {
+            "decision": ["clear", "not duplicate", "not-duplicate", "proceed", "pass"]
+          }
+        }
+      },
+      {
+        "key": "three-way-match",
+        "label": "three-way-match.json",
+        "validation": {
+          "type": "jsonFields",
+          "requiredFields": [
+            "invoiceTotal",
+            "poTotal",
+            "variance",
+            "variancePct",
+            "toleranceBand",
+            "qtyMatch",
+            "withinTolerance",
+            "matchResult"
+          ],
+          "expected": {
+            "invoiceTotal": 1220,
+            "poTotal": 1200,
+            "variance": 20,
+            "variancePct": 1.67,
+            "toleranceBand": 25,
+            "qtyMatch": true,
+            "withinTolerance": true
+          },
+          "acceptedValues": {
+            "matchResult": ["matched", "match", "pass", "clean match", "clean"]
+          }
+        }
+      },
+      {
+        "key": "match-decision",
+        "label": "match-decision.json",
+        "validation": {
+          "type": "jsonFields",
+          "requiredFields": [
+            "withinTolerance",
+            "qtyMatch",
+            "isDuplicate",
+            "route"
+          ],
+          "expected": {
+            "withinTolerance": true,
+            "qtyMatch": true,
+            "isDuplicate": false
+          },
+          "acceptedValues": {
+            "route": ["auto-approve", "auto-approve-path", "auto approve", "auto-approve path"]
+          }
+        }
+      }
+    ]
+  },
+  "copilotPrompt": "Help me rebuild four files for an accounts-payable invoice desk: invoice-record.json (invoiceNumber, vendorId, poNumber, quantity, unitPrice, invoiceTotal), duplicate-check.json (invoiceNumber, vendorId, invoiceTotal, foundInHistory, isDuplicate, decision), three-way-match.json (invoiceTotal, poTotal, variance, variancePct, toleranceBand, qtyMatch, withinTolerance, matchResult), and match-decision.json (withinTolerance, qtyMatch, isDuplicate, route). I will import them into the app to validate against the same bar.",
+  "successMessage": "Capstone complete. You rebuilt the Beacon invoice desk outside the app and proved every file against the same bar the lab used.",
+  "validateLabel": "Validate imports",
+  "intro": {
+    "heading": "Before you build: prove the transfer",
+    "sections": [
+      {
+        "title": "The capstone is transfer, not recall",
+        "body": "Every earlier lesson gave you the app's workspace. Here you leave it: rebuild the whole match pipeline in a tool of your choice and prove it by import. If you can do it outside the lab, you have actually learned it."
+      },
+      {
+        "title": "Your tooling is free, the bar is not",
+        "body": "PowerShell, Python, Power Automate, a spreadsheet, or pen and paper are all legal. The app grades each imported file with the exact validator that graded it in the lab, so the acceptance standard does not move."
+      },
+      {
+        "title": "Four files, one pipeline",
+        "body": "invoice-record.json, duplicate-check.json, three-way-match.json, and match-decision.json are the spine of the Beacon invoice desk. Rebuilding all four end to end is the proof that the pattern - extract, dedupe, reconcile, decide - is yours."
+      },
+      {
+        "title": "It happens to live at the decision fork",
+        "body": "This capstone attaches to the match decision node because it sits at the fork, after the duplicate check and the three-way match. The fork is where a clean invoice is proven payable - a fitting place to prove yours."
+      }
+    ],
+    "jsonExample": "{\n  \"invoiceNumber\": \"INV-58831\",\n  \"variance\": 20,\n  \"withinTolerance\": true,\n  \"route\": \"auto-approve\"\n}",
+    "skill": "Transfer: rebuild the pipeline in any tool",
+    "artifactName": "rebuilt-invoice-desk.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd stamp the result - matched or exception - so clean invoices move to pay and mismatches go to review.",
+      "tools": {
+        "powerAutomate": "'Switch'/'Condition' setting a match-status field",
+        "zapier": "'Paths' by match result",
+        "python": "return 'matched' or 'exception' with the failing reason"
+      }
+    },
+    "heading": "Pipeline rebuilt and proven",
+    "points": [
+      "You rebuilt invoice-record.json, duplicate-check.json, three-way-match.json, and match-decision.json outside the app and imported all four.",
+      "Each file passed the same validator that graded it in the lab, so the rebuild meets the real acceptance bar, not a lighter one.",
+      "You proved the pattern transfers: extract, dedupe, reconcile, and decide are skills you can run in any tool.",
+      "The workflow can now be rebuilt end to end by you alone, in whatever tooling your team actually uses."
+    ],
+    "artifactName": "rebuilt-invoice-desk.json"
+  }
+}
