@@ -56,6 +56,18 @@ Design the node graph. Guardrails, learned from Module 1:
 Deliverables: nodes/edges/phases JSON drafts + the LESSON_PREREQS tree.
 GATE: owner approves the map shape and unlock tree.
 
+### Step 2a - Recurrence map (one row per module)
+
+Add this module's entry to src/data/moduleSkeleton.json: `org`, `deliverable`,
+and a `map` naming the ONE representative node label for each of the seven
+shared skeleton stages (intake, reference, transform, decision, handoff,
+assembly, archive). This is what powers the once-per-module "you have seen this
+shape before" card (module-02+), which lines the new module up against the
+Meridian anchor stage for stage. Use the map to sanity-check the design: if a
+stage has no clean representative node, the map is probably missing an invariant
+(fix the map, not the card). module-01 (Meridian) is the anchor and shows no
+card.
+
 ## Step 3 - Node audit
 
 Write the module's NODE_AUDIT-style document (copy Module 1's NODE_AUDIT.md

@@ -2,6 +2,28 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-04 (anti-slop 1B - name-the-recurrence card)
+
+- Added a data-driven "You have seen this shape before" card shown once per
+  module (module-02 and beyond), the first time a learner enters a module.
+  Source of truth: src/data/moduleSkeleton.json (a shared 7-stage skeleton -
+  intake / reference / transform / one decision fork / handoff / assembly /
+  archive loop - plus a per-module map of the ONE representative node label per
+  stage). The card lines the module up against the Meridian anchor stage for
+  stage, making "all workflows are the same workflow" literally visible.
+- RecurrenceModal (src/components/HumanMoments.jsx) renders the table; gated in
+  ProjectCanvas by a per-project localStorage flag (signalflow_recurrence_seen__
+  <project>) via hasSeenRecurrence/markRecurrenceSeen in src/lib/progress.js.
+  Shown only when the project is not the anchor (module-01) AND has a skeleton
+  entry AND the welcome card is not also open (never stack). Anchor module shows
+  no card by design.
+- Not an Exercise/workbench screen, so the modal is bounded (max-w-2xl,
+  max-h-[85vh], internal scroll); live-verified the card fits the viewport at
+  BOTH 1280x800 and 1366x650, all 7 rows map Meridian->Beacon correctly, dismiss
+  persists (no reappearance on reload), and module-01 never shows it.
+- MODULE_AUTHORING_PLAYBOOK Step 2a now requires each new module to add its
+  moduleSkeleton.json row, so future modules (Module 3+) get the card for free.
+
 ## 2026-07-04 (anti-slop 1A - choiceCheck monopoly: measure, spec, cap)
 
 - MEASURED the current choiceCheck share per module (source of truth: the

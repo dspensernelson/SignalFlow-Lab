@@ -201,6 +201,31 @@ export function markTierCelebrated(tier = loadTier(), project = loadProject()) {
   }
 }
 
+// The "you have seen this shape before" recurrence card is shown once per
+// module (per project), the first time a learner enters a module that maps onto
+// the shared workflow skeleton (module-02 and beyond). Scoped per project so
+// each new module reintroduces the recurrence exactly once.
+function recurrenceKey(project) {
+  const p = hasProjectData(project) ? project : loadProject()
+  return `signalflow_recurrence_seen__${p}`
+}
+
+export function hasSeenRecurrence(project = loadProject()) {
+  try {
+    return localStorage.getItem(recurrenceKey(project)) === '1'
+  } catch {
+    return true
+  }
+}
+
+export function markRecurrenceSeen(project = loadProject()) {
+  try {
+    localStorage.setItem(recurrenceKey(project), '1')
+  } catch {
+    /* ignore: non-critical persistence */
+  }
+}
+
 // Display/reading order of the lessons (the pedagogical path). Used for default
 // selection and docs; unlocking is governed by the prerequisite tree, not this
 // order. Both come from the active project's lessonMeta.json; the exports below

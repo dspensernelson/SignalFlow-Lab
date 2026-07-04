@@ -81,3 +81,64 @@ export function TierCompleteModal({
     </Modal>
   )
 }
+
+// "You have seen this shape before." Shown once per module (module-02+), the
+// first time a learner enters a module that maps onto the shared workflow
+// skeleton. Data-driven from src/data/moduleSkeleton.json: it lines this
+// module's real nodes up against the Meridian anchor, stage for stage, so the
+// recurring shape itself becomes visible ("all workflows are the same
+// workflow"). One card per module.
+export function RecurrenceModal({ open, skeleton, anchorModule, thisModule, onDismiss }) {
+  if (!open || !skeleton || !anchorModule || !thisModule) return null
+  return (
+    <Modal
+      open={open}
+      onClose={onDismiss}
+      maxWidth="max-w-2xl"
+      labelledBy="recurrence-title"
+      describedBy="recurrence-body"
+    >
+      <div className="flex items-center gap-2">
+        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sf-accent-weak text-sf-accent-text">
+          <Icon name="rotate-cw" size={18} />
+        </span>
+        <h2 id="recurrence-title" className="text-lg font-semibold text-sf-text">
+          You have seen this shape before
+        </h2>
+      </div>
+      <p id="recurrence-body" className="mt-3 text-sm text-sf-body">
+        {anchorModule.org}&rsquo;s {anchorModule.deliverable} and {thisModule.org}&rsquo;s{' '}
+        {thisModule.deliverable} are the same seven-stage workflow. Only the names change &mdash;
+        learn the shape once and you can rebuild it anywhere.
+      </p>
+      <div className="mt-4 overflow-hidden rounded-lg border border-sf-border">
+        <table className="w-full border-collapse text-left text-sm">
+          <thead>
+            <tr className="bg-sf-surface-subtle text-xs uppercase tracking-wide text-sf-muted">
+              <th className="px-3 py-2 font-semibold">Stage</th>
+              <th className="px-3 py-2 font-semibold">{anchorModule.org} (Module 1)</th>
+              <th className="px-3 py-2 font-semibold">{thisModule.org} (this module)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {skeleton.map((s) => (
+              <tr key={s.id} className="border-t border-sf-border align-top">
+                <td className="px-3 py-2">
+                  <div className="font-medium text-sf-text">{s.stage}</div>
+                  <div className="text-xs text-sf-muted">{s.gloss}</div>
+                </td>
+                <td className="px-3 py-2 text-sf-body">{anchorModule.map[s.id]}</td>
+                <td className="px-3 py-2 font-medium text-sf-text">{thisModule.map[s.id]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="mt-5 flex justify-end">
+        <Button variant="primary" size="sm" iconRight="arrow-right" onClick={onDismiss}>
+          Build the same shape
+        </Button>
+      </div>
+    </Modal>
+  )
+}
