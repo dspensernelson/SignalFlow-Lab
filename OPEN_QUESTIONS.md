@@ -43,6 +43,37 @@ Entry format:
 
 (No other open questions at this time.)
 
+## 2026-07-04 Anti-slop: approve new interaction type(s) (OWNER GATE)
+- Doing: queue step 1A - break the choiceCheck monopoly (currently module-01
+  28.6% and module-02 47.5% choiceCheck; combined ~38%). Spec written at
+  ENGINE_ADDITIONS_SPEC fidelity: ENGINE_ADDITIONS_SPEC_INSPECTION_HANDOFF.md,
+  proposing two ADDITIVE deterministic interaction types - `tagSource` (tag
+  which source spans are which fields, for inspection nodes) and `handoffForm`
+  (capture the who/what/when of a handoff, for handoff nodes).
+- Blocked on: the work order makes a new interaction type an OWNER GATE
+  (spec-then-park), and Gate 4 also budgets AT MOST ONE new interaction type per
+  module. Need the owner to approve (a) whether to build new type(s) at all,
+  (b) which - tagSource, handoffForm, or both, and (c) if both, whether to waive
+  the one-per-module Gate 4 budget for the anti-slop initiative (they target two
+  different node kinds and span modules).
+- Options:
+  1. Approve BOTH with a budget note "anti-slop interaction types are exempt
+     from the one-per-module cap; still one NEW concept per module thereafter."
+     Recommended - gives inspection AND handoff an active alternative, the
+     fastest path to the ~25% cap.
+  2. Approve ONE now (tagSource has the bigger effect: inspection nodes are the
+     most numerous choiceCheck users), build the other later under a normal
+     per-module budget.
+  3. Approve NEITHER; hit the cap using only existing types (jsonEditor/
+     templateSlots/artifactImport) for inspection/handoff nodes. Cheapest, but
+     the quiz-feel critique is only partly addressed.
+- Parked: building either component/validator (spec is ready to implement on
+  approval). NOT parked and proceeding now: the map-gate choiceCheck cap
+  (grandfathering module-01/02, erroring for module-03+) and Module 3, which can
+  meet the cap with existing types under option 3 if approval does not arrive.
+
+(No further open questions at this time.)
+
 ---
 
 ## RESOLVED
