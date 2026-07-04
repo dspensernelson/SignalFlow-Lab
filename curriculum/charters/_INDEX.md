@@ -34,3 +34,12 @@ least one governed policy/reference, a cleaning/normalization step, exactly
 one decision fork, human handoffs with captured responses, one assembly
 output, one archive closing a temporal loop) so the recurring shape itself
 stays the deepest lesson. Keep ASCII-only.
+
+Every module also ships, without exception:
+
+- A MANDATORY Hard-tier solo-rebuild capstone (MODULE_AUTHORING_PLAYBOOK.md
+  Step 7a): an artifactImport lesson on the decision-fork node that has the
+  learner rebuild the module's four spine artifacts outside the app, each
+  graded by its original easy-tier validator.
+- A SPEND-OR-JUSTIFY interaction budget (Step 7b): spend all four exercise
+  types across the tiers, or record in DECISION_LOG.md why one is absent.
