@@ -6,15 +6,19 @@ SLOP_AND_POLISH_REVIEW.md (the current work order), then AUTONOMY_CHARTER.md,
 BUILDER_KICKOFF.md, and VERIFICATION_PLAYBOOK.md. Run `npm run check` and read
 OPEN_QUESTIONS.md before touching anything.
 
-STATE: Modules 1 and 2 are complete across all tiers (82 lessons, green). The
-go-live patch phases G0-G3 are all DONE and shipped (welcome/completion/export
-human moments, compact mode at 1366x650, the ScrollArea affordance, the
-realWorld transfer beat on every lesson, both TOOL_MAP.md files, the Module 2
-capstone, and per-project code-splitting). Two owner ship-actions are parked in
-OPEN_QUESTIONS.md (merge the PR stack; ratify the Gate 8 deploy amendment) - do
-NOT touch those; they are the owner's.
+STATE: Modules 1 and 2 are complete across all tiers (82 lessons, green) and
+the whole reviewed history is now MERGED TO main. Both former owner ship-actions
+are RESOLVED (OPEN_QUESTIONS): the PR stack is merged, and the Gate 8 deploy
+amendment is ratified - the builder MAY now deploy to the existing Vercel
+project from green main. Future work branches off main.
 
 YOUR QUEUE, in order:
+
+0. SHIP main. Confirm the production deploy of main (Vercel may auto-deploy on
+   the merge push; if it did not, deploy per the amendment). Then run the
+   VERIFICATION_PLAYBOOK end-to-end smoke test on the LIVE url at BOTH 1280x800
+   and 1366x650, and log the result + add the live url to README. If the smoke
+   test fails, that is the first fix - real users come before new work.
 
 1. ANTI-SLOP PASS (SLOP_AND_POLISH_REVIEW.md Q5 plan) - do this BEFORE Module 3
    authoring, because it changes the interaction contract every later module
