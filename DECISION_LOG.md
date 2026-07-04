@@ -2,6 +2,27 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-04 (anti-slop 1A - choiceCheck monopoly: measure, spec, cap)
+
+- MEASURED the current choiceCheck share per module (source of truth: the
+  interactionType of each registered lesson): module-01 12/42 = 28.6%,
+  module-02 19/40 = 47.5%; combined 31/82 = 37.8% (matches the review's ~38%).
+  jsonEditor is the largest bucket in M1 (26), choiceCheck the largest in M2 (19).
+- SPEC (spec-then-park): wrote ENGINE_ADDITIONS_SPEC_INSPECTION_HANDOFF.md at
+  ENGINE_ADDITIONS_SPEC fidelity for two ADDITIVE deterministic interaction
+  types - tagSource (tag which source spans are which fields, for inspection
+  nodes) and handoffForm (capture the who/what/when of a handoff, for handoff
+  nodes). A new interaction type is owner-gated for this work order, so BOTH are
+  PARKED for owner approval in OPEN_QUESTIONS (which to build; whether to waive
+  the Gate 4 one-per-module budget since two are proposed). No component or
+  validator was built.
+- CAP enforced at the map gate: scripts/lint-lessons.mjs now errors when a
+  module's choiceCheck share exceeds 25% (~1-in-4). module-01 and module-02
+  predate the rule and are GRANDFATHERED as warnings (they exceed the cap);
+  module-03+ must hold it as an error. This keeps `npm run check` green while
+  preventing new drift. Module 3 will meet the cap using existing interaction
+  types if the new types are not approved in time.
+
 ## 2026-07-04 (SHIP BLOCKED - main is still the initial commit)
 
 - On starting the slop-and-polish work order (queue step 0 = ship main), git
