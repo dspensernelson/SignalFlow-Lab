@@ -336,8 +336,9 @@ CURRICULUM_MASTER_PLAN.md.
   required `takeaway.realWorld` (soloRebuildPath + Power Automate/Zapier/Python
   mapping), rendered as the "Take this to work" panel on every takeaway,
   enforced in lint-lessons, backfilled across all 81 Module 1+2 lessons.
-  [remaining] Module 2 solo-rebuild capstone via artifactImport (4 Beacon
-  files), TOOL_MAP.md for modules 1+2, amend MODULE_AUTHORING_PLAYBOOK step 7
+  [done 2026-07-04] Module 2 solo-rebuild capstone (lesson-match-decision-hard,
+  artifactImport, 4 Beacon spine files, mirrors approval-decision-hard).
+  [remaining] TOOL_MAP.md for modules 1+2, amend MODULE_AUTHORING_PLAYBOOK step 7
   and charters/_INDEX (per-module capstone MANDATORY, interaction budget
   SPEND-OR-JUSTIFY).
 - G3 SHIP. F7 per-project code-splitting; then PARK owner items in

@@ -146,6 +146,7 @@ export const BUILT_LESSONS = {
       'lesson-duplicate-check-hard',
       'lesson-vendor-master-hard',
       'lesson-three-way-match-hard',
+      'lesson-match-decision-hard',
       'lesson-payment-run-hard',
     ],
   },
