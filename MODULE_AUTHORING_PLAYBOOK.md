@@ -139,6 +139,33 @@ Medium and Hard repeat steps 4-6 with their own canon and postures. Hard is
 curated: pick the 6-8 nodes whose content deepens into design/failure work;
 log the curation decision in DECISION_LOG.md.
 
+### Step 7a - Solo-rebuild capstone (MANDATORY)
+
+Every module MUST ship exactly one Hard-tier solo-rebuild capstone. It is not
+optional and it is not a normal lesson: it is the proof the learner can rebuild
+the module's spine WITHOUT the app.
+
+- Shape: an `artifactImport` lesson that asks the learner to rebuild the module's
+  four spine artifacts (extract, normalize/dedupe, derive/reconcile, decide) in
+  any tool of their choice and import each one. Mirror the reference
+  implementations `lesson-approval-decision-hard` (Module 1) and
+  `lesson-match-decision-hard` (Module 2).
+- Attach it to the module's decision-fork node (the late node where the run is
+  proven trustworthy), as the Hard-tier variant of that node's task.
+- Each imported file is graded by the SAME validator that graded it in its
+  easy-tier lesson - the acceptance bar does not move. Add a fixtures entry
+  (correct + wrong) so `test:lessons` exercises the real validator.
+- The capstone still carries a `takeaway.realWorld` beat like every lesson.
+
+### Step 7b - Interaction budget (SPEND-OR-JUSTIFY)
+
+Each module has an interaction-type budget: it should SPEND all four exercise
+types (choiceCheck, jsonEditor, templateSlots, artifactImport) across its tiers,
+or JUSTIFY in DECISION_LOG.md why a type is absent. A module that reuses only
+one or two interaction types is a design smell - variety is what keeps the
+recurring workflow shape from feeling like a worksheet. The artifactImport
+budget is always spent by the mandatory Step 7a capstone.
+
 ## Step 8 - Module wrap (OWNER GATE)
 
 - Full-path playthrough on every tier (VERIFICATION_PLAYBOOK end-to-end

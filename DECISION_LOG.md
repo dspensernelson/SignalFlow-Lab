@@ -2,6 +2,16 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-04 (G2.4 - doctrine: capstone mandatory, interaction budget)
+
+- MODULE_AUTHORING_PLAYBOOK.md Step 7 extended with Step 7a (MANDATORY Hard-tier
+  solo-rebuild artifactImport capstone on the decision-fork node, four spine
+  artifacts graded by their original easy-tier validators, fixtures required)
+  and Step 7b (interaction budget is SPEND-OR-JUSTIFY: spend all four exercise
+  types across tiers or justify an absence in this log).
+- curriculum/charters/_INDEX.md restates both as per-module requirements.
+- Extends frozen doctrine (adds obligations); weakens nothing. ASCII only.
+
 ## 2026-07-04 (G2.3 - tool maps)
 
 - Added curriculum/module-01/TOOL_MAP.md and curriculum/module-02/TOOL_MAP.md.

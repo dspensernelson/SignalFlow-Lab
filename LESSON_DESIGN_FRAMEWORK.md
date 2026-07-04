@@ -339,9 +339,9 @@ CURRICULUM_MASTER_PLAN.md.
   [done 2026-07-04] Module 2 solo-rebuild capstone (lesson-match-decision-hard,
   artifactImport, 4 Beacon spine files, mirrors approval-decision-hard).
   [done 2026-07-04] TOOL_MAP.md for modules 1+2 (per-step Power Automate/Zapier/
-  Python mapping). [remaining] amend MODULE_AUTHORING_PLAYBOOK step 7 and
-  charters/_INDEX (per-module capstone MANDATORY, interaction budget
-  SPEND-OR-JUSTIFY).
+  Python mapping). [done 2026-07-04] amended MODULE_AUTHORING_PLAYBOOK step 7
+  (7a capstone MANDATORY, 7b interaction budget SPEND-OR-JUSTIFY) and
+  charters/_INDEX. G2 phase complete; next is G3 ship (F7 code-split + owner park).
 - G3 SHIP. F7 per-project code-splitting; then PARK owner items in
   OPEN_QUESTIONS (merge PR stack #1->#2->#3, ratify the gate-8 deploy
   amendment). Deploy only after the owner acts.
