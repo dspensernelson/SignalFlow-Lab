@@ -2,6 +2,15 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-04 (G2.3 - tool maps)
+
+- Added curriculum/module-01/TOOL_MAP.md and curriculum/module-02/TOOL_MAP.md.
+  Each maps every workflow step to a "By hand" manual version plus Power
+  Automate / Zapier / Python equivalents, drawn from the per-lesson realWorld
+  beats authored in G2.1, and closes with the shared five-move transfer pattern
+  (trigger, normalize/reference, judge/match, decide/route, publish/pay+archive).
+  ASCII only.
+
 ## 2026-07-04 (G2.2 - Module 2 solo-rebuild capstone)
 
 - Added lesson-match-decision-hard, the Module 2 capstone, mirroring Module 1's
