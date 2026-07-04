@@ -2,6 +2,17 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-04 (anti-slop 1C - takeaway rhythm variance: DEFERRED)
+
+- 1C was explicitly conditional ("only if 1A + 1B do not refresh the feel").
+  Judgment: 1A (choiceCheck cap + the parked inspection/handoff interaction
+  spec) and 1B (the per-module recurrence card) address the core slop critique -
+  the quiz monopoly and the "every module feels the same" flatness - at the
+  interaction and framing layers, which is where the sameness was felt. Churning
+  the takeaway layout on top of that risks variety-for-its-own-sake without a
+  named problem. DEFERRED, not dropped: revisit if a future review still flags
+  takeaway monotony after Module 3 ships with the capped interaction mix.
+
 ## 2026-07-04 (anti-slop 1B - name-the-recurrence card)
 
 - Added a data-driven "You have seen this shape before" card shown once per
