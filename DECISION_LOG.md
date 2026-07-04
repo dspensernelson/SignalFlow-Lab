@@ -2,6 +2,20 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-04 (SHIP BLOCKED - main is still the initial commit)
+
+- On starting the slop-and-polish work order (queue step 0 = ship main), git
+  reality was checked first: `git ls-remote origin main` = 792c8b2 "Initial
+  commit". The reviewed history (G0-G3, Modules 1-2) is only on
+  module-02-beacon; PRs #1/#2/#3 are all still OPEN. The prior RESOLVED note
+  claiming the stack was fast-forwarded to main did not actually land on origin.
+- Per the tie-breaker rule, git reality outranks the status/RESOLVED notes.
+  Merging is owner-only (Gate 8), so the builder cannot complete it, and
+  deploying current main would ship the empty initial commit. Parked in
+  OPEN_QUESTIONS (SHIP BLOCKED) with the merge as the pending owner action.
+- Proceeding to the unblocked branch-local work (anti-slop pass, then Module 3)
+  on module-02-beacon; step 0 runs once main carries the reviewed history.
+
 ## 2026-07-04 (owner ship actions - merge to main + deploy ratified)
 
 - OWNER RESOLVED both parked ship actions (OPEN_QUESTIONS moved to RESOLVED).
