@@ -2,6 +2,31 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-04 (fifth PM review - slop-and-polish audit)
+
+- SLOP_AND_POLISH_REVIEW.md: fifth PM review at HEAD 70ea98e. Verdict -
+  go-live patch (G0-G3) is real and careful; every measured wound closed
+  (W2 compact mode holds 650=650 at 1366x650; W3 ScrollArea affordance is
+  opacity-driven with ResizeObserver+rAF; W4 welcome/completion/export all
+  live; stats row de-jargoned). Transfer layer clears the owner's "actually
+  build" bar (realWorld beats + TOOL_MAPs + mandatory capstones).
+- SLOP FINDING (the owner's core question), located precisely: the atoms are
+  high quality and the module maps genuinely differ, so slop-feel is NOT in
+  the writing or the structure - it is in ONE modality. choiceCheck is 38%
+  of lessons (31/82) and the default for every inspection and handoff node;
+  multiple-choice-after-reading is the texture people call "AI slop
+  e-learning." Second-order: the five-phase skeleton recurs unnamed, felt as
+  repetition rather than the intended revelation.
+- ANTI-SLOP PLAN (ratified as the next builder queue, ahead of Module 3):
+  (A) break the choiceCheck monopoly with an active inspection/handoff
+  interaction and cap choiceCheck at ~1-in-4 per module, logged at the map
+  gate - the new interaction is an owner gate, so spec-then-park; (B) add a
+  "you have seen this shape before" module-open card naming the Meridian
+  skeleton; (C) optional takeaway-rhythm variation.
+- FIXED a stale-handoff consistency defect: NEXT_SESSION_PROMPT.md still
+  listed the completed G0-G3 as the queue. Refreshed to the true frontier
+  (owner ship-actions parked, then the anti-slop pass, then Module 3).
+
 ## 2026-07-04 (G3 - F7 per-project code-splitting)
 
 - Split the lesson registry into per-project dynamic-import chunks
