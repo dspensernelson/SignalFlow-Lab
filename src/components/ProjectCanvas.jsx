@@ -11,10 +11,13 @@ import {
   markWelcomeSeen,
   hasCelebratedTier,
   markTierCelebrated,
+  hasSeenRecurrence,
+  markRecurrenceSeen,
 } from '../lib/progress'
 import { buildExport, downloadText } from '../lib/export'
-import { WelcomeModal, TierCompleteModal } from './HumanMoments'
+import { WelcomeModal, TierCompleteModal, RecurrenceModal } from './HumanMoments'
 import { Logo, ThemeToggle, StatItem, Button, Icon } from './ui'
+import moduleSkeleton from '../data/moduleSkeleton.json'
 
 const TIER_LABELS = { easy: 'Easy', medium: 'Medium', hard: 'Hard' }
 
@@ -209,9 +212,33 @@ export default function ProjectCanvas({
   const showCelebrate =
     tierComplete && !celebrateClosed && !hasCelebratedTier(tier, project)
 
+  // "You have seen this shape before": once per module (module-02+), the first
+  // time a learner enters a module that maps onto the shared workflow skeleton.
+  // Data-driven from moduleSkeleton.json; the anchor module (Meridian) never
+  // shows it. Gated behind the welcome card so the two never stack.
+  const anchorModule = moduleSkeleton.modules[moduleSkeleton.anchor]
+  const thisModule = moduleSkeleton.modules[project]
+  const recurrenceEligible = project !== moduleSkeleton.anchor && Boolean(thisModule)
+  const [recurrenceClosed, setRecurrenceClosed] = useState(false)
+  const [prevRecurrenceProject, setPrevRecurrenceProject] = useState(project)
+  if (project !== prevRecurrenceProject) {
+    setPrevRecurrenceProject(project)
+    setRecurrenceClosed(false)
+  }
+  const showRecurrence =
+    recurrenceEligible &&
+    !recurrenceClosed &&
+    !showWelcome &&
+    !hasSeenRecurrence(project)
+
   function dismissWelcome() {
     markWelcomeSeen()
     setShowWelcome(false)
+  }
+
+  function dismissRecurrence() {
+    markRecurrenceSeen(project)
+    setRecurrenceClosed(true)
   }
 
   function dismissCelebrate() {
@@ -348,6 +375,13 @@ export default function ProjectCanvas({
       </div>
 
       <WelcomeModal open={showWelcome} onDismiss={dismissWelcome} />
+      <RecurrenceModal
+        open={showRecurrence}
+        skeleton={moduleSkeleton.skeleton}
+        anchorModule={anchorModule}
+        thisModule={thisModule}
+        onDismiss={dismissRecurrence}
+      />
       <TierCompleteModal
         open={showCelebrate}
         tierLabel={TIER_LABELS[tier]}
