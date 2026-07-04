@@ -86,6 +86,14 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd stamp the result - matched or exception - so clean invoices move to pay and mismatches go to review.",
+      "tools": {
+        "powerAutomate": "'Switch'/'Condition' setting a match-status field",
+        "zapier": "'Paths' by match result",
+        "python": "return 'matched' or 'exception' with the failing reason"
+      }
+    },
     "heading": "Batch routed at the fork",
     "points": [
       "You applied one routing rule across the batch: auto-approve only when every check is clean.",

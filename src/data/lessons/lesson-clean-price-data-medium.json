@@ -56,6 +56,14 @@
     { "field": "settledPrice", "meaning": "Settled price as a plain number.", "type": "number", "hint": "If a row has no settled value, the row does not belong here." }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "By hand you'd find-and-replace the '$' and '/MWh' out in Excel, then set the column type to number so formulas work.",
+      "tools": {
+        "powerAutomate": "'Apply to each' row with replace()/int() expressions to coerce values",
+        "zapier": "'Formatter > Numbers' to strip symbols and convert text to a real number",
+        "python": "float(re.sub(r'[^0-9.]', '', value)) per cell, or pandas.to_numeric"
+      }
+    },
     "heading": "Clean table built the hard way",
     "points": [
       "You deduplicated a double-delivered reading before it could double-count.",

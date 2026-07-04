@@ -102,6 +102,14 @@
     "artifactName": "vendor-master-record.json"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd match the invoice's vendor to your official vendor list and add or correct the master record if it is new or stale.",
+      "tools": {
+        "powerAutomate": "'Get items' to find the vendor, then 'Update/Create item' to maintain the master",
+        "zapier": "'Find or Create Record' in your vendor table",
+        "python": "upsert into the vendor table keyed by tax id or vendor id"
+      }
+    },
     "heading": "Vendor master governed",
     "points": [
       "You answered the four governance questions: owner, change-controlled field, why-not-the-invoice, and what active authorizes.",

@@ -94,6 +94,14 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd send the brief to the distribution list and save a dated copy to a shared folder so there is a permanent record.",
+      "tools": {
+        "powerAutomate": "'Send an email' to the group + 'Create file' in a dated SharePoint library",
+        "zapier": "'Send Email' + 'Upload File' to Drive/Dropbox in one Zap",
+        "python": "smtplib to send, then write a timestamped file to storage or S3"
+      }
+    },
     "heading": "Loop closed",
     "points": [
       "You finished the run properly: delivered to a governed audience, retained under a named policy, and recorded both.",

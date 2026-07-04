@@ -102,6 +102,14 @@
     "artifactName": "source-profile-brief-template.json"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd keep last issue's brief as a starting template so today's edition follows the same headings and order.",
+      "tools": {
+        "powerAutomate": "a stored Word/HTML template populated with dynamic content",
+        "zapier": "a template message step with merge fields for each section",
+        "python": "a Jinja2 or string template with named sections"
+      }
+    },
     "heading": "Structure verified",
     "points": [
       "You separated the fixed part of a recurring output (sections) from the flowing part (values).",

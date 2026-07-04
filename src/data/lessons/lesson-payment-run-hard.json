@@ -65,6 +65,14 @@
   },
   "fieldGuide": [],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd submit the approved batch to the bank or ERP and record each payment's confirmation.",
+      "tools": {
+        "powerAutomate": "an HTTP/connector call to the bank/ERP API, then log the response",
+        "zapier": "a 'Webhooks' POST to the payment API + 'Create Row' for confirmations",
+        "python": "POST the batch to the bank API and store the returned payment ids"
+      }
+    },
     "heading": "Degraded run shipped",
     "points": [
       "You shipped on time with a dead dependency and paid nothing you could not verify - the outage never became a payment mistake.",

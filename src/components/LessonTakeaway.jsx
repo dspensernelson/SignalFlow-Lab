@@ -69,6 +69,42 @@ const CONSUMER_ICON = {
   'morning-brief': { name: 'doc', color: 'text-sf-accent' },
 }
 
+// Transfer beat: how this same step is rebuilt in the real world, by hand and in
+// the three automation platforms learners are most likely to meet. Rendered on
+// every takeaway layout (the Takeaway screen may scroll, so this is safe).
+const REAL_WORLD_TOOLS = [
+  ['Power Automate', 'powerAutomate'],
+  ['Zapier', 'zapier'],
+  ['Python', 'python'],
+]
+
+function RealWorldPanel({ realWorld }) {
+  if (!realWorld) return null
+  const tools = realWorld.tools || {}
+  return (
+    <section className="rounded-xl border border-sf-border bg-sf-surface p-4 shadow-sf-sm">
+      <h3 className="text-xs font-semibold uppercase tracking-sf-wide text-sf-subtle">
+        Take this to work
+      </h3>
+      {realWorld.soloRebuildPath && (
+        <p className="mt-2 text-sm text-sf-body">{realWorld.soloRebuildPath}</p>
+      )}
+      <dl className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+        {REAL_WORLD_TOOLS.map(([name, key]) =>
+          tools[key] ? (
+            <div key={key} className="rounded-lg border border-sf-border-subtle bg-sf-surface-subtle p-3">
+              <dt className="text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">
+                {name}
+              </dt>
+              <dd className="mt-1 text-xs leading-snug text-sf-body">{tools[key]}</dd>
+            </div>
+          ) : null
+        )}
+      </dl>
+    </section>
+  )
+}
+
 // Step 3 of the lesson template: show what the workflow can do now.
 // Lessons that define takeaway.capability + whatCameIn + consumers render the
 // workflow-diagram layout (the artifact is now live in the flow); others fall
@@ -83,33 +119,36 @@ export default function LessonTakeaway({ lesson, artifact, onReturnToCanvas }) {
 
   if (!rich) {
     return (
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <section className="lg:col-span-2 rounded-xl border border-sf-complete bg-sf-success-weak p-5 shadow-sf-sm">
-          <h2 className="text-lg font-semibold text-sf-complete-text">{takeaway.heading}</h2>
-          <ul className="mt-3 flex flex-col gap-2">
-            {takeaway.points.map((point, index) => (
-              <li key={index} className="flex items-start gap-2 text-sm text-sf-complete-text">
-                <span aria-hidden="true">&#10003;</span>
-                <span>{point}</span>
-              </li>
-            ))}
-          </ul>
-          <Button variant="success" size="md" className="mt-5" onClick={() => onReturnToCanvas()}>
-            Return to Canvas
-          </Button>
-        </section>
+      <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <section className="lg:col-span-2 rounded-xl border border-sf-complete bg-sf-success-weak p-5 shadow-sf-sm">
+            <h2 className="text-lg font-semibold text-sf-complete-text">{takeaway.heading}</h2>
+            <ul className="mt-3 flex flex-col gap-2">
+              {takeaway.points.map((point, index) => (
+                <li key={index} className="flex items-start gap-2 text-sm text-sf-complete-text">
+                  <span aria-hidden="true">&#10003;</span>
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+            <Button variant="success" size="md" className="mt-5" onClick={() => onReturnToCanvas()}>
+              Return to Canvas
+            </Button>
+          </section>
 
-        <aside className="rounded-xl border border-sf-border bg-sf-surface p-4 shadow-sf-sm">
-          <h3 className="text-xs font-semibold uppercase tracking-sf-wide text-sf-subtle">
-            Artifact produced
-          </h3>
-          <p className="mt-1 text-sm font-medium text-sf-text">{takeaway.artifactName}</p>
-          {artifact && (
-            <pre className="mt-3 overflow-auto rounded-md bg-sf-surface-subtle p-3 text-sm text-sf-body">
-              {typeof artifact === 'string' ? artifact : JSON.stringify(artifact, null, 2)}
-            </pre>
-          )}
-        </aside>
+          <aside className="rounded-xl border border-sf-border bg-sf-surface p-4 shadow-sf-sm">
+            <h3 className="text-xs font-semibold uppercase tracking-sf-wide text-sf-subtle">
+              Artifact produced
+            </h3>
+            <p className="mt-1 text-sm font-medium text-sf-text">{takeaway.artifactName}</p>
+            {artifact && (
+              <pre className="mt-3 overflow-auto rounded-md bg-sf-surface-subtle p-3 text-sm text-sf-body">
+                {typeof artifact === 'string' ? artifact : JSON.stringify(artifact, null, 2)}
+              </pre>
+            )}
+          </aside>
+        </div>
+        <RealWorldPanel realWorld={takeaway.realWorld} />
       </div>
     )
   }
@@ -246,6 +285,8 @@ export default function LessonTakeaway({ lesson, artifact, onReturnToCanvas }) {
           </div>
         )}
 
+        <RealWorldPanel realWorld={takeaway.realWorld} />
+
         {/* Actions */}
         <div className="flex items-center justify-between gap-3">
           <Button variant="neutral" size="md" icon="arrow-left" onClick={() => onReturnToCanvas()}>
@@ -320,6 +361,8 @@ export default function LessonTakeaway({ lesson, artifact, onReturnToCanvas }) {
           ))}
         </ul>
       )}
+
+      <RealWorldPanel realWorld={takeaway.realWorld} />
 
       <div className="flex flex-wrap gap-3">
         <Button variant="neutral" size="md" icon="arrow-left" onClick={() => onReturnToCanvas()}>

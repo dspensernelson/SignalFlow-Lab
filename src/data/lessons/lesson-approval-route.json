@@ -102,6 +102,14 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd look up who owns this decision (by desk, amount, or region) and send it to the right person instead of a catch-all inbox.",
+      "tools": {
+        "powerAutomate": "a lookup table + 'Start and wait for an approval' addressed to the resolved approver",
+        "zapier": "'Lookup Table' by Formatter to pick the approver, then send",
+        "python": "a routing map {region: approver} and a send call"
+      }
+    },
     "heading": "Approval record captured",
     "points": [
       "You converted a chat exchange into approval-route.json - the response is now a fact in the system, not a fact in a thread.",

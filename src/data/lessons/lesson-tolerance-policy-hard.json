@@ -72,6 +72,14 @@
     { "field": "rationale", "meaning": "Your defense, citing the distribution.", "type": "string", "hint": "Cite the 84/6 split and why larger-of." }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd write the match tolerances down (e.g. 'price within 2%, quantity exact') in a config tab so the match check uses one agreed rule set.",
+      "tools": {
+        "powerAutomate": "Environment Variables or a config list holding the tolerance limits",
+        "zapier": "'Storage by Zapier' or a lookup table for the tolerances",
+        "python": "a tolerance config dict/JSON loaded at runtime"
+      }
+    },
     "heading": "You are now where the band comes from",
     "points": [
       "You derived a tolerance from a variance distribution and outcome constraints - the real method behind every matching rule, fraud threshold, and credit limit you will meet.",

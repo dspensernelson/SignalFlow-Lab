@@ -108,6 +108,14 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd gather all approved invoices due today into one payment batch or file for the bank.",
+      "tools": {
+        "powerAutomate": "'Get items' where status=Approved + 'Create CSV table' for the batch",
+        "zapier": "'Find Records' (approved) into a 'Create Spreadsheet' batch",
+        "python": "filter approved rows and write the bank batch file (CSV/NACHA)"
+      }
+    },
     "heading": "Payment batch assembled",
     "points": [
       "You gathered the one approved invoice into a batch the AP Manager can approve in a single action.",

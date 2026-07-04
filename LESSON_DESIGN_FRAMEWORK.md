@@ -332,8 +332,11 @@ CURRICULUM_MASTER_PLAN.md.
   current-tier progress ("<Tier> tier complete" / percent). Both moments are
   fixed overlays (shared `ui/Modal.jsx`) so they add no page scroll; verified
   live at 1280x800 and 1366x650. See DECISION_LOG 2026-07-04 (G1).
-- G2 TRANSFER LAYER - NEXT. realWorld takeaway beat (engine + lint-lessons + backfill
-  Module 1+2), Module 2 solo-rebuild capstone via artifactImport (4 Beacon
+- G2 TRANSFER LAYER - IN PROGRESS. [done 2026-07-04] realWorld takeaway beat:
+  required `takeaway.realWorld` (soloRebuildPath + Power Automate/Zapier/Python
+  mapping), rendered as the "Take this to work" panel on every takeaway,
+  enforced in lint-lessons, backfilled across all 81 Module 1+2 lessons.
+  [remaining] Module 2 solo-rebuild capstone via artifactImport (4 Beacon
   files), TOOL_MAP.md for modules 1+2, amend MODULE_AUTHORING_PLAYBOOK step 7
   and charters/_INDEX (per-module capstone MANDATORY, interaction budget
   SPEND-OR-JUSTIFY).

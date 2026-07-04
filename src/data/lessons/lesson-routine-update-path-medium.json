@@ -64,6 +64,14 @@
     { "field": "loggedBy", "meaning": "Who wrote the entry.", "type": "string", "hint": "No human is on this path." }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd handle the no-exception case: when nothing is flagged, let the run proceed automatically and just log it.",
+      "tools": {
+        "powerAutomate": "the 'yes' branch that completes silently and writes an audit row",
+        "zapier": "the default Path that finishes without human review",
+        "python": "the else branch that commits and logs without escalation"
+      }
+    },
     "heading": "Version-aware outcome logged",
     "points": [
       "You logged not just what happened but which rule version made it happen - the difference between a defensible outcome and an apparent control gap.",

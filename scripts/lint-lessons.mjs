@@ -181,6 +181,22 @@ for (const file of files.sort()) {
   }
   if (!lesson.takeaway?.artifactName) err(id, 'takeaway.artifactName missing')
 
+  // 3b. Transfer beat (G2): every takeaway carries a realWorld mapping - how the
+  // step is rebuilt solo, plus the concrete action in each automation platform.
+  const rw = lesson.takeaway?.realWorld
+  if (!rw || typeof rw !== 'object') {
+    err(id, 'takeaway.realWorld missing (soloRebuildPath + tools.powerAutomate/zapier/python)')
+  } else {
+    if (typeof rw.soloRebuildPath !== 'string' || !rw.soloRebuildPath.trim()) {
+      err(id, 'takeaway.realWorld.soloRebuildPath missing or empty')
+    }
+    for (const t of ['powerAutomate', 'zapier', 'python']) {
+      if (typeof rw.tools?.[t] !== 'string' || !rw.tools[t].trim()) {
+        err(id, `takeaway.realWorld.tools.${t} missing or empty`)
+      }
+    }
+  }
+
   // 4. Interaction shape
   if (lesson.interactionType === 'choiceCheck') {
     const qs = lesson.validation?.questions

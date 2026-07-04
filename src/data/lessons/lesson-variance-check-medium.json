@@ -55,6 +55,14 @@
     { "field": "vsPriorDay", "meaning": "actual - priorDay.", "type": "number", "hint": "Compute from the input columns." }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd add an Excel column comparing today vs prior day and an IF formula that marks any row over the limit.",
+      "tools": {
+        "powerAutomate": "a 'Condition' comparing each value against the policy, tagging breaches",
+        "zapier": "'Filter' or 'Paths' that only continue when the variance exceeds the threshold",
+        "python": "compute (today-prior)/prior and flag rows where abs(pct) > limit"
+      }
+    },
     "heading": "Variance with a visible gap",
     "points": [
       "You computed defensible deltas for the hubs with complete references, keeping decimal precision.",

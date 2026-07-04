@@ -72,6 +72,14 @@
     { "field": "rationale", "meaning": "Your defense, naming the four cases.", "type": "string", "hint": "Say how the key handles the duplicate, resend, split, and altered total." }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd compare the new invoice's key fields against recent ones and stop it if the vendor, number, and amount already appear.",
+      "tools": {
+        "powerAutomate": "'Get items' + 'Condition' on matching vendor/number/amount to flag duplicates",
+        "zapier": "'Find Record'; a 'Filter' halts the Zap on a match",
+        "python": "check membership on a (vendor, number, amount) key set"
+      }
+    },
     "heading": "You designed what 'duplicate' means",
     "points": [
       "You chose an identity key, and that choice defined which invoices count as the same - the resend is caught and the split shipment is spared.",

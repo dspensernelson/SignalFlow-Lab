@@ -97,6 +97,14 @@
     "artifactName": "source-profile-po-register.json"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd pull the matching purchase order from the PO log so you can check the invoice against what was actually ordered.",
+      "tools": {
+        "powerAutomate": "'Get items' filtered by PO number from the PO list",
+        "zapier": "'Find Record' by PO number",
+        "python": "look up the PO by number in the register table"
+      }
+    },
     "heading": "PO register inspected",
     "points": [
       "You linked the five invoices to their purchase orders by the PO join key.",

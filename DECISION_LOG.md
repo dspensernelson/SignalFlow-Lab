@@ -2,6 +2,29 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-04 (G2.1 - transfer beat)
+
+- Added a required `takeaway.realWorld` beat to every lesson: `soloRebuildPath`
+  (how you'd rebuild THIS step by hand at work) + `tools.powerAutomate` /
+  `tools.zapier` / `tools.python` (the concrete action/connector/library in each
+  platform). Authored one mapping per task family (34 families across Modules 1
+  and 2); all three tier variants of a task share it, since the skill is the
+  same at every depth. Backfilled all 81 lesson files via a one-off migration
+  script (surgical insert, deleted after running).
+- Rendered on the Takeaway screen as a "Take this to work" panel
+  (LessonTakeaway `RealWorldPanel`), injected into all three takeaway layouts
+  (simple list, rich diagram, rich before/after). The Takeaway screen may scroll
+  (it is not an Exercise screen), so the panel is safe there. Verified live on
+  analyst-notes: panel shows soloRebuildPath + all three tool lines.
+- Enforced in scripts/lint-lessons.mjs (step 3b): fails if `realWorld` is absent
+  or any of the four strings is missing/empty. Documented the contract in
+  LESSON_AUTHORING_TEMPLATE.md (Takeaway structure + JSON checklist).
+- `npm run check` green (81 lessons; bundle grew ~795kB -> 827kB from the added
+  copy - F7 code-split remains the G3 item).
+- REMAINING in G2: Module 2 solo-rebuild capstone (artifactImport), TOOL_MAP.md
+  for both modules, and the MODULE_AUTHORING_PLAYBOOK / charters _INDEX
+  amendments.
+
 ## 2026-07-04 (G1 - human moments)
 
 - First-run welcome modal: shown once ever (localStorage `signalflow_welcomed`).

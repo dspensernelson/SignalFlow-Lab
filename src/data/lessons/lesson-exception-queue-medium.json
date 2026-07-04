@@ -98,6 +98,14 @@
     "artifactName": "exception-resolution.json"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd drop mismatched invoices into a review queue (a shared list or ticket) with a note on what failed, for a human to resolve.",
+      "tools": {
+        "powerAutomate": "'Create item' in an exceptions list + assign/notify the reviewer",
+        "zapier": "'Create Record' in a review table, plus a Slack/email alert",
+        "python": "append to an exceptions table and open a ticket or notify"
+      }
+    },
     "heading": "Exception queue worked",
     "points": [
       "You routed all four held invoices to the owner who can resolve each one.",

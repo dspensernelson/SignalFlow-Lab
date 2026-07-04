@@ -78,6 +78,14 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "By hand you'd find-and-replace the '$' and '/MWh' out in Excel, then set the column type to number so formulas work.",
+      "tools": {
+        "powerAutomate": "'Apply to each' row with replace()/int() expressions to coerce values",
+        "zapier": "'Formatter > Numbers' to strip symbols and convert text to a real number",
+        "python": "float(re.sub(r'[^0-9.]', '', value)) per cell, or pandas.to_numeric"
+      }
+    },
     "heading": "Clean price table built",
     "points": [
       "You normalized messy price strings into a numeric JSON table.",

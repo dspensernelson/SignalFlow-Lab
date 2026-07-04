@@ -101,6 +101,14 @@
     "artifactName": "signal-interpretation-trader-flag.json"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd take the trader's one-line flag (a chat ping or email) and log it as a row with ticker, severity, and reason so it can be merged with the desk note later.",
+      "tools": {
+        "powerAutomate": "Teams 'When a new message is posted' trigger into a Dataverse 'Create item'",
+        "zapier": "Slack 'New Message Posted' trigger into an Airtable 'Create Record'",
+        "python": "slack_sdk to read the channel, parse the flag text, append to a list or DataFrame"
+      }
+    },
     "heading": "Signal interpreted",
     "points": [
       "You separated one act of human judgment from the commentary around it.",

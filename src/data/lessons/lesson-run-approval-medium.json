@@ -98,6 +98,14 @@
     "artifactName": "run-approval.json"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd get a manager to sign off on the whole batch total before any money moves.",
+      "tools": {
+        "powerAutomate": "'Start and wait for an approval' on the batch summary",
+        "zapier": "an approval step (e.g. Slack approval) gating the run",
+        "python": "require an approver flag before the payment call runs"
+      }
+    },
     "heading": "Run approved with holds acknowledged",
     "points": [
       "The AP Manager approved the run of one payable invoice - the human control point stays even on a messy day.",

@@ -97,6 +97,14 @@
     "artifactName": "source-profile-payment-history.json"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd search prior payments for this vendor and invoice number to make sure you have not already paid it.",
+      "tools": {
+        "powerAutomate": "'Get items' filtered by vendor + invoice number from the payments list",
+        "zapier": "'Find Record' by vendor and invoice number",
+        "python": "SELECT from payments WHERE vendor and invoice_no"
+      }
+    },
     "heading": "Payment history inspected",
     "points": [
       "You read payment history as the paid-invoice baseline seeded by the prior run's archive - the temporal loop.",

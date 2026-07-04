@@ -111,6 +111,14 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd line up the invoice, the PO, and the receipt and confirm the three agree on item, quantity, and price.",
+      "tools": {
+        "powerAutomate": "join the three records and use a 'Condition' per field within tolerance",
+        "zapier": "a multi-step 'Lookup' + 'Filter' comparing the three sources",
+        "python": "compare invoice vs PO vs receipt field by field against tolerances"
+      }
+    },
     "heading": "Batch matched",
     "points": [
       "You reconciled the three matchable invoices, computing variance and percent from the totals rather than judging by eye.",

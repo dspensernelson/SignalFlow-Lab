@@ -122,6 +122,14 @@
     "artifactName": "market-brief.md"
   },
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd assemble the final brief by dropping the cleaned numbers and the risk verdicts into the template, ready to send at 7:00.",
+      "tools": {
+        "powerAutomate": "'Create HTML table' + 'Compose' to build the body, then 'Send an email'",
+        "zapier": "a 'Formatter' build step feeding 'Send Outbound Email' / Gmail",
+        "python": "render the template with the day data, output HTML or markdown"
+      }
+    },
     "heading": "Brief assembled",
     "points": [
       "You produced the morning's deliverable without deriving a single value - every slot was a lookup into an artifact you built.",

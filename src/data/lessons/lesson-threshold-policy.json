@@ -101,6 +101,14 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd write the threshold rules down in a shared doc or a config tab (e.g. 'flag if move > 8%') so the check reads one source of truth, not memory.",
+      "tools": {
+        "powerAutomate": "store limits in an Environment Variable or a SharePoint config list read at runtime",
+        "zapier": "keep thresholds in a 'Storage by Zapier' value or a lookup table",
+        "python": "a policy dict loaded from a JSON or YAML config at the top of the script"
+      }
+    },
     "heading": "Threshold policy set",
     "points": [
       "You turned a written policy brief into a versioned, owned threshold policy object.",

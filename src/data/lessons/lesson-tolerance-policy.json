@@ -135,6 +135,14 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd write the match tolerances down (e.g. 'price within 2%, quantity exact') in a config tab so the match check uses one agreed rule set.",
+      "tools": {
+        "powerAutomate": "Environment Variables or a config list holding the tolerance limits",
+        "zapier": "'Storage by Zapier' or a lookup table for the tolerances",
+        "python": "a tolerance config dict/JSON loaded at runtime"
+      }
+    },
     "heading": "Tolerance Policy authored",
     "points": [
       "You turned the Controller's judgment into a written, versioned rule the match applies the same way every day.",

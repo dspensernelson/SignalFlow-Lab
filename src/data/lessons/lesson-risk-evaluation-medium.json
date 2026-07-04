@@ -56,6 +56,14 @@
     { "field": "status", "meaning": "Classification under policy 1.1.0.", "type": "string", "hint": "normal, routine, or escalate - the bands are 6 and 14 now." }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd combine the clean prices and the policy into one judgement per hub - normal, watch, or breach - so a human sees a single verdict.",
+      "tools": {
+        "powerAutomate": "a 'Switch' on the computed score to assign a risk label",
+        "zapier": "'Paths' branching by score to set a risk-level field",
+        "python": "a scoring function mapping the metrics to a risk label"
+      }
+    },
     "heading": "Risk classified under the changed rule",
     "points": [
       "You derived the percent moves yourself, with the desk's rounding rule as part of the computation contract.",
