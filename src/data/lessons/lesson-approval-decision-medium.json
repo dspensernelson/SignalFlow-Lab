@@ -1,0 +1,79 @@
+{
+  "id": "lesson-approval-decision-medium",
+  "nodeId": "approval-decision",
+  "title": "Route Four Mornings, Including a Crash",
+  "difficulty": "Medium",
+  "skill": "Branching on magnitude, not direction",
+  "clock": "6:38 AM",
+  "scenario": "It is 6:38 AM. Four mornings to route under policy 1.1.0 (escalate at 14 or more). One of them is a price CRASH - a big move DOWN. Markets falling need approval as much as markets spiking, and this is where hand-rolled branches usually get it wrong.",
+  "inputType": "text",
+  "inputLabel": "Rule + Four Mornings",
+  "input": "Escalation rule (Threshold Policy v1.1.0): a day-over-day move of 14 percent OR MORE - in either direction - requires manager approval. Escalated mornings route to approval-route; all others to routine-update-path.\n\nFour mornings (biggest day-over-day move that day):\nday-1 (today): +15.9 percent (ERCOT)\nday-2: -14.0 percent (SPP crashed)\nday-3: +13.9 percent (ERCOT)\nday-4: -5.8 percent (WAUE)",
+  "instructions": [
+    "Apply the rule to the SIZE of each move: -14.0 is a 14-point move.",
+    "Watch both traps: the negative boundary case AND the just-under case.",
+    "Record the signed move in biggestMovePct but classify on magnitude.",
+    "Return a JSON array with one object per day, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n]",
+  "validation": {
+    "type": "jsonDeltas",
+    "keyField": "day",
+    "requiredFields": ["day", "biggestMovePct", "escalationRequired", "route"],
+    "numericFields": ["biggestMovePct"],
+    "expectedRows": [
+      { "day": "day-1", "biggestMovePct": 15.9, "escalationRequired": true, "route": "approval-route" },
+      { "day": "day-2", "biggestMovePct": -14, "escalationRequired": true, "route": "approval-route" },
+      { "day": "day-3", "biggestMovePct": 13.9, "escalationRequired": false, "route": "routine-update-path" },
+      { "day": "day-4", "biggestMovePct": -5.8, "escalationRequired": false, "route": "routine-update-path" }
+    ]
+  },
+  "copilotPrompt": "Route four days: a move of 14 percent or more IN EITHER DIRECTION escalates to approval-route; others go to routine-update-path. Days: +15.9, -14.0, +13.9, -5.8. Keep the signed value in biggestMovePct but classify on absolute size. Return a JSON array of { day, biggestMovePct, escalationRequired, route }.",
+  "successMessage": "Four mornings routed - including the crash that naive branches wave through.",
+  "intro": {
+    "heading": "Before you build: the absolute-value bug",
+    "sections": [
+      {
+        "title": "The most common branch bug in finance automation",
+        "body": "Someone writes 'if move >= 14 escalate' and ships it. Spikes escalate; crashes sail through, because -14 is not greater than 14. The rule was always about magnitude; the code quietly wasn't. Day-2 exists to make you feel this bug."
+      },
+      {
+        "title": "Two boundaries at once",
+        "body": "Day-2 is negative AND exactly at the threshold: abs(-14.0) = 14.0, and the rule says OR MORE. Day-3 sits at 13.9 - just under. Passing both proves the branch, not luck."
+      },
+      {
+        "title": "Sign in the record, magnitude in the rule",
+        "body": "The log keeps -14.0 because direction matters to readers (a crash reads differently than a spike). The classification uses 14.0 because the rule is about size. One value, two uses."
+      }
+    ],
+    "jsonExample": "[\n  { \"day\": \"day-9\", \"biggestMovePct\": -16.2, \"escalationRequired\": true, \"route\": \"approval-route\" }\n]",
+    "skill": "Branching on magnitude, not direction",
+    "artifactName": "decision-log.json"
+  },
+  "fieldGuide": [
+    { "field": "day", "meaning": "Which morning.", "type": "string", "hint": "day-1 through day-4." },
+    { "field": "biggestMovePct", "meaning": "The signed biggest move.", "type": "number", "hint": "Keep negatives negative." },
+    { "field": "escalationRequired", "meaning": "Whether the rule fires.", "type": "boolean", "hint": "Judge the size of the move, not its sign." },
+    { "field": "route", "meaning": "approval-route or routine-update-path.", "type": "string", "hint": "Follows directly from escalationRequired." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd apply the rule - auto-approve if within tolerance, otherwise send to a person - so obvious cases don't wait on a human.",
+      "tools": {
+        "powerAutomate": "'Condition' -> either auto-complete or 'Start and wait for an approval'",
+        "zapier": "'Filter'/'Paths' that auto-pass clean cases and route the rest",
+        "python": "if within_tolerance: approve() else: escalate()"
+      }
+    },
+    "heading": "The crash got caught",
+    "points": [
+      "You routed a negative boundary case correctly - the exact spot where 'if move >= threshold' silently fails in production.",
+      "You held both boundary disciplines at once: -14.0 escalates (or-more on magnitude), +13.9 does not (just under).",
+      "The log keeps signed values so readers see crash vs spike, while the rule reads magnitude - one number serving two masters, explicitly.",
+      "Today (day-1) escalates again - and the approval handoff ahead has a complication waiting.",
+      "The workflow can now route on the size of a move regardless of its direction."
+    ],
+    "artifactName": "decision-log.json"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "id": "lesson-tolerance-policy-hard",
+  "nodeId": "tolerance-policy",
+  "title": "Design the Tolerance Policy from Vendor History",
+  "difficulty": "Hard",
+  "skill": "Designing config-as-rules from evidence",
+  "clock": "8:20 AM",
+  "scenario": "The 2% or 25.00 tolerance you applied in earlier tiers was inherited from whoever set up the desk. Today you are that person. You have 90 days of price variances and two design constraints, and you must author the tolerance policy the matching engine will run - and defend it in writing. At Hard tier you do not apply the policy, you are where it comes from.",
+  "inputType": "text",
+  "inputLabel": "90 days of price variances + design constraints",
+  "input": "Absolute price variance vs PO, last 90 approved invoices:\n- 84 of 90 were under 25.00 AND under 2% of the PO - all benign (freight rounding, minor drift), later confirmed correct.\n- 6 of 90 were real overcharges - each exceeded BOTH 25.00 and 2%, all clawed back.\n- POs range ~600.00 (2% is ~12.00) to ~8,000.00 (2% is ~160.00).\n\nConstraints: benign drift must pass unreviewed; a small PO needs the dollar floor, a large PO needs the percentage - protect both.\n\nGovernance: owner AP Manager, approver Controller. Redesign from evidence -> version 2.0.0; rationale must cite the data.",
+  "instructions": [
+    "Choose priceTolerancePct and priceToleranceAbs so the 84 benign variances pass and the 6 overcharges are caught.",
+    "Set toleranceBasis to the rule that takes the LARGER of the two legs, so small and large POs are both protected.",
+    "Set qtyTolerance to the exact-match rule the desk requires (received must equal ordered).",
+    "Write a rationale that cites the 84/6 split and why larger-of beats either leg alone.",
+    "Record policyName, version 2.0.0, owner, and approver, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n}",
+  "validation": {
+    "type": "jsonPolicy",
+    "requiredFields": [
+      "policyName",
+      "version",
+      "owner",
+      "approver",
+      "priceTolerancePct",
+      "priceToleranceAbs",
+      "toleranceBasis",
+      "qtyTolerance",
+      "rationale"
+    ],
+    "numericFields": ["priceTolerancePct", "priceToleranceAbs", "qtyTolerance"],
+    "nonEmptyFields": ["policyName", "version", "owner", "approver", "toleranceBasis", "rationale"]
+  },
+  "copilotPrompt": "Design a price tolerance policy from 90 days of variances where 84 benign gaps were under 25 and under 2% and 6 real overcharges exceeded both. Return JSON with policyName, version 2.0.0, owner AP Manager, approver Controller, priceTolerancePct and priceToleranceAbs as numbers, toleranceBasis set to larger-of, qtyTolerance 0, and a rationale that cites the 84/6 split.",
+  "successMessage": "Tolerance policy designed from evidence. The band is yours now - and because the rationale cites the distribution, it can be challenged and revised when next quarter's data lands.",
+  "intro": {
+    "heading": "Before you design: a tolerance is a distribution decision",
+    "sections": [
+      {
+        "title": "Where the band actually comes from",
+        "body": "Every tolerance you applied earlier was once someone reading a variance distribution and asking 'where does benign end and overcharge begin?'. The honest method: pick the outcome you want (benign passes, overcharges caught) and read the numbers back to the boundary. The 84/6 split hands you a clean cut."
+      },
+      {
+        "title": "Why larger-of, not either leg alone",
+        "body": "A flat 25.00 lets a 2% overcharge on an 8,000.00 PO (160.00) sail through. A flat 2% rejects a 15.00 gap on a 600.00 PO that is pure freight rounding. Taking the LARGER of the two legs means the dollar floor protects small POs and the percentage protects large ones - the single rule the constraints demand."
+      },
+      {
+        "title": "A rationale is a falsifiable claim",
+        "body": "'25 feels right' cannot be argued with. '84 of 90 benign variances fell under both legs; all 6 overcharges exceeded both' can be checked, challenged, and revised. The validator checks your policy's shape and governance, not your exact numbers - the numbers are yours to defend."
+      },
+      {
+        "title": "Version 2.0.0, not 1.1.0",
+        "body": "This is not a tweak to an inherited number - it is a redesign from evidence, so it is a major version. The numbering itself tells the next reader what kind of change happened and that a rationale backs it."
+      }
+    ],
+    "jsonExample": "{\n  \"policyName\": \"Beacon Price Tolerance Policy\",\n  \"version\": \"2.0.0\",\n  \"toleranceBasis\": \"larger\",\n  \"priceTolerancePct\": 2,\n  \"priceToleranceAbs\": 25\n}",
+    "skill": "Designing config-as-rules from evidence",
+    "artifactName": "tolerance-policy.json"
+  },
+  "fieldGuide": [
+    { "field": "policyName", "meaning": "The policy you are redesigning.", "type": "string", "hint": "Same desk policy, new foundation." },
+    { "field": "version", "meaning": "Major bump for a redesign from evidence.", "type": "string", "hint": "2.0.0 - a redesign, not a tweak." },
+    { "field": "owner", "meaning": "Who owns the policy.", "type": "string", "hint": "In the governance line." },
+    { "field": "approver", "meaning": "Who approves changes to it.", "type": "string", "hint": "In the governance line." },
+    { "field": "priceTolerancePct", "meaning": "The percentage leg, as a number.", "type": "number", "hint": "Benign band sat under 2%." },
+    { "field": "priceToleranceAbs", "meaning": "The absolute-dollar leg, as a number.", "type": "number", "hint": "Benign band sat under 25." },
+    { "field": "toleranceBasis", "meaning": "How the two legs combine.", "type": "string", "hint": "larger - bigger leg wins." },
+    { "field": "qtyTolerance", "meaning": "Allowed quantity gap, as a number.", "type": "number", "hint": "0 - received must equal ordered." },
+    { "field": "rationale", "meaning": "Your defense, citing the distribution.", "type": "string", "hint": "Cite the 84/6 split and why larger-of." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd write the match tolerances down (e.g. 'price within 2%, quantity exact') in a config tab so the match check uses one agreed rule set.",
+      "tools": {
+        "powerAutomate": "Environment Variables or a config list holding the tolerance limits",
+        "zapier": "'Storage by Zapier' or a lookup table for the tolerances",
+        "python": "a tolerance config dict/JSON loaded at runtime"
+      }
+    },
+    "heading": "You are now where the band comes from",
+    "points": [
+      "You derived a tolerance from a variance distribution and outcome constraints - the real method behind every matching rule, fraud threshold, and credit limit you will meet.",
+      "Larger-of is a designed choice: the dollar floor protects small POs and the percentage protects large ones, so one rule covers the whole PO range.",
+      "The governance shape - owner, approver, version, rationale - is what separates a designed policy from a magic number buried in the matching code.",
+      "Because the rationale cites the 84/6 split, the next redesign starts from method, not from guessing why 25 was ever chosen.",
+      "The workflow can now be governed by a tolerance whose origin is evidence, not folklore."
+    ],
+    "artifactName": "tolerance-policy.json"
+  }
+}

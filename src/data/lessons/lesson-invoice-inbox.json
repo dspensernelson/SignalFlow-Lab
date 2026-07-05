@@ -1,0 +1,122 @@
+{
+  "id": "lesson-invoice-inbox",
+  "nodeId": "invoice-inbox",
+  "title": "Profile the Invoice Inbox",
+  "difficulty": "Beginner",
+  "skill": "Source provenance",
+  "clock": "8:00 AM",
+  "scenario": "It is 8:00 AM at Beacon Manufacturing's accounts-payable desk. Before you build anything, understand the raw material. Three invoices have landed overnight - read the inbox like an automation designer: who sends these, what shape do they arrive in, what would a system need to ingest them, and who reads them next?",
+  "inputType": "text",
+  "inputLabel": "Invoice Inbox (this morning)",
+  "input": "3 documents in the AP shared mailbox. (1) INV-58831 from Northwind Fasteners - a PDF attachment, 500 M8 hex bolts against PO-7742, total $1,220.00. (2) INV-58832 from Cascade Packaging - an emailed image of a paper invoice. (3) INV-58833 from Northwind Fasteners - a portal export (CSV). Same mailbox, three different formats, arriving on no fixed schedule. We follow INV-58831 through the whole desk today.",
+  "instructions": [
+    "Read the inbox as a source, not as data to extract - extraction is the Invoice Record task.",
+    "Answer the four source questions against the inbox and the workflow map.",
+    "Validate to mint the source profile."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "Who produces the documents in this inbox?",
+        "options": [
+          { "id": "a", "text": "The AP Clerk, by typing them each morning" },
+          { "id": "b", "text": "Vendors, who send invoices to Beacon's shared mailbox and portal" },
+          { "id": "c", "text": "The workflow generates them automatically" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Invoices originate outside Beacon - vendors like Northwind Fasteners send them. The AP Clerk receives and processes them; it does not author them."
+      },
+      {
+        "id": "q2",
+        "prompt": "What shape do these invoices arrive in?",
+        "options": [
+          { "id": "a", "text": "One consistent structured feed with named fields" },
+          { "id": "b", "text": "A single CSV table the mailbox produces" },
+          { "id": "c", "text": "Mixed formats - PDF, emailed image, portal CSV - on no fixed schedule" }
+        ],
+        "correctOptionId": "c",
+        "explain": "Look at the inbox: a PDF, a photographed paper invoice, and a portal export all landed in the same mailbox. Format variety and irregular timing are exactly what makes intake hard."
+      },
+      {
+        "id": "q3",
+        "prompt": "In a real company, what would ingesting this inbox require?",
+        "options": [
+          { "id": "a", "text": "Shared mailbox access, portal credentials, and document storage permission" },
+          { "id": "b", "text": "Nothing - invoices are public records" },
+          { "id": "c", "text": "The Controller to read each email first" }
+        ],
+        "correctOptionId": "a",
+        "explain": "The documents live in a shared mailbox and a vendor portal, and every original must be retained for audit. Reading them programmatically means access to those channels plus a retention policy. The lab simulates this with local document fixtures."
+      },
+      {
+        "id": "q4",
+        "prompt": "Which workflow step consumes these invoices first?",
+        "options": [
+          { "id": "a", "text": "Three-Way Match" },
+          { "id": "b", "text": "Invoice Record" },
+          { "id": "c", "text": "Payment Run" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Follow the map's edge from this node: the inbox's first stop is the Invoice Record task that extracts each document into a structured record."
+      }
+    ],
+    "artifactOnPass": {
+      "source": "invoice-inbox",
+      "producedBy": "Vendors (Northwind Fasteners, Cascade Packaging)",
+      "format": "mixed (PDF, image, portal CSV)",
+      "labVersion": "local document fixtures (the invoices shown in this lesson)",
+      "accessNeeded": "shared mailbox and vendor portal access, plus document retention",
+      "firstConsumer": "invoice-record"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Profile this invoice inbox as an automation source: who produces the documents, what formats they arrive in, what access ingesting them would require, and which workflow step consumes them first.",
+  "successMessage": "Source profiled. You now know where every payment starts - next, you will turn one invoice into a structured record.",
+  "intro": {
+    "heading": "Before you build: the inbox is the source",
+    "sections": [
+      {
+        "title": "Why inspect before building",
+        "body": "Payables automation fails at the inputs more often than at the logic. Before extracting anything, a designer profiles the source: who sends it, on what schedule, in what shape, behind what access."
+      },
+      {
+        "title": "A pile of documents is still a feed",
+        "body": "These invoices are unstructured and inconsistent, but they still arrive every day from the same vendors into the same mailbox. Recognizing that recurring pile as a feed is what makes it automatable at all."
+      },
+      {
+        "title": "Lab vs work",
+        "body": "In the lab the inbox is a set of local document fixtures. At work it is a shared mailbox and a vendor portal - and ingesting it needs access, credentials, and an audit retention policy. The workflow map records both realities."
+      },
+      {
+        "title": "What you produce here",
+        "body": "Passing the inspection mints a source profile - a small record proving this input is understood. Profiling inputs is itself a real deliverable in automation work."
+      }
+    ],
+    "jsonExample": "{\n  \"source\": \"invoice-inbox\",\n  \"format\": \"mixed (PDF, image, portal CSV)\",\n  \"firstConsumer\": \"invoice-record\"\n}",
+    "skill": "Source provenance",
+    "artifactName": "source-profile-invoice-inbox.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd triage the invoice inbox by hand - deciding which emails are real invoices, which are duplicates, and which are spam - before anything gets keyed.",
+      "tools": {
+        "powerAutomate": "Outlook trigger + Condition rules (or AI Builder) to classify each incoming invoice",
+        "zapier": "Email Parser + 'Filter' to keep only genuine invoices",
+        "python": "read the mailbox and classify by sender/subject rules into keep or skip"
+      }
+    },
+    "heading": "Source profiled",
+    "points": [
+      "You answered the four source questions: producer, format, access, first consumer.",
+      "The inbox is a recurring feed of mixed-format documents - which is exactly why the next step (Invoice Record) must exist to structure them.",
+      "The lab honestly simulates the access problem: local document fixtures stand in for mailbox and portal permissions plus audit retention.",
+      "Your source profile is stored - profiling inputs is the first deliverable of any real payables automation project.",
+      "The workflow can now identify where every invoice enters the payables desk."
+    ],
+    "artifactName": "source-profile-invoice-inbox.json"
+  }
+}

@@ -35,7 +35,7 @@
     "sections": [
       {
         "title": "What normalization is",
-        "body": "Normalization means reshaping messy values into one consistent form. Here, every price becomes a plain number so any later step can compare or calculate without re-parsing text."
+        "body": "Normalization means reshaping messy values into one consistent form. Here, every price becomes a plain number so any later step can compare or calculate without re-parsing text. (Domain note: a hub is a regional power-trading point; $/MWh is the price of one megawatt-hour of electricity; the settled price is the final cleared price for the day.)"
       },
       {
         "title": "Type coercion",
@@ -78,12 +78,21 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "By hand you'd find-and-replace the '$' and '/MWh' out in Excel, then set the column type to number so formulas work.",
+      "tools": {
+        "powerAutomate": "'Apply to each' row with replace()/int() expressions to coerce values",
+        "zapier": "'Formatter > Numbers' to strip symbols and convert text to a real number",
+        "python": "float(re.sub(r'[^0-9.]', '', value)) per cell, or pandas.to_numeric"
+      }
+    },
     "heading": "Clean price table built",
     "points": [
       "You normalized messy price strings into a numeric JSON table.",
       "Type coercion turned values like \"$187/MWh\" into the number 187 that automation can compute on.",
       "This artifact sits in Phase 2, the Data Structure Layer, of the Meridian workflow map.",
-      "Risk Evaluation and the Morning Brief reuse clean-prices.json downstream."
+      "Risk Evaluation and the Morning Brief reuse clean-prices.json downstream.",
+      "The workflow can now perform deterministic calculations on trusted numeric prices."
     ],
     "artifactName": "clean-prices.json"
   }

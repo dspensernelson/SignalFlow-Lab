@@ -1,0 +1,116 @@
+{
+  "id": "lesson-invoice-record-medium",
+  "nodeId": "invoice-record",
+  "title": "Extract the Invoice Batch",
+  "subtitle": "Turn five documents into five structured records",
+  "clock": "9:00 AM",
+  "difficulty": "Intermediate",
+  "skill": "Batch extraction",
+  "scenario": "It is 9:00 AM. Five invoices are in the inbox and the matching steps need structured records, not documents. Extract each invoice into a row - invoice number, vendor id, PO reference, and total - so the batch can be deduped, matched, and routed downstream.",
+  "inputType": "text",
+  "inputLabel": "Invoice documents",
+  "input": "INV-59001 - Northwind Fasteners (V-1042), PO-7742, total $1,200.00. INV-59002 - Cascade Packaging (V-1108), PO-7751, total $1,230.00. INV-58962 - Northwind Fasteners (V-1042), PO-7738, total $640.00. INV-59004 - Sierra Tooling (V-1205), PO-7760, total $1,200.00. INV-59005 - Northwind Fasteners (V-1042), PO-7763, total $1,000.00.",
+  "instructions": [
+    "Read all five invoice documents from the inbox.",
+    "Create one JSON object per invoice with invoiceNumber, vendorId, poNumber, and invoiceTotal.",
+    "Keep invoiceTotal as a plain number (no dollar sign or commas).",
+    "Capture the PO reference cleanly - it is the join key the match depends on.",
+    "Return a JSON array of the five rows, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"invoiceNumber\": \"INV-59001\", \"vendorId\": \"\", \"poNumber\": \"\", \"invoiceTotal\": 0 },\n  { \"invoiceNumber\": \"INV-59002\", \"vendorId\": \"\", \"poNumber\": \"\", \"invoiceTotal\": 0 },\n  { \"invoiceNumber\": \"INV-58962\", \"vendorId\": \"\", \"poNumber\": \"\", \"invoiceTotal\": 0 },\n  { \"invoiceNumber\": \"INV-59004\", \"vendorId\": \"\", \"poNumber\": \"\", \"invoiceTotal\": 0 },\n  { \"invoiceNumber\": \"INV-59005\", \"vendorId\": \"\", \"poNumber\": \"\", \"invoiceTotal\": 0 }\n]",
+  "validation": {
+    "type": "jsonRows",
+    "keyField": "invoiceNumber",
+    "rowFields": ["invoiceNumber", "vendorId", "poNumber", "invoiceTotal"],
+    "numericFields": ["invoiceTotal"],
+    "expectedRows": [
+      { "invoiceNumber": "INV-59001", "vendorId": "V-1042", "poNumber": "PO-7742", "invoiceTotal": 1200 },
+      { "invoiceNumber": "INV-59002", "vendorId": "V-1108", "poNumber": "PO-7751", "invoiceTotal": 1230 },
+      { "invoiceNumber": "INV-58962", "vendorId": "V-1042", "poNumber": "PO-7738", "invoiceTotal": 640 },
+      { "invoiceNumber": "INV-59004", "vendorId": "V-1205", "poNumber": "PO-7760", "invoiceTotal": 1200 },
+      { "invoiceNumber": "INV-59005", "vendorId": "V-1042", "poNumber": "PO-7763", "invoiceTotal": 1000 }
+    ]
+  },
+  "copilotPrompt": "Extract five invoices into a JSON array. Each object has invoiceNumber, vendorId, poNumber, and invoiceTotal (a plain number). Use the document details for the values.",
+  "successMessage": "Batch extracted. Five structured invoice records are ready for the duplicate check and the three-way match.",
+  "validateLabel": "Extract Batch",
+  "editorHelper": "One row per invoice - the batch the matching steps will judge.",
+  "intro": {
+    "heading": "Before you match: structure the whole batch",
+    "sections": [
+      {
+        "title": "Documents cannot be matched",
+        "body": "The inbox holds documents in mixed formats. The duplicate check and three-way match work on structured records, so the first job is to extract every invoice into the same shape - even the ones that will later be held."
+      },
+      {
+        "title": "The join key is the PO reference",
+        "body": "Each record carries its PO number. That is the key that links an invoice to its purchase order and receipt. Capture it cleanly on every row or the match for that invoice fails downstream."
+      },
+      {
+        "title": "Extract the bad ones too",
+        "body": "One of these is a duplicate, one has an unknown vendor. You still extract them. The record layer captures faithfully; the matching layer decides what to do. Keeping the bad invoices visible is what lets the desk hold them on purpose."
+      }
+    ],
+    "jsonExample": "[\n  { \"invoiceNumber\": \"INV-59001\", \"vendorId\": \"V-1042\", \"poNumber\": \"PO-7742\", \"invoiceTotal\": 1200 }\n]",
+    "skill": "Batch extraction",
+    "artifactName": "invoice-record.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "invoiceNumber",
+      "meaning": "The invoice's own identifier.",
+      "type": "string",
+      "example": "\"INV-59001\"",
+      "group": "Identity",
+      "lookFor": "which invoice is this?",
+      "hint": "Copy the INV-##### number exactly; it is the row key."
+    },
+    {
+      "field": "vendorId",
+      "meaning": "The vendor id the invoice is from.",
+      "type": "string",
+      "example": "\"V-1042\"",
+      "group": "Identity",
+      "lookFor": "who sent it?",
+      "hint": "The V-#### id in parentheses next to the vendor name."
+    },
+    {
+      "field": "poNumber",
+      "meaning": "The purchase order the invoice references.",
+      "type": "string",
+      "example": "\"PO-7742\"",
+      "group": "Join key",
+      "lookFor": "which PO?",
+      "hint": "The PO-#### reference - this links invoice to PO and receipt."
+    },
+    {
+      "field": "invoiceTotal",
+      "meaning": "The amount the invoice asks for.",
+      "type": "number",
+      "example": "1200",
+      "group": "Amount",
+      "lookFor": "how much?",
+      "hint": "Store the number only - drop the dollar sign and commas."
+    }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd read the PDF invoice and type its header and line fields (vendor, number, amount, date) into structured columns.",
+      "tools": {
+        "powerAutomate": "AI Builder 'Extract information from invoices' into a Dataverse 'Create row'",
+        "zapier": "an OCR/parser step feeding 'Create Record'",
+        "python": "an OCR/LLM extract (pdfplumber + parsing) into a dict"
+      }
+    },
+    "heading": "Invoice batch extracted",
+    "points": [
+      "You turned five documents into five structured invoice records with a consistent shape.",
+      "Every row carries its PO reference - the join key the three-way match depends on.",
+      "You extracted the duplicate and the unknown-vendor invoice too; the record layer captures faithfully and the matching layer decides.",
+      "The batch is stored as invoice-record.json for the duplicate check and the match to consume.",
+      "The workflow can now run its checks against a structured batch instead of a pile of documents."
+    ],
+    "artifactName": "invoice-record.json"
+  }
+}

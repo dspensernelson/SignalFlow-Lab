@@ -1,0 +1,40 @@
+{
+  "anchor": "module-01",
+  "skeleton": [
+    { "id": "intake", "stage": "Intake record", "gloss": "capture the raw input as a trusted record" },
+    { "id": "reference", "stage": "Policy + reference", "gloss": "load the governed rules and lookups" },
+    { "id": "transform", "stage": "Transform", "gloss": "turn raw input into clean, comparable data" },
+    { "id": "decision", "stage": "One decision fork", "gloss": "a single rule routes clean vs. exception" },
+    { "id": "handoff", "stage": "Handoff", "gloss": "pass to a person or queue, capture the reply" },
+    { "id": "assembly", "stage": "Assembly", "gloss": "assemble the traceable deliverable" },
+    { "id": "archive", "stage": "Archive loop", "gloss": "retain it; it seeds tomorrow's intake" }
+  ],
+  "modules": {
+    "module-01": {
+      "org": "Meridian",
+      "deliverable": "morning market brief",
+      "map": {
+        "intake": "Market Intake Record",
+        "reference": "Threshold Policy",
+        "transform": "Clean Price Data",
+        "decision": "Approval Decision",
+        "handoff": "Approval Route",
+        "assembly": "Morning Brief",
+        "archive": "Distribution / Archive"
+      }
+    },
+    "module-02": {
+      "org": "Beacon",
+      "deliverable": "3:00 PM payment run",
+      "map": {
+        "intake": "Invoice Record",
+        "reference": "Tolerance Policy",
+        "transform": "Three-Way Match",
+        "decision": "Match Decision",
+        "handoff": "Exception Queue",
+        "assembly": "Payment Run",
+        "archive": "Payment Archive"
+      }
+    }
+  }
+}

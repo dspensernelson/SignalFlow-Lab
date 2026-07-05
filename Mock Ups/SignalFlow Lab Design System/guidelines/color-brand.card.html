@@ -1,0 +1,70 @@
+<!-- @dsCard group="Colors" viewport="700x400" name="Semantic palette roles" subtitle="Five color families, each with a distinct product role" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8" /><link rel="stylesheet" href="../styles.css" />
+<style>
+  html,body{margin:0}
+  body{background:var(--sf-bg);font-family:var(--sf-font-sans);padding:18px;display:flex;flex-direction:column;gap:12px}
+  .role{display:flex;flex-direction:column;gap:5px}
+  .role-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sf-text-subtle)}
+  .role-name{font-weight:600;color:var(--sf-text);text-transform:none;letter-spacing:0}
+  .swatches{display:flex;gap:7px}
+  .sw{border-radius:var(--sf-radius-md);border:1px solid var(--sf-border);overflow:hidden;box-shadow:var(--sf-shadow-sm);flex:1}
+  .chip{height:44px}
+  .meta{padding:5px 8px;background:var(--sf-surface)}
+  .name{font-size:11px;font-weight:600;color:var(--sf-text)}
+  .hex{font-family:var(--sf-font-mono);font-size:10px;color:var(--sf-text-muted)}
+  .use{display:block;font-size:10px;color:var(--sf-text-subtle);margin-top:1px}
+</style></head>
+<body>
+
+  <div class="role">
+    <div class="role-lbl">Cobalt / Blue — <span class="role-name">primary action · current focus · selected node</span></div>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:var(--sf-blue-50)"></div><div class="meta"><div class="name">blue-50</div><div class="hex">#eff6ff</div><span class="use">accent weak</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sf-blue-400)"></div><div class="meta"><div class="name">blue-400</div><div class="hex">#60a5fa</div><span class="use">accent border</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sf-blue-600)"></div><div class="meta"><div class="name">blue-600</div><div class="hex">#2563eb</div><span class="use">primary action</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sf-blue-700)"></div><div class="meta"><div class="name">blue-700</div><div class="hex">#1d4ed8</div><span class="use">primary hover</span></div></div>
+    </div>
+  </div>
+
+  <div class="role">
+    <div class="role-lbl">Cyan / Teal — <span class="role-name">signal path · flow · extraction · artifact type · reuse</span></div>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:var(--sf-cyan-50)"></div><div class="meta"><div class="name">cyan-50</div><div class="hex">#ecfeff</div><span class="use">path zone bg</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sf-cyan-500)"></div><div class="meta"><div class="name">cyan-500</div><div class="hex">#06b6d4</div><span class="use">signal-path edge</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sf-cyan-600)"></div><div class="meta"><div class="name">cyan-600</div><div class="hex">#0891b2</div><span class="use">artifact type id</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sf-teal-500)"></div><div class="meta"><div class="name">teal-500</div><div class="hex">#14b8a6</div><span class="use">handoff · reuse</span></div></div>
+    </div>
+  </div>
+
+  <div class="role">
+    <div class="role-lbl">Emerald — <span class="role-name">trusted artifact · validated · complete</span></div>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:var(--sf-emerald-50)"></div><div class="meta"><div class="name">emerald-50</div><div class="hex">#ecfdf5</div><span class="use">trusted zone bg</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sf-emerald-400)"></div><div class="meta"><div class="name">emerald-400</div><div class="hex">#34d399</div><span class="use">complete (dark)</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sf-emerald-600)"></div><div class="meta"><div class="name">emerald-600</div><div class="hex">#059669</div><span class="use">artifact trusted</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sf-emerald-700)"></div><div class="meta"><div class="name">emerald-700</div><div class="hex">#047857</div><span class="use">trusted text</span></div></div>
+    </div>
+  </div>
+
+  <div class="role">
+    <div class="role-lbl">Amber — <span class="role-name">raw signal · unresolved · needs attention · upstream edge</span></div>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:var(--sf-amber-50)"></div><div class="meta"><div class="name">amber-50</div><div class="hex">#fffbeb</div><span class="use">raw signal bg</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sf-amber-400)"></div><div class="meta"><div class="name">amber-400</div><div class="hex">#fbbf24</div><span class="use">upstream edge</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sf-amber-500)"></div><div class="meta"><div class="name">amber-500</div><div class="hex">#f59e0b</div><span class="use">source · warning</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sf-amber-700)"></div><div class="meta"><div class="name">amber-700</div><div class="hex">#b45309</div><span class="use">warning text</span></div></div>
+    </div>
+  </div>
+
+  <div class="role">
+    <div class="role-lbl">Violet — <span class="role-name">governance · reference · policy / config</span></div>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:var(--sf-violet-50)"></div><div class="meta"><div class="name">violet-50</div><div class="hex">#f5f3ff</div><span class="use">reference bg</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sf-violet-200)"></div><div class="meta"><div class="name">violet-200</div><div class="hex">#ddd6fe</div><span class="use">context border</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sf-violet-500)"></div><div class="meta"><div class="name">violet-500</div><div class="hex">#8b5cf6</div><span class="use">reference · context</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sf-violet-700)"></div><div class="meta"><div class="name">violet-700</div><div class="hex">#6d28d9</div><span class="use">governance text</span></div></div>
+    </div>
+  </div>
+
+</body></html>

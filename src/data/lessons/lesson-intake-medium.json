@@ -1,0 +1,84 @@
+{
+  "id": "lesson-intake-medium",
+  "nodeId": "market-intake-record",
+  "title": "Intake from Conflicting Notes",
+  "difficulty": "Medium",
+  "skill": "Source authority & explicit nulls",
+  "clock": "6:15 AM",
+  "scenario": "It is 6:15 AM. Two overnight notes arrived and they do not agree. On top of that, neither note says how generation performed. Real intake is not extraction - it is deciding what is trustworthy, and being honest about what is missing.",
+  "inputType": "text",
+  "inputLabel": "Two Notes, One Record",
+  "input": "[5:40 AM] Overnight Desk Analyst:\nERCOT spiked overnight. Peak around $204/MWh, settled near $155. Trader flagged the spike for review - need approval before we act.\n\n[6:05 AM] Overnight Desk Analyst:\nCorrection after final settlement: ERCOT peak confirmed at $204/MWh, settled at $151/MWh. No word yet on generation performance.\n\nDesk rule: when notes conflict, the LATER note is authoritative. When a required fact is missing from every source, record null - never guess.",
+  "instructions": [
+    "Compare the two notes field by field and apply the desk rule.",
+    "Where the later note corrects the earlier one, use the correction.",
+    "Generation performance appears in neither note - record null, not a guess.",
+    "Record which note time you treated as authoritative.",
+    "Return one JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["hub", "peakPrice", "settledPrice", "generationFlag", "approvalRequired", "authoritativeNoteTime"],
+    "expected": {
+      "hub": "ERCOT",
+      "approvalRequired": true
+    },
+    "acceptedValues": {
+      "peakPrice": ["204", "$204", "204/MWh", "$204/MWh"],
+      "settledPrice": ["151", "$151", "151/MWh", "$151/MWh"],
+      "generationFlag": ["null"],
+      "authoritativeNoteTime": ["6:05", "6:05 AM", "06:05"]
+    }
+  },
+  "copilotPrompt": "Two notes conflict; the later one is authoritative. Extract hub, peakPrice, settledPrice, generationFlag, approvalRequired, and authoritativeNoteTime. Generation performance is stated nowhere, so generationFlag must be null - do not guess a value.",
+  "successMessage": "Intake record built from conflicting sources - with the gap recorded honestly instead of papered over.",
+  "intro": {
+    "heading": "Before you build: trust is decided, not extracted",
+    "sections": [
+      {
+        "title": "Conflicting sources are normal",
+        "body": "At Easy tier the note was single and clean. Real mornings produce corrections, retractions, and follow-ups. The intake step's real job is deciding which value wins - and the desk rule (later note is authoritative) is a governed decision, not your judgment call."
+      },
+      {
+        "title": "Null is a value, guessing is a bug",
+        "body": "Neither note says how generation performed. Writing null tells every downstream step 'this was checked and is unknown'. Writing a guess tells them a lie they cannot detect. Explicit nulls are how pipelines stay honest."
+      },
+      {
+        "title": "Record your provenance decision",
+        "body": "authoritativeNoteTime captures WHICH source you trusted. When someone asks next week why the brief said 141 and not 145, the record answers without archaeology."
+      }
+    ],
+    "jsonExample": "{\n  \"hub\": \"PJM\",\n  \"settledPrice\": \"98\",\n  \"generationFlag\": null,\n  \"authoritativeNoteTime\": \"6:10 AM\"\n}",
+    "skill": "Source authority & explicit nulls",
+    "artifactName": "market-intake.json"
+  },
+  "fieldGuide": [
+    { "field": "hub", "meaning": "The market hub both notes discuss.", "type": "string", "hint": "Both notes agree on this one." },
+    { "field": "peakPrice", "meaning": "The peak price from the authoritative source.", "type": "string", "hint": "Check whether the correction changed it." },
+    { "field": "settledPrice", "meaning": "The settled price from the authoritative source.", "type": "string", "hint": "This is the field the notes disagree on." },
+    { "field": "generationFlag", "meaning": "Generation performance - if any source states it.", "type": "null", "hint": "Stated nowhere. What does the desk rule say to record?" },
+    { "field": "approvalRequired", "meaning": "Whether review was requested.", "type": "boolean", "hint": "The flag from the first note was never retracted." },
+    { "field": "authoritativeNoteTime", "meaning": "Which note you treated as the source of truth.", "type": "string", "hint": "The desk rule decides this, not preference." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd open the analyst note and the trader flag side by side and copy both into one intake row, deciding which field wins when they disagree.",
+      "tools": {
+        "powerAutomate": "'Compose' + 'Join' to merge the two inputs, then 'Create item' for the record",
+        "zapier": "A multi-step Zap with a 'Formatter' merge feeding one 'Create Record'",
+        "python": "build one dict from both sources, {**note, **flag}, resolving conflicts explicitly"
+      }
+    },
+    "heading": "Intake built from conflict",
+    "points": [
+      "You resolved a source conflict using a governed rule (later wins), not intuition - the corrected settled price (151) matches what the feed will confirm.",
+      "You recorded an explicit null instead of a guess - downstream steps now KNOW generation status is unknown, rather than believing a fabrication.",
+      "You captured provenance (authoritativeNoteTime), so the record can defend itself under questioning.",
+      "The flag survived the correction: an unretracted escalation stays true.",
+      "The workflow can now build a trustworthy record even when its sources disagree."
+    ],
+    "artifactName": "market-intake.json"
+  }
+}

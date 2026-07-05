@@ -1,0 +1,116 @@
+{
+  "id": "lesson-vendor-master-medium",
+  "nodeId": "vendor-master",
+  "title": "Govern the Vendor Master with an Unknown Payee",
+  "difficulty": "Intermediate",
+  "skill": "Master data governance",
+  "clock": "10:00 AM",
+  "scenario": "It is 10:00 AM. Four of the five invoices are from vendors on file - but INV-59004 is from Sierra Tooling (V-1205), and that vendor is not in the master. No banking, no remit-to, no owner sign-off. Read the vendor master as governed data and decide what an unknown payee means for the run.",
+  "inputType": "text",
+  "inputLabel": "Vendor Master (today)",
+  "input": "V-1042 Northwind Fasteners - active, ACH ...4021, owned by Vendor Relations Desk. V-1108 Cascade Packaging - active, ACH ...7735, owned by Vendor Relations Desk. Today's batch also references V-1205 Sierra Tooling on INV-59004 - there is NO record for V-1205 in the master.",
+  "instructions": [
+    "Read the vendor master as governed reference data, not a lookup table.",
+    "Identify what is missing for V-1205 and why that blocks payment.",
+    "Answer the governance questions and validate to mint the vendor record."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "INV-59004 is from V-1205, which is not in the vendor master. What does that mean for paying it?",
+        "options": [
+          { "id": "a", "text": "Pay it anyway - the invoice has a total and a PO" },
+          { "id": "b", "text": "It cannot be paid yet - there is no banking or remit-to on file to pay to" },
+          { "id": "c", "text": "Route it through the tolerance check to decide" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Without a master record there is no verified account to send money to. An unknown payee is a hard stop, not a close call - you cannot pay someone the desk cannot identify."
+      },
+      {
+        "id": "q2",
+        "prompt": "Is an unknown vendor a tolerance judgement like a price variance?",
+        "options": [
+          { "id": "a", "text": "Yes - run it through the 2% / $25 band" },
+          { "id": "b", "text": "No - tolerance is about price; a missing vendor is a missing payee, a different kind of block" },
+          { "id": "c", "text": "Yes - if the amount is small enough, pay it" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Not every exception is a number. Tolerance answers 'is the price close enough?' The vendor master answers 'do we know who to pay?' A missing payee blocks payment regardless of the amount."
+      },
+      {
+        "id": "q3",
+        "prompt": "Who may add V-1205 to the master so INV-59004 can eventually pay?",
+        "options": [
+          { "id": "a", "text": "The AP Clerk, on the spot, to keep the run moving" },
+          { "id": "b", "text": "The Vendor Relations Desk, which owns and governs vendor records" },
+          { "id": "c", "text": "Anyone who received the invoice" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Vendor records are governed master data. Only the Vendor Relations Desk may onboard a vendor, verify its banking, and log the change - which is exactly what fraud controls depend on."
+      },
+      {
+        "id": "q4",
+        "prompt": "Which downstream step will hold INV-59004 because of the missing vendor?",
+        "options": [
+          { "id": "a", "text": "The Exception Queue, which routes it to Vendor Relations" },
+          { "id": "b", "text": "The Payment Run, which pays it and flags it later" },
+          { "id": "c", "text": "The Remittance Advice" }
+        ],
+        "correctOptionId": "a",
+        "explain": "The match decision routes an unknown-vendor invoice to the Exception Queue, where it is handed to Vendor Relations to onboard the vendor before it can ever be paid."
+      }
+    ],
+    "artifactOnPass": {
+      "reference": "vendor-master",
+      "knownVendors": ["V-1042 Northwind Fasteners", "V-1108 Cascade Packaging"],
+      "unknownPayee": "V-1205 Sierra Tooling",
+      "unknownPayeeRule": "cannot pay - no banking or remit-to on file",
+      "changeOwner": "Vendor Relations Desk"
+    }
+  },
+  "copilotPrompt": "Read a vendor master where one invoice references a vendor (V-1205) that has no record. Explain why an unknown payee blocks payment, why it is not a tolerance judgement, who may onboard the vendor, and which step holds the invoice.",
+  "successMessage": "Vendor master governed. The unknown payee is a hard stop routed to Vendor Relations, not a price call.",
+  "intro": {
+    "heading": "Before you match: the vendor record is the payee",
+    "sections": [
+      {
+        "title": "Master data answers 'who do we pay?'",
+        "body": "The vendor master is the governed record of who Beacon is allowed to pay and to which account. It is not a convenience lookup - it is the control that stops money going to an unverified payee."
+      },
+      {
+        "title": "An unknown vendor is a hard stop",
+        "body": "INV-59004 references V-1205, which is not on file. There is no verified banking to pay to, so the invoice cannot be paid regardless of its amount or PO. This is a different failure mode than a price that is a little high."
+      },
+      {
+        "title": "Only the owner may onboard",
+        "body": "Adding a vendor is governed: the Vendor Relations Desk verifies and logs it. Letting anyone add a payee mid-run is exactly how fraudulent payments slip through, which is why the desk routes the invoice out instead of paying it."
+      }
+    ],
+    "jsonExample": "{\n  \"unknownPayee\": \"V-1205 Sierra Tooling\",\n  \"changeOwner\": \"Vendor Relations Desk\"\n}",
+    "skill": "Master data governance",
+    "artifactName": "vendor-master-record.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd match the invoice's vendor to your official vendor list and add or correct the master record if it is new or stale.",
+      "tools": {
+        "powerAutomate": "'Get items' to find the vendor, then 'Update/Create item' to maintain the master",
+        "zapier": "'Find or Create Record' in your vendor table",
+        "python": "upsert into the vendor table keyed by tax id or vendor id"
+      }
+    },
+    "heading": "Vendor master governed",
+    "points": [
+      "You read the vendor master as a governed control that decides who Beacon may pay, not a convenience lookup.",
+      "INV-59004's vendor V-1205 is not on file, so it is a hard stop - an unknown payee cannot be paid at any amount.",
+      "A missing vendor is not a tolerance judgement; not every exception is a number.",
+      "Only the Vendor Relations Desk may onboard the vendor, and the invoice is routed there instead of paid.",
+      "The workflow can now block payment to any vendor that is not governed in the master."
+    ],
+    "artifactName": "vendor-master-record.json"
+  }
+}

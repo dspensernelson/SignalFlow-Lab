@@ -32,11 +32,31 @@ The historical MVP was accepted against `signalflow-lab-mvp-spec-v2.md`: one com
 ## Current Architecture
 
 - Phase-banded workflow graph driven by `src/data/phases.json`, `src/data/workflowNodes.json`, and `src/data/workflowEdges.json`.
-- Buildable task nodes are tracked in localStorage under `signalflow_progress`; artifacts are stored under `signalflow_artifacts`.
-- The current interactive tasks are `lesson-intake`, attached to `market-intake-record`; `lesson-threshold-policy`, attached to `threshold-policy`; and `lesson-clean-price-data`, attached to `clean-price-data`.
-- Every workflow node has a lesson intent; only nodes with built task IDs are completion-tracked today.
-- Future interactive nodes remain visible but locked/stubbed.
+- Three difficulty tiers (easy/medium/hard) share the map. The active tier is
+  persisted under `signalflow_tier`; each tier has independent progress and
+  artifacts (`signalflow_progress` / `signalflow_artifacts` for easy - the
+  legacy keys - and `_medium` / `_hard` suffixed keys for the others). Theme
+  preference is stored under `signalflow_theme`.
+- Tier lesson variants resolve by convention in `src/lib/progress.js`
+  (`tierLessonId`): a node's `taskId` names its easy lesson; medium/hard
+  variants are `taskId-medium` / `taskId-hard`, registered in App's LESSONS
+  map and `BUILT_LESSON_IDS_BY_TIER`.
+- All 17 Module 1 nodes have built easy lessons. Interaction types:
+  `jsonEditor` (validators `jsonFields`, `jsonPolicy`, `jsonRows`,
+  `jsonDeltas`), `choiceCheck` (inspection/interpretation quizzes), and
+  `templateSlots` (assembly with an artifact shelf; stores a rendered string
+  artifact). Medium is COMPLETE at 17 of 17 built. Hard has 7 built (the
+  full curated drill set); only the solo-rebuild capstone remains.
 - Lesson flow follows Intro -> Exercise -> Takeaway.
+- Curriculum sources of truth: `CURRICULUM_MASTER_PLAN.md` (modules/tiers),
+  `curriculum/module-01/<tier>/_OVERVIEW.md` (canon data + status per tier).
+
+## Visual System
+
+- The app is reskinned to the design system in `Mock Ups/SignalFlow Lab Design System/`. Tokens live in `src/styles/tokens/` and are imported in `src/index.css` before Tailwind; `tailwind.config.js` maps them to `sf.*` classes via `var(--sf-*)`.
+- Light and dark themes are supported via a persisted toggle (`signalflow_theme`, applied as `data-theme` by `src/lib/theme.js`).
+- Reusable UI primitives live in `src/components/ui/`. Signal flow is the core visual metaphor: `SignalFlowDiagram` converges upstream inputs into the central artifact and fans out to downstream consumers, colored by DS edge semantics.
+- Hard rule: Exercise/workbench screens must not page-scroll at innerHeight >= 800 in any state, including the wrong-answer state. Intro and Takeaway may scroll. See `AGENTS.md` and `PRODUCT_DOCTRINE.md`.
 
 ## Next Direction
 

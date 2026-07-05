@@ -1,0 +1,111 @@
+/* ============================================================
+   SignalFlow Lab — Raw color palette
+   The literal hues used across the product UI. These are base
+   values only; components reference the SEMANTIC aliases in
+   semantic.css, never these directly (except specimen cards).
+   Sourced from the SignalFlow-Lab codebase (Tailwind classes
+   + src/lib/nodeStyles.js).
+   ============================================================ */
+
+:root {
+  /* Brand blue — the single product accent (Tailwind blue) */
+  --sf-blue-50:  #eff6ff;
+  --sf-blue-100: #dbeafe;
+  --sf-blue-400: #60a5fa;
+  --sf-blue-500: #3b82f6;
+  --sf-blue-600: #2563eb; /* primary action */
+  --sf-blue-700: #1d4ed8; /* primary hover */
+
+  /* Neutral grays — the workspace chrome (Tailwind gray) */
+  --sf-gray-50:  #f9fafb;
+  --sf-gray-100: #f3f4f6; /* app background (light) */
+  --sf-gray-200: #e5e7eb; /* default border */
+  --sf-gray-300: #d1d5db; /* strong border */
+  --sf-gray-400: #9ca3af; /* subtle/label text */
+  --sf-gray-500: #6b7280; /* muted text */
+  --sf-gray-600: #4b5563;
+  --sf-gray-700: #374151; /* body text */
+  --sf-gray-800: #1f2937;
+  --sf-gray-900: #111827; /* headings */
+
+  /* Slate — phase regions, dark-theme surfaces (Tailwind slate) */
+  --sf-slate-50:  #f8fafc;
+  --sf-slate-100: #f1f5f9;
+  --sf-slate-300: #cbd5e1;
+  --sf-slate-400: #94a3b8;
+  --sf-slate-500: #64748b;
+  --sf-slate-700: #334155;
+  --sf-slate-900: #0f172a;
+
+  /* Semantic status hues (Tailwind families) */
+  --sf-emerald-50:  #ecfdf5;
+  --sf-emerald-400: #34d399;
+  --sf-emerald-500: #10b981;
+  --sf-emerald-600: #059669;
+  --sf-emerald-700: #047857;
+  --sf-emerald-900: #064e3b;
+
+  --sf-amber-50:  #fffbeb;
+  --sf-amber-300: #fcd34d;
+  --sf-amber-400: #fbbf24;
+  --sf-amber-500: #f59e0b;
+  --sf-amber-600: #d97706;
+  --sf-amber-700: #b45309;
+  --sf-amber-800: #92400e;
+
+  --sf-red-50:  #fef2f2;
+  --sf-red-200: #fecaca;
+  --sf-red-600: #dc2626;
+  --sf-red-700: #b91c1c;
+  --sf-red-800: #991b1b;
+
+  --sf-violet-50:  #f5f3ff;
+  --sf-violet-100: #ede9fe;
+  --sf-violet-200: #ddd6fe;
+  --sf-violet-500: #8b5cf6;
+  --sf-violet-700: #6d28d9;
+  --sf-violet-950: #2e1065;
+
+  --sf-indigo-50:  #eef2ff;
+  --sf-indigo-100: #e0e7ff;
+  --sf-indigo-200: #c7d2fe;
+  --sf-indigo-500: #6366f1;
+  --sf-indigo-600: #4f46e5;
+  --sf-indigo-700: #4338ca;
+  --sf-indigo-900: #312e81;
+
+  --sf-green-50:  #f0fdf4;
+  --sf-green-300: #86efac;
+  --sf-green-600: #16a34a;
+  --sf-green-700: #15803d;
+  --sf-green-800: #166534;
+  --sf-green-900: #14532d;
+
+  --sf-yellow-500: #eab308;
+  --sf-stone-400:  #a8a29e;
+
+  /* Cyan — signal-path accent, extraction lines, reuse edges, artifact type identity */
+  --sf-cyan-50:  #ecfeff;
+  --sf-cyan-100: #cffafe;
+  --sf-cyan-200: #a5f3fc;
+  --sf-cyan-400: #22d3ee;
+  --sf-cyan-500: #06b6d4; /* signal-path default                    */
+  --sf-cyan-600: #0891b2; /* artifact structural type identity       */
+  --sf-cyan-700: #0e7490; /* artifact border / hover                 */
+
+  /* Teal — expanded (was single stop; handoff type + signal-reuse paths) */
+  --sf-teal-50:  #f0fdfa;
+  --sf-teal-100: #ccfbf1;
+  --sf-teal-400: #2dd4bf;
+  --sf-teal-500: #14b8a6; /* handoff node type                       */
+  --sf-teal-600: #0d9488;
+  --sf-teal-700: #0f766e;
+
+  /* Dark-canvas blue-blacks (from the product's dark theme) */
+  --sf-ink-950: #070b14; /* top bar / deepest */
+  --sf-ink-900: #0a0f1c; /* app background (dark) */
+  --sf-ink-850: #0d1424;
+  --sf-ink-800: #121a2c; /* panel surface (dark) */
+  --sf-ink-700: #1a2438; /* raised surface (dark) */
+  --sf-ink-line: #243048; /* border (dark) */
+}

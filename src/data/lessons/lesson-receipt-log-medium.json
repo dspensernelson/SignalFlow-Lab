@@ -1,0 +1,118 @@
+{
+  "id": "lesson-receipt-log-medium",
+  "nodeId": "receipt-log",
+  "title": "Check Receipts for the Missing Third Leg",
+  "difficulty": "Intermediate",
+  "skill": "Proof of receipt",
+  "clock": "10:20 AM",
+  "scenario": "It is 10:20 AM. The receipt log is proof that goods actually arrived - the third leg of the three-way match. Four of the five invoices have a matching receipt; one does not. Inspect the log and see why a missing receipt turns a three-way match into a two-way one.",
+  "inputType": "text",
+  "inputLabel": "Receipt Log (posted by Receiving Desk)",
+  "input": "PO-7742: 500 received, accepted, day-1. PO-7751: 300 received, accepted, day-1. PO-7738: 400 received, accepted, day-0. PO-7760: 200 received, accepted, day-1. PO-7763: NO receipt posted yet - the goods for INV-59005 have not been recorded as delivered.",
+  "instructions": [
+    "Read the receipt log as proof of delivery, owned by the Receiving Desk.",
+    "Match each invoice's PO to a receipt.",
+    "Identify the invoice (INV-59005 / PO-7763) with no receipt and what that blocks.",
+    "Answer the questions and validate to mint the source profile."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "What does a goods receipt prove that a PO and an invoice do not?",
+        "options": [
+          { "id": "a", "text": "That the price is correct" },
+          { "id": "b", "text": "That the goods actually arrived and were accepted" },
+          { "id": "c", "text": "That the vendor is on file" }
+        ],
+        "correctOptionId": "b",
+        "explain": "A PO is the order and the invoice is the bill; only the receipt proves delivery. That is why it is the independent third leg of the match - it confirms Beacon actually got what it is being billed for."
+      },
+      {
+        "id": "q2",
+        "prompt": "PO-7763 has no receipt. What does that make INV-59005's match?",
+        "options": [
+          { "id": "a", "text": "A full three-way match - the receipt is optional" },
+          { "id": "b", "text": "A two-way match only - invoice and PO agree, but delivery is unproven" },
+          { "id": "c", "text": "An automatic pass, since price is within tolerance" }
+        ],
+        "correctOptionId": "b",
+        "explain": "With no receipt you can compare invoice to PO (two legs) but cannot confirm the goods arrived. That is a two-way match, and it is not enough to auto-approve a payment."
+      },
+      {
+        "id": "q3",
+        "prompt": "INV-59005's price is within tolerance. Should it auto-approve despite the missing receipt?",
+        "options": [
+          { "id": "a", "text": "Yes - a good price is enough" },
+          { "id": "b", "text": "No - paying before delivery is confirmed risks paying for goods that never arrived" },
+          { "id": "c", "text": "Yes - Receiving can post the receipt later" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Price being fine does not prove delivery happened. Auto-approving a two-way match would let Beacon pay for undelivered goods, so the invoice is held until a receipt is posted."
+      },
+      {
+        "id": "q4",
+        "prompt": "Who posts receipts, and therefore owns resolving the missing one?",
+        "options": [
+          { "id": "a", "text": "The Procurement Lead" },
+          { "id": "b", "text": "The Receiving Desk" },
+          { "id": "c", "text": "The AP Manager" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The Receiving Desk posts goods receipts, so a missing receipt is routed back to them to confirm and record the delivery before INV-59005 can be paid."
+      }
+    ],
+    "artifactOnPass": {
+      "source": "receipt-log",
+      "owner": "Receiving Desk",
+      "provesThirdLeg": true,
+      "missingReceiptInvoice": "INV-59005 (PO-7763)",
+      "missingReceiptEffect": "two-way match only - held until a receipt is posted",
+      "firstConsumer": "three-way-match"
+    }
+  },
+  "copilotPrompt": "Inspect a receipt log for a batch: explain what a receipt proves, why a missing receipt makes a two-way rather than three-way match, whether a good price alone should auto-approve it, and who owns posting receipts.",
+  "successMessage": "Receipts inspected. INV-59005 has no third leg, so it is a two-way match to be held - not auto-approved.",
+  "intro": {
+    "heading": "Before you match: proof of delivery is the third leg",
+    "sections": [
+      {
+        "title": "Three independent legs",
+        "body": "The match reconciles three owners: the PO (order), the invoice (bill), and the receipt (delivery). Each is produced by a different desk, and agreement across all three is what makes a payment trustworthy."
+      },
+      {
+        "title": "No receipt, no third leg",
+        "body": "INV-59005's PO-7763 has no posted receipt. You can still compare the invoice to the PO, but you cannot confirm the goods arrived. That is a two-way match - weaker, and not enough to pay on its own."
+      },
+      {
+        "title": "A good price is not proof of delivery",
+        "body": "INV-59005's price is within tolerance, but tolerance is about price, not receipt. Paying a two-way match would risk paying for goods that never came, so the desk holds it for the Receiving Desk to confirm."
+      }
+    ],
+    "jsonExample": "{\n  \"missingReceiptInvoice\": \"INV-59005 (PO-7763)\",\n  \"owner\": \"Receiving Desk\"\n}",
+    "skill": "Proof of receipt",
+    "artifactName": "source-profile-receipt-log.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd check the goods-receipt log to confirm what was actually delivered before paying for it.",
+      "tools": {
+        "powerAutomate": "'Get items' from the receipts list filtered by PO and line",
+        "zapier": "'Find Record' in the receipts table",
+        "python": "query the receipts store by PO line"
+      }
+    },
+    "heading": "Receipt log inspected",
+    "points": [
+      "You confirmed the receipt log is the independent third leg that proves goods arrived.",
+      "INV-59005 has no receipt, so its match is two-way only - not enough to auto-approve.",
+      "A price within tolerance does not substitute for proof of delivery; the invoice is held.",
+      "The missing receipt routes to the Receiving Desk, which owns posting receipts.",
+      "The workflow can now distinguish a full three-way match from a two-way match that must be held."
+    ],
+    "artifactName": "source-profile-receipt-log.json"
+  }
+}

@@ -101,12 +101,21 @@
     }
   ],
   "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd write the threshold rules down in a shared doc or a config tab (e.g. 'flag if move > 8%') so the check reads one source of truth, not memory.",
+      "tools": {
+        "powerAutomate": "store limits in an Environment Variable or a SharePoint config list read at runtime",
+        "zapier": "keep thresholds in a 'Storage by Zapier' value or a lookup table",
+        "python": "a policy dict loaded from a JSON or YAML config at the top of the script"
+      }
+    },
     "heading": "Threshold policy set",
     "points": [
       "You turned a written policy brief into a versioned, owned threshold policy object.",
       "The thresholds now live as config-as-rules, not hardcoded logic, so the owner can change them safely.",
       "This policy sits in Phase 3, the Evaluation Layer, of the Meridian workflow map.",
-      "Risk Evaluation, Approval Decision, and the Morning Brief all reuse these same thresholds downstream."
+      "Risk Evaluation, Approval Decision, and the Morning Brief all reuse these same thresholds downstream.",
+      "The workflow can now apply consistent business thresholds without hardcoding rules."
     ],
     "artifactName": "threshold-policy.json"
   }

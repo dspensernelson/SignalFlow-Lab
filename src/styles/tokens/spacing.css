@@ -1,0 +1,41 @@
+/* ============================================================
+   SignalFlow Lab — Spacing, radii, borders, layout
+   Built on a 4px grid. Cards are softly rounded with hairline
+   borders; controls are 8px.
+   ============================================================ */
+
+:root {
+  /* Spacing scale (4px base) */
+  --sf-space-0_5: 2px;
+  --sf-space-1:   4px;
+  --sf-space-1_5: 6px;
+  --sf-space-2:   8px;
+  --sf-space-2_5: 10px;
+  --sf-space-3:   12px;
+  --sf-space-4:   16px;
+  --sf-space-5:   20px;
+  --sf-space-6:   24px;
+  --sf-space-8:   32px;
+  --sf-space-10:  40px;
+  --sf-space-12:  48px;
+
+  /* Radii */
+  --sf-radius-sm:   4px;
+  --sf-radius-md:   6px;
+  --sf-radius-lg:   8px;
+  --sf-radius-xl:   12px;
+  --sf-radius-2xl:  16px;
+  --sf-radius-full: 9999px;
+
+  /* Borders */
+  --sf-border-width:   1px;
+  --sf-border-accent:  4px;
+
+  /* Workflow node geometry (canvas design space) */
+  --sf-node-w: 190px;
+  --sf-node-h: 84px;
+
+  /* Layout */
+  --sf-detail-w:   260px;
+  --sf-content-max: 1280px;
+}

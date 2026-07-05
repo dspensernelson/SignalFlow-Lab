@@ -1,0 +1,59 @@
+<!-- @dsCard group="Colors" viewport="700x260" name="Status colors" subtitle="Six node progress states — exact vocabulary, color roles, and definitions" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8" /><link rel="stylesheet" href="../styles.css" />
+<style>
+  html,body{margin:0}
+  body{background:var(--sf-bg);font-family:var(--sf-font-sans);padding:20px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .sw{border-radius:var(--sf-radius-lg);border:1px solid var(--sf-border);background:var(--sf-surface);overflow:hidden;box-shadow:var(--sf-shadow-sm)}
+  .bar{height:8px}
+  .body{padding:10px 12px}
+  .pill{display:inline-block;padding:2px 9px;border-radius:var(--sf-radius-full);font-size:11px;font-weight:600}
+  .def{font-size:10px;color:var(--sf-text-subtle);margin-top:6px;line-height:1.4}
+</style></head>
+<body>
+<div class="grid">
+  <div class="sw">
+    <div class="bar" style="background:var(--sf-ready)"></div>
+    <div class="body">
+      <span class="pill" style="background:var(--sf-ready-weak);color:var(--sf-ready-text)">Ready</span>
+      <div class="def">Task can be started. All inputs present.</div>
+    </div>
+  </div>
+  <div class="sw">
+    <div class="bar" style="background:var(--sf-progress)"></div>
+    <div class="body">
+      <span class="pill" style="background:var(--sf-progress-weak);color:var(--sf-progress-text)">In progress</span>
+      <div class="def">Started but not yet validated.</div>
+    </div>
+  </div>
+  <div class="sw">
+    <div class="bar" style="background:var(--sf-complete)"></div>
+    <div class="body">
+      <span class="pill" style="background:var(--sf-complete-weak);color:var(--sf-complete-text)">Complete</span>
+      <div class="def">Validation passed; artifact saved. Artifact type → emerald/cyan emphasis.</div>
+    </div>
+  </div>
+  <div class="sw">
+    <div class="bar" style="background:var(--sf-needs-inputs)"></div>
+    <div class="body">
+      <span class="pill" style="background:var(--sf-needs-inputs-weak);color:var(--sf-needs-inputs-text)">Needs inputs</span>
+      <div class="def">Can reuse upstream artifact but is not yet build-ready.</div>
+    </div>
+  </div>
+  <div class="sw">
+    <div class="bar" style="background:var(--sf-upcoming)"></div>
+    <div class="body">
+      <span class="pill" style="background:var(--sf-upcoming-weak);color:var(--sf-upcoming-text)">Upcoming</span>
+      <div class="def">Visible future node. Not currently actionable.</div>
+    </div>
+  </div>
+  <div class="sw">
+    <div class="bar" style="background:var(--sf-context)"></div>
+    <div class="body">
+      <span class="pill" style="background:var(--sf-context-weak);color:var(--sf-context-text)">Context</span>
+      <div class="def">Inspectable node with no current build action.</div>
+    </div>
+  </div>
+</div>
+</body></html>

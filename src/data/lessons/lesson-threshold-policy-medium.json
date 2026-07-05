@@ -1,0 +1,86 @@
+{
+  "id": "lesson-threshold-policy-medium",
+  "nodeId": "threshold-policy",
+  "title": "Version a Policy Through a Change",
+  "difficulty": "Medium",
+  "skill": "Policy versioning & change notes",
+  "clock": "6:25 AM",
+  "scenario": "It is 6:25 AM. The threshold policy is changing, and the decision arrived the way real decisions do: as an email chain where an early proposal was superseded. Your job is to record the CURRENT policy - at the right version, with a note explaining what changed and why.",
+  "inputType": "text",
+  "inputLabel": "Email Chain (read bottom-up)",
+  "input": "[Mon 4:12 PM] Risk Desk Lead -> Desk Manager:\nProposing we keep routine at 5% and escalation at 12% for next quarter.\n\n[Mon 5:30 PM] Desk Manager -> Risk Desk Lead:\nToo noisy last quarter - we escalated eight times and six were nothing. Raise both.\n\n[Mon 6:02 PM] Risk Desk Lead -> Desk Manager:\nAgreed. Routine moves to 6%, escalation to 14%, effective tomorrow. This supersedes my earlier proposal.\n\n[Mon 6:05 PM] Desk Manager -> Risk Desk Lead:\nApproved. Version it and note the reason.\n\nThe current policy on file is version 1.0.0 (routine 5, escalation 12).",
+  "instructions": [
+    "Read the chain to its conclusion - the first proposal was superseded.",
+    "Record the NEW thresholds as plain numbers.",
+    "Bump the version: a threshold change on an existing 1.0.0 policy makes this 1.1.0.",
+    "Write a changeNote stating what changed and why.",
+    "Keep escalation greater than routine, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n}",
+  "validation": {
+    "type": "jsonPolicy",
+    "requiredFields": [
+      "policyName",
+      "version",
+      "owner",
+      "approver",
+      "routineThreshold",
+      "escalationThreshold",
+      "changeNote"
+    ],
+    "numericFields": ["routineThreshold", "escalationThreshold"],
+    "nonEmptyFields": ["policyName", "version", "owner", "approver", "changeNote"],
+    "ordering": { "greater": "escalationThreshold", "than": "routineThreshold" }
+  },
+  "copilotPrompt": "Record the final agreed policy from this email chain as JSON: policyName, version (bump 1.0.0 to 1.1.0 for a threshold change), owner, approver, routineThreshold and escalationThreshold as plain numbers (use the superseding values, not the first proposal), and a changeNote explaining what changed and why.",
+  "successMessage": "Policy versioned through a change. Downstream steps now read the current rule, and the audit trail explains the old one.",
+  "intro": {
+    "heading": "Before you build: policies change; versions remember",
+    "sections": [
+      {
+        "title": "The superseded proposal trap",
+        "body": "The chain contains two sets of numbers. Automations that scrape the first match get yesterday's rule. Reading a decision thread to its CONCLUSION - and knowing what superseded what - is a real skill this lesson makes explicit."
+      },
+      {
+        "title": "Version bumps carry meaning",
+        "body": "1.0.0 to 1.1.0 says: same policy, changed values. The version is how Risk Evaluation can say 'I classified today under 1.1.0' - without it, historical decisions become unexplainable."
+      },
+      {
+        "title": "The change note is the why",
+        "body": "Six of eight escalations were noise - THAT is why the thresholds moved. A policy that records why it changed can be challenged, defended, and changed again intelligently. One that does not just drifts."
+      }
+    ],
+    "jsonExample": "{\n  \"policyName\": \"Outage Alert Policy\",\n  \"version\": \"1.1.0\",\n  \"owner\": \"Ops Lead\",\n  \"approver\": \"Site Manager\",\n  \"routineThreshold\": 8,\n  \"escalationThreshold\": 20,\n  \"changeNote\": \"Raised both bands; last quarter's alerts were mostly noise.\"\n}",
+    "skill": "Policy versioning & change notes",
+    "artifactName": "threshold-policy.json"
+  },
+  "fieldGuide": [
+    { "field": "policyName", "meaning": "The policy being changed.", "type": "string", "hint": "Same policy as version 1.0.0." },
+    { "field": "version", "meaning": "The bumped version for this change.", "type": "string", "hint": "Threshold change on 1.0.0 - what does that make this?" },
+    { "field": "owner", "meaning": "Who owns the policy.", "type": "string", "hint": "Named in the chain." },
+    { "field": "approver", "meaning": "Who approved this change.", "type": "string", "hint": "The final message answers this." },
+    { "field": "routineThreshold", "meaning": "The CURRENT routine band, as a number.", "type": "number", "hint": "Not the first proposal." },
+    { "field": "escalationThreshold", "meaning": "The CURRENT escalation band, as a number.", "type": "number", "hint": "Not the first proposal." },
+    { "field": "changeNote", "meaning": "What changed and why.", "type": "string", "hint": "The Desk Manager's complaint is the why." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd write the threshold rules down in a shared doc or a config tab (e.g. 'flag if move > 8%') so the check reads one source of truth, not memory.",
+      "tools": {
+        "powerAutomate": "store limits in an Environment Variable or a SharePoint config list read at runtime",
+        "zapier": "keep thresholds in a 'Storage by Zapier' value or a lookup table",
+        "python": "a policy dict loaded from a JSON or YAML config at the top of the script"
+      }
+    },
+    "heading": "Policy versioned through change",
+    "points": [
+      "You read a decision thread to its conclusion and recorded the superseding values, not the first match.",
+      "The version bump (1.1.0) makes every past and future classification explainable against the rule that was in force.",
+      "The changeNote preserves the reasoning - noisy escalations - so the next change starts from evidence, not folklore.",
+      "Risk Evaluation on this tier will classify against 6/14; watch how the same workflow behaves under a changed rule.",
+      "The workflow can now evolve its business rules without losing its history."
+    ],
+    "artifactName": "threshold-policy.json"
+  }
+}

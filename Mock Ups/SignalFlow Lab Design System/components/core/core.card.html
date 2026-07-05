@@ -1,0 +1,87 @@
+<!-- @dsCard group="Components" viewport="700x440" name="Core — buttons, badges, chips, logo" subtitle="Actions, status pills, tags, brand mark, theme toggle" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  html, body { margin: 0; }
+  body { background: var(--sf-bg); color: var(--sf-text); font-family: var(--sf-font-sans); padding: 22px; }
+  .wrap { display: flex; flex-direction: column; gap: 20px; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .grp { display: flex; flex-direction: column; gap: 8px; }
+  .lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--sf-text-subtle); }
+</style>
+</head>
+<body>
+<div id="root" class="wrap"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+const { Button, Badge, Chip, Logo, ThemeToggle, SectionLabel, StatItem } = window.SignalFlowLabDesignSystem_4c48cf;
+
+function Demo() {
+  const [theme, setTheme] = React.useState('light');
+  return (
+    <div className="wrap">
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <Logo uppercase size={22} />
+        <ThemeToggle value={theme} onChange={setTheme} />
+      </div>
+
+      <div className="grp">
+        <span className="lbl">Buttons</span>
+        <div className="row">
+          <Button variant="primary" iconRight="arrow-right">Start lesson</Button>
+          <Button variant="success">Continue</Button>
+          <Button variant="warning">Continue task</Button>
+          <Button variant="neutral" icon="rotate-cw">Restart</Button>
+          <Button variant="ghost" icon="maximize">Fit</Button>
+          <Button variant="link" icon="arrow-left">Back to Canvas</Button>
+          <Button variant="primary" disabled>Disabled</Button>
+        </div>
+        <div className="row">
+          <Button size="sm" variant="primary">Small</Button>
+          <Button size="sm" variant="neutral" icon="copy">Copy Prompt</Button>
+        </div>
+      </div>
+
+      <div className="grp">
+        <span className="lbl">Status badges</span>
+        <div className="row">
+          <Badge tone="context">Context</Badge>
+          <Badge tone="ready">Ready</Badge>
+          <Badge tone="progress">In progress</Badge>
+          <Badge tone="complete" icon="circle-check">Complete</Badge>
+          <Badge tone="locked" icon="lock">Upcoming</Badge>
+          <Badge tone="info">Interactive now</Badge>
+        </div>
+      </div>
+
+      <div className="grp">
+        <span className="lbl">Concept chips</span>
+        <div className="row">
+          <Chip>JSON</Chip><Chip>Named fields</Chip><Chip>Schema</Chip>
+          <Chip>Field extraction</Chip><Chip mono>market-intake.json</Chip>
+        </div>
+      </div>
+
+      <div className="grp">
+        <span className="lbl">Stat items</span>
+        <div className="row" style={{ gap: 28 }}>
+          <StatItem icon="circle-check-big" value={4} label="Artifacts built" tone="complete" />
+          <StatItem icon="circle-play" value={6} label="Processes available" tone="ready" />
+          <StatItem icon="clock" value={7} label="Waiting on inputs" tone="progress" />
+          <StatItem icon="lock" value={3} label="Future nodes locked" tone="locked" />
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

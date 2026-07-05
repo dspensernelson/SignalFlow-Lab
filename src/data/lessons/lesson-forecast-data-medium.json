@@ -1,0 +1,118 @@
+{
+  "id": "lesson-forecast-data-medium",
+  "nodeId": "forecast-data",
+  "title": "When the Reference Has a Hole",
+  "difficulty": "Medium",
+  "skill": "Reference gaps & ownership",
+  "clock": "6:18 AM",
+  "scenario": "It is 6:18 AM. The forecast arrived - for two of the three hubs. WAUE joined the desk last month and the forecast model does not produce a number for it yet. A reference with a hole raises ownership and behavior questions the easy tier never had to ask.",
+  "inputType": "text",
+  "inputLabel": "Overnight Forecast (incomplete)",
+  "input": "Forecast per hub, published nightly by the desk's forecast model:\nERCOT: 188\nSPP: 100\nWAUE: (not produced - hub not yet in the model)\n\nGovernance on file: the internal model is the authoritative forecast. The model is owned by the Forecast Model Owner; adding a hub to it is that owner's change to make, on their release schedule.",
+  "instructions": [
+    "Note which hubs have references and which do not.",
+    "Answer the four gap questions.",
+    "Validate to record the assessment."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "Why is WAUE missing from the forecast?",
+        "options": [
+          { "id": "a", "text": "The file was truncated in transit" },
+          { "id": "b", "text": "The model does not know the hub yet - a coverage gap, not a delivery failure" },
+          { "id": "c", "text": "WAUE prices are too small to forecast" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The input says it directly: hub not yet in the model. Diagnosing WHY a value is missing decides what to do about it - a coverage gap and a broken delivery have different fixes."
+      },
+      {
+        "id": "q2",
+        "prompt": "What should Variance Check do about WAUE this morning?",
+        "options": [
+          { "id": "a", "text": "Use ERCOT's forecast as a stand-in - hubs are similar enough" },
+          { "id": "b", "text": "Use zero as the forecast so the math still runs" },
+          { "id": "c", "text": "Exclude WAUE from forecast comparison - compute nothing you cannot defend" }
+        ],
+        "correctOptionId": "c",
+        "explain": "A borrowed or zero forecast produces a delta that LOOKS real and is fiction. The honest behavior is exclusion, with the gap visible."
+      },
+      {
+        "id": "q3",
+        "prompt": "Whose job is it to close the gap?",
+        "options": [
+          { "id": "a", "text": "The Forecast Model Owner - source-of-truth changes belong to the source owner" },
+          { "id": "b", "text": "The morning workflow - it should synthesize a forecast" },
+          { "id": "c", "text": "Nobody - the gap resolves itself over time" }
+        ],
+        "correctOptionId": "a",
+        "explain": "The governance line names the owner and the change path. Consumers of a reference do not patch the reference; they route the request to its owner."
+      },
+      {
+        "id": "q4",
+        "prompt": "Can WAUE still be risk-classified this morning?",
+        "options": [
+          { "id": "a", "text": "No - one missing reference disqualifies a hub from everything" },
+          { "id": "b", "text": "Yes - day-over-day classification needs only the prior-day baseline, which exists" },
+          { "id": "c", "text": "Only if the Desk Manager approves an exception" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Different steps have different data requirements. The threshold policy classifies on the day-over-day move, and WAUE has a prior-day value - the forecast gap does not infect that computation."
+      }
+    ],
+    "artifactOnPass": {
+      "source": "forecast-data",
+      "gap": "WAUE not produced (hub not yet in model)",
+      "gapKind": "coverage gap, not delivery failure",
+      "consumerBehavior": "variance excludes WAUE from forecast comparison",
+      "closeOwner": "Forecast Model Owner",
+      "stillPossible": "day-over-day risk classification for WAUE"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Assess a reference gap: diagnose why the value is missing, decide the consumer's honest behavior, name who owns closing the gap, and identify what remains computable despite it.",
+  "successMessage": "Gap assessed. The workflow knows what to skip, what still works, and whose queue the fix belongs in.",
+  "intro": {
+    "heading": "Before you judge: references fail partially",
+    "sections": [
+      {
+        "title": "Diagnose before deciding",
+        "body": "A missing value has many possible causes - truncation, renames, coverage gaps - and each has a different correct response. The first move is always: why is it missing?"
+      },
+      {
+        "title": "Consumers do not patch sources",
+        "body": "The tempting fix (invent a WAUE forecast) quietly makes the workflow the author of reference data it does not own. Gaps route to the source owner; consumers behave honestly in the meantime."
+      },
+      {
+        "title": "Partial failure is not total failure",
+        "body": "The gap breaks one comparison for one hub. Everything else - two full variance rows, three risk classifications - still works. Scoping the blast radius precisely is the skill."
+      }
+    ],
+    "jsonExample": "{\n  \"gapKind\": \"coverage gap\",\n  \"consumerBehavior\": \"exclude, do not fabricate\",\n  \"closeOwner\": \"Forecast Model Owner\"\n}",
+    "skill": "Reference gaps & ownership",
+    "artifactName": "source-profile-forecast-data.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd pull the forecast numbers from the provider's portal or emailed report and drop them into a structured table keyed by hub and date.",
+      "tools": {
+        "powerAutomate": "HTTP 'GET' the forecast API + 'Parse JSON' into a table",
+        "zapier": "Webhooks by Zapier 'GET' the forecast endpoint, then 'Create Row'",
+        "python": "requests.get the forecast API, then json() the response into records"
+      }
+    },
+    "heading": "Reference gap assessed",
+    "points": [
+      "You diagnosed the gap (coverage, not breakage) before choosing a response - the diagnosis IS the decision.",
+      "You kept the workflow honest: exclusion over fabrication, with the gap visible downstream.",
+      "You routed the fix to the source owner instead of patching someone else's data.",
+      "You scoped the blast radius: one comparison lost, day-over-day classification intact.",
+      "The workflow can now operate correctly against a reference that is only partially there."
+    ],
+    "artifactName": "source-profile-forecast-data.json"
+  }
+}

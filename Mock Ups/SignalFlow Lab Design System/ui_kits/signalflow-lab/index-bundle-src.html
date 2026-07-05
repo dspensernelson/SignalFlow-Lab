@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SignalFlow Lab — Meridian Morning Market Brief</title>
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  html, body, #root { height: 100%; margin: 0; }
+  body { background: var(--sf-bg); }
+</style>
+<template id="__bundler_thumbnail" data-bg-color="#f3f4f6">
+  <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+    <rect width="800" height="500" fill="#f3f4f6"/>
+    <rect width="800" height="46" fill="white" stroke="#e5e7eb" stroke-width="1"/>
+    <rect x="20" y="18" width="6" height="14" rx="1.5" fill="#2563eb" opacity="0.5"/>
+    <rect x="29" y="10" width="6" height="22" rx="1.5" fill="#2563eb"/>
+    <rect x="38" y="22" width="6" height="10" rx="1.5" fill="#2563eb" opacity="0.7"/>
+    <rect x="47" y="14" width="6" height="18" rx="1.5" fill="#2563eb" opacity="0.85"/>
+    <rect x="65" y="20" width="90" height="8" rx="3" fill="#374151" opacity="0.3"/>
+    <rect x="16" y="62" width="178" height="400" rx="12" fill="rgba(248,250,252,0.9)" stroke="#e5e7eb" stroke-width="1"/>
+    <rect x="214" y="62" width="178" height="400" rx="12" fill="transparent"/>
+    <rect x="412" y="62" width="178" height="400" rx="12" fill="rgba(248,250,252,0.9)" stroke="#e5e7eb" stroke-width="1"/>
+    <rect x="610" y="62" width="178" height="400" rx="12" fill="transparent"/>
+    <rect x="28" y="90" width="154" height="68" rx="8" fill="white" stroke="#f59e0b" stroke-width="1.5"/>
+    <circle cx="46" cy="108" r="5" fill="#f59e0b"/>
+    <rect x="58" y="104" width="58" height="6" rx="3" fill="#f59e0b" opacity="0.55"/>
+    <rect x="28" y="120" width="108" height="7" rx="3" fill="#374151" opacity="0.35"/>
+    <rect x="28" y="133" width="76" height="5" rx="2.5" fill="#9ca3af" opacity="0.45"/>
+    <rect x="28" y="174" width="154" height="68" rx="8" fill="white" stroke="#8b5cf6" stroke-width="1.5"/>
+    <circle cx="46" cy="192" r="5" fill="#8b5cf6"/>
+    <rect x="58" y="188" width="66" height="6" rx="3" fill="#8b5cf6" opacity="0.55"/>
+    <rect x="28" y="204" width="108" height="7" rx="3" fill="#374151" opacity="0.35"/>
+    <rect x="226" y="90" width="154" height="68" rx="8" fill="white" stroke="#06b6d4" stroke-width="2"/>
+    <circle cx="244" cy="108" r="5" fill="#0891b2"/>
+    <rect x="256" y="104" width="68" height="6" rx="3" fill="#0891b2" opacity="0.55"/>
+    <rect x="226" y="120" width="108" height="7" rx="3" fill="#374151" opacity="0.38"/>
+    <rect x="226" y="133" width="88" height="5" rx="2.5" fill="#06b6d4" opacity="0.35"/>
+    <rect x="226" y="174" width="154" height="68" rx="8" fill="#ecfdf5" stroke="#06b6d4" stroke-width="1.5"/>
+    <circle cx="244" cy="192" r="5" fill="#0891b2"/>
+    <rect x="256" y="188" width="68" height="6" rx="3" fill="#0891b2" opacity="0.55"/>
+    <rect x="226" y="204" width="108" height="7" rx="3" fill="#374151" opacity="0.35"/>
+    <rect x="424" y="90" width="154" height="68" rx="8" fill="white" stroke="#e5e7eb" stroke-width="1"/>
+    <circle cx="442" cy="108" r="5" fill="#6366f1"/>
+    <rect x="454" y="104" width="58" height="6" rx="3" fill="#6366f1" opacity="0.55"/>
+    <rect x="424" y="120" width="108" height="7" rx="3" fill="#374151" opacity="0.35"/>
+    <rect x="622" y="90" width="154" height="68" rx="8" fill="white" stroke="#e5e7eb" stroke-width="1"/>
+    <circle cx="640" cy="108" r="5" fill="#22c55e"/>
+    <rect x="652" y="104" width="58" height="6" rx="3" fill="#22c55e" opacity="0.55"/>
+    <rect x="622" y="120" width="108" height="7" rx="3" fill="#374151" opacity="0.35"/>
+    <path d="M 182 124 C 204 124, 210 124, 226 124" stroke="#06b6d4" stroke-width="2" fill="none" opacity="0.85"/>
+    <path d="M 182 208 C 204 208, 210 124, 226 124" stroke="#f59e0b" stroke-width="1.5" fill="none" opacity="0.65"/>
+    <path d="M 380 124 C 402 124, 408 124, 424 124" stroke="#06b6d4" stroke-width="2" fill="none" opacity="0.85"/>
+    <path d="M 380 208 C 402 208, 408 124, 424 124" stroke="#10b981" stroke-width="1.5" fill="none" opacity="0.7"/>
+    <path d="M 578 124 C 600 124, 606 124, 622 124" stroke="#06b6d4" stroke-width="1.5" fill="none" opacity="0.7"/>
+  </svg>
+</template>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script src="workflowData.js"></script>
+
+<script type="text/babel">
+/* All four JSX modules merged. All code runs inside mount() so the DS namespace
+   is confirmed populated before any component is defined or rendered. */
+(function mount() {
+  var NS = window.SignalFlowLabDesignSystem_4c48cf;
+  if (!NS || !NS.WorkflowNode || !NS.Logo) { setTimeout(mount, 40); return; }
+  if (window.__sfMounted) return;
+  window.__sfMounted = true;
+
+  const {
+    WorkflowNode, Logo, ThemeToggle, Button, Icon, SectionLabel, StatItem,
+    Badge, Chip, Stepper, Card, CodeBlock, FieldGuideRow, ValidationRow,
+  } = NS;
+
+/* ── NodeDetailPanel ──────────────────────────────────────────── */
+
+const TYPE_LABEL = {
+  source: 'Source object', reference: 'Reference object', artifact: 'Artifact',
+  process: 'Process step', decision: 'Decision point', handoff: 'Handoff',
+  output: 'Output', archive: 'Archive',
+};
+const TYPE_VAR = {
+  source: 'var(--sf-type-source)', reference: 'var(--sf-type-reference)',
+  artifact: 'var(--sf-type-artifact)', process: 'var(--sf-type-process)',
+  decision: 'var(--sf-type-decision)', handoff: 'var(--sf-type-handoff)',
+  output: 'var(--sf-type-output)', archive: 'var(--sf-type-archive)',
+};
+const STATUS_BADGE = {
+  context:        { tone: 'context',  label: 'Context' },
+  locked:         { tone: 'locked',   label: 'Upcoming' },
+  upcoming:       { tone: 'locked',   label: 'Upcoming' },
+  ready:          { tone: 'ready',    label: 'Ready' },
+  'in-progress':  { tone: 'progress', label: 'In progress' },
+  'needs-inputs': { tone: 'progress', label: 'Needs inputs' },
+  complete:       { tone: 'complete', label: 'Complete' },
+};
+
+function PanelSection({ title, children }) {
+  return (
+    <div style={{ borderTop: '1px solid var(--sf-border-subtle)', paddingTop: 10, marginTop: 10 }}>
+      <SectionLabel size="xs">{title}</SectionLabel>
+      <div style={{ marginTop: 5, fontSize: 'var(--sf-text-11)', lineHeight: 'var(--sf-leading-snug)', color: 'var(--sf-text-body)' }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function LinkRow({ items, color, onSelect }) {
+  if (!items.length) return <span style={{ color: 'var(--sf-text-subtle)' }}>—</span>;
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px 8px' }}>
+      {items.map((it, i) => (
+        <button key={it.id} type="button" onClick={() => onSelect(it.id)}
+          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', font: 'inherit', fontWeight: 600, color }}>
+          {it.label}{i < items.length - 1 ? ' ·' : ''}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function NodeDetailPanel({ node, nodesById, edges, onSelect, onStart, onViewArtifact }) {
+  if (!node) {
+    return (
+      <div style={{ background: 'var(--sf-surface)', border: '1px solid var(--sf-border)', borderRadius: 'var(--sf-radius-xl)', padding: 16, fontSize: 12, color: 'var(--sf-text-muted)' }}>
+        Select a node in the workflow map to inspect it.
+      </div>
+    );
+  }
+  const accent = TYPE_VAR[node.type];
+  const badge = STATUS_BADGE[node.status] || STATUS_BADGE.locked;
+  const feedsInto = edges.filter((e) => e.from === node.id).map((e) => ({ id: e.to, label: nodesById[e.to].label }));
+  const dependsOn = edges.filter((e) => e.to === node.id).map((e) => ({ id: e.from, label: nodesById[e.from].label }));
+  const buildable = !!node.lessonId;
+
+  return (
+    <div style={{
+      background: 'var(--sf-surface)', border: '1px solid var(--sf-border)',
+      borderLeft: `var(--sf-border-accent) solid ${accent}`,
+      borderRadius: 'var(--sf-radius-xl)', padding: 14, boxShadow: 'var(--sf-shadow-sm)',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 'var(--sf-text-9)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 'var(--sf-tracking-wide)', color: accent }}>
+            {TYPE_LABEL[node.type]}
+          </div>
+          <h3 style={{ margin: '2px 0 0', fontSize: 'var(--sf-text-sm)', fontWeight: 700, lineHeight: 1.2, color: 'var(--sf-text)' }}>{node.label}</h3>
+          {node.artifactName && (
+            <div style={{ marginTop: 2, fontFamily: 'var(--sf-font-mono)', fontSize: 'var(--sf-text-10)', color: 'var(--sf-text-muted)' }}>{node.artifactName}</div>
+          )}
+        </div>
+        <Badge tone={badge.tone} icon={
+          node.status === 'complete'      ? 'circle-check' :
+          node.status === 'needs-inputs'  ? 'alert-circle'  :
+          (node.status === 'locked' || node.status === 'upcoming') ? 'lock' : undefined
+        }>{badge.label}</Badge>
+      </div>
+      <p style={{ margin: '10px 0 0', fontSize: 'var(--sf-text-11)', lineHeight: 'var(--sf-leading-snug)', color: 'var(--sf-text-muted)' }}>{node.description}</p>
+      <PanelSection title="What you'll do">{node.intent}</PanelSection>
+      <PanelSection title="Concepts">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+          {node.concepts.map((c) => <Chip key={c}>{c}</Chip>)}
+        </div>
+      </PanelSection>
+      <PanelSection title="In the lab">{node.labVersion}</PanelSection>
+      <PanelSection title="Depends on">
+        {dependsOn.length === 0
+          ? <span style={{ color: 'var(--sf-text-subtle)' }}>Entry point</span>
+          : <LinkRow items={dependsOn} color="var(--sf-signal-raw)" onSelect={onSelect} />}
+      </PanelSection>
+      <PanelSection title="Feeds into">
+        {feedsInto.length === 0
+          ? <span style={{ color: 'var(--sf-text-subtle)' }}>Nothing downstream</span>
+          : <LinkRow items={feedsInto} color="var(--sf-signal-reuse)" onSelect={onSelect} />}
+      </PanelSection>
+      <PanelSection title="Governance">{node.governance}</PanelSection>
+      <div style={{ marginTop: 12 }}>
+        {buildable && node.status === 'ready' && (
+          <Button variant="primary" fullWidth iconRight="arrow-right" onClick={() => onStart(node)}>Start lesson</Button>
+        )}
+        {buildable && node.status === 'complete' && (
+          <Button variant="success" fullWidth icon="braces" onClick={() => onViewArtifact(node)}>View artifact</Button>
+        )}
+        {!buildable && (
+          <p style={{ margin: 0, padding: '8px 10px', borderRadius: 'var(--sf-radius-lg)', background: 'var(--sf-surface-subtle)', fontSize: 'var(--sf-text-11)', lineHeight: 1.4, color: 'var(--sf-text-muted)' }}>
+            {node.status === 'context'
+              ? 'Inspection node — read its provenance and reuse; nothing to build here.'
+              : 'Lesson defined — the interaction is coming in a later pass.'}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── WorkflowMap ──────────────────────────────────────────────── */
+
+const PHASE_DOT = {
+  complete: 'var(--sf-complete)',
+  'in-progress': 'var(--sf-progress)',
+  ready: 'var(--sf-ready)',
+  'needs-inputs': 'var(--sf-needs-inputs)',
+};
+
+function phaseStatus(nodes, phaseId) {
+  const ns = nodes.filter((n) => n.phaseId === phaseId);
+  if (ns.some((n) => n.status === 'in-progress')) return 'in-progress';
+  if (ns.some((n) => n.status === 'ready')) return 'ready';
+  if (ns.some((n) => n.lessonId) && ns.filter((n) => n.lessonId).every((n) => n.status === 'complete')) return 'complete';
+  return 'locked';
+}
+
+function edgeColor(edge, selectedId, statusById) {
+  if (edge.from === selectedId) return { c: 'var(--sf-edge-downstream)', w: 2.5, o: 1 };
+  if (edge.to === selectedId)   return { c: 'var(--sf-edge-upstream)',   w: 2.5, o: 1 };
+  if (statusById[edge.from] === 'complete') return { c: 'var(--sf-edge-completed)', w: 1.5, o: 0.7 };
+  return { c: 'var(--sf-edge-muted)', w: 1.5, o: 0.5 };
+}
+
+function Canvas({ nodes, phases, edges, selectedId, onSelect, statusById }) {
+  const contentRef = React.useRef(null);
+  const nodeRefs = React.useRef({});
+  const [paths, setPaths] = React.useState([]);
+  const [dims, setDims] = React.useState({ w: 0, h: 0 });
+
+  const measure = React.useCallback(() => {
+    const content = contentRef.current;
+    if (!content) return;
+    const base = content.getBoundingClientRect();
+    setDims({ w: content.scrollWidth, h: content.scrollHeight });
+    const next = [];
+    edges.forEach((e) => {
+      const a = nodeRefs.current[e.from];
+      const b = nodeRefs.current[e.to];
+      if (!a || !b) return;
+      const ra = a.getBoundingClientRect();
+      const rb = b.getBoundingClientRect();
+      const sx = ra.right - base.left, sy = ra.top - base.top + ra.height / 2;
+      const tx = rb.left - base.left, ty = rb.top - base.top + rb.height / 2;
+      let d;
+      if (tx <= sx) {
+        d = `M ${sx} ${sy} C ${sx + 34} ${sy}, ${tx - 34} ${ty}, ${tx} ${ty}`;
+      } else {
+        const dx = (tx - sx) * 0.5;
+        d = `M ${sx} ${sy} C ${sx + dx} ${sy}, ${tx - dx} ${ty}, ${tx} ${ty}`;
+      }
+      next.push({ key: `${e.from}->${e.to}`, d, ...edgeColor(e, selectedId, statusById) });
+    });
+    setPaths(next);
+  }, [edges, selectedId, statusById]);
+
+  React.useLayoutEffect(() => { measure(); }, [measure, nodes]);
+  React.useEffect(() => {
+    const ro = new ResizeObserver(() => measure());
+    if (contentRef.current) ro.observe(contentRef.current);
+    window.addEventListener('resize', measure);
+    return () => { ro.disconnect(); window.removeEventListener('resize', measure); };
+  }, [measure]);
+
+  const related = React.useMemo(() => {
+    if (!selectedId) return null;
+    const s = new Set([selectedId]);
+    edges.forEach((e) => { if (e.from === selectedId) s.add(e.to); if (e.to === selectedId) s.add(e.from); });
+    return s;
+  }, [selectedId, edges]);
+
+  const EDGE_MARKERS = ['var(--sf-edge-downstream)', 'var(--sf-edge-upstream)', 'var(--sf-edge-completed)', 'var(--sf-edge-muted)'];
+
+  return (
+    <div style={{ overflowX: 'auto', borderRadius: 'var(--sf-radius-xl)', border: '1px solid var(--sf-border)', background: 'var(--sf-surface)', padding: 14 }}>
+      <div ref={contentRef} style={{ position: 'relative', display: 'inline-flex', gap: 18, minWidth: '100%' }}>
+        <svg style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'visible' }} width={dims.w} height={dims.h} aria-hidden="true">
+          <defs>
+            {EDGE_MARKERS.map((c, i) => (
+              <marker key={i} id={`sf-arrow-${i}`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill={c} />
+              </marker>
+            ))}
+          </defs>
+          {paths.map((p) => (
+            <path key={p.key} d={p.d} fill="none" stroke={p.c} strokeWidth={p.w} opacity={p.o}
+              markerEnd={`url(#sf-arrow-${EDGE_MARKERS.indexOf(p.c)})`} />
+          ))}
+        </svg>
+        {phases.map((phase, i) => {
+          const ns = nodes.filter((n) => n.phaseId === phase.id);
+          const ps = phaseStatus(nodes, phase.id);
+          const sel = selectedId && nodes.find((n) => n.id === selectedId)?.phaseId === phase.id;
+          return (
+            <div key={phase.id} style={{
+              position: 'relative', display: 'flex', flexDirection: 'column', gap: 14,
+              width: 210, flexShrink: 0, padding: '10px 10px 16px', borderRadius: 'var(--sf-radius-2xl)',
+              background: sel ? 'var(--sf-phase-band-sel)' : (i % 2 === 0 ? 'var(--sf-phase-band)' : 'transparent'),
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: PHASE_DOT[ps] || 'var(--sf-locked)' }} />
+                  <span style={{ fontSize: 'var(--sf-text-10)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 'var(--sf-tracking-widest)', color: sel ? 'var(--sf-accent-text)' : 'var(--sf-text-subtle)' }}>
+                    Phase {phase.order}
+                  </span>
+                </div>
+                <div style={{ marginTop: 2, fontSize: 'var(--sf-text-xs)', fontWeight: 600, color: 'var(--sf-text)', lineHeight: 1.2 }}>{phase.title}</div>
+                <div style={{ fontSize: 'var(--sf-text-10)', color: 'var(--sf-text-muted)' }}>{phase.goal}</div>
+              </div>
+              {ns.map((n) => {
+                let relation = 'none';
+                if (n.id === selectedId) relation = 'selected';
+                else if (selectedId) {
+                  if (edges.some((e) => e.from === selectedId && e.to === n.id)) relation = 'downstream';
+                  else if (edges.some((e) => e.to === selectedId && e.from === n.id)) relation = 'upstream';
+                }
+                const dimmed = related ? !related.has(n.id) : false;
+                return (
+                  <div key={n.id} ref={(el) => { nodeRefs.current[n.id] = el; }}>
+                    <WorkflowNode type={n.type} label={n.label} artifactName={n.artifactName}
+                      status={n.status} relation={relation} dimmed={dimmed}
+                      onClick={() => onSelect(n.id)} style={{ width: '100%' }} />
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function WorkflowMap({ nodes, phases, edges, selectedId, onSelect, theme, onToggleTheme, onStart, onViewArtifact, onReset }) {
+  const nodesById = React.useMemo(() => Object.fromEntries(nodes.map((n) => [n.id, n])), [nodes]);
+  const statusById = React.useMemo(() => Object.fromEntries(nodes.map((n) => [n.id, n.status])), [nodes]);
+  const selected = nodesById[selectedId];
+
+  const buildable = nodes.filter((n) => n.lessonId);
+  const built = buildable.filter((n) => n.status === 'complete').length;
+  const ready = nodes.filter((n) => n.status === 'ready').length;
+  const waiting = nodes.filter((n) => n.status === 'locked' && n.artifactName).length;
+  const locked = nodes.filter((n) => n.status === 'locked').length;
+
+  return (
+    <div style={{ minHeight: '100%', background: 'var(--sf-bg)', color: 'var(--sf-text)', fontFamily: 'var(--sf-font-sans)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '12px 24px', background: 'var(--sf-surface)', borderBottom: '1px solid var(--sf-border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+          <Logo uppercase size={22} />
+          <div style={{ display: 'flex', flexDirection: 'column', borderLeft: '1px solid var(--sf-border)', paddingLeft: 18 }}>
+            <span style={{ fontSize: 'var(--sf-text-9)', textTransform: 'uppercase', letterSpacing: 'var(--sf-tracking-wide)', color: 'var(--sf-text-subtle)' }}>Project</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 'var(--sf-text-sm)', fontWeight: 600, color: 'var(--sf-text)' }}>
+              Meridian Morning Market Brief <Icon name="chevron-down" size={14} />
+            </span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 'var(--sf-text-xs)', color: 'var(--sf-text-muted)' }}>
+            <Icon name="clock" size={14} /> 6:15 AM CT
+          </span>
+          <ThemeToggle value={theme} onChange={onToggleTheme} />
+          <Button variant="neutral" size="sm" icon="rotate-cw" onClick={onReset}>Start Over</Button>
+        </div>
+      </div>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 24 }}>
+          <div style={{ maxWidth: 760 }}>
+            <h1 style={{ margin: 0, fontSize: 'var(--sf-text-2xl)', fontWeight: 600, color: 'var(--sf-text)' }}>Meridian Morning Market Brief</h1>
+            <p style={{ margin: '6px 0 0', fontSize: 'var(--sf-text-sm)', lineHeight: 1.5, color: 'var(--sf-text-muted)' }}>
+              Build a workplace automation that turns messy overnight market inputs into an approval-ready 7:00 AM brief. The map below is the real dependency graph — phases on the left feed objects that get reused, evaluated, and routed downstream.
+            </p>
+            <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 12, fontSize: 'var(--sf-text-sm)' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--sf-text-body)', fontWeight: 500 }}>
+                <Icon name="clipboard-list" size={15} /> Interactive tasks built: {built} of {buildable.length}
+              </span>
+              <span style={{ color: 'var(--sf-border-strong)' }}>·</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--sf-text-muted)', fontWeight: 500 }}>
+                <Icon name="workflow" size={15} /> Workflow lessons defined: {nodes.length} of {nodes.length}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <SectionLabel style={{ marginBottom: 10 }}>Workflow Map</SectionLabel>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) var(--sf-detail-w)', gap: 20, alignItems: 'start' }}>
+            <Canvas nodes={nodes} phases={phases} edges={edges} selectedId={selectedId} onSelect={onSelect} statusById={statusById} />
+            <div style={{ position: 'sticky', top: 24 }}>
+              <NodeDetailPanel node={selected} nodesById={nodesById} edges={edges} onSelect={onSelect} onStart={onStart} onViewArtifact={onViewArtifact} />
+            </div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 40, flexWrap: 'wrap', padding: '16px 20px', background: 'var(--sf-surface)', border: '1px solid var(--sf-border)', borderRadius: 'var(--sf-radius-xl)', boxShadow: 'var(--sf-shadow-sm)' }}>
+          <SectionLabel>Workflow Health</SectionLabel>
+          <StatItem icon="circle-check-big" value={built} label="Artifacts built" tone="complete" />
+          <StatItem icon="circle-play" value={ready} label="Tasks ready" tone="ready" />
+          <StatItem icon="clock" value={waiting} label="Waiting on inputs" tone="progress" />
+          <StatItem icon="lock" value={locked} label="Future nodes locked" tone="locked" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── LessonWorkspace ──────────────────────────────────────────── */
+
+function validateIntake(answerText) {
+  let obj;
+  try { obj = JSON.parse(answerText); }
+  catch { return { ok: false, results: [{ label: 'JSON', message: 'Could not parse — check for missing quotes or commas.', passed: false, hint: 'Every key and string value needs double quotes.' }] }; }
+  const norm = (v) => String(v == null ? '' : v).toLowerCase().trim();
+  const checks = [
+    { id: 'hub',             label: 'hub',             test: () => norm(obj.hub).includes('ercot'),                                                               hint: 'Look for the named trading hub or region.' },
+    { id: 'peakPrice',       label: 'peakPrice',       test: () => norm(obj.peakPrice).includes('187'),                                                           hint: 'Find the spike value before it settled ($187).' },
+    { id: 'settledPrice',    label: 'settledPrice',    test: () => norm(obj.settledPrice).includes('142'),                                                         hint: 'Find the price the note says it settled near ($142).' },
+    { id: 'generationFlag',  label: 'generationFlag',  test: () => norm(obj.generationFlag).includes('wind') && norm(obj.generationFlag).includes('under'),        hint: 'Name the source and that it underperformed.' },
+    { id: 'approvalRequired',label: 'approvalRequired',test: () => obj.approvalRequired === true,                                                                  hint: 'The trader flagged it — use the boolean true.' },
+  ];
+  const results = checks.map((c) => ({ label: c.label, message: c.test() ? 'Value captured.' : 'Value not recognized.', passed: c.test(), hint: c.hint }));
+  return { ok: results.every((r) => r.passed), results };
+}
+
+function CopilotPromptCard({ prompt }) {
+  const [copied, setCopied] = React.useState(false);
+  return (
+    <Card tone="info" padding="sm">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ color: 'var(--sf-info)', display: 'inline-flex' }}><Icon name="braces" size={15} /></span>
+        <span style={{ fontSize: 'var(--sf-text-sm)', fontWeight: 600, color: 'var(--sf-info)' }}>Copilot Prompt Coach</span>
+      </div>
+      <div style={{ marginTop: 8 }}><CodeBlock wrap>{prompt}</CodeBlock></div>
+      <div style={{ marginTop: 10 }}>
+        <Button size="sm" variant="neutral" icon={copied ? 'check' : 'copy'}
+          onClick={() => { try { navigator.clipboard.writeText(prompt); } catch {} setCopied(true); setTimeout(() => setCopied(false), 1600); }}>
+          {copied ? 'Copied!' : 'Copy Prompt'}
+        </Button>
+      </div>
+    </Card>
+  );
+}
+
+function LessonWorkspace({ lesson, onBack, onComplete }) {
+  const STEPS = ['Intro', 'Exercise', 'Takeaway'];
+  const [step, setStep] = React.useState(0);
+  const [answer, setAnswer] = React.useState(lesson.starterAnswer);
+  const [results, setResults] = React.useState(null);
+  const [passed, setPassed] = React.useState(false);
+  const [checked, setChecked] = React.useState(lesson.instructions.map(() => false));
+
+  function handleValidate() {
+    const r = validateIntake(answer);
+    setResults(r.results);
+    setPassed(r.ok);
+    if (r.ok) onComplete(lesson.nodeId, lesson.solution);
+  }
+
+  return (
+    <div style={{ minHeight: '100%', background: 'var(--sf-bg)', color: 'var(--sf-text)', fontFamily: 'var(--sf-font-sans)' }}>
+      <div style={{ maxWidth: 1180, margin: '0 auto', padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div>
+          <Button variant="link" icon="arrow-left" onClick={onBack}>Back to Canvas</Button>
+          <h1 style={{ margin: '6px 0 2px', fontSize: 'var(--sf-text-2xl)', fontWeight: 600 }}>{lesson.title}</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 'var(--sf-text-sm)', color: 'var(--sf-text-muted)' }}>
+            <Badge tone="info">{lesson.difficulty}</Badge> {lesson.skill}
+          </div>
+        </div>
+        <Stepper steps={STEPS} current={step} />
+
+        {step === 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'start' }}>
+            <Card padding="lg">
+              <h2 style={{ margin: 0, fontSize: 'var(--sf-text-lg)', fontWeight: 600, color: 'var(--sf-text)' }}>{lesson.intro.heading}</h2>
+              <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {lesson.intro.sections.map((s) => (
+                  <div key={s.title}>
+                    <h3 style={{ margin: 0, fontSize: 'var(--sf-text-sm)', fontWeight: 600, color: 'var(--sf-text)' }}>{s.title}</h3>
+                    <p style={{ margin: '4px 0 0', fontSize: 'var(--sf-text-sm)', lineHeight: 1.5, color: 'var(--sf-text-body)' }}>{s.body}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <Card><SectionLabel>JSON Example</SectionLabel><div style={{ marginTop: 8 }}><CodeBlock>{lesson.jsonExample}</CodeBlock></div></Card>
+              <Card>
+                <SectionLabel>You will produce</SectionLabel>
+                <div style={{ marginTop: 4, fontSize: 'var(--sf-text-sm)', fontWeight: 600, color: 'var(--sf-text)', fontFamily: 'var(--sf-font-mono)' }}>market-intake.json</div>
+                <div style={{ marginTop: 10 }}><SectionLabel>Skill you are practicing</SectionLabel></div>
+                <div style={{ marginTop: 4, fontSize: 'var(--sf-text-sm)', fontWeight: 600, color: 'var(--sf-text)' }}>{lesson.skill}</div>
+              </Card>
+            </div>
+            <div><Button variant="primary" iconRight="arrow-right" onClick={() => setStep(1)}>Continue to Exercise</Button></div>
+          </div>
+        )}
+
+        {step === 1 && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.1fr 0.9fr', gap: 16, alignItems: 'start' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <Card><SectionLabel>{lesson.inputLabel}</SectionLabel><div style={{ marginTop: 8 }}><CodeBlock wrap>{lesson.input}</CodeBlock></div></Card>
+              <Card>
+                <SectionLabel>Instructions</SectionLabel>
+                <ul style={{ listStyle: 'none', margin: '8px 0 0', padding: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {lesson.instructions.map((ins, i) => (
+                    <li key={i}>
+                      <label style={{ display: 'flex', gap: 8, cursor: 'pointer', fontSize: 'var(--sf-text-sm)', color: 'var(--sf-text-body)' }}>
+                        <input type="checkbox" checked={checked[i]} onChange={() => setChecked((p) => p.map((v, j) => j === i ? !v : v))} style={{ marginTop: 2, accentColor: 'var(--sf-accent)' }} />
+                        <span style={{ textDecoration: checked[i] ? 'line-through' : 'none', color: checked[i] ? 'var(--sf-text-subtle)' : 'var(--sf-text-body)' }}>{ins}</span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+              <Card>
+                <SectionLabel>Field Guide</SectionLabel>
+                <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {lesson.fieldGuide.map((f, i) => <FieldGuideRow key={f.field} divider={i !== 0} {...f} />)}
+                </div>
+              </Card>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <Card>
+                <SectionLabel>Your Answer (JSON)</SectionLabel>
+                <textarea value={answer} onChange={(e) => setAnswer(e.target.value)} spellCheck={false} rows={13}
+                  style={{ marginTop: 8, width: '100%', boxSizing: 'border-box', resize: 'vertical', borderRadius: 'var(--sf-radius-md)', border: '1px solid var(--sf-border-strong)', background: 'var(--sf-surface)', color: 'var(--sf-text)', padding: 12, fontFamily: 'var(--sf-font-mono)', fontSize: 'var(--sf-text-sm)', lineHeight: 1.5, outline: 'none' }} />
+                <div style={{ marginTop: 12 }}><Button variant="primary" icon="circle-check" onClick={handleValidate}>Validate</Button></div>
+              </Card>
+              {passed && (
+                <Card tone="success">
+                  <p style={{ margin: 0, fontSize: 'var(--sf-text-sm)', fontWeight: 600, color: 'var(--sf-green-800)' }}>{lesson.successMessage}</p>
+                  <div style={{ marginTop: 12 }}><Button variant="success" iconRight="arrow-right" onClick={() => setStep(2)}>Continue to Takeaway</Button></div>
+                </Card>
+              )}
+              <CopilotPromptCard prompt={lesson.copilotPrompt} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <Card>
+                <SectionLabel>Validation Results</SectionLabel>
+                <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {results ? results.map((r, i) => <ValidationRow key={i} {...r} />)
+                    : <p style={{ margin: 0, fontSize: 'var(--sf-text-sm)', color: 'var(--sf-text-muted)' }}>Validate your answer to see per-field results and hints here.</p>}
+                </div>
+              </Card>
+              {passed && (
+                <Card>
+                  <SectionLabel>Output Preview</SectionLabel>
+                  <div style={{ marginTop: 8 }}><CodeBlock>{lesson.solution}</CodeBlock></div>
+                </Card>
+              )}
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'start' }}>
+            <Card tone="success" padding="lg">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ color: 'var(--sf-complete)', display: 'inline-flex' }}><Icon name="circle-check-big" size={22} /></span>
+                <h2 style={{ margin: 0, fontSize: 'var(--sf-text-lg)', fontWeight: 600, color: 'var(--sf-green-900)' }}>{lesson.takeaway.heading}</h2>
+              </div>
+              <ul style={{ listStyle: 'none', margin: '14px 0 0', padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {lesson.takeaway.points.map((p, i) => (
+                  <li key={i} style={{ display: 'flex', gap: 8, fontSize: 'var(--sf-text-sm)', color: 'var(--sf-green-900)' }}>
+                    <span style={{ color: 'var(--sf-complete)', display: 'inline-flex', marginTop: 1 }}><Icon name="check" size={15} strokeWidth={2.5} /></span>{p}
+                  </li>
+                ))}
+              </ul>
+              <div style={{ marginTop: 18 }}><Button variant="success" icon="workflow" onClick={onBack}>Return to Canvas</Button></div>
+            </Card>
+            <Card>
+              <SectionLabel>Artifact produced</SectionLabel>
+              <div style={{ marginTop: 4, fontFamily: 'var(--sf-font-mono)', fontSize: 'var(--sf-text-sm)', fontWeight: 600, color: 'var(--sf-text)' }}>market-intake.json</div>
+              <div style={{ marginTop: 12 }}><CodeBlock>{lesson.solution}</CodeBlock></div>
+            </Card>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── App ──────────────────────────────────────────────────────── */
+
+function ArtifactViewer({ node, onBack }) {
+  const artifact = node.id === 'market-intake-record'
+    ? { hub: 'ERCOT', peakPrice: '$187/MWh', settledPrice: '$142/MWh', generationFlag: 'Wind underperformed', approvalRequired: true }
+    : {};
+  return (
+    <div style={{ minHeight: '100%', background: 'var(--sf-bg)', color: 'var(--sf-text)', fontFamily: 'var(--sf-font-sans)' }}>
+      <div style={{ maxWidth: 760, margin: '0 auto', padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div>
+          <Button variant="link" icon="arrow-left" onClick={onBack}>Back to Canvas</Button>
+          <h1 style={{ margin: '6px 0 2px', fontSize: 'var(--sf-text-2xl)', fontWeight: 600 }}>{node.label} Artifact</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontFamily: 'var(--sf-font-mono)', fontSize: 'var(--sf-text-sm)', color: 'var(--sf-text-muted)' }}>{node.artifactName}</span>
+            <Badge tone="complete" icon="circle-check">Built</Badge>
+          </div>
+        </div>
+        <pre style={{ margin: 0, padding: 16, borderRadius: 'var(--sf-radius-xl)', border: '1px solid var(--sf-border)', background: 'var(--sf-surface)', fontFamily: 'var(--sf-font-mono)', fontSize: 'var(--sf-text-sm)', color: 'var(--sf-text-body)', overflow: 'auto', boxShadow: 'var(--sf-shadow-sm)' }}>
+          {JSON.stringify(artifact, null, 2)}
+        </pre>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [theme, setTheme] = React.useState('light');
+  const [nodes, setNodes] = React.useState(() => window.SF_NODES.map((n) => ({ ...n })));
+  const [selectedId, setSelectedId] = React.useState('market-intake-record');
+  const [view, setView] = React.useState('canvas');
+  const [activeNode, setActiveNode] = React.useState(null);
+
+  const phases = window.SF_PHASES;
+  const edges = window.SF_EDGES;
+
+  function startLesson(node) {
+    if (node.lessonId !== 'lesson-intake') return;
+    setActiveNode(node);
+    setNodes((prev) => prev.map((n) => n.id === node.id ? { ...n, status: 'in-progress' } : n));
+    setView('lesson');
+  }
+  function completeLesson(nodeId) {
+    setNodes((prev) => prev.map((n) => n.id === nodeId ? { ...n, status: 'complete' } : n));
+  }
+  function viewArtifact(node) { setActiveNode(node); setView('artifact'); }
+  function backToCanvas() { setView('canvas'); }
+  function reset() {
+    setNodes(window.SF_NODES.map((n) => ({ ...n })));
+    setSelectedId('market-intake-record'); setView('canvas');
+  }
+
+  let screen;
+  if (view === 'lesson' && activeNode) {
+    screen = <LessonWorkspace lesson={window.SF_LESSON_INTAKE} onBack={backToCanvas} onComplete={completeLesson} />;
+  } else if (view === 'artifact' && activeNode) {
+    screen = <ArtifactViewer node={nodes.find((n) => n.id === activeNode.id)} onBack={backToCanvas} />;
+  } else {
+    screen = (
+      <WorkflowMap nodes={nodes} phases={phases} edges={edges} selectedId={selectedId}
+        onSelect={setSelectedId} theme={theme} onToggleTheme={setTheme}
+        onStart={startLesson} onViewArtifact={viewArtifact} onReset={reset} />
+    );
+  }
+
+  return (
+    <div data-theme={theme === 'dark' ? 'dark' : undefined} style={{ minHeight: '100vh', background: 'var(--sf-bg)' }}>
+      {view === 'canvas' && !nodes.find((n) => n.id === 'market-intake-record').status.includes('complete') && (
+        <div style={{ position: 'fixed', right: 16, bottom: 16, zIndex: 20 }}>
+          <div style={{ background: 'var(--sf-surface)', border: '1px solid var(--sf-border)', borderRadius: 'var(--sf-radius-lg)', boxShadow: 'var(--sf-shadow-lg)', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8, maxWidth: 280 }}>
+            <span style={{ color: 'var(--sf-accent)', display: 'inline-flex' }}><Icon name="circle-help" size={16} /></span>
+            <span style={{ fontSize: 'var(--sf-text-xs)', color: 'var(--sf-text-body)', lineHeight: 1.4 }}>
+              Try it: select <strong style={{ color: 'var(--sf-text)' }}>Market Intake Record</strong> and Start lesson.
+            </span>
+          </div>
+        </div>
+      )}
+      {screen}
+    </div>
+  );
+}
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+})();
+</script>
+</body>
+</html>

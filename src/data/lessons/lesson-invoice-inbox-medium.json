@@ -1,0 +1,117 @@
+{
+  "id": "lesson-invoice-inbox-medium",
+  "nodeId": "invoice-inbox",
+  "title": "Profile a Messy Invoice Inbox",
+  "difficulty": "Intermediate",
+  "skill": "Source provenance",
+  "clock": "8:00 AM",
+  "scenario": "It is 8:00 AM and five invoices landed overnight - more than the clean morning, and not all of them should be paid. Before you build, profile this busier inbox: who sends these, why the pile is riskier than it looks, and what the desk must be ready to catch downstream.",
+  "inputType": "text",
+  "inputLabel": "Invoice Inbox (this morning)",
+  "input": "5 documents in the AP shared mailbox. INV-59001 (Northwind Fasteners, PO-7742, $1,200.00). INV-59002 (Cascade Packaging, PO-7751, $1,230.00). INV-58962 (Northwind Fasteners, $640.00) - the number looks familiar. INV-59004 (Sierra Tooling, PO-7760, $1,200.00) - a vendor the desk does not recognize. INV-59005 (Northwind Fasteners, PO-7763, $1,000.00). Same mailbox, mixed formats, arriving on no fixed schedule.",
+  "instructions": [
+    "Read the inbox as a source, not as data to extract - extraction is the Invoice Record task.",
+    "Notice that a busier inbox carries more failure modes, not just more volume.",
+    "Answer the four source questions and validate to mint the source profile."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "Who produces the documents in this inbox?",
+        "options": [
+          { "id": "a", "text": "The AP Clerk, by typing them each morning" },
+          { "id": "b", "text": "Vendors, who send invoices to Beacon's shared mailbox and portal" },
+          { "id": "c", "text": "The workflow generates them automatically" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Invoices still originate outside Beacon - Northwind, Cascade, and an unfamiliar Sierra Tooling all sent these. The AP Clerk receives and processes them; it does not author them."
+      },
+      {
+        "id": "q2",
+        "prompt": "Why is a five-invoice inbox riskier than a one-invoice inbox, beyond volume?",
+        "options": [
+          { "id": "a", "text": "It is not - more invoices just take longer to type" },
+          { "id": "b", "text": "Each extra invoice can carry its own failure mode - a duplicate, a bad price, an unknown vendor, a missing receipt" },
+          { "id": "c", "text": "The mailbox charges per document" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Look at the pile: a familiar-looking number, an unrecognized vendor, prices to check. A batch is where duplicates, out-of-tolerance prices, unknown vendors, and missing receipts all hide - so the desk downstream must be built to catch each one."
+      },
+      {
+        "id": "q3",
+        "prompt": "Should the inbox itself decide which invoices are duplicates or bad?",
+        "options": [
+          { "id": "a", "text": "Yes - the mailbox should reject bad invoices on arrival" },
+          { "id": "b", "text": "No - the inbox only captures what arrived; matching and dedupe are later, owned steps" },
+          { "id": "c", "text": "No - bad invoices should be deleted before anyone sees them" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The source's job is faithful capture, including the bad ones. Judging them (duplicate check, three-way match, routing) happens downstream where the rules are owned and logged - never silently at the door."
+      },
+      {
+        "id": "q4",
+        "prompt": "Which workflow step consumes these invoices first?",
+        "options": [
+          { "id": "a", "text": "Three-Way Match" },
+          { "id": "b", "text": "Invoice Record" },
+          { "id": "c", "text": "Payment Run" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Follow the map's edge: the inbox's first stop is the Invoice Record task, which extracts every document - clean or not - into a structured record for the matching steps to judge."
+      }
+    ],
+    "artifactOnPass": {
+      "source": "invoice-inbox",
+      "producedBy": "Vendors (Northwind Fasteners, Cascade Packaging, Sierra Tooling)",
+      "format": "mixed (PDF, image, portal CSV)",
+      "documentCount": 5,
+      "knownFailureModes": ["duplicate", "price over tolerance", "vendor not in master", "missing receipt"],
+      "firstConsumer": "invoice-record"
+    }
+  },
+  "copilotPrompt": "Profile a five-invoice AP inbox as an automation source: who produces the documents, why a batch carries more failure modes than volume, whether the inbox should judge invoices, and which workflow step consumes them first.",
+  "successMessage": "Source profiled. You know the pile is mixed and some invoices should not pay - next, extract all five into structured records.",
+  "intro": {
+    "heading": "Before you build: a batch hides more than volume",
+    "sections": [
+      {
+        "title": "The clean day was the exception",
+        "body": "In the Easy tier one clean invoice flowed the whole desk. Real mornings look like this one: several invoices at once, and only some are payable. Profiling that reality up front is what makes the matching steps worth building."
+      },
+      {
+        "title": "Every invoice is a different risk",
+        "body": "A batch is not one problem five times. This pile hides a duplicate, a price outside tolerance, a vendor not on file, and an invoice with no receipt. Recognizing that variety is the whole point of the Medium tier."
+      },
+      {
+        "title": "Capture first, judge later",
+        "body": "The inbox faithfully captures everything that arrived, including the bad invoices. The desk judges them downstream where the rules are owned and every decision is logged - never silently at the door."
+      }
+    ],
+    "jsonExample": "{\n  \"source\": \"invoice-inbox\",\n  \"documentCount\": 5,\n  \"firstConsumer\": \"invoice-record\"\n}",
+    "skill": "Source provenance",
+    "artifactName": "source-profile-invoice-inbox.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd triage the invoice inbox by hand - deciding which emails are real invoices, which are duplicates, and which are spam - before anything gets keyed.",
+      "tools": {
+        "powerAutomate": "Outlook trigger + Condition rules (or AI Builder) to classify each incoming invoice",
+        "zapier": "Email Parser + 'Filter' to keep only genuine invoices",
+        "python": "read the mailbox and classify by sender/subject rules into keep or skip"
+      }
+    },
+    "heading": "Messy source profiled",
+    "points": [
+      "You profiled a five-invoice inbox and named its four hidden failure modes: duplicate, price over tolerance, unknown vendor, missing receipt.",
+      "A batch carries more risk than volume - each invoice can fail differently, which is exactly what the matching steps must catch.",
+      "The inbox captures everything faithfully, including invoices that should not pay; judging them is a later, owned, logged step.",
+      "Your source profile records the document count and known failure modes for the batch.",
+      "The workflow can now treat the inbox as a mixed batch where some invoices will be held rather than paid."
+    ],
+    "artifactName": "source-profile-invoice-inbox.json"
+  }
+}

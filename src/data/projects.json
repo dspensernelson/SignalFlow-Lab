@@ -1,0 +1,12 @@
+[
+  { "id": "module-01", "name": "Meridian Morning Market Brief", "org": "Meridian Energy", "status": "complete", "clock": "6:15 AM CT", "goal": "Build a workplace automation that turns messy overnight market inputs into an approval-ready 7:00 AM brief. The map below is the real dependency graph - phases on the left feed objects that get reused, evaluated, and routed downstream. Click any node to see how that piece gets built and reused." },
+  { "id": "module-02", "name": "Beacon Invoice Desk", "org": "Beacon Manufacturing", "status": "active", "clock": "8:00 AM", "goal": "Build a workplace automation that runs a day of vendor invoices through a clean payables desk: extract each invoice, match it three ways against the PO and receipt, clear duplicates, route on tolerance, and assemble an approved payment run by 3:00 PM. The map below is the real dependency graph - click any node to see how that piece gets built and reused." },
+  { "id": "module-03", "name": "Harbor Onboarding", "org": "Harbor", "status": "planned" },
+  { "id": "module-04", "name": "Relay Ticket Triage", "org": "Relay", "status": "planned" },
+  { "id": "module-05", "name": "Ledger Month-End Close", "org": "Ledger", "status": "planned" },
+  { "id": "module-06", "name": "Compass CRM Hygiene", "org": "Compass", "status": "planned" },
+  { "id": "module-07", "name": "Depot Order Flow", "org": "Depot", "status": "planned" },
+  { "id": "module-08", "name": "Sentinel Evidence Locker", "org": "Sentinel", "status": "planned" },
+  { "id": "module-09", "name": "Studio Campaign Ops", "org": "Studio", "status": "planned" },
+  { "id": "module-10", "name": "Watchtower Incident Response", "org": "Watchtower", "status": "planned" }
+]

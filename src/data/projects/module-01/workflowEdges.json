@@ -21,5 +21,6 @@
   { "from": "approval-route", "to": "morning-brief", "label": "approval status" },
   { "from": "routine-update-path", "to": "morning-brief", "label": "routine note" },
   { "from": "prior-day-brief-template", "to": "morning-brief", "label": "template" },
-  { "from": "morning-brief", "to": "distribution-archive", "label": "sent and saved" }
+  { "from": "morning-brief", "to": "distribution-archive", "label": "sent and saved" },
+  { "from": "distribution-archive", "to": "prior-day-reference", "label": "seeds tomorrow" }
 ]

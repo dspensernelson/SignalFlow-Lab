@@ -1,0 +1,118 @@
+{
+  "id": "lesson-po-register-medium",
+  "nodeId": "po-register",
+  "title": "Match the Batch to the PO Register",
+  "difficulty": "Intermediate",
+  "skill": "System of record",
+  "clock": "10:10 AM",
+  "scenario": "It is 10:10 AM. The PO register is the authority on what Beacon agreed to buy and at what price. Line the five invoices up against their POs by the join key and notice where an invoice price disagrees with the order it claims to match.",
+  "inputType": "text",
+  "inputLabel": "PO Register (relevant orders)",
+  "input": "PO-7742 (V-1042): 500 @ 2.40 = $1,200.00. PO-7751 (V-1108): 300 @ 3.80 = $1,140.00. PO-7738 (V-1042): 400 @ 1.60 = $640.00. PO-7760 (V-1205): 200 @ 6.00 = $1,200.00. PO-7763 (V-1042): 400 @ 2.48 = $992.00. Owned by the Procurement Lead. The join key is the PO number carried on each invoice.",
+  "instructions": [
+    "Read the PO register as the agreed order of record, owned by Procurement.",
+    "Use the PO number to link each invoice to its order.",
+    "Notice that INV-59002's invoice price is above its PO price - a variance the match must judge.",
+    "Answer the questions and validate to mint the source profile."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "What links an invoice to its purchase order in this batch?",
+        "options": [
+          { "id": "a", "text": "The vendor name spelled the same way" },
+          { "id": "b", "text": "The PO number carried on both the invoice and the register" },
+          { "id": "c", "text": "The dollar total matching exactly" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The PO number is the stable join key. Names can be spelled differently and totals can disagree - the PO reference is what reliably ties an invoice to the order it claims to fulfill."
+      },
+      {
+        "id": "q2",
+        "prompt": "INV-59002 bills $1,230.00 but its PO-7751 agreed to $1,140.00. Which figure is the authority?",
+        "options": [
+          { "id": "a", "text": "The invoice - the vendor knows the real price" },
+          { "id": "b", "text": "The PO - it is the agreed order of record; the gap is a variance to judge" },
+          { "id": "c", "text": "Whichever is lower" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The PO is what Beacon agreed to pay. When the invoice asks for more, that difference is a price variance the three-way match must test against the tolerance policy - not something to accept on the vendor's word."
+      },
+      {
+        "id": "q3",
+        "prompt": "The register shows a PO for every invoice, including the unknown-vendor one. Does a valid PO make INV-59004 payable?",
+        "options": [
+          { "id": "a", "text": "Yes - a matching PO is enough to pay" },
+          { "id": "b", "text": "No - a PO proves an order was placed, but the vendor must still be on file to be paid" },
+          { "id": "c", "text": "Yes - the PO overrides the vendor master" }
+        ],
+        "correctOptionId": "b",
+        "explain": "A PO is authority to buy, not authority to pay. INV-59004 has PO-7760, but its vendor V-1205 is not in the master, so it is still blocked - each control checks a different thing."
+      },
+      {
+        "id": "q4",
+        "prompt": "Who owns the PO register as a system of record?",
+        "options": [
+          { "id": "a", "text": "The AP Clerk" },
+          { "id": "b", "text": "The Procurement Lead" },
+          { "id": "c", "text": "The vendor" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Procurement places and owns the purchase orders, so the Procurement Lead is the owner AP routes a price dispute back to - as it will for INV-59002."
+      }
+    ],
+    "artifactOnPass": {
+      "source": "po-register",
+      "joinKey": "poNumber",
+      "owner": "Procurement Lead",
+      "authorityOn": "agreed price and quantity",
+      "priceDisputeInvoice": "INV-59002 (bills 1230.00 vs PO 1140.00)",
+      "firstConsumer": "three-way-match"
+    }
+  },
+  "copilotPrompt": "Inspect a PO register for a batch: identify the join key, which figure is authoritative when invoice and PO prices disagree, whether a valid PO alone makes an unknown-vendor invoice payable, and who owns the register.",
+  "successMessage": "PO register inspected. The join key links the batch, and INV-59002's price gap is queued for the match to judge.",
+  "intro": {
+    "heading": "Before you match: the PO is the agreed order",
+    "sections": [
+      {
+        "title": "The register is authority, not a copy",
+        "body": "The PO register records what Procurement agreed to buy and for how much. When an invoice and its PO disagree on price, the PO is the reference the match trusts - the invoice is a claim to be tested."
+      },
+      {
+        "title": "Join by the PO number",
+        "body": "Each invoice carries a PO reference; the register is keyed the same way. That shared key is what lets the match line the invoice up against the right order and receipt in a batch of five."
+      },
+      {
+        "title": "Authority to buy is not authority to pay",
+        "body": "Every invoice here has a matching PO - even the unknown-vendor one. A PO proves the order was placed; it does not override the vendor master or the tolerance band. Each control answers its own question."
+      }
+    ],
+    "jsonExample": "{\n  \"joinKey\": \"poNumber\",\n  \"owner\": \"Procurement Lead\"\n}",
+    "skill": "System of record",
+    "artifactName": "source-profile-po-register.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd pull the matching purchase order from the PO log so you can check the invoice against what was actually ordered.",
+      "tools": {
+        "powerAutomate": "'Get items' filtered by PO number from the PO list",
+        "zapier": "'Find Record' by PO number",
+        "python": "look up the PO by number in the register table"
+      }
+    },
+    "heading": "PO register inspected",
+    "points": [
+      "You linked the five invoices to their purchase orders by the PO join key.",
+      "When INV-59002's invoice price exceeded its PO, you kept the PO as the authority and flagged the gap as a variance to judge.",
+      "A valid PO is authority to buy, not to pay - INV-59004 still fails on its missing vendor.",
+      "The register is owned by the Procurement Lead, the owner a price dispute routes back to.",
+      "The workflow can now anchor every match to the agreed order of record."
+    ],
+    "artifactName": "source-profile-po-register.json"
+  }
+}
