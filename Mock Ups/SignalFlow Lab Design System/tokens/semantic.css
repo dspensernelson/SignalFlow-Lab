@@ -1,0 +1,181 @@
+/* ============================================================
+   SignalFlow Lab — Semantic aliases (light default + dark theme)
+   Components reference THESE tokens, not the raw palette. Switch
+   the whole product between themes with data-theme="dark" on a
+   wrapping element (or <html>). Light is the default.
+   ============================================================ */
+
+:root {
+  /* Surfaces */
+  --sf-bg:             var(--sf-gray-100); /* app background        */
+  --sf-surface:        #ffffff;            /* cards, panels, bars   */
+  --sf-surface-subtle: var(--sf-gray-50);  /* inset code/JSON wells */
+  --sf-surface-inset:  var(--sf-gray-100);
+  --sf-surface-raised: #ffffff;
+
+  /* Borders */
+  --sf-border:        var(--sf-gray-200); /* default card border    */
+  --sf-border-strong: var(--sf-gray-300); /* inputs, neutral buttons*/
+  --sf-border-subtle: var(--sf-gray-100); /* in-card section divider*/
+
+  /* Text */
+  --sf-text:         var(--sf-gray-900); /* headings              */
+  --sf-text-body:    var(--sf-gray-700); /* body copy             */
+  --sf-text-muted:   var(--sf-gray-500); /* secondary             */
+  --sf-text-subtle:  var(--sf-gray-400); /* uppercase micro-labels*/
+  --sf-text-inverse: #ffffff;
+
+  /* Brand accent */
+  --sf-accent:        var(--sf-blue-600);
+  --sf-accent-hover:  var(--sf-blue-700);
+  --sf-accent-text:   var(--sf-blue-600);
+  --sf-accent-weak:   var(--sf-blue-50);
+  --sf-accent-border: var(--sf-blue-400);
+  --sf-ring:          var(--sf-blue-600);
+
+  /* Status — fill / text / weak-surface triplets */
+  --sf-ready:           var(--sf-blue-600);
+  --sf-ready-text:      #1d4ed8;
+  --sf-ready-weak:      var(--sf-blue-100);
+  --sf-progress:        var(--sf-amber-500);
+  --sf-progress-text:   var(--sf-amber-700);
+  --sf-progress-weak:   var(--sf-amber-50);
+  --sf-complete:        var(--sf-emerald-600);
+  --sf-complete-text:   var(--sf-emerald-700);
+  --sf-complete-weak:   var(--sf-emerald-50);
+  --sf-locked:          var(--sf-gray-400);
+  --sf-locked-weak:     var(--sf-gray-100);
+  --sf-context:         var(--sf-violet-500);
+  --sf-context-text:    var(--sf-violet-700);
+  --sf-context-weak:    var(--sf-violet-100);
+
+  /* needs-inputs — node can reuse upstream artifact but is not yet build-ready */
+  --sf-needs-inputs:       #d97706; /* amber-600 — heavier than in-progress (amber-500) */
+  --sf-needs-inputs-text:  #92400e; /* amber-800 */
+  --sf-needs-inputs-weak:  #fef3c7; /* amber-100 — more saturated than progress-weak    */
+
+  /* upcoming — visible future node; not currently actionable */
+  --sf-upcoming:       var(--sf-slate-400);
+  --sf-upcoming-text:  var(--sf-slate-500);
+  --sf-upcoming-weak:  var(--sf-slate-100);
+
+  /* artifact-trusted — applied when type=artifact AND status=complete.
+     Uses emerald text + border from cyan for emerald/cyan emphasis.
+     Do NOT use for general complete state; --sf-complete handles that. */
+  --sf-artifact-trusted:        var(--sf-type-artifact-trusted); /* emerald-600 */
+  --sf-artifact-trusted-text:   var(--sf-emerald-700);
+  --sf-artifact-trusted-weak:   var(--sf-emerald-50);
+  --sf-artifact-trusted-border: var(--sf-cyan-500); /* cyan border + emerald fill = trusted */
+
+  /* Feedback */
+  --sf-success:      var(--sf-green-600);
+  --sf-success-weak: var(--sf-green-50);
+  --sf-danger:       var(--sf-red-600);
+  --sf-danger-weak:  var(--sf-red-50);
+  --sf-warning:      var(--sf-amber-500);
+  --sf-warning-weak: var(--sf-amber-50);
+  --sf-info:         var(--sf-indigo-600);
+  --sf-info-weak:    var(--sf-indigo-50);
+
+  /* Phase-region tint on the canvas */
+  --sf-phase-band:        rgba(248, 250, 252, 0.7); /* slate-50/70 */
+  --sf-phase-band-sel:    var(--sf-blue-50);
+  --sf-phase-band-active: rgba(6, 182, 212, 0.07); /* active signal phase; subtle cyan tint */
+
+  /* Signal-flow semantic layer
+     These tokens express the core signal-flow mental model.
+     Cyan = path/flow; amber = raw input; emerald = trusted; violet = governance.
+     Currently used by: edge rendering, phase-band tints, selected-node inspector.
+     GUARDRAIL: add new signal-* tokens only when a component consumes them. */
+  --sf-signal-path:         var(--sf-cyan-500);    /* extraction/reuse/flow edge color     */
+  --sf-signal-path-weak:    var(--sf-cyan-50);     /* signal-zone background tint          */
+  --sf-signal-raw:          var(--sf-amber-500);   /* raw/unresolved upstream signal       */
+  --sf-signal-trusted:      var(--sf-emerald-500); /* validated artifact emphasis          */
+  --sf-signal-trusted-weak: var(--sf-emerald-50);  /* validated-zone background tint       */
+  --sf-signal-reuse:        var(--sf-teal-500);    /* downstream artifact reuse path       */
+  --sf-signal-governance:   var(--sf-violet-500);  /* policy / config / governance ref     */
+
+  /* Elevation */
+  --sf-shadow-sm:  0 1px 2px 0 rgba(17, 24, 39, 0.06);
+  --sf-shadow-md:  0 4px 12px -2px rgba(17, 24, 39, 0.10);
+  --sf-shadow-lg:  0 12px 32px -8px rgba(17, 24, 39, 0.18);
+  --sf-shadow-glow: none; /* node glow only in dark theme */
+}
+
+/* ---- Dark theme -------------------------------------------- */
+[data-theme="dark"] {
+  --sf-bg:             var(--sf-ink-900);
+  --sf-surface:        var(--sf-ink-800);
+  --sf-surface-subtle: var(--sf-ink-850);
+  --sf-surface-inset:  var(--sf-ink-950);
+  --sf-surface-raised: var(--sf-ink-700);
+
+  --sf-border:        var(--sf-ink-line);
+  --sf-border-strong: #334155;
+  --sf-border-subtle: rgba(255, 255, 255, 0.06);
+
+  --sf-text:         var(--sf-slate-100);
+  --sf-text-body:    var(--sf-slate-300);
+  --sf-text-muted:   var(--sf-slate-400);
+  --sf-text-subtle:  var(--sf-slate-500);
+  --sf-text-inverse: #ffffff;
+
+  --sf-accent:        var(--sf-blue-500);
+  --sf-accent-hover:  var(--sf-blue-600);
+  --sf-accent-text:   #93c5fd;
+  --sf-accent-weak:   rgba(59, 130, 246, 0.14);
+  --sf-accent-border: var(--sf-blue-500);
+  --sf-ring:          var(--sf-blue-500);
+
+  --sf-ready:         var(--sf-blue-500);
+  --sf-ready-text:    #93c5fd;
+  --sf-ready-weak:    rgba(59, 130, 246, 0.14);
+  --sf-progress:      var(--sf-amber-400);
+  --sf-progress-text: #fcd34d;
+  --sf-progress-weak: rgba(245, 158, 11, 0.14);
+  --sf-complete:      var(--sf-emerald-500);
+  --sf-complete-text: var(--sf-emerald-400);
+  --sf-complete-weak: rgba(16, 185, 129, 0.14);
+  --sf-locked:        var(--sf-slate-500);
+  --sf-locked-weak:   rgba(148, 163, 184, 0.12);
+  --sf-context:       var(--sf-violet-500);
+  --sf-context-text:  #c4b5fd;
+  --sf-context-weak:  rgba(139, 92, 246, 0.16);
+
+  --sf-needs-inputs:       var(--sf-amber-500);
+  --sf-needs-inputs-text:  #fbbf24;
+  --sf-needs-inputs-weak:  rgba(217, 119, 6, 0.18);
+  --sf-upcoming:       var(--sf-slate-500);
+  --sf-upcoming-text:  var(--sf-slate-400);
+  --sf-upcoming-weak:  rgba(148, 163, 184, 0.10);
+  --sf-artifact-trusted:        var(--sf-emerald-500);
+  --sf-artifact-trusted-text:   var(--sf-emerald-400);
+  --sf-artifact-trusted-weak:   rgba(16, 185, 129, 0.16);
+  --sf-artifact-trusted-border: var(--sf-cyan-500);
+
+  --sf-success:      var(--sf-emerald-500);
+  --sf-success-weak: rgba(16, 185, 129, 0.14);
+  --sf-danger:       #f87171;
+  --sf-danger-weak:  rgba(220, 38, 38, 0.16);
+  --sf-warning:      var(--sf-amber-400);
+  --sf-warning-weak: rgba(245, 158, 11, 0.14);
+  --sf-info:         var(--sf-indigo-500);
+  --sf-info-weak:    rgba(99, 102, 241, 0.16);
+
+  --sf-phase-band:        rgba(255, 255, 255, 0.025);
+  --sf-phase-band-sel:    rgba(59, 130, 246, 0.10);
+  --sf-phase-band-active: rgba(6, 182, 212, 0.09);
+
+  --sf-signal-path:         var(--sf-cyan-400);
+  --sf-signal-path-weak:    rgba(6, 182, 212, 0.12);
+  --sf-signal-raw:          var(--sf-amber-400);
+  --sf-signal-trusted:      var(--sf-emerald-400);
+  --sf-signal-trusted-weak: rgba(16, 185, 129, 0.14);
+  --sf-signal-reuse:        var(--sf-teal-400);
+  --sf-signal-governance:   var(--sf-violet-500);
+
+  --sf-shadow-sm:  0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --sf-shadow-md:  0 4px 14px -2px rgba(0, 0, 0, 0.5);
+  --sf-shadow-lg:  0 16px 40px -10px rgba(0, 0, 0, 0.6);
+  --sf-shadow-glow: 0 0 0 1px rgba(59, 130, 246, 0.25), 0 0 22px -4px rgba(59, 130, 246, 0.45);
+}

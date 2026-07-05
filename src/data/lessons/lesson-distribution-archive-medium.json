@@ -1,0 +1,87 @@
+{
+  "id": "lesson-distribution-archive-medium",
+  "nodeId": "distribution-archive",
+  "title": "Close Out a Day That Had Exceptions",
+  "difficulty": "Medium",
+  "skill": "Exception-aware closeout",
+  "clock": "7:00 AM",
+  "scenario": "It is 7:00 AM on the messy morning. Delivery and retention still happen - but a day with exceptions has a third closeout job: making sure the exceptions were routed to their owners, on the record. A dropped row nobody follows up on becomes next month's mystery.",
+  "inputType": "text",
+  "inputLabel": "Closeout Runbook (exception days)",
+  "input": "Closeout runbook, morning brief:\n- At 7:00 AM the brief is sent to the Trading Desk DL and archived to briefs-archive (retention 30 days). The archive seeds tomorrow's baseline.\n- On exception days, the run record must also list each exception and confirm it was reported to the owner of upstream data quality, the Risk Desk Lead.\n- Today's exceptions: the MISO feed row was dropped at cleaning (missing settled value); WAUE was excluded from variance (no forecast).",
+  "instructions": [
+    "Record the standard delivery and retention facts.",
+    "List both exception hubs and confirm who they were reported to.",
+    "Mark that the archive seeds tomorrow's baseline.",
+    "Return one JSON object - the run record - then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["deliveredTo", "sendTime", "archiveFolder", "retentionDays", "droppedRowHub", "missingForecastHub", "exceptionsReportedTo", "seedsTomorrowBaseline"],
+    "expected": {
+      "deliveredTo": "Trading Desk DL",
+      "archiveFolder": "briefs-archive",
+      "droppedRowHub": "MISO",
+      "missingForecastHub": "WAUE",
+      "exceptionsReportedTo": "Risk Desk Lead"
+    },
+    "acceptedValues": {
+      "sendTime": ["7:00", "7:00 AM", "07:00"],
+      "retentionDays": ["30"],
+      "seedsTomorrowBaseline": ["true"]
+    }
+  },
+  "copilotPrompt": "Write an exception-aware closeout record as JSON with deliveredTo, sendTime, archiveFolder, retentionDays, droppedRowHub, missingForecastHub, exceptionsReportedTo, and seedsTomorrowBaseline, based on this runbook.",
+  "successMessage": "Day closed out. Delivered, retained, seeded - and every exception is in somebody's queue instead of nobody's memory.",
+  "intro": {
+    "heading": "Before you build: exception days close differently",
+    "sections": [
+      {
+        "title": "The third closeout job",
+        "body": "Quiet days close with delivery and retention. Exception days add routing: each anomaly must reach the person who can fix its cause. The MISO row is a vendor conversation; the WAUE gap is a model change - both belong to the Risk Desk Lead's queue, and the run record proves they got there."
+      },
+      {
+        "title": "Tomorrow inherits today, gaps included",
+        "body": "Tonight's archive seeds tomorrow's baseline - and note what that means for MISO: dropped today means no clean MISO price in the archive, so tomorrow MISO may have a baseline gap of its own. Exceptions propagate through the loop; the closeout record is where that becomes visible."
+      },
+      {
+        "title": "One record, both audiences",
+        "body": "The auditor reads this record to confirm the exceptions were handled; tomorrow's operator reads it to know what today left behind. Same fields serve both - which is the mark of a well-designed record."
+      }
+    ],
+    "jsonExample": "{\n  \"droppedRowHub\": \"MISO\",\n  \"missingForecastHub\": \"WAUE\",\n  \"exceptionsReportedTo\": \"Risk Desk Lead\",\n  \"seedsTomorrowBaseline\": true\n}",
+    "skill": "Exception-aware closeout",
+    "artifactName": "archive-record.json"
+  },
+  "fieldGuide": [
+    { "field": "deliveredTo", "meaning": "The governed audience.", "type": "string", "hint": "Same list as every morning." },
+    { "field": "sendTime", "meaning": "When the brief went out.", "type": "string", "hint": "From the runbook." },
+    { "field": "archiveFolder", "meaning": "Where the copy lives.", "type": "string", "hint": "From the runbook." },
+    { "field": "retentionDays", "meaning": "How long it is kept.", "type": "number", "hint": "From the runbook." },
+    { "field": "droppedRowHub", "meaning": "The hub whose feed row was dropped.", "type": "string", "hint": "Named in today's exceptions." },
+    { "field": "missingForecastHub", "meaning": "The hub excluded from variance.", "type": "string", "hint": "Named in today's exceptions." },
+    { "field": "exceptionsReportedTo", "meaning": "Who owns following up on both.", "type": "string", "hint": "The owner of upstream data quality." },
+    { "field": "seedsTomorrowBaseline", "meaning": "Whether this archive is tomorrow's baseline.", "type": "boolean", "hint": "The loop always closes." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd send the brief to the distribution list and save a dated copy to a shared folder so there is a permanent record.",
+      "tools": {
+        "powerAutomate": "'Send an email' to the group + 'Create file' in a dated SharePoint library",
+        "zapier": "'Send Email' + 'Upload File' to Drive/Dropbox in one Zap",
+        "python": "smtplib to send, then write a timestamped file to storage or S3"
+      }
+    },
+    "heading": "Exception day closed",
+    "points": [
+      "You closed the loop with all three jobs: delivered, retained, and routed the exceptions to their owner.",
+      "The run record names both anomalies and their recipient - follow-up is now a queue item, not a memory.",
+      "You saw exceptions propagate through the loop: today's dropped MISO row is tomorrow's potential baseline gap.",
+      "Across this tier you handled the whole exception lifecycle: detect (cleaning), behave honestly (variance), surface (brief), route (here).",
+      "The workflow can now finish a messy day as cleanly as a quiet one - with nothing lost and nothing hidden."
+    ],
+    "artifactName": "archive-record.json"
+  }
+}

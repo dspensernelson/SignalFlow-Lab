@@ -1,0 +1,118 @@
+{
+  "id": "lesson-trader-flag-medium",
+  "nodeId": "trader-flag",
+  "title": "Signal Lifecycle: Who Clears a Flag?",
+  "difficulty": "Medium",
+  "skill": "Signal lifecycle & fail direction",
+  "clock": "6:08 AM",
+  "scenario": "It is 6:08 AM. The trader's flag was raised in the 5:40 note - and the 6:05 correction never mentions it. Signals have lifecycles: they are raised, they persist, and someone specific clears them. Get the lifecycle wrong and escalations either never end or silently vanish.",
+  "inputType": "text",
+  "inputLabel": "The Flag Across Two Notes",
+  "input": "[5:40 AM note] \"... Trader flagged the spike for review.\"\n[6:05 AM correction] Corrects the settled price. Says nothing about the flag.\n\nDesk agreement on escalation signals: a flag stays active until the role that owns the escalation channel (the Desk Trader) explicitly clears it. When signals conflict - one source escalates, another reads routine - the workflow fails toward review.",
+  "instructions": [
+    "Track the flag across both notes.",
+    "Answer the four lifecycle questions.",
+    "Validate to record the interpretation."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "The 6:05 correction does not mention the flag. What is the flag's status?",
+        "options": [
+          { "id": "a", "text": "Expired - each new note resets all signals" },
+          { "id": "b", "text": "Still active - an unretracted escalation persists" },
+          { "id": "c", "text": "Ambiguous - the workflow should skip approval to be efficient" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The desk agreement in the input says a flag stays active until explicitly cleared. Silence about a signal is not a retraction of it."
+      },
+      {
+        "id": "q2",
+        "prompt": "Who may clear a raised flag?",
+        "options": [
+          { "id": "a", "text": "Anyone who reads the note stream" },
+          { "id": "b", "text": "The workflow, automatically, when the brief ships" },
+          { "id": "c", "text": "The role that owns the escalation channel - the Desk Trader" }
+        ],
+        "correctOptionId": "c",
+        "explain": "Signals have owners. The input names the owning role; clearing rights follow channel ownership, not readership."
+      },
+      {
+        "id": "q3",
+        "prompt": "If one source escalates and another reads routine, which way does the workflow fail?",
+        "options": [
+          { "id": "a", "text": "Toward review - a possibly-unnecessary approval beats a missed escalation" },
+          { "id": "b", "text": "Toward routine - approvals are expensive" },
+          { "id": "c", "text": "It halts entirely until a human resolves the conflict" }
+        ],
+        "correctOptionId": "a",
+        "explain": "The desk agreement states the fail direction. The two error costs are asymmetric: an extra review wastes minutes; a missed escalation ships an unapproved brief."
+      },
+      {
+        "id": "q4",
+        "prompt": "So what value does approvalRequired carry into today's intake record?",
+        "options": [
+          { "id": "a", "text": "false - the correction superseded everything in the first note" },
+          { "id": "b", "text": "true - the flag was raised and never cleared" },
+          { "id": "c", "text": "null - the second note is silent about it" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Later-wins applies to VALUES both notes state (like the settled price). The flag was raised and never cleared by its owner, so it persists - and persistence is a known fact, not a null."
+      }
+    ],
+    "artifactOnPass": {
+      "signal": "trader-flag",
+      "raisedIn": "5:40 AM note",
+      "lifecycleRule": "active until explicitly cleared by the owning role",
+      "clearingOwner": "Desk Trader",
+      "failDirection": "toward review",
+      "valueToday": true
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Reason about an escalation signal's lifecycle: does an unmentioned flag persist, who may clear it, which way conflicting signals fail, and what approvalRequired carries today.",
+  "successMessage": "Lifecycle judged. The flag persists, its owner is known, and the fail direction is on record.",
+  "intro": {
+    "heading": "Before you judge: signals have lifecycles",
+    "sections": [
+      {
+        "title": "Raised, persisting, cleared",
+        "body": "A signal is not a fact about the world - it is a request with a lifecycle. The easy tier asked what the flag becomes; this tier asks how long it lives and who ends it."
+      },
+      {
+        "title": "Silence is not retraction",
+        "body": "The correction note fixes a price and says nothing about the flag. Treating silence as clearance is how escalations vanish without anyone deciding they should."
+      },
+      {
+        "title": "Fail direction is a design choice",
+        "body": "When signals conflict, some workflows fail toward action, some toward review, some halt. The right choice depends on asymmetric error costs - and it must be decided and written down before the conflict happens."
+      }
+    ],
+    "jsonExample": "{\n  \"lifecycleRule\": \"active until cleared by owner\",\n  \"failDirection\": \"toward review\",\n  \"valueToday\": true\n}",
+    "skill": "Signal lifecycle & fail direction",
+    "artifactName": "signal-interpretation-trader-flag.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd take the trader's one-line flag (a chat ping or email) and log it as a row with ticker, severity, and reason so it can be merged with the desk note later.",
+      "tools": {
+        "powerAutomate": "Teams 'When a new message is posted' trigger into a Dataverse 'Create item'",
+        "zapier": "Slack 'New Message Posted' trigger into an Airtable 'Create Record'",
+        "python": "slack_sdk to read the channel, parse the flag text, append to a list or DataFrame"
+      }
+    },
+    "heading": "Signal lifecycle recorded",
+    "points": [
+      "You distinguished later-wins (for stated values) from persistence (for unretracted signals) - two different rules that both applied this morning.",
+      "You located clearing rights with the channel owner, not with whoever reads the note.",
+      "You applied the fail-toward-review principle and can say WHY: the error costs are asymmetric.",
+      "approvalRequired carries true into the intake record on this tier - and the delegation drama later this morning depends on it.",
+      "The workflow can now manage an escalation signal across its whole lifecycle, not just at the moment it is raised."
+    ],
+    "artifactName": "signal-interpretation-trader-flag.json"
+  }
+}

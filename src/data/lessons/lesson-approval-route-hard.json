@@ -1,0 +1,96 @@
+{
+  "id": "lesson-approval-route-hard",
+  "nodeId": "approval-route",
+  "title": "When Nobody Answers: the Escalation Ladder",
+  "difficulty": "Hard",
+  "skill": "Timeout design & escalation ladders",
+  "clock": "6:55 AM",
+  "scenario": "The request went out and the clock is winning: the Desk Manager is silent, then the delegate is silent too. Mature approval design assumes non-response and pre-defines a ladder - who gets pinged next, after how long, and what happens if the ladder runs out before the deadline. Execute the ladder and capture the record that proves each rung was honored.",
+  "inputType": "text",
+  "inputLabel": "Ladder Policy + This Morning's Timeline",
+  "input": "Escalation ladder (approval template v2.0.0): if the approver has not responded 10 minutes after the request, escalate to the named delegate. If the delegate has not responded 10 minutes after THAT, escalate to the Desk Head. If no decision exists by 6:59 AM, the brief is released marked UNAPPROVED with an incident logged - shipping late is a worse failure than shipping flagged.\n\nThis morning:\n6:30 AM - request sent to Desk Manager. No response.\n6:40 AM - rung 1: escalated to Deputy Desk Manager. No response.\n6:50 AM - rung 2: escalated to Desk Head.\n6:55 AM - Desk Head replies: Approved.",
+  "instructions": [
+    "Trace the timeline against the ladder policy - each rung fires exactly 10 minutes after the previous silence.",
+    "Record when the request was sent and when each escalation rung fired.",
+    "Record who finally decided, what, and when.",
+    "Record how many rungs were used and what the final fallback would have been.",
+    "Return one JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["requestSentAt", "rung1At", "rung1To", "rung2At", "rung2To", "decision", "decidedBy", "decidedAt", "rungsUsed", "exhaustedFallback"],
+    "expected": {
+      "decision": "approved",
+      "decidedBy": "Desk Head",
+      "rung1To": "Deputy Desk Manager",
+      "rung2To": "Desk Head"
+    },
+    "acceptedValues": {
+      "requestSentAt": ["6:30", "6:30 AM", "06:30"],
+      "rung1At": ["6:40", "6:40 AM", "06:40"],
+      "rung2At": ["6:50", "6:50 AM", "06:50"],
+      "decidedAt": ["6:55", "6:55 AM", "06:55"],
+      "rungsUsed": ["2"],
+      "exhaustedFallback": ["release unapproved with incident", "release-unapproved-with-incident", "unapproved release with incident", "release marked unapproved with incident logged"]
+    }
+  },
+  "copilotPrompt": "Capture an escalation-ladder approval as JSON: requestSentAt, rung1At/rung1To, rung2At/rung2To, decision, decidedBy, decidedAt, rungsUsed, and exhaustedFallback (what the policy does if the ladder runs out before the deadline).",
+  "successMessage": "Ladder executed and recorded. Three people were silent or slow, and the workflow never once had to improvise.",
+  "intro": {
+    "heading": "Before you build: design for silence",
+    "sections": [
+      {
+        "title": "Non-response is the common failure",
+        "body": "Medium tier handled an approver who TOLD you they were away. Hard tier handles the realistic version: silence. Nobody declines, nobody redirects - the clock just runs. A handoff design that needs a response to proceed is a handoff design that hangs."
+      },
+      {
+        "title": "Ladders convert silence into schedule",
+        "body": "Each rung is a timeout plus a target: 10 minutes of silence, next role. The genius of a ladder is that silence itself becomes actionable - no human has to notice the request is stuck, because the workflow treats non-response as an event."
+      },
+      {
+        "title": "The bottom of the ladder is a policy choice",
+        "body": "What if everyone is silent at 6:59? This desk chose: release marked UNAPPROVED, log an incident. Another desk might choose: hold the brief. Both are defensible; what is NOT defensible is never having decided. The exhausted-ladder fallback is the hardest and most important line in the policy."
+      },
+      {
+        "title": "The record proves the process",
+        "body": "Skipping straight to the Desk Head would have gotten the same approval faster - and violated the control. The rung timestamps prove each role got its window. In approval systems, HOW you got the yes matters as much as the yes."
+      }
+    ],
+    "jsonExample": "{\n  \"rung1At\": \"9:10 AM\",\n  \"rung2At\": \"9:20 AM\",\n  \"rungsUsed\": 2,\n  \"exhaustedFallback\": \"release unapproved with incident\"\n}",
+    "skill": "Timeout design & escalation ladders",
+    "artifactName": "approval-route.json"
+  },
+  "fieldGuide": [
+    { "field": "requestSentAt", "meaning": "When the original request went out.", "type": "string", "hint": "First line of the timeline." },
+    { "field": "rung1At", "meaning": "When the first escalation fired.", "type": "string", "hint": "Ten minutes of silence after the request." },
+    { "field": "rung1To", "meaning": "Who rung 1 escalated to.", "type": "string", "hint": "The template's named delegate." },
+    { "field": "rung2At", "meaning": "When the second escalation fired.", "type": "string", "hint": "Ten minutes of silence after rung 1." },
+    { "field": "rung2To", "meaning": "Who rung 2 escalated to.", "type": "string", "hint": "The ladder's last named role." },
+    { "field": "decision", "meaning": "The decision word.", "type": "string", "hint": "From the 6:55 reply." },
+    { "field": "decidedBy", "meaning": "Who finally decided.", "type": "string", "hint": "The role at rung 2." },
+    { "field": "decidedAt", "meaning": "When the decision arrived.", "type": "string", "hint": "Four minutes before the fallback would have fired." },
+    { "field": "rungsUsed", "meaning": "How many escalation rungs fired.", "type": "number", "hint": "Count the escalations, not the original request." },
+    { "field": "exhaustedFallback", "meaning": "What the policy does if the ladder runs out.", "type": "string", "hint": "The last sentence of the ladder policy." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd look up who owns this decision (by desk, amount, or region) and send it to the right person instead of a catch-all inbox.",
+      "tools": {
+        "powerAutomate": "a lookup table + 'Start and wait for an approval' addressed to the resolved approver",
+        "zapier": "'Lookup Table' by Formatter to pick the approver, then send",
+        "python": "a routing map {region: approver} and a send call"
+      }
+    },
+    "heading": "Ladder executed on the record",
+    "points": [
+      "You handled the realistic failure - silence - with a mechanism that converts non-response into scheduled action.",
+      "Every rung has a timestamp, proving each role received its window before the next escalation - the control held under pressure.",
+      "You recorded the exhausted-ladder fallback even though it never fired: the record shows what WOULD have happened, which is what makes the design auditable.",
+      "Across the tiers you have now seen the full handoff spectrum: a present approver (easy), an announced absence (medium), and pure silence (hard).",
+      "The workflow can now obtain a governed decision even when every preferred decider goes quiet."
+    ],
+    "artifactName": "approval-route.json"
+  }
+}

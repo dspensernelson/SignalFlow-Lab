@@ -1,0 +1,107 @@
+{
+  "id": "lesson-match-decision-medium",
+  "nodeId": "match-decision",
+  "title": "Route the Batch at the Fork",
+  "subtitle": "Auto-approve the clean invoice, send the rest to exceptions",
+  "clock": "11:30 AM",
+  "difficulty": "Intermediate",
+  "skill": "Decision routing",
+  "scenario": "It is 11:30 AM at the fork. Every invoice now carries its checks - duplicate flag, match result, vendor status, receipt status. Route each one: only the invoice that is clean on every count auto-approves; each of the others goes to the exception queue with the reason it failed.",
+  "inputType": "text",
+  "inputLabel": "Batch check results",
+  "input": "INV-59001: not duplicate, within tolerance, qty match, vendor on file, receipt present. INV-59002: within all but price is over tolerance (variance 90 > band 25). INV-58962: duplicate (already paid day-0). INV-59004: vendor V-1205 not in master. INV-59005: price within tolerance but no receipt (two-way only). Rule: auto-approve only if not duplicate AND within tolerance AND qty match AND vendor on file; otherwise exception.",
+  "instructions": [
+    "For each invoice, apply the routing rule to its checks.",
+    "Set route to auto-approve only for the fully clean invoice; exception for the rest.",
+    "Set reason: clean match, price over tolerance, duplicate, vendor not in master, or missing receipt.",
+    "Remember a duplicate always wins - it routes to exception regardless of its other checks.",
+    "Return a JSON array of the five rows, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"invoiceNumber\": \"INV-59001\", \"route\": \"\", \"reason\": \"\" },\n  { \"invoiceNumber\": \"INV-59002\", \"route\": \"\", \"reason\": \"\" },\n  { \"invoiceNumber\": \"INV-58962\", \"route\": \"\", \"reason\": \"\" },\n  { \"invoiceNumber\": \"INV-59004\", \"route\": \"\", \"reason\": \"\" },\n  { \"invoiceNumber\": \"INV-59005\", \"route\": \"\", \"reason\": \"\" }\n]",
+  "validation": {
+    "type": "jsonRows",
+    "keyField": "invoiceNumber",
+    "rowFields": ["invoiceNumber", "route", "reason"],
+    "numericFields": [],
+    "expectedRows": [
+      { "invoiceNumber": "INV-59001", "route": "auto-approve", "reason": "clean match" },
+      { "invoiceNumber": "INV-59002", "route": "exception", "reason": "price over tolerance" },
+      { "invoiceNumber": "INV-58962", "route": "exception", "reason": "duplicate" },
+      { "invoiceNumber": "INV-59004", "route": "exception", "reason": "vendor not in master" },
+      { "invoiceNumber": "INV-59005", "route": "exception", "reason": "missing receipt" }
+    ]
+  },
+  "copilotPrompt": "Route five invoices at the match fork. Set route to auto-approve only when an invoice is not a duplicate, within tolerance, quantity-matched, and its vendor is on file; otherwise exception. Add a reason: clean match, price over tolerance, duplicate, vendor not in master, or missing receipt.",
+  "successMessage": "Batch routed. One invoice auto-approves; four are sent to the exception queue with their reasons.",
+  "validateLabel": "Route Batch",
+  "editorHelper": "One row per invoice - route plus the reason it failed.",
+  "intro": {
+    "heading": "The fork: one clean path, one exception path",
+    "sections": [
+      {
+        "title": "Auto-approve is the strict path",
+        "body": "An invoice only takes the quiet path when it is clean on every check: not a duplicate, price within tolerance, quantity confirmed, and vendor on file. Miss any one and it becomes an exception."
+      },
+      {
+        "title": "Every exception carries its reason",
+        "body": "Routing is not just a yes/no. Each held invoice is labeled with why it failed - price over tolerance, duplicate, vendor not in master, or missing receipt - so the right owner can work it without re-investigating."
+      },
+      {
+        "title": "A duplicate always wins",
+        "body": "INV-58962 could have a perfect price and receipt and it would still route to exception, because it was already paid. The duplicate flag overrides everything else at the fork."
+      }
+    ],
+    "jsonExample": "[\n  { \"invoiceNumber\": \"INV-59001\", \"route\": \"auto-approve\", \"reason\": \"clean match\" }\n]",
+    "skill": "Decision routing",
+    "artifactName": "match-decision.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "invoiceNumber",
+      "meaning": "The invoice being routed.",
+      "type": "string",
+      "example": "\"INV-59001\"",
+      "group": "Identity",
+      "lookFor": "which invoice?",
+      "hint": "Copy the INV-##### number exactly; it is the row key."
+    },
+    {
+      "field": "route",
+      "meaning": "Where the invoice goes at the fork.",
+      "type": "string",
+      "example": "\"auto-approve\"",
+      "group": "Decision",
+      "lookFor": "clean or held?",
+      "hint": "Use auto-approve only for INV-59001; exception for the other four."
+    },
+    {
+      "field": "reason",
+      "meaning": "Why the invoice took its route.",
+      "type": "string",
+      "example": "\"price over tolerance\"",
+      "group": "Decision",
+      "lookFor": "why?",
+      "hint": "clean match, price over tolerance, duplicate, vendor not in master, or missing receipt."
+    }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd stamp the result - matched or exception - so clean invoices move to pay and mismatches go to review.",
+      "tools": {
+        "powerAutomate": "'Switch'/'Condition' setting a match-status field",
+        "zapier": "'Paths' by match result",
+        "python": "return 'matched' or 'exception' with the failing reason"
+      }
+    },
+    "heading": "Batch routed at the fork",
+    "points": [
+      "You applied one routing rule across the batch: auto-approve only when every check is clean.",
+      "INV-59001 took the auto-approve path; the other four were routed to exceptions.",
+      "Each exception carries its reason - price, duplicate, vendor, or receipt - so the right owner can act.",
+      "INV-58962 routed to exception on its duplicate flag alone, because a duplicate always wins.",
+      "The workflow can now split a mixed batch into a clean auto-approve path and a labeled exception path."
+    ],
+    "artifactName": "match-decision.json"
+  }
+}

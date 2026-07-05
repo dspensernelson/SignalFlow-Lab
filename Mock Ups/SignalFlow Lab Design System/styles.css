@@ -1,0 +1,11 @@
+/* ============================================================
+   SignalFlow Lab Design System — global entry point.
+   Consumers link THIS one file. It only @imports; never put
+   rules here directly. Everything reachable from here ships.
+   ============================================================ */
+
+@import "./tokens/palette.css";
+@import "./tokens/node-types.css";
+@import "./tokens/semantic.css";
+@import "./tokens/typography.css";
+@import "./tokens/spacing.css";

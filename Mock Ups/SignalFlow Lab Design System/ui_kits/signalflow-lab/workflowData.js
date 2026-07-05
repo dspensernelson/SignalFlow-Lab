@@ -1,0 +1,213 @@
+/*
+ * SignalFlow Lab — Meridian Morning Market Brief workflow data.
+ * Condensed from the source repo's src/data/*.json (workflowNodes, phases,
+ * edges) plus lesson-intake.json. Used by the UI-kit recreation.
+ */
+
+window.SF_PHASES = [
+  { id: 'intake-layer',          order: 1, title: 'Intake Layer',          goal: 'Capture raw signals' },
+  { id: 'data-structure-layer',  order: 2, title: 'Data Structure Layer',  goal: 'Build trusted records' },
+  { id: 'evaluation-layer',      order: 3, title: 'Evaluation Layer',      goal: 'Assess and analyze' },
+  { id: 'routing-layer',         order: 4, title: 'Routing Layer',         goal: 'Decide and route' },
+  { id: 'brief-assembly-layer',  order: 5, title: 'Brief Assembly Layer',  goal: 'Assemble and deliver' },
+];
+
+// status: 'context' | 'ready' | 'in-progress' | 'complete' | 'locked'
+window.SF_NODES = [
+  { id: 'analyst-notes', label: 'Analyst Notes', type: 'source', phaseId: 'intake-layer', status: 'context',
+    artifactName: null, description: 'Unstructured overnight market commentary from the trading desk. The raw input the whole workflow starts from.',
+    intent: 'Inspect where this raw note comes from, its real-world sources, and the access ingesting it would require.',
+    concepts: ['Source provenance', 'Unstructured input', 'Ingestion'],
+    labVersion: 'Local text fixture stored in lesson-intake.json (the note you read in the Intake task).',
+    governance: 'Ingesting from inbox, Teams, or a terminal needs access and permission; provenance must be retained for audit.' },
+
+  { id: 'trader-flag', label: 'Trader Flag', type: 'source', phaseId: 'intake-layer', status: 'context',
+    artifactName: null, description: 'An escalation signal a trader raises when overnight movement may need a closer look.',
+    intent: 'Interpret a human escalation signal and map it to the structured approvalRequired field the workflow acts on.',
+    concepts: ['Escalation signals', 'Boolean/event flags', 'Human judgment as data'],
+    labVersion: 'Represented as the approval cue inside the analyst note fixture.',
+    governance: 'Requires agreement on what counts as a flag, and ownership of the escalation channel.' },
+
+  { id: 'market-intake-record', label: 'Market Intake Record', type: 'artifact', phaseId: 'intake-layer', status: 'ready',
+    artifactName: 'market-intake.json', description: 'A structured JSON record created from the analyst notes and trader flag. The first machine-readable artifact in the workflow.',
+    intent: 'Extract hub, peakPrice, settledPrice, generationFlag, and approvalRequired from a messy note into valid JSON and pass field validation.',
+    concepts: ['JSON', 'Named fields / schema', 'Field extraction', 'Deterministic validation'],
+    labVersion: 'Built by you in the Intake task by extracting fields from the analyst note.',
+    governance: 'Requires agreement on the required intake fields; the schema is the contract every downstream step trusts.',
+    lessonId: 'lesson-intake' },
+
+  { id: 'price-feed', label: 'Price Feed / CSV Rows', type: 'source', phaseId: 'data-structure-layer', status: 'context',
+    artifactName: null, description: 'Raw overnight price rows for the relevant hubs, usually delivered as CSV or a market feed.',
+    intent: 'Inspect where numeric data enters, its column format, and the access a real feed or export would require.',
+    concepts: ['Tabular/CSV ingestion', 'Feed scheduling', 'Column formats'],
+    labVersion: 'Not wired up yet — shown to reveal where numeric data enters the workflow.',
+    governance: 'Needs access to the feed or export and knowledge of the column contract.' },
+
+  { id: 'forecast-data', label: 'Forecast Data', type: 'source', phaseId: 'data-structure-layer', status: 'context',
+    artifactName: null, description: 'Expected generation and price forecasts used to judge how the actual overnight numbers compare.',
+    intent: 'Inspect a second numeric input and judge why "which forecast is authoritative" matters before it is compared.',
+    concepts: ['Comparison inputs', 'Joining datasets by key', 'Authoritative source'],
+    labVersion: 'Not wired up yet — shown as a second numeric input.',
+    governance: 'Requires agreement on which forecast is authoritative (ownership of source-of-truth).' },
+
+  { id: 'prior-day-reference', label: 'Prior Day Reference', type: 'reference', phaseId: 'data-structure-layer', status: 'context',
+    artifactName: null, description: "Yesterday's normalized prices, kept as a baseline so today's movement has something to compare against.",
+    intent: 'Inspect how a saved prior run is retained and reused as today\u2019s comparison baseline.',
+    concepts: ['Baselines', 'Historical retention', 'Temporal reuse'],
+    labVersion: 'Stubbed reference object for now.',
+    governance: 'Needs read access to prior runs and a retention location; retention policy is a governance decision.' },
+
+  { id: 'clean-price-data', label: 'Clean Price Data', type: 'artifact', phaseId: 'data-structure-layer', status: 'ready',
+    artifactName: 'clean-prices.json', description: 'Normalized, validated price values pulled into a consistent table the rules engine can trust.',
+    intent: 'Coerce and validate raw price rows into a trusted, normalized clean-prices.json table.',
+    concepts: ['Normalization', 'Validation', 'Data quality', 'Type coercion'],
+    labVersion: 'Built by you in the Clean Price Data task by normalizing messy price rows into a numeric table.',
+    governance: 'Read access to the feed plus a store for the cleaned table; data-quality rules are the trust boundary downstream.',
+    lessonId: 'lesson-clean-price-data' },
+
+  { id: 'threshold-policy', label: 'Threshold Policy', type: 'reference', phaseId: 'evaluation-layer', status: 'ready',
+    artifactName: 'threshold-policy.json', description: 'Reusable business rules that define when market movement requires attention. Referenced by several downstream steps.',
+    intent: 'Set and version the threshold values reused by three downstream nodes, and decide their ownership and approval path.',
+    concepts: ['Business rules as config', 'Parameterization', 'Policy vs logic'],
+    labVersion: 'Built by you in the Threshold Policy task by setting and versioning the threshold values.',
+    governance: 'Strongest governance node on the map: needs business-owner approval, risk-policy access, and versioning.',
+    lessonId: 'lesson-threshold-policy' },
+
+  { id: 'variance-check', label: 'Variance Check', type: 'process', phaseId: 'evaluation-layer', status: 'locked',
+    artifactName: 'variance-summary.json', description: 'Compares actuals against forecast and the prior day to surface meaningful variance before the risk rules run.',
+    intent: 'Compute actual-vs-forecast and actual-vs-prior deltas and flag material variance.',
+    concepts: ['Comparison steps', 'Materiality thresholds', 'Flagging deltas'],
+    labVersion: 'Built in a future phase — shown to reveal the full workflow shape.',
+    governance: 'Requires agreement on what variance is material (a business rule overlapping Threshold Policy).' },
+
+  { id: 'risk-evaluation', label: 'Risk Evaluation', type: 'process', phaseId: 'evaluation-layer', status: 'locked',
+    artifactName: 'risk-evaluation.json', description: 'Applies the threshold policy to the intake record, clean prices, and variance to produce a decision-ready risk view.',
+    intent: 'Apply the threshold policy to the intake record, clean prices, and variance to emit the reusable risk-evaluation.json record.',
+    concepts: ['Rules engine', 'Applying policy to data', 'Decision-ready record'],
+    labVersion: 'Built in a future phase — shown to reveal the full workflow shape.',
+    governance: 'Needs the agreed threshold values and read access to four upstream artifacts; the risk record should be auditable.' },
+
+  { id: 'approval-template', label: 'Approval Template', type: 'reference', phaseId: 'routing-layer', status: 'context',
+    artifactName: 'approval-template.json', description: 'A reusable template that shapes how an approval request is written when sign-off is needed.',
+    intent: 'Define the reusable approval format and the required fields a sign-off request must contain.',
+    concepts: ['Output templating', 'Reusable formats', 'Required-field standards'],
+    labVersion: 'Stubbed reference object for now.',
+    governance: 'Needs agreement on required approval fields; the template standardizes what every approver sees.' },
+
+  { id: 'approval-decision', label: 'Approval Decision', type: 'decision', phaseId: 'routing-layer', status: 'locked',
+    artifactName: null, description: 'The branch point: does this movement require sign-off, or can it flow straight to the brief as routine?',
+    intent: 'Encode the if/else branch from the risk evaluation and log each decision for audit.',
+    concepts: ['Branching logic', 'Thresholds', 'Decision audit logging'],
+    labVersion: 'Built in a future phase — shown to reveal the full workflow shape.',
+    governance: 'Needs the escalation threshold and knowledge of who can approve; every decision should be logged for audit.' },
+
+  { id: 'approval-route', label: 'Approval Route', type: 'handoff', phaseId: 'routing-layer', status: 'locked',
+    artifactName: 'approval-route.json', description: 'When sign-off is needed, the request is routed to an approver and the response is captured before the brief goes out.',
+    intent: 'Route a sign-off request to an approver and capture the yes/no response as approval-route.json.',
+    concepts: ['Handoff', 'Human-in-the-loop approval', 'Capturing a response'],
+    labVersion: 'Built in a future phase — shown to reveal the full workflow shape.',
+    governance: 'Needs the ability to message the approver and a place to record the response; the response is an audit record.' },
+
+  { id: 'routine-update-path', label: 'Routine Update Path', type: 'handoff', phaseId: 'routing-layer', status: 'locked',
+    artifactName: null, description: 'The other side of the branch: when no approval is needed, movement is logged as a routine note for the brief.',
+    intent: 'Handle the no-approval branch: write a routine note when below threshold and keep it for the audit trail.',
+    concepts: ['Alternate-branch handling', 'No-action logging', 'Path symmetry'],
+    labVersion: 'Built in a future phase — shown to reveal the full workflow shape.',
+    governance: "Needs a place to record routine outcomes; 'no action' must still be auditable." },
+
+  { id: 'prior-day-brief-template', label: 'Prior Day Brief Template', type: 'reference', phaseId: 'brief-assembly-layer', status: 'context',
+    artifactName: null, description: "The brief's reusable structure, carried over from prior days so the morning output stays consistent.",
+    intent: 'Inspect the reusable brief structure and how it keeps the daily output consistent before assembly.',
+    concepts: ['Output structure', 'Consistency', 'Templating across runs'],
+    labVersion: 'Stubbed reference object for now.',
+    governance: 'Needs agreement on the brief sections; template versioning keeps output consistent.' },
+
+  { id: 'morning-brief', label: 'Morning Brief', type: 'output', phaseId: 'brief-assembly-layer', status: 'locked',
+    artifactName: 'market-brief.md', description: 'The approval-ready 7:00 AM summary that joins intake, clean prices, risk, and approval status into one business output.',
+    intent: 'Assemble the intake record, clean prices, risk, approval status, and template into one approval-ready market-brief.md.',
+    concepts: ['Aggregation / assembly', 'Joining artifacts', 'Rendering output'],
+    labVersion: 'Built in a future phase — shown to reveal the full workflow shape.',
+    governance: 'Needs read access to all upstream artifacts plus the template; the assembled brief is the record of the day.' },
+
+  { id: 'distribution-archive', label: 'Distribution / Archive', type: 'archive', phaseId: 'brief-assembly-layer', status: 'locked',
+    artifactName: null, description: "The finished brief is delivered to the desk and stored for the record, seeding tomorrow's prior-day reference.",
+    intent: "Deliver the brief to the desk, archive it for the record, and seed tomorrow's prior-day baseline.",
+    concepts: ['Delivery', 'Retention', 'Audit trail', 'Feedback loop'],
+    labVersion: 'Built in a future phase — shown to reveal the full workflow shape.',
+    governance: 'Needs send permission to the distribution list and write access to the archive; retention/audit policy applies.' },
+];
+
+window.SF_EDGES = [
+  { from: 'analyst-notes', to: 'market-intake-record' },
+  { from: 'trader-flag', to: 'market-intake-record' },
+  { from: 'market-intake-record', to: 'risk-evaluation' },
+  { from: 'market-intake-record', to: 'approval-decision' },
+  { from: 'market-intake-record', to: 'morning-brief' },
+  { from: 'price-feed', to: 'clean-price-data' },
+  { from: 'forecast-data', to: 'variance-check' },
+  { from: 'prior-day-reference', to: 'variance-check' },
+  { from: 'clean-price-data', to: 'risk-evaluation' },
+  { from: 'clean-price-data', to: 'morning-brief' },
+  { from: 'threshold-policy', to: 'risk-evaluation' },
+  { from: 'threshold-policy', to: 'approval-decision' },
+  { from: 'threshold-policy', to: 'morning-brief' },
+  { from: 'variance-check', to: 'risk-evaluation' },
+  { from: 'risk-evaluation', to: 'approval-decision' },
+  { from: 'risk-evaluation', to: 'morning-brief' },
+  { from: 'approval-template', to: 'approval-route' },
+  { from: 'approval-decision', to: 'approval-route' },
+  { from: 'approval-decision', to: 'routine-update-path' },
+  { from: 'approval-route', to: 'morning-brief' },
+  { from: 'routine-update-path', to: 'morning-brief' },
+  { from: 'prior-day-brief-template', to: 'morning-brief' },
+  { from: 'morning-brief', to: 'distribution-archive' },
+];
+
+// The fully-built Intake lesson (from lesson-intake.json).
+window.SF_LESSON_INTAKE = {
+  id: 'lesson-intake',
+  nodeId: 'market-intake-record',
+  title: 'Turn Analyst Notes into Structured JSON',
+  difficulty: 'Beginner',
+  skill: 'Field extraction',
+  inputLabel: 'Source Note',
+  input: 'Checked overnight prices. ERCOT hub spiked around 2am, hit $187/MWh briefly then settled near $142/MWh. Wind generation underperformed, about 60% of forecast. Gas prices up slightly. Trader flagged the hub spike for review. No action taken yet. Need approval if we move on this.',
+  instructions: [
+    'Identify the market hub referenced.',
+    'Find the peak price and the settled price.',
+    'Find the generation source and performance status.',
+    'Determine whether approval was flagged.',
+    'Return a valid JSON object with those fields.',
+  ],
+  starterAnswer: '{\n  "hub": "",\n  "peakPrice": "",\n  "settledPrice": "",\n  "generationFlag": "",\n  "approvalRequired": false\n}',
+  solution: {
+    hub: 'ERCOT', peakPrice: '$187/MWh', settledPrice: '$142/MWh',
+    generationFlag: 'Wind underperformed', approvalRequired: true,
+  },
+  jsonExample: '{\n  "city": "Austin",\n  "temperature": 98,\n  "alertSent": true\n}',
+  copilotPrompt: 'Extract structured JSON from this analyst note. Return fields for hub, peakPrice, settledPrice, generationFlag, and approvalRequired. Use true or false for boolean fields.',
+  successMessage: 'Intake record built. The workflow now has structured data to work with.',
+  fieldGuide: [
+    { field: 'hub', type: 'string', meaning: 'The market hub mentioned in the note.', example: '"ERCOT"', hint: 'Look for the named trading hub or region.' },
+    { field: 'peakPrice', type: 'string', meaning: 'The highest price mentioned in the note.', example: '"$187/MWh"', hint: 'Find the spike or peak value before it settled.' },
+    { field: 'settledPrice', type: 'string', meaning: 'The later price the market settled near.', example: '"$142/MWh"', hint: 'Find the price the note says it settled at.' },
+    { field: 'generationFlag', type: 'string', meaning: 'The generation source plus its performance status.', example: '"Wind underperformed"', hint: 'Name the source and whether it over- or underperformed.' },
+    { field: 'approvalRequired', type: 'boolean', meaning: 'Whether approval is needed before acting.', example: 'true', hint: 'Use true or false based on whether the note flags approval.' },
+  ],
+  intro: {
+    heading: 'Before you build: structured intake',
+    sections: [
+      { title: 'What is JSON?', body: 'JSON is a simple text format for structured data. It stores information as named fields and values, so software can read it reliably instead of guessing.' },
+      { title: 'Why structured data matters', body: 'Automation cannot act on a messy paragraph. Turning notes into named fields lets every later step run consistently without re-reading the original text.' },
+      { title: 'How this workflow uses it', body: 'Your Intake output is the first record in the Meridian workflow. Structure, Evaluate, Route, and Brief all build on the fields you extract here.' },
+    ],
+  },
+  takeaway: {
+    heading: 'Intake complete',
+    points: [
+      'You turned an unstructured note into structured JSON.',
+      'Each named field is now reliable input for the rest of the workflow.',
+      'Field extraction is the foundation every later automation step depends on.',
+    ],
+  },
+};

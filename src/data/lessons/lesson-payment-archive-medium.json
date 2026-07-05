@@ -1,0 +1,121 @@
+{
+  "id": "lesson-payment-archive-medium",
+  "nodeId": "payment-archive",
+  "title": "Archive the Run, Carry the Holds",
+  "difficulty": "Intermediate",
+  "skill": "Retention and the loop",
+  "clock": "3:05 PM",
+  "scenario": "It is 3:05 PM. One invoice paid, four still held. Archiving must do two things now: seed tomorrow's duplicate baseline with INV-59001, and carry the four held invoices forward so they are not forgotten overnight. Close the loop without losing the exceptions.",
+  "inputType": "text",
+  "inputLabel": "Payment Archive",
+  "input": "Today's run: INV-59001 (V-1042, 1200.00), paid day-1. Held and carried forward: INV-59002 (price), INV-58962 (duplicate - rejected), INV-59004 (unknown vendor), INV-59005 (missing receipt). Archiving stores the run for audit, appends paid invoices to payment history by identity key (vendor id + invoice number + total), and carries unresolved holds into tomorrow's queue.",
+  "instructions": [
+    "Read the archive as an audit record, a duplicate seed, and a carry-forward for holds.",
+    "Note that only INV-59001 seeds the payment history; the rejected duplicate does not.",
+    "Understand which held invoices carry forward and which are closed.",
+    "Answer the questions and validate to mint the payment-archive record."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "Which of today's invoices seeds tomorrow's payment history?",
+        "options": [
+          { "id": "a", "text": "All five, so nothing is lost" },
+          { "id": "b", "text": "Only INV-59001 - the one that was actually paid" },
+          { "id": "c", "text": "Only the held invoices" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Payment history records payments. Only INV-59001 was paid, so only it is appended by identity key. Seeding a held invoice would falsely mark it as already paid."
+      },
+      {
+        "id": "q2",
+        "prompt": "What happens to the four held invoices at archive time?",
+        "options": [
+          { "id": "a", "text": "They are deleted" },
+          { "id": "b", "text": "They carry forward into tomorrow's queue with their reasons intact" },
+          { "id": "c", "text": "They seed the payment history like paid invoices" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Archiving carries unresolved holds forward so they are worked the next day. Their reasons persist, so no exception silently disappears overnight."
+      },
+      {
+        "id": "q3",
+        "prompt": "INV-58962 was rejected as a duplicate. Does it carry forward as an open hold?",
+        "options": [
+          { "id": "a", "text": "Yes - every held invoice always carries forward" },
+          { "id": "b", "text": "No - a rejected duplicate is closed; it is archived as resolved, not re-queued" },
+          { "id": "c", "text": "Yes, and it also seeds the payment history" }
+        ],
+        "correctOptionId": "b",
+        "explain": "A confirmed duplicate is a closed outcome, not an open problem. It is archived as rejected so the decision is auditable, but it does not re-enter tomorrow's queue - only genuinely unresolved holds do."
+      },
+      {
+        "id": "q4",
+        "prompt": "Why does the archive point back to a reference node instead of forward to a new step?",
+        "options": [
+          { "id": "a", "text": "It is a mistake in the map" },
+          { "id": "b", "text": "The workflow is a daily cycle - its output feeds the next day's inputs" },
+          { "id": "c", "text": "Archives always point backward for no reason" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The desk runs every day. The archive seeds payment history and carries holds, both of which are inputs to tomorrow's run. That backward edge is the loop that makes the workflow repeatable."
+      }
+    ],
+    "artifactOnPass": {
+      "archive": "payment-archive",
+      "runDate": "day-1",
+      "retainedFor": "audit",
+      "seedsPaymentHistory": ["INV-59001"],
+      "identityKey": "vendorId + invoiceNumber + invoiceTotal",
+      "carriedForward": ["INV-59002", "INV-59004", "INV-59005"],
+      "closedAsRejected": ["INV-58962"],
+      "readNextBy": "duplicate-check (next run)"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Explain how archiving a messy run works: only the paid invoice (INV-59001) seeds the payment history, unresolved holds carry forward to tomorrow's queue with their reasons, a rejected duplicate is closed rather than re-queued, and the archive closes a daily loop.",
+  "successMessage": "Run archived. INV-59001 seeds tomorrow's baseline, three holds carry forward, the duplicate is closed - the loop is intact.",
+  "intro": {
+    "heading": "Before you close: seed tomorrow, keep the holds",
+    "sections": [
+      {
+        "title": "Only the paid invoice seeds history",
+        "body": "Payment history records payments, not intentions. INV-59001 is appended by identity key so a re-submission is caught tomorrow; the held invoices were never paid, so they never enter the paid baseline."
+      },
+      {
+        "title": "Holds carry forward, they do not vanish",
+        "body": "Three unresolved exceptions - price, unknown vendor, missing receipt - carry into tomorrow's queue with their reasons intact. Archiving a messy day means the mess is remembered, not swept away."
+      },
+      {
+        "title": "Closed is different from carried",
+        "body": "INV-58962 was rejected as a duplicate - a final outcome. It is archived as resolved so the decision is auditable, but it does not re-queue. Only genuinely open holds carry forward."
+      }
+    ],
+    "jsonExample": "{\n  \"seedsPaymentHistory\": [\"INV-59001\"],\n  \"carriedForward\": [\"INV-59002\", \"INV-59004\", \"INV-59005\"]\n}",
+    "skill": "Retention and the loop",
+    "artifactName": "payment-archive.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd file the paid invoice, the match evidence, and the confirmation together in a dated folder for audit.",
+      "tools": {
+        "powerAutomate": "'Create file' in a dated library + 'Update item' to mark it archived",
+        "zapier": "'Upload File' to Drive + update the record's status",
+        "python": "write the bundle to storage/S3 with a timestamped key"
+      }
+    },
+    "heading": "Run archived",
+    "points": [
+      "Only INV-59001, the paid invoice, seeds tomorrow's payment history by identity key.",
+      "Three unresolved holds carry forward into tomorrow's queue with their reasons intact.",
+      "The rejected duplicate INV-58962 is archived as closed, not re-queued - a final, auditable outcome.",
+      "On the map the archive points back to a reference node: today's output is tomorrow's guardrail, closing the daily loop.",
+      "The workflow can now run again tomorrow, protected from repeats and still holding the exceptions it could not resolve."
+    ],
+    "artifactName": "payment-archive.json"
+  }
+}

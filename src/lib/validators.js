@@ -343,10 +343,317 @@ function jsonRows(answer, validation) {
   }
 }
 
+// Derived-values / variance validator. Config-driven and additive: it does NOT
+// touch jsonFields, jsonPolicy, or jsonRows. Checks valid JSON, a top-level
+// array, that each expected row (matched by keyField) is present, that required
+// fields are present, that configured numeric delta fields are real numbers
+// (not strings), that delta values match the expected derived value, and that an
+// optional boolean flag (e.g. material variance) is correct ONLY when included.
+function jsonDeltas(answer, validation) {
+  let parsed
+  try {
+    parsed = JSON.parse(answer)
+  } catch {
+    return {
+      passed: false,
+      results: [
+        {
+          id: 'json-parse',
+          label: 'Valid JSON',
+          passed: false,
+          message: 'Your answer is not valid JSON. Check for missing quotes, commas, or braces.',
+        },
+      ],
+      artifact: null,
+    }
+  }
+
+  const {
+    keyField = 'id',
+    requiredFields = [],
+    numericFields = [],
+    optionalBooleanFields = [],
+    expectedRows = [],
+  } = validation
+  const results = []
+
+  // 1. Top-level must be an array of rows.
+  const isArray = Array.isArray(parsed)
+  results.push({
+    id: 'top-level-array',
+    label: 'Top-level array',
+    passed: isArray,
+    message: isArray
+      ? 'The answer is a JSON array of variance rows.'
+      : 'The answer must be a JSON array of variance rows.',
+  })
+  if (!isArray) {
+    return { passed: false, results, artifact: null }
+  }
+
+  // Index the user's rows by their normalized key field.
+  const byKey = {}
+  parsed.forEach((row) => {
+    if (
+      row &&
+      typeof row === 'object' &&
+      !Array.isArray(row) &&
+      Object.prototype.hasOwnProperty.call(row, keyField)
+    ) {
+      byKey[normalize(row[keyField])] = row
+    }
+  })
+
+  // 2. Each expected row must be present, complete, numeric, and correct.
+  expectedRows.forEach((expected) => {
+    const keyVal = expected[keyField]
+    const row = byKey[normalize(keyVal)]
+    const present = Boolean(row)
+    results.push({
+      id: `present-${keyVal}`,
+      label: `Row present: ${keyVal}`,
+      passed: present,
+      message: present ? `Row for "${keyVal}" is present.` : `Missing row for "${keyVal}".`,
+    })
+    if (!present) return
+
+    // Required fields present (key field is implicitly present via the match).
+    requiredFields.forEach((field) => {
+      if (field === keyField) return
+      const hasField = Object.prototype.hasOwnProperty.call(row, field)
+      const value = row[field]
+      const expectedVal = expected[field]
+      const isNumericField = numericFields.includes(field)
+
+      let passed
+      let message
+      if (!hasField) {
+        passed = false
+        message = `"${keyVal}" is missing "${field}".`
+      } else if (isNumericField && !(typeof value === 'number' && Number.isFinite(value))) {
+        passed = false
+        message = `"${keyVal}" ${field} must be a number, not a string.`
+      } else if (isNumericField && value !== expectedVal) {
+        passed = false
+        message = `"${keyVal}" ${field} should be ${expectedVal}.`
+      } else if (!isNumericField && normalize(value) !== normalize(expectedVal)) {
+        passed = false
+        message = `"${keyVal}" ${field} should be "${expectedVal}".`
+      } else {
+        passed = true
+        message = `"${keyVal}" ${field} is correct.`
+      }
+
+      results.push({
+        id: `value-${keyVal}-${field}`,
+        label: `${keyVal} ${field}`,
+        passed,
+        message,
+      })
+    })
+
+    // Optional boolean flags: validated ONLY when the learner includes them.
+    optionalBooleanFields.forEach((field) => {
+      if (!Object.prototype.hasOwnProperty.call(row, field)) return
+      const value = row[field]
+      const expectedVal = expected[field]
+      const isBool = typeof value === 'boolean'
+      const passed = isBool && value === expectedVal
+      results.push({
+        id: `value-${keyVal}-${field}`,
+        label: `${keyVal} ${field}`,
+        passed,
+        message: !isBool
+          ? `"${keyVal}" ${field} must be true or false (a real boolean).`
+          : passed
+            ? `"${keyVal}" ${field} is correct.`
+            : `"${keyVal}" ${field} should be ${expectedVal}.`,
+      })
+    })
+  })
+
+  const passed = results.every((r) => r.passed)
+
+  return {
+    passed,
+    results,
+    artifact: passed ? parsed : null,
+  }
+}
+
+// Inspection/interpretation quiz validator. Config-driven and additive: it does
+// NOT touch the JSON validators. The answer is a JSON string of
+// { questionId: optionId }. Each question yields one result row; wrong answers
+// show the question's explain text without revealing the correct option. On
+// pass, the artifact is the author-defined artifactOnPass object (a source
+// profile), so inspection lessons still mint a stored artifact.
+function choiceCheck(answer, validation) {
+  let parsed
+  try {
+    parsed = JSON.parse(answer)
+  } catch {
+    parsed = {}
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) parsed = {}
+
+  const { questions = [], artifactOnPass = null } = validation
+  const results = []
+
+  questions.forEach((question, index) => {
+    const chosen = parsed[question.id]
+    let passed = false
+    let message
+    if (chosen === undefined || chosen === null || chosen === '') {
+      message = `Answer question ${index + 1} before validating.`
+    } else if (chosen === question.correctOptionId) {
+      passed = true
+      message = 'Correct.'
+    } else {
+      message = question.explain
+    }
+    results.push({
+      id: `choice-${question.id}`,
+      label: `Question ${index + 1}`,
+      passed,
+      message,
+    })
+  })
+
+  const passed = results.length > 0 && results.every((r) => r.passed)
+
+  return {
+    passed,
+    results,
+    artifact: passed ? artifactOnPass : null,
+  }
+}
+
+// Assembly validator. Config-driven and additive. The answer is a JSON string
+// of { slotId: value }. Numeric slots compare as numbers; text slots compare
+// normalized against expected/accepted. On pass, the artifact is the template
+// string with every {{slotId}} token replaced by the learner's value - a
+// rendered document, stored as a string artifact.
+function templateSlots(answer, validation) {
+  let parsed
+  try {
+    parsed = JSON.parse(answer)
+  } catch {
+    parsed = {}
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) parsed = {}
+
+  const { slots = [], template = '' } = validation
+  const results = []
+
+  slots.forEach((slot) => {
+    const raw = parsed[slot.id]
+    const strVal = raw === undefined || raw === null ? '' : String(raw).trim()
+    let passed = false
+    let message
+    if (!strVal) {
+      message = `Fill in: ${slot.label}.${slot.hint ? ` ${slot.hint}` : ''}`
+    } else if (slot.numeric) {
+      const num = Number(strVal)
+      passed = Number.isFinite(num) && num === slot.expected
+      message = passed
+        ? `${slot.label} matches the source artifact.`
+        : `${slot.label} does not match the source artifact.${slot.hint ? ` ${slot.hint}` : ''}`
+    } else {
+      const acceptedList =
+        slot.accepted || (slot.expected !== undefined ? [slot.expected] : [])
+      passed = acceptedList.map(normalize).includes(normalize(strVal))
+      message = passed
+        ? `${slot.label} matches the source artifact.`
+        : `${slot.label} does not match the source artifact.${slot.hint ? ` ${slot.hint}` : ''}`
+    }
+    results.push({
+      id: `slot-${slot.id}`,
+      label: slot.label,
+      passed,
+      message,
+    })
+  })
+
+  const passed = results.length > 0 && results.every((r) => r.passed)
+
+  let artifact = null
+  if (passed) {
+    artifact = template
+    slots.forEach((slot) => {
+      const value = String(parsed[slot.id]).trim()
+      artifact = artifact.split(`{{${slot.id}}}`).join(value)
+    })
+  }
+
+  return {
+    passed,
+    results,
+    artifact,
+  }
+}
+
+// Capstone composition validator. Additive: it does NOT touch any existing
+// validator - it COMPOSES them. The learner rebuilds the pipeline OUTSIDE the
+// app (any tool) and proves it by importing the files their rebuild produced;
+// each file is graded by the EXISTING easy-tier validator for that artifact.
+// The answer is a JSON string of { key: rawFileText }, where each rawFileText
+// is the raw text of one imported file. On pass, the artifact maps each key to
+// its parsed artifact plus rebuiltOutside: true.
+function artifactImport(answer, validation) {
+  let parsed
+  try {
+    parsed = JSON.parse(answer)
+  } catch {
+    parsed = {}
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) parsed = {}
+
+  const { imports = [] } = validation
+  const results = []
+  const artifact = {}
+
+  imports.forEach((imp) => {
+    const rawText = parsed[imp.key]
+    const hasText = typeof rawText === 'string' && rawText.trim().length > 0
+    if (!hasText) {
+      results.push({
+        id: `import-${imp.key}`,
+        label: imp.label,
+        passed: false,
+        message: `Import ${imp.label} before validating.`,
+      })
+      return
+    }
+    // Grade the imported file with the EXISTING validator for that artifact.
+    const inner = validateAnswer(rawText, imp.validation)
+    inner.results.forEach((r) => {
+      results.push({
+        id: `${imp.key}:${r.id}`,
+        label: `${imp.label} - ${r.label}`,
+        passed: r.passed,
+        message: r.message,
+      })
+    })
+    if (inner.passed) artifact[imp.key] = inner.artifact
+  })
+
+  const passed = results.length > 0 && results.every((r) => r.passed)
+
+  return {
+    passed,
+    results,
+    artifact: passed ? { ...artifact, rebuiltOutside: true } : null,
+  }
+}
+
 const validators = {
   jsonFields,
   jsonPolicy,
   jsonRows,
+  jsonDeltas,
+  choiceCheck,
+  templateSlots,
+  artifactImport,
   // Stubs for future build passes.
   csvColumns: null,
   ruleBuilder: null,

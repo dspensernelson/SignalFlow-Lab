@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Button, CodeBlock, Icon } from './ui'
 
 export default function CopilotPromptCard({ prompt }) {
   const [copied, setCopied] = useState(false)
@@ -20,20 +21,22 @@ export default function CopilotPromptCard({ prompt }) {
   }
 
   return (
-    <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-4">
-      <h3 className="text-sm font-semibold text-indigo-900">Copilot Prompt Coach</h3>
-      <pre className="mt-2 whitespace-pre-wrap rounded-md border border-indigo-100 bg-white p-3 text-sm text-gray-800">
-        {prompt}
-      </pre>
+    <div
+      className="rounded-xl border border-sf-border bg-sf-surface p-4 shadow-sf-sm"
+      style={{ borderLeftColor: 'var(--sf-copilot)', borderLeftWidth: 4 }}
+    >
+      <h3 className="flex items-center gap-1.5 text-sm font-semibold text-sf-text">
+        <Icon name="sparkles" size={15} style={{ color: 'var(--sf-copilot)' }} />
+        Copilot Prompt Coach
+      </h3>
+      <div className="mt-2">
+        <CodeBlock wrap>{prompt}</CodeBlock>
+      </div>
       <div className="mt-3 flex items-center gap-3">
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        >
+        <Button variant="primary" size="sm" icon={copied ? 'circle-check' : 'copy'} onClick={handleCopy}>
           {copied ? 'Copied!' : 'Copy Prompt'}
-        </button>
-        <p className="text-xs text-indigo-800">
+        </Button>
+        <p className="text-xs text-sf-muted">
           Use this prompt when asking Copilot to help with a similar workflow.
         </p>
       </div>

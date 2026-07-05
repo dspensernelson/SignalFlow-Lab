@@ -1,0 +1,118 @@
+{
+  "id": "lesson-tolerance-policy-medium",
+  "nodeId": "tolerance-policy",
+  "title": "Apply the Tolerance Policy to the Batch",
+  "difficulty": "Intermediate",
+  "skill": "Config-as-rules",
+  "clock": "10:30 AM",
+  "scenario": "It is 10:30 AM. The tolerance policy is owned, versioned config the matching engine applies the same way every time. Read it, then apply it to two invoices with price gaps - one small, one large - and see the band do its job.",
+  "inputType": "text",
+  "inputLabel": "Tolerance Policy v1.0.0",
+  "input": "Price variance allowed within the LARGER of 2% of the PO amount or $25.00. Quantity must match exactly. Approved by the Controller, effective day-0. Batch gaps to test: INV-59002 bills $1,230.00 vs PO $1,140.00 (gap $90.00, PO band = max(2% of 1140 = 22.80, 25) = 25.00). INV-59005 bills $1,000.00 vs PO $992.00 (gap $8.00, PO band = max(2% of 992 = 19.84, 25) = 25.00).",
+  "instructions": [
+    "Read the tolerance policy as owned, versioned config - not an opinion.",
+    "Compute each invoice's band as the larger of 2% of the PO and $25.00.",
+    "Compare each price gap to its band: INV-59002's $90 is outside, INV-59005's $8 is inside.",
+    "Answer the governance questions and validate to mint the policy record."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "What is INV-59002's tolerance band, and does its $90 gap pass?",
+        "options": [
+          { "id": "a", "text": "Band $22.80; the $90 gap fails" },
+          { "id": "b", "text": "Band $25.00 (larger of 2% of 1140 and 25); the $90 gap fails" },
+          { "id": "c", "text": "Band $90.00; the gap passes exactly" }
+        ],
+        "correctOptionId": "b",
+        "explain": "2% of the $1,140 PO is $22.80, and the absolute floor is $25.00, so the band is the larger: $25.00. A $90.00 gap is far outside it, so the price leg fails and the invoice is an exception."
+      },
+      {
+        "id": "q2",
+        "prompt": "INV-59005's gap is $8.00 against a $25.00 band. What does the policy say about its price?",
+        "options": [
+          { "id": "a", "text": "It fails - any gap is a failure" },
+          { "id": "b", "text": "It passes - $8 is within the $25 band" },
+          { "id": "c", "text": "It cannot be judged without the receipt" }
+        ],
+        "correctOptionId": "b",
+        "explain": "$8.00 sits inside the $25.00 band, so on price alone INV-59005 is within tolerance. (Its problem is a missing receipt, which is a separate leg of the match - not a price issue.)"
+      },
+      {
+        "id": "q3",
+        "prompt": "Why is the band 'the LARGER of 2% or $25' rather than just 2%?",
+        "options": [
+          { "id": "a", "text": "To make the math harder" },
+          { "id": "b", "text": "So small POs still get a reasonable absolute allowance instead of a tiny percentage" },
+          { "id": "c", "text": "To always favor the vendor" }
+        ],
+        "correctOptionId": "b",
+        "explain": "On a small PO, 2% could be just a few dollars and would flag trivial rounding. The $25 floor gives a sensible minimum allowance; the larger-of rule keeps both fair."
+      },
+      {
+        "id": "q4",
+        "prompt": "Who may change these tolerance bands, and why does that matter?",
+        "options": [
+          { "id": "a", "text": "The AP Clerk, to clear stuck invoices faster" },
+          { "id": "b", "text": "The Controller - looser bands move money faster but catch fewer errors, so the change is governed and versioned" },
+          { "id": "c", "text": "The vendor, by request" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Tolerance is a control on how much price error passes automatically. Loosening it is a real risk decision, so only the Controller may approve a change and every version is recorded."
+      }
+    ],
+    "artifactOnPass": {
+      "reference": "tolerance-policy",
+      "version": "1.0.0",
+      "rule": "larger of 2% of PO or 25.00; quantity exact",
+      "inv59002": "band 25.00, gap 90.00 - outside",
+      "inv59005": "band 25.00, gap 8.00 - inside",
+      "changeOwner": "Controller"
+    }
+  },
+  "copilotPrompt": "Apply a tolerance policy (larger of 2% of the PO or $25) to two invoices: compute each band, decide which price gap passes, explain why the rule uses the larger-of form, and who governs changes.",
+  "successMessage": "Tolerance applied. INV-59002's $90 gap is outside the band; INV-59005's $8 is inside - price-wise.",
+  "intro": {
+    "heading": "Before you match: the band is owned config",
+    "sections": [
+      {
+        "title": "One rule, applied the same way",
+        "body": "The tolerance policy is versioned config the matching engine reads. Because it is written down and owned, every invoice is judged by the same band - not by whoever is at the desk that day."
+      },
+      {
+        "title": "The larger-of band",
+        "body": "The allowance is the larger of 2% of the PO or a $25 floor. For these invoices both bands land at $25. INV-59002's $90 gap blows past it; INV-59005's $8 gap sits comfortably inside."
+      },
+      {
+        "title": "Loosening the band is a risk decision",
+        "body": "A wider band pays faster but lets more price error through. That trade-off is why only the Controller may change the policy, and why every version is recorded - governance before automation."
+      }
+    ],
+    "jsonExample": "{\n  \"rule\": \"larger of 2% of PO or 25.00\",\n  \"changeOwner\": \"Controller\"\n}",
+    "skill": "Config-as-rules",
+    "artifactName": "tolerance-policy.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd write the match tolerances down (e.g. 'price within 2%, quantity exact') in a config tab so the match check uses one agreed rule set.",
+      "tools": {
+        "powerAutomate": "Environment Variables or a config list holding the tolerance limits",
+        "zapier": "'Storage by Zapier' or a lookup table for the tolerances",
+        "python": "a tolerance config dict/JSON loaded at runtime"
+      }
+    },
+    "heading": "Tolerance policy applied",
+    "points": [
+      "You applied one owned, versioned band consistently to two different price gaps.",
+      "INV-59002's $90 gap is outside the $25 band, so its price leg fails and it becomes an exception.",
+      "INV-59005's $8 gap is inside the band - its block is a missing receipt, a separate leg, not a price problem.",
+      "The larger-of-2%-or-$25 form keeps small POs fair, and only the Controller may change it.",
+      "The workflow can now judge every price gap against the same governed tolerance band."
+    ],
+    "artifactName": "tolerance-policy.json"
+  }
+}

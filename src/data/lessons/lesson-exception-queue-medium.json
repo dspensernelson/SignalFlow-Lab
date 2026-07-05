@@ -1,0 +1,119 @@
+{
+  "id": "lesson-exception-queue-medium",
+  "nodeId": "exception-queue",
+  "title": "Work the Exception Queue",
+  "difficulty": "Intermediate",
+  "skill": "Exception handling",
+  "clock": "1:00 PM",
+  "scenario": "It is 1:00 PM. Four invoices were held at the fork, each for a different reason. Working an exception is not deleting it - it is routing each one to the owner who can resolve it and logging what happens. Assign the four correctly so nothing is silently dropped.",
+  "inputType": "text",
+  "inputLabel": "Exception Queue (4 held invoices)",
+  "input": "INV-59002 - price over tolerance (bills $1,230 vs PO $1,140). INV-58962 - duplicate (already paid day-0). INV-59004 - vendor V-1205 not in master. INV-59005 - missing receipt (two-way only). Owners available: AP Clerk, Procurement Lead, Vendor Relations Desk, Receiving Desk.",
+  "instructions": [
+    "Treat each held invoice as work to route, not to discard.",
+    "Match each exception to the owner who can actually resolve it.",
+    "Answer the routing questions and validate to mint the exception resolution log."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "INV-59002 was held for a price over tolerance. Who works it?",
+        "options": [
+          { "id": "a", "text": "The Receiving Desk, to re-count the goods" },
+          { "id": "b", "text": "The Procurement Lead, who owns the PO and can confirm or correct the agreed price" },
+          { "id": "c", "text": "The vendor, who set the price" }
+        ],
+        "correctOptionId": "b",
+        "explain": "A price dispute is about what was agreed on the PO. The Procurement Lead owns the register, so they confirm the price or resolve the difference before the invoice can proceed."
+      },
+      {
+        "id": "q2",
+        "prompt": "INV-58962 was flagged as a duplicate of a day-0 payment. What is the resolution?",
+        "options": [
+          { "id": "a", "text": "Pay it again to be safe" },
+          { "id": "b", "text": "Reject it - it was already paid; the AP Clerk records the rejection" },
+          { "id": "c", "text": "Send it to Procurement for a new PO" }
+        ],
+        "correctOptionId": "b",
+        "explain": "A confirmed duplicate must not pay twice. The AP Clerk rejects it and logs why, closing the exception with a clear record rather than letting it linger."
+      },
+      {
+        "id": "q3",
+        "prompt": "INV-59004's vendor V-1205 is not in the master. Who must act first?",
+        "options": [
+          { "id": "a", "text": "The AP Clerk, by paying to a temporary account" },
+          { "id": "b", "text": "The Vendor Relations Desk, to onboard and verify the vendor before payment is possible" },
+          { "id": "c", "text": "The Receiving Desk" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Payment is impossible without a governed vendor record. Vendor Relations owns onboarding, so they verify and add V-1205 - and only then can the invoice re-enter the flow."
+      },
+      {
+        "id": "q4",
+        "prompt": "INV-59005 was held for a missing receipt. What resolves it?",
+        "options": [
+          { "id": "a", "text": "Waive the receipt since the price is fine" },
+          { "id": "b", "text": "The Receiving Desk posts the goods receipt confirming delivery; until then it is held" },
+          { "id": "c", "text": "Procurement raises the PO amount" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The block is unproven delivery, not price. The Receiving Desk posts the receipt to confirm the goods arrived; the invoice stays held until that third leg exists."
+      }
+    ],
+    "artifactOnPass": {
+      "step": "exception-queue",
+      "heldCount": 4,
+      "assignments": [
+        { "invoice": "INV-59002", "issue": "price over tolerance", "owner": "Procurement Lead", "action": "verify PO price" },
+        { "invoice": "INV-58962", "issue": "duplicate", "owner": "AP Clerk", "action": "reject - already paid" },
+        { "invoice": "INV-59004", "issue": "vendor not in master", "owner": "Vendor Relations Desk", "action": "onboard vendor" },
+        { "invoice": "INV-59005", "issue": "missing receipt", "owner": "Receiving Desk", "action": "hold for receipt" }
+      ]
+    }
+  },
+  "copilotPrompt": "Route four held invoices to their owners: a price-over-tolerance to Procurement, a duplicate to the AP Clerk to reject, an unknown vendor to Vendor Relations to onboard, and a missing receipt to the Receiving Desk to post.",
+  "successMessage": "Exceptions routed. Four holds are assigned to owners and logged - none silently dropped.",
+  "intro": {
+    "heading": "Working exceptions: route and log, never drop",
+    "sections": [
+      {
+        "title": "An exception is work, not waste",
+        "body": "Holding an invoice does not resolve it. Each of the four held invoices needs an owner who can act - Procurement, the AP Clerk, Vendor Relations, or Receiving - and a logged outcome so it is not lost."
+      },
+      {
+        "title": "The reason picks the owner",
+        "body": "Because the fork labeled each hold with its reason, routing is direct: a price gap goes to Procurement, a duplicate to the AP Clerk, an unknown vendor to Vendor Relations, a missing receipt to Receiving. The right desk resolves the right problem."
+      },
+      {
+        "title": "Some exceptions can re-enter, some close",
+        "body": "A verified vendor or a posted receipt lets an invoice return to the flow; a confirmed duplicate is rejected and closed. Either way the resolution is recorded - that log is what makes the desk auditable."
+      }
+    ],
+    "jsonExample": "{\n  \"invoice\": \"INV-59004\",\n  \"owner\": \"Vendor Relations Desk\",\n  \"action\": \"onboard vendor\"\n}",
+    "skill": "Exception handling",
+    "artifactName": "exception-resolution.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd drop mismatched invoices into a review queue (a shared list or ticket) with a note on what failed, for a human to resolve.",
+      "tools": {
+        "powerAutomate": "'Create item' in an exceptions list + assign/notify the reviewer",
+        "zapier": "'Create Record' in a review table, plus a Slack/email alert",
+        "python": "append to an exceptions table and open a ticket or notify"
+      }
+    },
+    "heading": "Exception queue worked",
+    "points": [
+      "You routed all four held invoices to the owner who can resolve each one.",
+      "The price dispute went to Procurement, the duplicate to the AP Clerk to reject, the unknown vendor to Vendor Relations, the missing receipt to Receiving.",
+      "Working an exception means routing and logging - nothing is silently dropped.",
+      "A resolved vendor or receipt can re-enter the flow; a confirmed duplicate is closed as rejected.",
+      "The workflow can now hand each exception to an accountable owner and keep an auditable record."
+    ],
+    "artifactName": "exception-resolution.json"
+  }
+}

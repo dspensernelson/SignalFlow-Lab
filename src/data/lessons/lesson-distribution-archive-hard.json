@@ -1,0 +1,89 @@
+{
+  "id": "lesson-distribution-archive-hard",
+  "nodeId": "distribution-archive",
+  "title": "Design the Retention Policy",
+  "difficulty": "Hard",
+  "skill": "Designing retention from constraints",
+  "clock": "7:05 AM",
+  "scenario": "Until now, 'keep it 30 days' was a number someone handed you. Today you are the someone. Design the retention policy for briefs and incident records from the desk's constraints - and defend your numbers in writing, because retention is where compliance, cost, and postmortems collide.",
+  "inputType": "text",
+  "inputLabel": "Retention Constraints",
+  "input": "Constraints gathered from the desk:\n1. Compliance floor: briefs that carry an approval (or explain the lack of one) must be retrievable for at least 90 days.\n2. Storage guidance: nothing is kept past 365 days without a named exception.\n3. Postmortems: incident records must OUTLIVE the briefs they explain - investigations reference incidents long after the brief itself matters.\n4. The day-over-day baseline only ever needs yesterday's brief; retention beyond that serves audit, not the loop.\n\nGovernance: the retention policy is owned by the Risk Desk Lead; changes are approved by the Desk Head. This is the desk's first written retention policy: version 1.0.0. Your rationale must cite the constraints your numbers satisfy.",
+  "instructions": [
+    "Choose briefRetentionDays: at least the compliance floor, within the storage ceiling.",
+    "Choose incidentRetentionDays: longer than the briefs, within the ceiling.",
+    "Write a rationale citing which constraint each number satisfies.",
+    "Record owner, approver, and version, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n}",
+  "validation": {
+    "type": "jsonPolicy",
+    "requiredFields": [
+      "policyName",
+      "version",
+      "owner",
+      "approver",
+      "briefRetentionDays",
+      "incidentRetentionDays",
+      "rationale"
+    ],
+    "numericFields": ["briefRetentionDays", "incidentRetentionDays"],
+    "nonEmptyFields": ["policyName", "version", "owner", "approver", "rationale"],
+    "ordering": { "greater": "incidentRetentionDays", "than": "briefRetentionDays" }
+  },
+  "copilotPrompt": "Design a retention policy from constraints: briefRetentionDays at least 90 and at most 365, incidentRetentionDays greater than briefRetentionDays and at most 365. Return JSON with policyName, version 1.0.0, owner, approver, both numbers, and a rationale citing the compliance floor, the storage ceiling, and the postmortem rule.",
+  "successMessage": "Retention designed. The numbers are yours, the constraints are satisfied, and the rationale can face an audit.",
+  "intro": {
+    "heading": "Before you design: retention is a trade, not a default",
+    "sections": [
+      {
+        "title": "Three forces pull on every retention number",
+        "body": "Compliance pulls it up (retrievable long enough to answer questions), storage and privacy pull it down (do not hoard), and operations sets floors of its own (postmortems need their evidence). A retention number is where those forces settle - and someone has to choose the spot."
+      },
+      {
+        "title": "The ordering rule encodes an insight",
+        "body": "Incidents outliving briefs is not arbitrary: a brief is superseded by tomorrow's brief, but an incident is evidence in investigations that can start months later. Records that EXPLAIN other records must outlive them - a pattern you will meet in every audit-adjacent system."
+      },
+      {
+        "title": "Same design discipline as the thresholds",
+        "body": "Like the threshold redesign, the validator checks your policy's SHAPE and governance - fields, ordering, a rationale that cites constraints. The specific numbers inside the acceptable region are your call to make and defend. That is what owning a design means."
+      },
+      {
+        "title": "Note what retention is NOT for",
+        "body": "The loop only needs yesterday (constraint 4). Everything past day two is kept for accountability, not operation. Knowing WHY each day of retention exists is what lets you cut it safely later."
+      }
+    ],
+    "jsonExample": "{\n  \"policyName\": \"Brief Retention Policy\",\n  \"version\": \"1.0.0\",\n  \"briefRetentionDays\": 120,\n  \"incidentRetentionDays\": 365,\n  \"rationale\": \"120 exceeds the 90-day compliance floor; incidents at 365 outlive briefs for postmortems; both within the storage ceiling.\"\n}",
+    "skill": "Designing retention from constraints",
+    "artifactName": "archive-record.json"
+  },
+  "fieldGuide": [
+    { "field": "policyName", "meaning": "The policy you are creating.", "type": "string", "hint": "The desk's first written retention policy." },
+    { "field": "version", "meaning": "First version.", "type": "string", "hint": "Stated in the governance line." },
+    { "field": "owner", "meaning": "Who owns retention.", "type": "string", "hint": "Stated in the governance line." },
+    { "field": "approver", "meaning": "Who approves changes.", "type": "string", "hint": "Stated in the governance line." },
+    { "field": "briefRetentionDays", "meaning": "Your chosen brief retention, in days.", "type": "number", "hint": "At least the compliance floor, under the ceiling." },
+    { "field": "incidentRetentionDays", "meaning": "Your chosen incident retention, in days.", "type": "number", "hint": "Must exceed the brief number - constraint 3 says why." },
+    { "field": "rationale", "meaning": "Your defense, citing constraints.", "type": "string", "hint": "Name the floor, the ceiling, and the postmortem rule your numbers satisfy." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd send the brief to the distribution list and save a dated copy to a shared folder so there is a permanent record.",
+      "tools": {
+        "powerAutomate": "'Send an email' to the group + 'Create file' in a dated SharePoint library",
+        "zapier": "'Send Email' + 'Upload File' to Drive/Dropbox in one Zap",
+        "python": "smtplib to send, then write a timestamped file to storage or S3"
+      }
+    },
+    "heading": "Retention is now a designed policy",
+    "points": [
+      "You turned 'how long do we keep things' from an inherited number into a constraint-satisfying design with an owner and a version.",
+      "The ordering you enforced - explainers outlive the explained - is a durable pattern across audit systems everywhere.",
+      "Your rationale cites constraints, so next year's storage review can re-derive or revise the numbers instead of cargo-culting them.",
+      "With this lesson the Hard tier's design arc is complete: you have designed the thresholds, the failure responses, the escalation ladder, and now the memory of the system itself.",
+      "The workflow can now justify every day of data it keeps - and every day it does not."
+    ],
+    "artifactName": "archive-record.json"
+  }
+}

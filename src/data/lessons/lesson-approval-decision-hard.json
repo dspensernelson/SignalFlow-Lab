@@ -1,0 +1,144 @@
+{
+  "id": "lesson-approval-decision-hard",
+  "nodeId": "approval-decision",
+  "title": "Rebuild the Meridian Pipeline Yourself",
+  "difficulty": "Hard",
+  "skill": "Transfer: rebuild the pipeline in any tool",
+  "scenario": "The lab is behind you. Rebuild the four core artifacts of the Meridian morning in any tool you choose - PowerShell, Python, Power Automate, a spreadsheet, or by hand - then import them here to prove the pattern is yours. Each file is graded by the same validator the lab used, so the acceptance bar does not move.",
+  "inputType": "text",
+  "inputLabel": "Rebuild runbook",
+  "input": "You have already built every step of the Meridian pipeline inside the lab. The capstone proves you can do it WITHOUT the lab. Rebuild these four files in ANY tool, then import each one here.\n\n=== 1. market-intake.json (one object) ===\nFrom the analyst note: ERCOT hub spiked around 2am, hit $187/MWh briefly then settled near $142/MWh. Wind generation underperformed. Trader flagged the hub spike for review; approval needed.\nFields: hub, peakPrice, settledPrice, generationFlag, approvalRequired.\n\n=== 2. clean-prices.json (array) ===\nRaw rows: ercot $187/MWh $142/MWh; SPP $96/MWh $88/MWh; miso $74/MWh $70/MWh.\nOne object per hub with numeric peakPrice and settledPrice (strip the $ and /MWh).\n\n=== 3. variance-summary.json (array) ===\nActual / forecast / prior day: ERCOT 187/170/165; SPP 96/96/92; MISO 74/80/78.\nvsForecast = actual - forecast; vsPriorDay = actual - priorDay. Optional material = true when |vsForecast| >= 10.\n\n=== 4. risk-evaluation.json (array) ===\nThreshold policy on the day-over-day percent move (size of move): under 5 = normal; 5 to under 12 = routine; 12 or more = escalate.\nMoves: ERCOT +13.3, SPP +4.3, MISO -5.1. One object per hub with pctMove and status.\n\nRule: your tooling is free, the acceptance bar is not. Import all four, then validate.",
+  "instructions": [
+    "Rebuild each of the four files in any tool you like, outside the app.",
+    "Import market-intake.json, clean-prices.json, variance-summary.json, and risk-evaluation.json.",
+    "Use the file picker, or paste each file's contents with 'Paste instead'.",
+    "Match the shapes the lab taught: an object for intake, arrays for the other three.",
+    "Validate - every file is graded by the validator that built it in the lab."
+  ],
+  "interactionType": "artifactImport",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "artifactImport",
+    "imports": [
+      {
+        "key": "market-intake-record",
+        "label": "market-intake.json",
+        "validation": {
+          "type": "jsonFields",
+          "requiredFields": [
+            "hub",
+            "peakPrice",
+            "settledPrice",
+            "generationFlag",
+            "approvalRequired"
+          ],
+          "expected": {
+            "hub": "ERCOT",
+            "approvalRequired": true
+          },
+          "acceptedValues": {
+            "peakPrice": ["187", "$187", "187/MWh", "$187/MWh"],
+            "settledPrice": ["142", "$142", "142/MWh", "$142/MWh"],
+            "generationFlag": [
+              "Wind underperformed",
+              "wind underperformed",
+              "Wind generation underperformed",
+              "wind generation underperformed"
+            ]
+          }
+        }
+      },
+      {
+        "key": "clean-price-data",
+        "label": "clean-prices.json",
+        "validation": {
+          "type": "jsonRows",
+          "keyField": "hub",
+          "rowFields": ["hub", "peakPrice", "settledPrice"],
+          "numericFields": ["peakPrice", "settledPrice"],
+          "expectedRows": [
+            { "hub": "ERCOT", "peakPrice": 187, "settledPrice": 142 },
+            { "hub": "SPP", "peakPrice": 96, "settledPrice": 88 },
+            { "hub": "MISO", "peakPrice": 74, "settledPrice": 70 }
+          ]
+        }
+      },
+      {
+        "key": "variance-check",
+        "label": "variance-summary.json",
+        "validation": {
+          "type": "jsonDeltas",
+          "keyField": "hub",
+          "requiredFields": ["hub", "vsForecast", "vsPriorDay"],
+          "numericFields": ["vsForecast", "vsPriorDay"],
+          "optionalBooleanFields": ["material"],
+          "expectedRows": [
+            { "hub": "ERCOT", "vsForecast": 17, "vsPriorDay": 22, "material": true },
+            { "hub": "SPP", "vsForecast": 0, "vsPriorDay": 4, "material": false },
+            { "hub": "MISO", "vsForecast": -6, "vsPriorDay": -4, "material": false }
+          ]
+        }
+      },
+      {
+        "key": "risk-evaluation",
+        "label": "risk-evaluation.json",
+        "validation": {
+          "type": "jsonDeltas",
+          "keyField": "hub",
+          "requiredFields": ["hub", "pctMove", "status"],
+          "numericFields": ["pctMove"],
+          "expectedRows": [
+            { "hub": "ERCOT", "pctMove": 13.3, "status": "escalate" },
+            { "hub": "SPP", "pctMove": 4.3, "status": "normal" },
+            { "hub": "MISO", "pctMove": -5.1, "status": "routine" }
+          ]
+        }
+      }
+    ]
+  },
+  "copilotPrompt": "Help me rebuild four files for an energy-market morning pipeline: market-intake.json (one object with hub, peakPrice, settledPrice, generationFlag, approvalRequired), clean-prices.json (array of hub/peakPrice/settledPrice as plain numbers), variance-summary.json (array of hub/vsForecast/vsPriorDay), and risk-evaluation.json (array of hub/pctMove/status). I will import them into the app to validate against the same bar.",
+  "successMessage": "Capstone complete. You rebuilt the Meridian pipeline outside the app and proved every file against the same bar the lab used.",
+  "validateLabel": "Validate imports",
+  "intro": {
+    "heading": "Before you build: prove the transfer",
+    "sections": [
+      {
+        "title": "The capstone is transfer, not recall",
+        "body": "Every earlier lesson gave you the app's workspace. Here you leave it: rebuild the whole pipeline in a tool of your choice and prove it by import. If you can do it outside the lab, you have actually learned it."
+      },
+      {
+        "title": "Your tooling is free, the bar is not",
+        "body": "PowerShell, Python, Power Automate, a spreadsheet, or pen and paper are all legal. The app grades each imported file with the exact validator that graded it in the lab, so the acceptance standard does not move."
+      },
+      {
+        "title": "Four files, one pipeline",
+        "body": "market-intake.json, clean-prices.json, variance-summary.json, and risk-evaluation.json are the spine of the Meridian morning. Rebuilding all four end to end is the proof that the pattern - extract, normalize, derive, classify - is yours."
+      },
+      {
+        "title": "It happens to live at the decision desk",
+        "body": "This capstone attaches to the approval decision node because it sits late on the path, after risk evaluation. The desk is where a morning's work is proven trustworthy - a fitting place to prove yours."
+      }
+    ],
+    "jsonExample": "{\n  \"hub\": \"ERCOT\",\n  \"peakPrice\": \"$187/MWh\",\n  \"settledPrice\": \"$142/MWh\",\n  \"generationFlag\": \"Wind underperformed\",\n  \"approvalRequired\": true\n}",
+    "skill": "Transfer: rebuild the pipeline in any tool",
+    "artifactName": "rebuilt-pipeline.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd apply the rule - auto-approve if within tolerance, otherwise send to a person - so obvious cases don't wait on a human.",
+      "tools": {
+        "powerAutomate": "'Condition' -> either auto-complete or 'Start and wait for an approval'",
+        "zapier": "'Filter'/'Paths' that auto-pass clean cases and route the rest",
+        "python": "if within_tolerance: approve() else: escalate()"
+      }
+    },
+    "heading": "Pipeline rebuilt and proven",
+    "points": [
+      "You rebuilt market-intake.json, clean-prices.json, variance-summary.json, and risk-evaluation.json outside the app and imported all four.",
+      "Each file passed the same validator that graded it in the lab, so the rebuild meets the real acceptance bar, not a lighter one.",
+      "You proved the pattern transfers: extract, normalize, derive, and classify are skills you can run in any tool.",
+      "The workflow can now be rebuilt end to end by you alone, in whatever tooling your desk actually uses."
+    ],
+    "artifactName": "rebuilt-pipeline.json"
+  }
+}

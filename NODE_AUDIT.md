@@ -1,5 +1,23 @@
 # Node Audit - Meridian Morning Market Brief
 
+> **STATUS UPDATE (2026-07-02, module-01-tiers).** This audit was written when
+> 4 lessons were interactive. As of the module-01-tiers branch, **all 17 nodes
+> are `[NOW]` at the Easy tier** (built from curriculum/module-01/easy/), and
+> Medium is COMPLETE (17 of 17 built) and Hard has 7 built - the full curated
+> drill set, with only the solo-rebuild capstone remaining (see the per-tier
+> overviews in curriculum/module-01/). The per-node `[INTENT]`/`[LATER]`
+> markers below are preserved as the pre-build record; the analysis, lesson
+> types, governance notes, and open risks remain the curriculum source of
+> truth. Items resolved since the audit: item 8 (concept-overlap pairs are
+> disambiguated in the built lesson copy), item 9 (Approval Decision stores
+> decision-log.json; Routine Update Path stores routine-log.json), item 10
+> (price-feed and forecast-data have fixtures). Items 2-3 (node splits) are
+> SETTLED per AUTONOMY_CHARTER.md section 6: dual-nature nodes stay single,
+> clarified in lesson copy, permanently. Item 4 is resolved: the temporal
+> edge (distribution-archive -> prior-day-reference, "seeds tomorrow") is
+> now in workflowEdges.json and renders; scripts/lint-map.mjs enforces its
+> presence. No audit items remain open.
+>
 > **Purpose of this document.** A per-node curriculum audit of every workflow node currently on the Meridian map. It checks each node against the Product Doctrine (the map is the curriculum; **every node is a lesson**; artifacts are the unit of progress; connections reveal context; governance is part of automation) and the Selected Node Panel Contract.
 >
 > **Doctrine update reflected in this pass.** There is no longer any "inspect-only" node. Every node is a lesson - the *lesson type* is what differs. Each node is assigned exactly one lesson type from: **inspection, interpretation, build, transformation, decision, handoff, assembly, governance.**
@@ -54,7 +72,7 @@
 | 6 | Prior Day Reference | reference | Thing | inspection | - | `[INTENT]` |
 | 7 | Clean Price Data | artifact | Thing | transformation | `clean-prices.json` | `[NOW]` |
 | 8 | Threshold Policy | reference | Thing | governance | `threshold-policy.json` | `[NOW]` |
-| 9 | Variance Check | process | Action | transformation | - | `[LATER]` |
+| 9 | Variance Check | process | Action | transformation | `variance-summary.json` | `[NOW]` |
 | 10 | Risk Evaluation | process (artifact-producing) | Action | transformation | `risk-evaluation.json` | `[LATER]` |
 | 11 | Approval Template | reference | Thing | governance | `approval-template.json` | `[INTENT]` |
 | 12 | Approval Decision | decision | Action | decision | - | `[LATER]` |
@@ -151,7 +169,7 @@
 | Dependencies | None (workflow origin) |
 | Downstream reuse | Variance Check |
 | Governance note | Requires agreement on which forecast is authoritative (ownership of source-of-truth) |
-| Open question / risk | Feeds only Variance Check, which is a `[LATER]` transformation - this sub-branch stays dormant until Phase 3 interactions land |
+| Open question / risk | Feeds Variance Check, now a `[NOW]` transformation that consumes a forecast reference value per hub - the lab supplies the forecast inline until this source is wired up |
 
 ### 6. Prior Day Reference - `prior-day-reference` `[INTENT]`
 
@@ -166,7 +184,7 @@
 | Dependencies | Distribution / Archive (seeded by the prior day's archived brief) |
 | Downstream reuse | Variance Check |
 | Governance note | Needs read access to prior runs and a retention location; retention policy is a governance decision |
-| Open question / risk | **Temporal cycle:** depends on Distribution / Archive, which sits at the end of the workflow. The map encodes a day-over-day loop - confirm the UI does not render this as a confusing backward edge or a false circular dependency |
+| Open question / risk | **Temporal cycle:** depends on Distribution / Archive, which sits at the end of the workflow. The map encodes a day-over-day loop - confirm the UI does not render this as a confusing backward edge or a false circular dependency. Now feeds the `[NOW]` Variance Check task, which uses a prior-day reference value per hub (supplied inline in the lab) |
 
 ### 7. Clean Price Data - `clean-price-data` `[NOW]`
 
@@ -204,7 +222,7 @@
 | Governance note | Strongest governance node on the map - needs business-owner approval, risk-policy access, and versioning. Reused by three downstream steps |
 | Open question / risk | High reuse makes this the first governance proof point. Keep the lesson focused on config-as-rules, versioning, ownership, and approval; avoid turning it into a full rule-engine build |
 
-### 9. Variance Check - `variance-check` `[LATER]`
+### 9. Variance Check - `variance-check` `[NOW]`
 
 | Field | Detail |
 | --- | --- |
@@ -213,11 +231,11 @@
 | Lesson type | transformation |
 | Concepts introduced | Comparison/transformation steps; materiality thresholds; flagging meaningful deltas |
 | Learner practice | Compute actual-vs-forecast and actual-vs-prior deltas and flag material variance |
-| Lab version | Shown to reveal the full workflow shape; the transformation lesson is authored in a later pass |
+| Lab version | Built by you in the Variance Check task by computing deltas from clean actuals plus forecast and prior-day references |
 | Dependencies | Forecast Data; Prior Day Reference |
 | Downstream reuse | Risk Evaluation |
 | Governance note | Requires agreement on what variance is *material* (a business rule overlapping Threshold Policy) |
-| Open question / risk | Produces no named artifact yet is a transformation lesson - decide whether its output is a transient signal or should be stored for auditability |
+| Open question / risk | Now stores an explicit `variance-summary.json` so Risk Evaluation consumes a derived, auditable signal instead of recomputing deltas |
 
 ### 10. Risk Evaluation - `risk-evaluation` `[LATER]`
 
@@ -370,9 +388,10 @@
 6. **Major artifact build order** (artifact-producing nodes that gate progress):
    1. Market Intake Record -> `market-intake.json` - `[NOW]`
    2. Clean Price Data -> `clean-prices.json` - `[NOW]`
-   3. Risk Evaluation -> `risk-evaluation.json`
-   4. Approval Route -> `approval-route.json`
-   5. Morning Brief -> `market-brief.md`
+   3. Variance Check -> `variance-summary.json` - `[NOW]`
+   4. Risk Evaluation -> `risk-evaluation.json`
+   5. Approval Route -> `approval-route.json`
+   6. Morning Brief -> `market-brief.md`
 
    Supporting governance artifacts feed in alongside: Threshold Policy -> `threshold-policy.json` (before Risk Evaluation) and Approval Template -> `approval-template.json` (before Approval Route). This order respects fan-in: low-dependency artifacts first, the 4-in Risk Evaluation and 7-in Morning Brief last.
 
@@ -399,8 +418,8 @@
 
 8. **Concept-overlap pairs to disambiguate in panels.** Analyst Notes (inspection) vs. Trader Flag (interpretation) - commentary vs. signal. Prior Day Reference (baseline data) vs. Prior Day Brief Template (output structure). Each pair shares a phase and a downstream target, so the distinct lesson must be explicit.
 
-9. **Lessons without a stored artifact.** Variance Check, Approval Decision, and Routine Update Path produce no named artifact. For auditability, decide per node whether the output is a transient signal or a stored, inspectable record before authoring their lessons.
+9. **Lessons without a stored artifact.** Approval Decision and Routine Update Path produce no named artifact. For auditability, decide per node whether the output is a transient signal or a stored, inspectable record before authoring their lessons. (Variance Check resolved this by storing `variance-summary.json`.)
 
 10. **Sources need fixtures before their lessons are interactive.** Price Feed and Forecast Data have no local fixture, so their inspection lessons currently have little to examine. Add minimal sample fixtures so the nodes read as real rather than placeholder.
 
-11. **Coverage snapshot.** 17 lessons by type: inspection 5 (Analyst Notes, Price Feed, Forecast Data, Prior Day Reference, Prior Day Brief Template), interpretation 1 (Trader Flag), build 1 (Market Intake Record), transformation 3 (Clean Price Data, Variance Check, Risk Evaluation), governance 2 (Threshold Policy, Approval Template), decision 1 (Approval Decision), handoff 3 (Approval Route, Routine Update Path, Distribution / Archive), assembly 1 (Morning Brief). By status: 3 `[NOW]`, 5 `[INTENT]`, 9 `[LATER]`.
+11. **Coverage snapshot.** 17 lessons by type: inspection 5 (Analyst Notes, Price Feed, Forecast Data, Prior Day Reference, Prior Day Brief Template), interpretation 1 (Trader Flag), build 1 (Market Intake Record), transformation 3 (Clean Price Data, Variance Check, Risk Evaluation), governance 2 (Threshold Policy, Approval Template), decision 1 (Approval Decision), handoff 3 (Approval Route, Routine Update Path, Distribution / Archive), assembly 1 (Morning Brief). By status: 4 `[NOW]`, 5 `[INTENT]`, 8 `[LATER]`.

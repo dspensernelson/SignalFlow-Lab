@@ -1,0 +1,47 @@
+<!-- @dsCard group="Colors" viewport="700x280" name="Node-type accents" subtitle="Every workflow object colored by type; edges by signal relationship" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8" /><link rel="stylesheet" href="../styles.css" />
+<style>
+  html,body{margin:0}
+  body{background:var(--sf-bg);font-family:var(--sf-font-sans);padding:18px;display:flex;flex-direction:column;gap:14px}
+  .lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sf-text-subtle)}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:7px}
+  .row{display:flex;gap:8px;margin-top:7px}
+  .sw{border-radius:var(--sf-radius-md);border:1px solid var(--sf-border);background:var(--sf-surface);padding:8px 10px;box-shadow:var(--sf-shadow-sm)}
+  .top{display:flex;align-items:center;gap:6px}
+  .dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+  .name{font-size:12px;font-weight:600;color:var(--sf-text)}
+  .hex{font-family:var(--sf-font-mono);font-size:10px;color:var(--sf-text-muted);margin-top:3px}
+  .use{font-size:10px;color:var(--sf-text-subtle);margin-top:1px}
+  .edge-sw{border-radius:var(--sf-radius-md);border:1px solid var(--sf-border);background:var(--sf-surface);padding:8px 10px;box-shadow:var(--sf-shadow-sm);flex:1}
+  .edge-line{height:3px;border-radius:2px;margin-bottom:6px}
+</style></head>
+<body>
+
+<div>
+  <div class="lbl">Node types</div>
+  <div class="grid">
+    <div class="sw"><div class="top"><span class="dot" style="background:var(--sf-type-source)"></span><span class="name">Source</span></div><div class="hex">#f59e0b</div><div class="use">raw input signal</div></div>
+    <div class="sw"><div class="top"><span class="dot" style="background:var(--sf-type-reference)"></span><span class="name">Reference</span></div><div class="hex">#8b5cf6</div><div class="use">policy / governance</div></div>
+    <div class="sw"><div class="top"><span class="dot" style="background:var(--sf-type-artifact)"></span><span class="name">Artifact</span></div><div class="hex">#0891b2</div><div class="use">structured signal object</div></div>
+    <div class="sw"><div class="top"><span class="dot" style="background:var(--sf-type-process)"></span><span class="name">Process</span></div><div class="hex">#6366f1</div><div class="use">transformation step</div></div>
+    <div class="sw"><div class="top"><span class="dot" style="background:var(--sf-type-decision)"></span><span class="name">Decision</span></div><div class="hex">#eab308</div><div class="use">branch / fork</div></div>
+    <div class="sw"><div class="top"><span class="dot" style="background:var(--sf-type-handoff)"></span><span class="name">Handoff</span></div><div class="hex">#14b8a6</div><div class="use">human-in-loop routing</div></div>
+    <div class="sw"><div class="top"><span class="dot" style="background:var(--sf-type-output)"></span><span class="name">Output</span></div><div class="hex">#22c55e</div><div class="use">delivered result</div></div>
+    <div class="sw"><div class="top"><span class="dot" style="background:var(--sf-type-archive)"></span><span class="name">Archive</span></div><div class="hex">#a8a29e</div><div class="use">retention / locked</div></div>
+  </div>
+</div>
+
+<div>
+  <div class="lbl">Edge semantics</div>
+  <div class="row">
+    <div class="edge-sw"><div class="edge-line" style="background:var(--sf-edge-upstream)"></div><div class="name" style="font-size:11px">Upstream</div><div class="use">depends-on; raw source</div></div>
+    <div class="edge-sw"><div class="edge-line" style="background:var(--sf-edge-downstream)"></div><div class="name" style="font-size:11px">Downstream</div><div class="use">feeds-into; signal path</div></div>
+    <div class="edge-sw"><div class="edge-line" style="background:var(--sf-edge-reuse)"></div><div class="name" style="font-size:11px">Reuse</div><div class="use">artifact consumed downstream</div></div>
+    <div class="edge-sw"><div class="edge-line" style="background:var(--sf-edge-completed)"></div><div class="name" style="font-size:11px">Completed</div><div class="use">path from validated node</div></div>
+    <div class="edge-sw"><div class="edge-line" style="background:var(--sf-edge-muted)"></div><div class="name" style="font-size:11px">Muted</div><div class="use">idle / inactive / future</div></div>
+    <div class="edge-sw"><div class="edge-line" style="background:var(--sf-edge-selected)"></div><div class="name" style="font-size:11px">Selected</div><div class="use">selected-node relationship</div></div>
+  </div>
+</div>
+
+</body></html>

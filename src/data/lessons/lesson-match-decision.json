@@ -1,0 +1,122 @@
+{
+  "id": "lesson-match-decision",
+  "nodeId": "match-decision",
+  "title": "Make the Match Decision",
+  "subtitle": "Route the invoice on the results, not on a hunch",
+  "clock": "11:30 AM",
+  "difficulty": "Beginner",
+  "skill": "Decision routing",
+  "scenario": "It is 11:30 AM. Two records decide this invoice's path: the three-way match (matched, within tolerance, quantity exact) and the duplicate check (not a duplicate). This is the fork in the workflow. Encode the rule that sends a clean invoice to auto-approval - and would send anything else to the exception queue.",
+  "inputType": "text",
+  "input": "Three-Way Match: withinTolerance true, qtyMatch true, matchResult matched. Duplicate Check: isDuplicate false. Rule: if the line is within tolerance AND quantities match AND it is not a duplicate, route to auto-approve; otherwise route to the exception queue for a human.",
+  "instructions": [
+    "Restate the three inputs the decision reads: withinTolerance, qtyMatch, isDuplicate.",
+    "Apply the rule: all three clean means auto-approve; any failure means exception.",
+    "Set route to the path this clean invoice takes.",
+    "Return one valid JSON object. Use true/false for the flags."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"withinTolerance\": false,\n  \"qtyMatch\": false,\n  \"isDuplicate\": false,\n  \"route\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": [
+      "withinTolerance",
+      "qtyMatch",
+      "isDuplicate",
+      "route"
+    ],
+    "expected": {
+      "withinTolerance": true,
+      "qtyMatch": true,
+      "isDuplicate": false
+    },
+    "acceptedValues": {
+      "route": ["auto-approve", "auto-approve-path", "auto approve", "auto-approve path"]
+    }
+  },
+  "copilotPrompt": "Produce a match-decision JSON record: withinTolerance, qtyMatch, isDuplicate, and route. Route to auto-approve only when within tolerance, quantities match, and it is not a duplicate; otherwise route to the exception queue.",
+  "successMessage": "Decision made. Clean on all three checks, INV-58831 routes to auto-approval.",
+  "validateLabel": "Route Invoice",
+  "editorHelper": "Apply the fork rule to the two upstream results.",
+  "intro": {
+    "heading": "Before you pay: the fork",
+    "sections": [
+      {
+        "title": "One decision, two paths",
+        "body": "Every invoice reaches this fork. Clean lines flow to auto-approval; anything unusual goes to the exception queue for a human. The decision is the map's only branch."
+      },
+      {
+        "title": "Route on results, not vibes",
+        "body": "The decision reads three booleans from upstream - withinTolerance, qtyMatch, isDuplicate. Because the inputs are already computed, the routing is a rule, not a judgment call."
+      },
+      {
+        "title": "All clean means auto-approve",
+        "body": "INV-58831 is within tolerance, quantities match, and it is not a duplicate. All three green means it earns the auto-approve path - no human needed today."
+      },
+      {
+        "title": "Any failure means exception",
+        "body": "Flip any one of the three and the same rule routes to the exception queue instead. Encoding the fork once is what makes both outcomes consistent and auditable."
+      }
+    ],
+    "jsonExample": "{\n  \"withinTolerance\": true,\n  \"isDuplicate\": false,\n  \"route\": \"auto-approve\"\n}",
+    "skill": "Decision routing",
+    "artifactName": "match-decision.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "withinTolerance",
+      "meaning": "Whether the three-way match found the price within tolerance.",
+      "type": "boolean",
+      "example": "true",
+      "group": "Inputs",
+      "lookFor": "price acceptable?",
+      "hint": "From the three-way match - true for INV-58831."
+    },
+    {
+      "field": "qtyMatch",
+      "meaning": "Whether received equals ordered.",
+      "type": "boolean",
+      "example": "true",
+      "group": "Inputs",
+      "lookFor": "quantities equal?",
+      "hint": "From the three-way match - true for INV-58831."
+    },
+    {
+      "field": "isDuplicate",
+      "meaning": "Whether the duplicate check flagged this invoice.",
+      "type": "boolean",
+      "example": "false",
+      "group": "Inputs",
+      "lookFor": "already paid?",
+      "hint": "From the duplicate check - false for INV-58831."
+    },
+    {
+      "field": "route",
+      "meaning": "The path the invoice takes out of the fork.",
+      "type": "string",
+      "example": "\"auto-approve\"",
+      "group": "Decision",
+      "lookFor": "which path?",
+      "hint": "All three clean routes to auto-approve; any failure routes to the exception queue."
+    }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd stamp the result - matched or exception - so clean invoices move to pay and mismatches go to review.",
+      "tools": {
+        "powerAutomate": "'Switch'/'Condition' setting a match-status field",
+        "zapier": "'Paths' by match result",
+        "python": "return 'matched' or 'exception' with the failing reason"
+      }
+    },
+    "heading": "Match decision made",
+    "points": [
+      "You encoded the workflow's one fork as a rule over three upstream booleans.",
+      "Within tolerance, quantities matched, and not a duplicate - all three green - so INV-58831 routes to auto-approve.",
+      "Flipping any single input would route the same rule to the exception queue instead.",
+      "Routing on computed results, not judgment, is what makes both outcomes consistent and auditable.",
+      "The workflow can now send clean invoices to auto-approval and exceptions to a human, automatically."
+    ],
+    "artifactName": "match-decision.json"
+  }
+}

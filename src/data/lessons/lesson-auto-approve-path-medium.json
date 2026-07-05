@@ -1,0 +1,118 @@
+{
+  "id": "lesson-auto-approve-path-medium",
+  "nodeId": "auto-approve-path",
+  "title": "Confirm the Auto-Approve Path",
+  "difficulty": "Intermediate",
+  "skill": "Straight-through processing",
+  "clock": "1:30 PM",
+  "scenario": "It is 1:30 PM. Only INV-59001 cleared every check, so it takes the auto-approve path - the quiet lane where a fully clean invoice moves toward payment without a human touching it. Confirm it belongs there and that the path logs the approval it grants.",
+  "inputType": "text",
+  "inputLabel": "Auto-Approve Candidate",
+  "input": "INV-59001 (V-1042 Northwind Fasteners): not a duplicate, variance $0 within a $25 band, quantity 500 of 500 received, vendor on file with ACH ...4021. It is the only invoice of the five that is clean on every check.",
+  "instructions": [
+    "Confirm INV-59001 meets every condition for straight-through approval.",
+    "Understand what the auto-approve path records and what it does not decide.",
+    "Answer the questions and validate to mint the auto-approval log."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "Why does INV-59001 qualify for auto-approve when the other four do not?",
+        "options": [
+          { "id": "a", "text": "It is the largest invoice in the batch" },
+          { "id": "b", "text": "It is clean on every check: not a duplicate, within tolerance, quantity matched, vendor on file" },
+          { "id": "c", "text": "It arrived first in the inbox" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Auto-approve is earned by passing every gate, not by size or order. INV-59001 is the only invoice with no duplicate flag, price within band, quantity confirmed, and a governed vendor."
+      },
+      {
+        "id": "q2",
+        "prompt": "What does 'auto-approve' actually mean here?",
+        "options": [
+          { "id": "a", "text": "The invoice is paid instantly with no further steps" },
+          { "id": "b", "text": "It moves toward payment without manual review, but still enters the batch and awaits the run approval" },
+          { "id": "c", "text": "A manager signs each auto-approved invoice by hand" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Straight-through means no human works the invoice, not that controls vanish. INV-59001 still joins the payment batch and waits for the single run approval before money moves."
+      },
+      {
+        "id": "q3",
+        "prompt": "What does the auto-approve path record for INV-59001?",
+        "options": [
+          { "id": "a", "text": "Nothing - clean invoices need no log" },
+          { "id": "b", "text": "An approval entry noting it passed all checks, so the decision is auditable" },
+          { "id": "c", "text": "Only the vendor's bank details" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Even the quiet path is logged. Recording that INV-59001 passed every check keeps the auto-approval auditable - you can always show why it skipped manual review."
+      },
+      {
+        "id": "q4",
+        "prompt": "If a fifth check later flagged INV-59001, what should happen?",
+        "options": [
+          { "id": "a", "text": "Keep it on the auto-approve path since it started clean" },
+          { "id": "b", "text": "Pull it to the exception queue - auto-approve requires every check to stay clean" },
+          { "id": "c", "text": "Pay it and reconcile later" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The auto-approve path is conditional on being clean on all checks. Any new flag moves the invoice to exceptions; the quiet lane is only for invoices that pass every gate."
+      }
+    ],
+    "artifactOnPass": {
+      "step": "auto-approve-path",
+      "invoice": "INV-59001",
+      "vendor": "V-1042 Northwind Fasteners",
+      "amount": 1200.00,
+      "checks": "duplicate:false, withinTolerance:true, qtyMatch:true, vendorOnFile:true",
+      "decision": "auto-approved",
+      "awaits": "run-approval"
+    }
+  },
+  "copilotPrompt": "Confirm INV-59001 qualifies for straight-through auto-approval: it is not a duplicate, within tolerance, quantity-matched, and its vendor is on file. Explain that it still enters the batch and awaits run approval, and that the approval is logged.",
+  "successMessage": "Auto-approve confirmed. INV-59001 passed every check and is logged into the payment batch, awaiting the run approval.",
+  "intro": {
+    "heading": "The quiet lane: earned, not skipped",
+    "sections": [
+      {
+        "title": "One invoice earned the quiet path",
+        "body": "Of five invoices, only INV-59001 passed every gate. Auto-approve is a reward for being clean on all checks, not a shortcut - the other four are working through exceptions right now."
+      },
+      {
+        "title": "Straight-through, not control-free",
+        "body": "Auto-approve means no human reviews the invoice line by line, but it still enters the payment batch and waits for the single run approval before any money moves. Controls stay; only the manual touch is removed."
+      },
+      {
+        "title": "The quiet path is still logged",
+        "body": "The approval is recorded with the checks it passed, so you can always show why INV-59001 skipped manual review. And if any new flag appears, it is pulled to exceptions - clean is a continuing condition."
+      }
+    ],
+    "jsonExample": "{\n  \"invoice\": \"INV-59001\",\n  \"decision\": \"auto-approved\",\n  \"awaits\": \"run-approval\"\n}",
+    "skill": "Straight-through processing",
+    "artifactName": "auto-approval-log.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd let fully-matched, within-tolerance invoices approve automatically so only real problems reach a person.",
+      "tools": {
+        "powerAutomate": "the 'yes' branch that sets Approved and skips the review step",
+        "zapier": "the default Path that marks the invoice approved",
+        "python": "if matched and within tolerance: status = 'approved'"
+      }
+    },
+    "heading": "Auto-approve path confirmed",
+    "points": [
+      "INV-59001 was the only invoice clean on every check, so it earned the auto-approve path.",
+      "Straight-through means no manual review, but it still enters the batch and awaits the run approval.",
+      "The approval is logged with the checks it passed, keeping the quiet path auditable.",
+      "Any new flag would pull it back to exceptions - auto-approve requires staying clean on all checks.",
+      "The workflow can now move a fully clean invoice toward payment without manual handling while keeping the record."
+    ],
+    "artifactName": "auto-approval-log.json"
+  }
+}

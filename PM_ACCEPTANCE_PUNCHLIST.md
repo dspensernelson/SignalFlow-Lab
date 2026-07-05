@@ -47,6 +47,20 @@ Use this as the PM pass/fail checklist for the current local build. The original
 - [ ] A missing expected hub row fails with per-rule feedback.
 - [ ] Correct normalized JSON passes.
 
+## Variance Check Lesson
+
+- [ ] Clicking the `Variance Check` buildable node can open the transformation lesson.
+- [ ] Lesson content loads from `src/data/lessons/lesson-variance-check.json`.
+- [ ] The exercise input panel header reads `Actuals vs References`, not `Source Note`.
+- [ ] User can edit the JSON rows answer.
+- [ ] Invalid JSON fails with clear feedback.
+- [ ] A non-array top-level shape fails with clear feedback.
+- [ ] A row missing a required delta field fails with per-rule feedback.
+- [ ] Delta values left as strings fail because they must be numbers.
+- [ ] A wrong delta value fails with per-rule feedback.
+- [ ] An incorrect `material` flag fails only when the learner includes it; omitting it does not fail.
+- [ ] Correct deltas pass.
+
 ## Completion Flow
 
 - [ ] Passing saves the user's parsed JSON as `market-intake.json`.
@@ -55,6 +69,8 @@ Use this as the PM pass/fail checklist for the current local build. The original
 - [ ] Passing Threshold Policy marks `Threshold Policy` as `complete`.
 - [ ] Passing Clean Price Data saves the user's parsed JSON array as `clean-prices.json`.
 - [ ] Passing Clean Price Data marks `Clean Price Data` as `complete`.
+- [ ] Passing Variance Check saves the user's parsed JSON array as `variance-summary.json`.
+- [ ] Passing Variance Check marks `Variance Check` as `complete`.
 - [ ] The completed artifact visually becomes reusable by downstream workflow nodes.
 - [ ] Future buildable nodes remain visible but locked/stubbed unless explicitly scoped.
 - [ ] Completed `Market Intake Record` shows a View Artifact action.
