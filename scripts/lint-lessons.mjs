@@ -15,9 +15,11 @@
 //  4. Interaction shape: choiceCheck 3-5 questions x exactly 3 options with
 //     a valid correctOptionId, explain text, and artifactOnPass; templateSlots
 //     slots<->{{tokens}} match exactly, each slot has label/hint and an
-//     expected or accepted, shelf entries are complete; jsonEditor lessons
-//     have a fieldGuide row for every validated field and a parseable
-//     starterAnswer.
+//     expected or accepted, shelf entries are complete; tagSource 3-6 fields
+//     with >= fields+1 segments and every correctSegmentId on the source;
+//     handoffForm 2-5 fields, each select/text with expected-or-accepted and
+//     select answers present in options; jsonEditor lessons have a fieldGuide
+//     row for every validated field and a parseable starterAnswer.
 //  5. Canon: every assertion in curriculum/module-01/canon.json holds.
 //  6. choiceCheck cap: no more than ~1-in-4 lessons per module are choiceCheck
 //     (module-01/02 grandfathered as warnings; module-03+ is an error).
@@ -34,8 +36,8 @@ const lessonsDir = path.join(root, 'src', 'data', 'lessons')
 const registry = JSON.parse(readFileSync(path.join(root, 'src', 'data', 'projects.json'), 'utf8'))
 const projectsSource = readFileSync(path.join(root, 'src', 'lib', 'projects.js'), 'utf8')
 
-const VALID_INTERACTIONS = ['jsonEditor', 'choiceCheck', 'templateSlots', 'artifactImport']
-const VALID_VALIDATORS = ['jsonFields', 'jsonPolicy', 'jsonRows', 'jsonDeltas', 'choiceCheck', 'templateSlots', 'artifactImport']
+const VALID_INTERACTIONS = ['jsonEditor', 'choiceCheck', 'templateSlots', 'artifactImport', 'tagSource', 'handoffForm']
+const VALID_VALIDATORS = ['jsonFields', 'jsonPolicy', 'jsonRows', 'jsonDeltas', 'choiceCheck', 'templateSlots', 'artifactImport', 'tagSource', 'handoffForm']
 const VALID_DIFFICULTIES = ['Beginner', 'Intermediate', 'Medium', 'Hard']
 
 // Lessons are global (flat, unique ids); each is registered to exactly one
@@ -252,6 +254,50 @@ for (const file of files.sort()) {
       } catch {
         err(id, 'starterAnswer is not valid JSON')
       }
+    }
+  } else if (lesson.interactionType === 'tagSource') {
+    const segments = lesson.validation?.source?.segments
+    const flds = lesson.validation?.fields
+    if (!Array.isArray(flds) || flds.length < 3 || flds.length > 6) {
+      err(id, `tagSource needs 3-6 fields (has ${flds?.length ?? 0})`)
+    }
+    if (!Array.isArray(segments) || segments.length === 0) {
+      err(id, 'tagSource needs a nonempty validation.source.segments array')
+    } else if (Array.isArray(flds) && segments.length < flds.length + 1) {
+      err(id, `tagSource needs at least fields+1 segments (has ${segments.length} for ${flds.length} fields)`)
+    }
+    if (Array.isArray(flds) && Array.isArray(segments)) {
+      const segIds = new Set(segments.map((s) => s.id))
+      flds.forEach((f, i) => {
+        if (!f.id || !f.label) err(id, `tagSource field ${i + 1} needs id and label`)
+        if (!segIds.has(f.correctSegmentId)) err(id, `tagSource field "${f.id ?? i + 1}" correctSegmentId "${f.correctSegmentId}" matches no segment`)
+        if (!f.explain || !f.explain.trim()) err(id, `tagSource field "${f.id ?? i + 1}" needs explain text`)
+      })
+      segments.forEach((s, i) => {
+        if (!s.id || typeof s.text !== 'string' || !s.text.trim()) err(id, `tagSource segment ${i + 1} needs id and text`)
+      })
+    }
+  } else if (lesson.interactionType === 'handoffForm') {
+    const flds = lesson.validation?.fields
+    if (!Array.isArray(flds) || flds.length < 2 || flds.length > 5) {
+      err(id, `handoffForm needs 2-5 fields (has ${flds?.length ?? 0})`)
+    } else {
+      flds.forEach((f, i) => {
+        if (!f.id || !f.label) err(id, `handoffForm field ${i + 1} needs id and label`)
+        if (f.kind !== 'select' && f.kind !== 'text') err(id, `handoffForm field "${f.id ?? i + 1}" kind must be "select" or "text"`)
+        const hasExpected = f.expected !== undefined
+        const hasAccepted = Array.isArray(f.accepted) && f.accepted.length > 0
+        if (!hasExpected && !hasAccepted) err(id, `handoffForm field "${f.id ?? i + 1}" needs expected or accepted`)
+        if (!f.explain || !f.explain.trim()) err(id, `handoffForm field "${f.id ?? i + 1}" needs explain text`)
+        if (f.kind === 'select') {
+          const opts = Array.isArray(f.options) ? f.options : []
+          if (opts.length === 0) err(id, `handoffForm select field "${f.id ?? i + 1}" needs options`)
+          const answers = hasAccepted ? f.accepted : hasExpected ? [f.expected] : []
+          answers.forEach((a) => {
+            if (!opts.includes(a)) err(id, `handoffForm select field "${f.id ?? i + 1}" answer "${a}" is not in options`)
+          })
+        }
+      })
     }
   } else {
     // jsonEditor

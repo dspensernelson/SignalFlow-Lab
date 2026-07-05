@@ -11,57 +11,41 @@
   "input": "Payment Batch: 1 invoice, total 1220.00, 0 held, cutoff 3:00 PM. The AP Manager reviews the batch control totals and approves the run at 2:30 PM. Approval confirms the batch is complete and the totals are right; it is the single point where a human authorizes funds to leave Beacon.",
   "instructions": [
     "Read run approval as the human control point before funds move.",
-    "Answer the four questions about who approves and what the approval confirms.",
+    "Fill the run-approval record: who approves, what it confirms, and whether it beats the cutoff.",
     "Validate to mint the run-approval record."
   ],
-  "interactionType": "choiceCheck",
+  "interactionType": "handoffForm",
   "starterAnswer": "{}",
   "validation": {
-    "type": "choiceCheck",
-    "questions": [
+    "type": "handoffForm",
+    "fields": [
       {
-        "id": "q1",
-        "prompt": "Who approves the payment run?",
-        "options": [
-          { "id": "a", "text": "The AP Clerk who processed the invoices" },
-          { "id": "b", "text": "The AP Manager" },
-          { "id": "c", "text": "The vendor" }
-        ],
-        "correctOptionId": "b",
-        "explain": "Separation of duties: the Clerk processes invoices, the Manager approves the run. The person releasing funds is not the person who prepared them."
+        "id": "approvedBy",
+        "label": "Approved by",
+        "kind": "select",
+        "options": ["AP Clerk", "AP Manager", "Vendor"],
+        "expected": "AP Manager",
+        "explain": "Separation of duties: the Clerk prepares the batch, the Manager approves the run. The person releasing funds is never the person who prepared them."
       },
       {
-        "id": "q2",
-        "prompt": "What does the approval confirm?",
+        "id": "confirms",
+        "label": "Approval confirms",
+        "kind": "select",
         "options": [
-          { "id": "a", "text": "That the batch is complete and its control totals are correct" },
-          { "id": "b", "text": "That each invoice is re-typed from scratch" },
-          { "id": "c", "text": "That the vendor received the goods" }
+          "Batch complete and control totals correct",
+          "Each invoice re-typed from scratch",
+          "The vendor received the goods"
         ],
-        "correctOptionId": "a",
-        "explain": "The Manager checks the batch's count and total - the control figures - and confirms nothing was dropped or added. The line-level checks already happened upstream."
+        "expected": "Batch complete and control totals correct",
+        "explain": "The Manager checks the batch count and total - the control figures - confirming nothing was dropped or added. Line-level checks already happened upstream."
       },
       {
-        "id": "q3",
-        "prompt": "Why keep a human here when everything upstream was automatic?",
-        "options": [
-          { "id": "a", "text": "Because releasing funds is the highest-risk action and needs a named, accountable person" },
-          { "id": "b", "text": "Because the software cannot add numbers" },
-          { "id": "c", "text": "To slow the process down on purpose" }
-        ],
-        "correctOptionId": "a",
-        "explain": "Automation handles the judgment that can be encoded. Authorizing money to leave the company is deliberately kept human so there is always someone accountable for the release."
-      },
-      {
-        "id": "q4",
-        "prompt": "The approval happens at 2:30 PM against a 3:00 PM cutoff. Why does timing matter?",
-        "options": [
-          { "id": "a", "text": "It does not; approval can happen any time" },
-          { "id": "b", "text": "Approval must land before the cutoff or the run misses today's payment window" },
-          { "id": "c", "text": "The vendor sets the time" }
-        ],
-        "correctOptionId": "b",
-        "explain": "The run has to be approved before the 3:00 PM cutoff to be delivered today. Approving at 2:30 leaves margin; miss the cutoff and payment slips to the next run."
+        "id": "beforeCutoff",
+        "label": "Approved before 3:00 PM cutoff",
+        "kind": "select",
+        "options": ["yes", "no"],
+        "expected": "yes",
+        "explain": "Approval at 2:30 PM must clear the 3:00 PM cutoff. Approve before the cutoff or the run slips to the next payment window."
       }
     ],
     "artifactOnPass": {
@@ -113,7 +97,7 @@
     },
     "heading": "Run approved",
     "points": [
-      "You answered the four questions: who approves, what it confirms, why it stays human, and why timing matters.",
+      "You captured the run-approval record: who approves, what it confirms, and that it beats the cutoff.",
       "Run approval is the one point where a named person authorizes funds to leave the company.",
       "The AP Manager confirms the batch control totals, not the line-level checks already done upstream.",
       "Approving at 2:30 PM clears the 3:00 PM cutoff, so the run ships today - captured in run-approval.json.",

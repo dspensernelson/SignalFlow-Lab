@@ -171,12 +171,20 @@ the module's spine WITHOUT the app.
 
 ### Step 7b - Interaction budget (SPEND-OR-JUSTIFY)
 
-Each module has an interaction-type budget: it should SPEND all four exercise
-types (choiceCheck, jsonEditor, templateSlots, artifactImport) across its tiers,
-or JUSTIFY in DECISION_LOG.md why a type is absent. A module that reuses only
-one or two interaction types is a design smell - variety is what keeps the
-recurring workflow shape from feeling like a worksheet. The artifactImport
-budget is always spent by the mandatory Step 7a capstone.
+Each module has an interaction-type budget: it should SPEND a variety of the
+available exercise types across its tiers, or JUSTIFY in DECISION_LOG.md why a
+type is absent. A module that reuses only one or two interaction types is a
+design smell - variety is what keeps the recurring workflow shape from feeling
+like a worksheet. The artifactImport budget is always spent by the mandatory
+Step 7a capstone.
+
+Available exercise types (all engine-supported): `choiceCheck`, `jsonEditor`,
+`templateSlots`, `artifactImport`, plus the two anti-slop additions `tagSource`
+(inspection-by-tagging) and `handoffForm` (capture the handoff record) - see
+ENGINE_ADDITIONS_SPEC_INSPECTION_HANDOFF.md. Prefer `tagSource` on
+inspection/provenance nodes and `handoffForm` on handoff/notify nodes instead of
+`choiceCheck`; that is how a module meets the <=25% choiceCheck cap
+(scripts/lint-lessons.mjs, a HARD ERROR for module-03+).
 
 ## Step 8 - Module wrap (OWNER GATE)
 
