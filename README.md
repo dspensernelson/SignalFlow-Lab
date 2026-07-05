@@ -4,9 +4,26 @@ SignalFlow Lab is a local React learning app for practicing workplace automation
 
 The first project is **Meridian Morning Market Brief**, a fictional energy-market workflow that turns messy overnight market inputs into an approval-ready 7:00 AM brief.
 
-## Current Status (2026-07-03, module-02-beacon - MODULE 2 COMPLETE, all three tiers)
+**Live:** https://signal-flow-lab.vercel.app (production, auto-deployed from green `main`).
+
+## Current Status (2026-07-05, main - MODULES 1-2 COMPLETE + SHIPPED + anti-slop pass)
 
 Where things stand if you are picking this back up:
+
+- **Shipped and live.** The whole reviewed history (Modules 1-2 all tiers, the
+  go-live patch, and the anti-slop pass) is merged to `main` and deployed at
+  https://signal-flow-lab.vercel.app. End-to-end smoke test passed at both
+  1280x800 and 1366x650 (fresh-profile welcome, wrong-answer no-scroll,
+  tier-completion card, project switch + recurrence card, console clean).
+- **Anti-slop pass complete.** The choiceCheck share is capped at <=25% per
+  module at the map gate (`scripts/lint-lessons.mjs`) - a hard error for
+  module-03+, a grandfathered warning for module-01 (28.6%) and module-02
+  (47.5%). A data-driven "you have seen this shape before" card
+  (`src/data/moduleSkeleton.json`) shows once per module (module-02+), mapping
+  the module onto the shared Meridian skeleton. Two new interaction types -
+  `tagSource` and `handoffForm`
+  (`ENGINE_ADDITIONS_SPEC_INSPECTION_HANDOFF.md`) - are owner-approved and
+  next up to build.
 
 - **Module 2 (Beacon Invoice Desk) is COMPLETE across all three tiers** (Easy
   17/17, Medium 17/17, Hard 5/5). Easy operates the AP pipeline on a clean
