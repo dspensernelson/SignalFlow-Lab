@@ -2,6 +2,36 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-05 (build: tagSource + handoffForm interaction types)
+
+- BUILT both approved anti-slop interaction types per
+  ENGINE_ADDITIONS_SPEC_INSPECTION_HANDOFF.md (own branch
+  feat/inspection-handoff-interactions, own PR against main).
+- Additive validators only: `tagSource` and `handoffForm` added to
+  src/lib/validators.js and registered in the `validators` map. No existing
+  validator matching logic touched (frozen). Both return the shared result
+  shape and mint a named artifact on pass (artifactOnPass, or auto-built from
+  the learner's inputs).
+- Components: TagSourceExercise.jsx (native <select> per field row, source shown
+  as read-only segment chips) and HandoffFormExercise.jsx (compact select/text
+  form), branched in LessonExercise.jsx by interactionType, mirroring the
+  existing ChoiceCheckExercise pattern (source left, bounded readiness right).
+- Lint: both types added to VALID_INTERACTIONS/VALID_VALIDATORS in
+  scripts/lint-lessons.mjs with shape checks (tagSource 3-6 fields, >= fields+1
+  segments, every correctSegmentId on the source; handoffForm 2-5 fields,
+  select/text kind, expected-or-accepted, select answers in options).
+- Consumed them by retrofitting two grandfathered module-02 EASY lessons off
+  choiceCheck: lesson-po-register -> tagSource (tag PO fields; teaches PO price
+  2.40 vs invoice claim 2.44 via a distractor segment) and lesson-run-approval
+  -> handoffForm (capture who approves / what it confirms / beats the cutoff).
+  Artifacts preserved via artifactOnPass, so downstream + overview docs are
+  unchanged. This cut module-02 choiceCheck from 42.5% (17/40) - it was 47.5%
+  (19/40) before the go-live retarget re-counted. Fixtures added for both.
+- Verified: npm run check green (82 lessons, 0 errors, 2 grandfathered cap
+  warnings). Live no-scroll confirmed in the WRONG-answer state at BOTH
+  1280x800 and 1366x650 for tagSource (po-register) and handoffForm
+  (run-approval): document scrollHeight === clientHeight at both viewports.
+
 ## 2026-07-05 (SHIP confirmed - live deploy smoke test PASSED)
 
 - Verified git reality first: origin/main = 10e5e2b "Ship: Modules 1-2 +
