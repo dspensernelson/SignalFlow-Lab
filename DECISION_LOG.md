@@ -2,6 +2,24 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-05 (SHIP confirmed - live deploy smoke test PASSED)
+
+- Verified git reality first: origin/main = 10e5e2b "Ship: Modules 1-2 +
+  go-live + anti-slop to main"; the reviewed history really is on main. New
+  work now branches off main (branch chore/post-ship-sync for this doc sync).
+- Confirmed Vercel auto-deployed green main: https://signal-flow-lab.vercel.app
+  serves index-BTK3pmZd.js / index-rU59DQwh.css, the exact hashes from the
+  current build - i.e. the live bundle includes the anti-slop pass. No manual
+  deploy was needed (Gate 8 auto-deploy path).
+- Ran the VERIFICATION_PLAYBOOK end-to-end smoke test on the LIVE url at BOTH
+  1280x800 and 1366x650, all PASS: fresh-profile welcome shows; choiceCheck
+  wrong-answer state is no-scroll (scrollH===clientH at 800 and at 650);
+  tier-completion card fires on a fully-built easy tier; project switch to
+  module-02 loads its lazy chunk and shows the recurrence card (7 rows,
+  Meridian->Beacon); console clean (zero errors/pageerrors across the run).
+- Docs synced: README status line + live url; NEXT_SESSION_PROMPT.md refreshed
+  to the post-ship state (queue = build tagSource/handoffForm, then Module 3).
+
 ## 2026-07-05 (owner: ship main + approve both anti-slop interaction types)
 
 - SHIP (owner chose "ship it now"): the reviewed stack was merged to main FOR
