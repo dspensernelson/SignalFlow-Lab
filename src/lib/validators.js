@@ -646,6 +646,145 @@ function artifactImport(answer, validation) {
   }
 }
 
+// Inspection-by-tagging validator (additive). Replaces choiceCheck trivia on
+// inspection/provenance nodes: the learner assigns each required FIELD to the
+// source SEGMENT that holds its value. The answer is a JSON string of
+// { fieldId: segmentId }. Each field yields one result row; wrong answers show
+// the field's explain text without revealing the correct segment id. On pass,
+// the artifact is the author-defined artifactOnPass object, or an auto-built
+// map of field.id -> tagged segment TEXT, so inspection still mints an artifact.
+function tagSource(answer, validation) {
+  let parsed
+  try {
+    parsed = JSON.parse(answer)
+  } catch {
+    return {
+      passed: false,
+      results: [
+        {
+          id: 'json-parse',
+          label: 'Valid JSON',
+          passed: false,
+          message: 'Your answer is not valid JSON. Check for missing quotes, commas, or braces.',
+        },
+      ],
+      artifact: null,
+    }
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) parsed = {}
+
+  const { source = {}, fields = [], artifactOnPass = null } = validation
+  const segments = source.segments || []
+  const segmentText = {}
+  segments.forEach((segment) => {
+    segmentText[segment.id] = segment.text
+  })
+  const results = []
+
+  fields.forEach((field) => {
+    const chosen = parsed[field.id]
+    let passed = false
+    let message
+    if (chosen === undefined || chosen === null || chosen === '') {
+      message = `Tag "${field.label}" in the source before validating.`
+    } else if (chosen === field.correctSegmentId) {
+      passed = true
+      message = 'Correct.'
+    } else {
+      message = field.explain
+    }
+    results.push({
+      id: `tag-${field.id}`,
+      label: field.label,
+      passed,
+      message,
+    })
+  })
+
+  const passed = results.length > 0 && results.every((r) => r.passed)
+
+  let artifact = null
+  if (passed) {
+    if (artifactOnPass) {
+      artifact = artifactOnPass
+    } else {
+      artifact = {}
+      fields.forEach((field) => {
+        artifact[field.id] = segmentText[parsed[field.id]]
+      })
+    }
+  }
+
+  return { passed, results, artifact }
+}
+
+// Handoff-record validator (additive). Replaces choiceCheck on handoff nodes:
+// the learner fills a small fixed form (who/what/when) describing the handoff.
+// The answer is a JSON string of { fieldId: value }. Each field yields one
+// result row; a value passes when normalize(value) matches normalize(expected)
+// or is in the normalized accepted list. On pass, the artifact is the
+// author-defined artifactOnPass, or an auto-built map of field.id -> value.
+function handoffForm(answer, validation) {
+  let parsed
+  try {
+    parsed = JSON.parse(answer)
+  } catch {
+    return {
+      passed: false,
+      results: [
+        {
+          id: 'json-parse',
+          label: 'Valid JSON',
+          passed: false,
+          message: 'Your answer is not valid JSON. Check for missing quotes, commas, or braces.',
+        },
+      ],
+      artifact: null,
+    }
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) parsed = {}
+
+  const { fields = [], artifactOnPass = null } = validation
+  const results = []
+
+  fields.forEach((field) => {
+    const raw = parsed[field.id]
+    const value = raw === undefined || raw === null ? '' : String(raw).trim()
+    let passed = false
+    let message
+    if (value === '') {
+      message = `Fill in: ${field.label}.`
+    } else {
+      const accepted =
+        field.accepted || (field.expected !== undefined ? [field.expected] : [])
+      passed = accepted.map(normalize).includes(normalize(value))
+      message = passed ? 'Correct.' : field.explain
+    }
+    results.push({
+      id: `field-${field.id}`,
+      label: field.label,
+      passed,
+      message,
+    })
+  })
+
+  const passed = results.length > 0 && results.every((r) => r.passed)
+
+  let artifact = null
+  if (passed) {
+    if (artifactOnPass) {
+      artifact = artifactOnPass
+    } else {
+      artifact = {}
+      fields.forEach((field) => {
+        artifact[field.id] = String(parsed[field.id]).trim()
+      })
+    }
+  }
+
+  return { passed, results, artifact }
+}
+
 const validators = {
   jsonFields,
   jsonPolicy,
@@ -654,6 +793,8 @@ const validators = {
   choiceCheck,
   templateSlots,
   artifactImport,
+  tagSource,
+  handoffForm,
   // Stubs for future build passes.
   csvColumns: null,
   ruleBuilder: null,

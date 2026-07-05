@@ -2,6 +2,8 @@ import CopilotPromptCard from './CopilotPromptCard'
 import ChoiceCheckExercise from './ChoiceCheckExercise'
 import TemplateSlotsExercise from './TemplateSlotsExercise'
 import ArtifactImportExercise from './ArtifactImportExercise'
+import TagSourceExercise from './TagSourceExercise'
+import HandoffFormExercise from './HandoffFormExercise'
 import { Button, ScrollArea } from './ui'
 
 // The editor renders one JSON field per line; these constants match the
@@ -105,6 +107,32 @@ export default function LessonExercise({
   if (lesson.interactionType === 'artifactImport') {
     return (
       <ArtifactImportExercise
+        lesson={lesson}
+        answer={answer}
+        onAnswerChange={onAnswerChange}
+        onValidate={onValidate}
+        results={results}
+        passed={passed}
+        onContinue={onContinue}
+      />
+    )
+  }
+  if (lesson.interactionType === 'tagSource') {
+    return (
+      <TagSourceExercise
+        lesson={lesson}
+        answer={answer}
+        onAnswerChange={onAnswerChange}
+        onValidate={onValidate}
+        results={results}
+        passed={passed}
+        onContinue={onContinue}
+      />
+    )
+  }
+  if (lesson.interactionType === 'handoffForm') {
+    return (
+      <HandoffFormExercise
         lesson={lesson}
         answer={answer}
         onAnswerChange={onAnswerChange}

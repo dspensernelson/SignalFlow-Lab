@@ -1,6 +1,15 @@
 {
   "_comment": "Per-lesson regression fixtures for scripts/validate-lessons.mjs. Each entry has a `correct` answer (must pass validation and store an artifact) and a `wrong` answer (must fail with no artifact). choiceCheck lessons need no fixture: the runner derives answers from the questions. Answers are the parsed form; the runner JSON-stringifies them before calling validateAnswer.",
 
+  "lesson-po-register": {
+    "correct": { "poNumber": "po", "vendor": "vendor", "quantityOrdered": "qty", "unitPricePO": "poPrice", "poTotal": "total" },
+    "wrong": { "poNumber": "po", "vendor": "vendor", "quantityOrdered": "qty", "unitPricePO": "invoicePrice", "poTotal": "total" }
+  },
+  "lesson-run-approval": {
+    "correct": { "approvedBy": "AP Manager", "confirms": "Batch complete and control totals correct", "beforeCutoff": "yes" },
+    "wrong": { "approvedBy": "AP Clerk", "confirms": "Batch complete and control totals correct", "beforeCutoff": "yes" }
+  },
+
   "lesson-intake": {
     "correct": { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": "$142/MWh", "generationFlag": "Wind underperformed", "approvalRequired": true },
     "wrong": { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": "$142/MWh", "generationFlag": "Wind underperformed", "approvalRequired": false }

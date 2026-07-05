@@ -11,57 +11,56 @@
   "input": "PO-7742 | Vendor: V-1042 Northwind Fasteners | Line: M8 hex bolt, zinc | Quantity ordered: 500 | Unit price (PO): 2.40 | PO total: 1200.00 | Owned by: Procurement Lead. The PO number is the join key - it links the invoice to this order and to the goods receipt.",
   "instructions": [
     "Read the PO Register as Beacon's own record of what was agreed, not the vendor's claim.",
-    "Answer the four lookup questions against the register and the workflow map.",
+    "Tag each field to the value that holds it in the register - watch the PO price versus the invoice claim.",
     "Validate to mint the PO source profile."
   ],
-  "interactionType": "choiceCheck",
+  "interactionType": "tagSource",
   "starterAnswer": "{}",
   "validation": {
-    "type": "choiceCheck",
-    "questions": [
+    "type": "tagSource",
+    "source": {
+      "label": "PO Register - PO-7742",
+      "segments": [
+        { "id": "po", "text": "PO-7742" },
+        { "id": "vendor", "text": "V-1042 Northwind Fasteners" },
+        { "id": "item", "text": "M8 hex bolt, zinc" },
+        { "id": "qty", "text": "500" },
+        { "id": "poPrice", "text": "2.40 (PO unit price)" },
+        { "id": "invoicePrice", "text": "2.44 (invoice claim)" },
+        { "id": "total", "text": "1200.00" },
+        { "id": "owner", "text": "Procurement Lead" }
+      ]
+    },
+    "fields": [
       {
-        "id": "q1",
-        "prompt": "What is the PO number used for across the workflow?",
-        "options": [
-          { "id": "a", "text": "A display label with no downstream use" },
-          { "id": "b", "text": "The join key that links invoice, PO, and receipt together" },
-          { "id": "c", "text": "The payment amount" }
-        ],
-        "correctOptionId": "b",
-        "explain": "PO-7742 is how the desk connects three documents: the invoice cites it, the receipt posts against it, and the match reads all three by it. It is the anchor of the three-way match."
+        "id": "poNumber",
+        "label": "Join key (PO number)",
+        "correctSegmentId": "po",
+        "explain": "The join key is the identifier the whole three-way match is anchored on - the number the invoice cites and the receipt posts against."
       },
       {
-        "id": "q2",
-        "prompt": "The PO says unit price 2.40; the invoice says 2.44. Which is the agreed price?",
-        "options": [
-          { "id": "a", "text": "The invoice - the vendor sets the price" },
-          { "id": "b", "text": "The PO - it records what Beacon and the vendor agreed when ordering" },
-          { "id": "c", "text": "Whichever is higher" }
-        ],
-        "correctOptionId": "b",
-        "explain": "The PO is the agreement. The invoice is a claim against it. A gap between the two is exactly what the tolerance check exists to judge - it does not automatically win."
+        "id": "vendor",
+        "label": "Vendor",
+        "correctSegmentId": "vendor",
+        "explain": "Tag the vendor Beacon ordered from, not the item description - the register names who the order was placed with."
       },
       {
-        "id": "q3",
-        "prompt": "Who owns the PO Register?",
-        "options": [
-          { "id": "a", "text": "The Procurement Lead" },
-          { "id": "b", "text": "The AP Clerk" },
-          { "id": "c", "text": "The vendor" }
-        ],
-        "correctOptionId": "a",
-        "explain": "Procurement raises and owns purchase orders. The AP desk reads the register to match against it, but does not create or edit orders."
+        "id": "quantityOrdered",
+        "label": "Quantity ordered",
+        "correctSegmentId": "qty",
+        "explain": "Tag the count the PO agreed to - the ordered quantity the invoice and receipt are checked against."
       },
       {
-        "id": "q4",
-        "prompt": "Which downstream step depends most directly on this record?",
-        "options": [
-          { "id": "a", "text": "Remittance Advice" },
-          { "id": "b", "text": "Three-Way Match" },
-          { "id": "c", "text": "Payment Archive" }
-        ],
-        "correctOptionId": "b",
-        "explain": "The three-way match reads the PO for the agreed quantity and price, then compares them against the invoice and the receipt. Without the PO there is nothing to match to."
+        "id": "unitPricePO",
+        "label": "Agreed unit price",
+        "correctSegmentId": "poPrice",
+        "explain": "The agreed price is the PO's own figure, not the 2.44 the invoice claims. The gap between them is exactly what the tolerance check judges."
+      },
+      {
+        "id": "poTotal",
+        "label": "PO total",
+        "correctSegmentId": "total",
+        "explain": "Tag the order value Beacon committed to - the PO total the agreed line quantities roll up to."
       }
     ],
     "artifactOnPass": {
@@ -114,7 +113,7 @@
     },
     "heading": "PO inspected",
     "points": [
-      "You answered the four lookup questions: join key, agreed price, owner, and first consumer.",
+      "You tagged each field in the PO register: join key, vendor, quantity, agreed price, and total.",
       "The PO number is the anchor that joins invoice, PO, and receipt into one matchable set.",
       "The PO price is the agreement; the invoice price is a claim the tolerance check will judge.",
       "Your PO source profile is stored - the ordered quantity and agreed price the match depends on.",
