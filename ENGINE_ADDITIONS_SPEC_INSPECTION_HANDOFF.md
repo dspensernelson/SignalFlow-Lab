@@ -1,12 +1,13 @@
 # Engine Additions Spec - Inspection + Handoff Interactions (anti-slop)
 
-> **STATUS: PROPOSED - PENDING OWNER APPROVAL (spec-then-park).** This spec is
-> written to ENGINE_ADDITIONS_SPEC.md fidelity but is NOT implemented. A new
-> interaction type is owner-gated for this initiative (see the builder work
-> order 2026-07-04 and OPEN_QUESTIONS "anti-slop: approve new interaction
-> type(s)"). Do NOT build until the owner approves which type(s) land and how
-> the Gate 4 one-per-module budget is treated. Existing validators' matching
-> rules stay frozen forever; both additions below are ADDITIVE.
+> **STATUS: APPROVED (owner, 2026-07-05) - BOTH types land.** The owner
+> approved `tagSource` and `handoffForm` (DECISION_LOG 2026-07-05), with a
+> Gate 4 budget note: anti-slop interaction types are exempt from the
+> one-per-module cap; the normal one-new-concept-per-module budget resumes
+> after these two. Implement both per this spec and use them in Module 3 to
+> meet the <=25% choiceCheck cap. Existing validators' matching rules stay
+> frozen forever; both additions below are ADDITIVE. Ship each with fixtures,
+> lint coverage, and live no-scroll verification at 1280x800 AND 1366x650.
 
 ## Why this exists
 

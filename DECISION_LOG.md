@@ -2,6 +2,26 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-05 (owner: ship main + approve both anti-slop interaction types)
+
+- SHIP (owner chose "ship it now"): the reviewed stack was merged to main FOR
+  REAL this time. All three PRs retargeted to base main; main fast-forwarded
+  to the module-02-beacon tip (clean FF, main was a strict ancestor, no merge
+  commits); PRs #1/#2/#3 closed as merged. main now carries Modules 1-2 (all
+  tiers), the G0-G3 go-live work, and the anti-slop pass. Supersedes the false
+  2026-07-04 "merged to main" record (that merge had never landed - origin/main
+  was still 792c8b2). Builder's remaining step-0 work: production smoke test on
+  the live URL at both viewport checkpoints, then add the live URL to README.
+- INTERACTION TYPES (owner: APPROVE BOTH): tagSource + handoffForm approved per
+  ENGINE_ADDITIONS_SPEC_INSPECTION_HANDOFF.md. Gate 4 budget note: anti-slop
+  interaction types are exempt from the one-per-module cap (two node kinds,
+  whole-curriculum benefit); the normal one-new-concept-per-module budget
+  resumes afterward. Builder implements both and uses them in Module 3 to meet
+  the <=25% choiceCheck cap.
+- DEPLOY: Vercel may auto-deploy main on the merge push; per the gate-8
+  amendment that counts as the authorized deploy and still requires the smoke
+  test + log.
+
 ## 2026-07-04 (anti-slop 1C - takeaway rhythm variance: DEFERRED)
 
 - 1C was explicitly conditional ("only if 1A + 1B do not refresh the feel").
