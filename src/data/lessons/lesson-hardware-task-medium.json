@@ -1,0 +1,105 @@
+{
+  "id": "lesson-hardware-task-medium",
+  "nodeId": "hardware-task",
+  "title": "Handle a Backordered Laptop",
+  "subtitle": "Capture a blocked physical task honestly",
+  "clock": "SD-2, 10:00 AM",
+  "difficulty": "Intermediate",
+  "skill": "Physical-world handoff",
+  "scenario": "You place the laptop order and get bad news: the standard laptop is backordered, earliest delivery SD+3 - three days AFTER the start. You cannot make it land in time. Capture the handoff honestly as not on track, so the tracker shows blocked and the gate can escalate instead of pretending.",
+  "inputType": "text",
+  "inputLabel": "Hardware task (backordered)",
+  "input": "Task: hardware for hire H-4022 (owner IT Provisioner, due SD-2). The Standard laptop is backordered; earliest delivery is SD+3, after the start date. It cannot arrive by the deadline. Capture the order truthfully: it is not on track, which marks this branch blocked for the tracker.",
+  "instructions": [
+    "Record who placed the order.",
+    "Set the realistic delivery date (the backordered SD+3).",
+    "Mark that it is NOT on track for the start.",
+    "Validate to mint the (blocked) hardware handoff record."
+  ],
+  "interactionType": "handoffForm",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "handoffForm",
+    "fields": [
+      {
+        "id": "orderedBy",
+        "label": "Ordered by",
+        "kind": "select",
+        "options": ["IT Provisioner", "Facilities Coordinator", "Vendor"],
+        "expected": "IT Provisioner",
+        "explain": "The IT Provisioner owns hardware; they placed the order and report the backorder."
+      },
+      {
+        "id": "deliverBy",
+        "label": "Earliest delivery",
+        "kind": "select",
+        "options": ["SD-2", "SD-1", "SD+3"],
+        "expected": "SD+3",
+        "explain": "Record the true earliest delivery (SD+3), not a hopeful date - the tracker and gate must see reality."
+      },
+      {
+        "id": "onTrack",
+        "label": "On track for start",
+        "kind": "select",
+        "options": ["yes", "no"],
+        "expected": "no",
+        "explain": "SD+3 is after the start, so this branch is not on track; marking it honestly is what lets the gate escalate."
+      }
+    ],
+    "artifactOnPass": {
+      "task": "hardware",
+      "orderedBy": "IT Provisioner",
+      "item": "Standard laptop",
+      "deliverBy": "SD+3",
+      "onTrack": "no",
+      "state": "blocked",
+      "blockedReason": "laptop backordered to SD+3"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Capture a backordered hardware handoff: who ordered it, the true earliest delivery (SD+3, after start), and that it is not on track. Honesty here is what lets the gate escalate.",
+  "successMessage": "Backorder captured honestly. The branch is blocked - the gate can now escalate instead of assuming.",
+  "intro": {
+    "heading": "When a physical task cannot make it",
+    "sections": [
+      {
+        "title": "Honesty over optimism",
+        "body": "The worst thing to do with a backorder is record a hopeful date. The tracker and the gate act on what you write; a rosy delivery date turns into a hire with no laptop on day one."
+      },
+      {
+        "title": "Blocked is a real state",
+        "body": "Marking not-on-track sets this branch to blocked. That is not a failure of the workflow - it is the workflow doing its job, surfacing a problem while there is still time to act."
+      },
+      {
+        "title": "The gate needs the truth",
+        "body": "A blocked branch is exactly what the readiness gate is built to catch. Capturing it truthfully is what routes the hire to escalation instead of a silent miss."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A blocked hardware record with a reason. The tracker will show it blocked, and escalation will arrange a loaner."
+      }
+    ],
+    "jsonExample": "{\n  \"onTrack\": \"no\",\n  \"state\": \"blocked\"\n}",
+    "skill": "Physical-world handoff",
+    "artifactName": "hardware-task.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd record the real backorder date and flag it, rather than writing a delivery date you hope comes true.",
+      "tools": {
+        "powerAutomate": "capture the vendor's real ETA; set a blocked flag when it is past start",
+        "zapier": "store the true delivery date and a not-on-track marker",
+        "python": "record deliverBy and mark blocked when deliverBy > start"
+      }
+    },
+    "heading": "Backorder captured",
+    "points": [
+      "You recorded the true earliest delivery (SD+3), not a hopeful one.",
+      "Marking not-on-track sets this branch to blocked - honestly.",
+      "A blocked branch is what the readiness gate exists to catch.",
+      "The captured reason lets escalation arrange a loaner.",
+      "The workflow can now surface a stuck physical task instead of hiding it."
+    ],
+    "artifactName": "hardware-task.json"
+  }
+}

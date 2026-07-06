@@ -1,0 +1,84 @@
+{
+  "id": "lesson-access-task-medium",
+  "nodeId": "access-task",
+  "title": "Grant Access and Revoke a Stale One",
+  "subtitle": "Least-privilege means removing extras too",
+  "clock": "SD-1, 9:00 AM",
+  "difficulty": "Intermediate",
+  "skill": "Least-privilege access",
+  "scenario": "Someone copied a previous hire's access as a shortcut, which left a stale finance-readonly grant Sam's role does not include. Grant the role's real groups and REVOKE the stale one. Least-privilege is not just what you add - it is what you take away.",
+  "inputType": "text",
+  "inputLabel": "Access task (with a stale grant)",
+  "input": "Task: access for hire H-4022 (owner Facilities Coordinator, due SD-1). Role profile groups for Logistics Coordinator: ops-general, warehouse-readonly. A shortcut copied a prior hire, adding finance-readonly - which the role does NOT include. Grant the two profile groups and revoke finance-readonly.",
+  "instructions": [
+    "Grant ops-general and warehouse-readonly (action grant).",
+    "Revoke finance-readonly (action revoke) - it is not in the role profile.",
+    "Set grantedBy to the Facilities Coordinator on each row.",
+    "Return a JSON array of the three rows, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"group\": \"ops-general\", \"grantedBy\": \"\", \"action\": \"\" },\n  { \"group\": \"warehouse-readonly\", \"grantedBy\": \"\", \"action\": \"\" },\n  { \"group\": \"finance-readonly\", \"grantedBy\": \"\", \"action\": \"\" }\n]",
+  "validation": {
+    "type": "jsonRows",
+    "keyField": "group",
+    "rowFields": ["group", "grantedBy", "action"],
+    "numericFields": [],
+    "expectedRows": [
+      { "group": "ops-general", "grantedBy": "Facilities Coordinator", "action": "grant" },
+      { "group": "warehouse-readonly", "grantedBy": "Facilities Coordinator", "action": "grant" },
+      { "group": "finance-readonly", "grantedBy": "Facilities Coordinator", "action": "revoke" }
+    ]
+  },
+  "copilotPrompt": "Build a JSON array of access rows: grant ops-general and warehouse-readonly (the role profile), and revoke finance-readonly (a stale grant not in the profile). Each row has group, grantedBy, action.",
+  "successMessage": "Access reconciled to the role. The stale grant is revoked - least-privilege restored.",
+  "validateLabel": "Validate Grants",
+  "editorHelper": "Grant the role's groups; revoke what the role does not include.",
+  "intro": {
+    "heading": "Least-privilege cuts both ways",
+    "sections": [
+      {
+        "title": "Copying access is a trap",
+        "body": "Cloning a previous hire's access is fast and wrong. It carries over grants the new role never earned. Least-privilege means the access matches the role, not the last person who sat there."
+      },
+      {
+        "title": "Revoking is part of the job",
+        "body": "Adding the right groups is only half of it. A stale grant is a standing risk until someone removes it. Reconciling to the profile means revoking what does not belong."
+      },
+      {
+        "title": "Still sourced from the profile",
+        "body": "Grant and revoke both point back to the role profile: it lists ops-general and warehouse-readonly, so anything else is out. The profile is the authority for both directions."
+      },
+      {
+        "title": "What you produce here",
+        "body": "An access record that grants the role's groups and revokes the stale one - clean, auditable, and least-privilege."
+      }
+    ],
+    "jsonExample": "[\n  { \"group\": \"finance-readonly\", \"action\": \"revoke\" }\n]",
+    "skill": "Least-privilege access",
+    "artifactName": "access-task.json"
+  },
+  "fieldGuide": [
+    { "field": "group", "meaning": "An access group being reconciled.", "type": "string", "example": "\"ops-general\"", "group": "Grant", "lookFor": "which group?", "hint": "The two profile groups plus the stale finance-readonly." },
+    { "field": "grantedBy", "meaning": "Who performed the action.", "type": "string", "example": "\"Facilities Coordinator\"", "group": "Grant", "lookFor": "who did it?", "hint": "The Facilities Coordinator owns access." },
+    { "field": "action", "meaning": "grant a profile group, revoke a stale one.", "type": "string", "example": "\"grant\"", "group": "Grant", "lookFor": "grant or revoke?", "hint": "Grant the profile groups; revoke finance-readonly." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd add the role's groups and strip anything a copy-paste left behind, so access matches the role exactly.",
+      "tools": {
+        "powerAutomate": "Add to profile groups; Remove member for anything off-profile",
+        "zapier": "grant the role groups, remove the stale one",
+        "python": "diff current access against the profile; grant missing, revoke extra"
+      }
+    },
+    "heading": "Access reconciled",
+    "points": [
+      "You granted the role's groups: ops-general and warehouse-readonly.",
+      "You revoked finance-readonly - a stale grant the role never earned.",
+      "Least-privilege is what you remove as much as what you add.",
+      "Both actions trace to the role profile as the authority.",
+      "The workflow can now reconcile access to the role, not to a copied setup."
+    ],
+    "artifactName": "access-task.json"
+  }
+}

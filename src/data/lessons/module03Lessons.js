@@ -27,6 +27,11 @@ import lessonRoleProfileCatalogMedium from './lesson-role-profile-catalog-medium
 import lessonOnboardingRecordMedium from './lesson-onboarding-record-medium.json'
 import lessonSlaPolicyMedium from './lesson-sla-policy-medium.json'
 import lessonProvisioningPlanMedium from './lesson-provisioning-plan-medium.json'
+import lessonAccountsTaskMedium from './lesson-accounts-task-medium.json'
+import lessonHardwareTaskMedium from './lesson-hardware-task-medium.json'
+import lessonAccessTaskMedium from './lesson-access-task-medium.json'
+import lessonPayrollTaskMedium from './lesson-payroll-task-medium.json'
+import lessonTaskTrackerMedium from './lesson-task-tracker-medium.json'
 
 const module03Lessons = {
   // Easy tier
@@ -52,6 +57,11 @@ const module03Lessons = {
   'lesson-onboarding-record-medium': lessonOnboardingRecordMedium,
   'lesson-sla-policy-medium': lessonSlaPolicyMedium,
   'lesson-provisioning-plan-medium': lessonProvisioningPlanMedium,
+  'lesson-accounts-task-medium': lessonAccountsTaskMedium,
+  'lesson-hardware-task-medium': lessonHardwareTaskMedium,
+  'lesson-access-task-medium': lessonAccessTaskMedium,
+  'lesson-payroll-task-medium': lessonPayrollTaskMedium,
+  'lesson-task-tracker-medium': lessonTaskTrackerMedium,
 }
 
 export default module03Lessons

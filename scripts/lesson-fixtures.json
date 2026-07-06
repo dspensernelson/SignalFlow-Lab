@@ -122,6 +122,44 @@
       { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
     ]
   },
+  "lesson-accounts-task-medium": {
+    "correct": { "taskId": "accounts", "existingFound": true, "action": "reused", "accountId": "acct-4022", "state": "done" },
+    "wrong": { "taskId": "accounts", "existingFound": true, "action": "created", "accountId": "acct-4022", "state": "done" }
+  },
+  "lesson-hardware-task-medium": {
+    "correct": { "orderedBy": "IT Provisioner", "deliverBy": "SD+3", "onTrack": "no" },
+    "wrong": { "orderedBy": "IT Provisioner", "deliverBy": "SD+3", "onTrack": "yes" }
+  },
+  "lesson-access-task-medium": {
+    "correct": [
+      { "group": "ops-general", "grantedBy": "Facilities Coordinator", "action": "grant" },
+      { "group": "warehouse-readonly", "grantedBy": "Facilities Coordinator", "action": "grant" },
+      { "group": "finance-readonly", "grantedBy": "Facilities Coordinator", "action": "revoke" }
+    ],
+    "wrong": [
+      { "group": "ops-general", "grantedBy": "Facilities Coordinator", "action": "grant" },
+      { "group": "warehouse-readonly", "grantedBy": "Facilities Coordinator", "action": "grant" },
+      { "group": "finance-readonly", "grantedBy": "Facilities Coordinator", "action": "grant" }
+    ]
+  },
+  "lesson-payroll-task-medium": {
+    "correct": { "sentTo": "Payroll Specialist", "payClass": "Non-exempt / Hourly", "priority": "rush" },
+    "wrong": { "sentTo": "Payroll Specialist", "payClass": "Non-exempt / Hourly", "priority": "standard" }
+  },
+  "lesson-task-tracker-medium": {
+    "correct": [
+      { "taskId": "accounts", "state": "done", "blockedReason": "" },
+      { "taskId": "hardware", "state": "blocked", "blockedReason": "laptop backordered to SD+3" },
+      { "taskId": "access", "state": "done", "blockedReason": "" },
+      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+    ],
+    "wrong": [
+      { "taskId": "accounts", "state": "done", "blockedReason": "" },
+      { "taskId": "hardware", "state": "done", "blockedReason": "" },
+      { "taskId": "access", "state": "done", "blockedReason": "" },
+      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+    ]
+  },
 
   "lesson-intake": {
     "correct": { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": "$142/MWh", "generationFlag": "Wind underperformed", "approvalRequired": true },
