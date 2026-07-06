@@ -6,24 +6,27 @@ The first project is **Meridian Morning Market Brief**, a fictional energy-marke
 
 **Live:** https://signal-flow-lab.vercel.app (production, auto-deployed from green `main`).
 
-## Current Status (2026-07-05, main - MODULES 1-2 COMPLETE + SHIPPED + anti-slop pass)
+## Current Status (2026-07-06, feat/module-03-harbor - MODULE 3 COMPLETE, all tiers)
 
 Where things stand if you are picking this back up:
 
-- **Shipped and live.** The whole reviewed history (Modules 1-2 all tiers, the
-  go-live patch, and the anti-slop pass) is merged to `main` and deployed at
-  https://signal-flow-lab.vercel.app. End-to-end smoke test passed at both
-  1280x800 and 1366x650 (fresh-profile welcome, wrong-answer no-scroll,
-  tier-completion card, project switch + recurrence card, console clean).
-- **Anti-slop pass complete.** The choiceCheck share is capped at <=25% per
-  module at the map gate (`scripts/lint-lessons.mjs`) - a hard error for
-  module-03+, a grandfathered warning for module-01 (28.6%) and module-02
-  (47.5%). A data-driven "you have seen this shape before" card
-  (`src/data/moduleSkeleton.json`) shows once per module (module-02+), mapping
-  the module onto the shared Meridian skeleton. Two new interaction types -
-  `tagSource` and `handoffForm`
-  (`ENGINE_ADDITIONS_SPEC_INSPECTION_HANDOFF.md`) - are owner-approved and
-  next up to build.
+- **Module 3 (Harbor Onboarding) is COMPLETE across all three tiers** (Easy
+  16/16, Medium 16/16, Hard 6/6 = 38 lessons). It teaches ORCHESTRATION:
+  four provisioning branches run in parallel against SLAs, a readiness gate
+  fans in on ALL tasks (one blocked task blocks the hire), and the deliverable
+  is `day-one-package.md`. Easy is a clean hire; Medium is a messy second hire
+  (moved/amended start, backordered laptop -> blocked -> escalation -> loaner ->
+  degraded package, idempotent re-run); Hard is 6 curated drills including the
+  mandatory solo-rebuild `artifactImport` capstone on the readiness gate. No new
+  engine type was needed (the task-tracker board uses `jsonDeltas`). choiceCheck
+  is 5.3% (2/38), well under the <=25% cap. Live no-scroll verified at 1280x800
+  and 1366x650 in the wrong-answer state across every component (tagSource,
+  templateSlots, jsonEditor, jsonDeltas, handoffForm, artifactImport). Canon:
+  `curriculum/module-03/canon.json` + `easy/_OVERVIEW.md`.
+- **The two anti-slop interaction types shipped and are in use.** `tagSource`
+  and `handoffForm` (`ENGINE_ADDITIONS_SPEC_INSPECTION_HANDOFF.md`) were built
+  (merged to `main`) and are spent across Module 3's inspection and handoff
+  nodes to hold the choiceCheck cap.
 
 - **Module 2 (Beacon Invoice Desk) is COMPLETE across all three tiers** (Easy
   17/17, Medium 17/17, Hard 5/5). Easy operates the AP pipeline on a clean
