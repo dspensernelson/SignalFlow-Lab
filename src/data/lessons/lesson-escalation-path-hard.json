@@ -1,0 +1,86 @@
+{
+  "id": "lesson-escalation-path-hard",
+  "nodeId": "escalation-path",
+  "title": "Escalate an Unresponsive Owner",
+  "difficulty": "Hard",
+  "skill": "Escalation ladder at scale",
+  "scenario": "The gate escalated a blocked task to its owner - and the owner has gone quiet past the deadline. Escalating once is not enough. Design the next rung of the ladder: when the first owner is unresponsive, escalate up with a firmer deadline so a stuck task cannot stall indefinitely.",
+  "inputType": "text",
+  "inputLabel": "Unresponsive escalation",
+  "input": "Hire H-4022 has a blocked hardware task. It was escalated to the IT Provisioner with a deadline of SD-2. It is now SD-2 and the IT Provisioner has not responded (level1Responded = false). Ladder rule: if the level-1 owner is unresponsive by the deadline, escalate to the People Ops Lead with a firm final deadline of SD-1. Capture the ladder.",
+  "instructions": [
+    "Record the blocked task and the level-1 owner and deadline.",
+    "Record that level 1 did not respond.",
+    "Escalate to the level-2 owner (People Ops Lead) with a firm final deadline.",
+    "Return one JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"blockedTask\": \"\",\n  \"level1Owner\": \"\",\n  \"level1Deadline\": \"\",\n  \"level1Responded\": true,\n  \"level2Owner\": \"\",\n  \"finalDeadline\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["blockedTask", "level1Owner", "level1Deadline", "level1Responded", "level2Owner", "finalDeadline"],
+    "expected": {
+      "blockedTask": "hardware",
+      "level1Owner": "IT Provisioner",
+      "level1Deadline": "SD-2",
+      "level1Responded": false,
+      "level2Owner": "People Ops Lead",
+      "finalDeadline": "SD-1"
+    }
+  },
+  "copilotPrompt": "Encode an escalation ladder: blockedTask hardware, level1Owner IT Provisioner with level1Deadline SD-2, level1Responded false, escalate to level2Owner People Ops Lead with finalDeadline SD-1.",
+  "successMessage": "Ladder captured. An unresponsive owner no longer stalls the hire - it climbs to the next rung.",
+  "validateLabel": "Validate Ladder",
+  "editorHelper": "One rung is not a ladder - escalate up when level 1 goes quiet.",
+  "intro": {
+    "heading": "When escalation itself stalls",
+    "sections": [
+      {
+        "title": "Owners go quiet",
+        "body": "At scale, some escalations sit. A single escalation with no next step is a wish, not a mechanism. The ladder is what turns silence into the next accountable person."
+      },
+      {
+        "title": "Each rung is firmer",
+        "body": "The level-2 deadline (SD-1) is tighter than level 1 because time is running out. Escalation ladders compress as the start date approaches - urgency increases with each rung."
+      },
+      {
+        "title": "Up to whom",
+        "body": "When the IT Provisioner is unresponsive, the People Ops Lead - who owns the onboarding outcome - is the next rung. The ladder climbs toward broader accountability, not sideways."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A two-rung ladder record: who was asked, that they were silent, and who now owns it with a firm deadline."
+      }
+    ],
+    "jsonExample": "{\n  \"level1Responded\": false,\n  \"level2Owner\": \"People Ops Lead\"\n}",
+    "skill": "Escalation ladder at scale",
+    "artifactName": "escalation-record.json"
+  },
+  "fieldGuide": [
+    { "field": "blockedTask", "meaning": "The task that is blocked.", "type": "string", "example": "\"hardware\"", "group": "Block", "lookFor": "which task?", "hint": "Hardware." },
+    { "field": "level1Owner", "meaning": "The first owner escalated to.", "type": "string", "example": "\"IT Provisioner\"", "group": "Level 1", "lookFor": "first owner?", "hint": "The IT Provisioner." },
+    { "field": "level1Deadline", "meaning": "The level-1 deadline.", "type": "string", "example": "\"SD-2\"", "group": "Level 1", "lookFor": "by when?", "hint": "SD-2." },
+    { "field": "level1Responded", "meaning": "Whether level 1 responded in time.", "type": "boolean", "example": "false", "group": "Level 1", "lookFor": "did they answer?", "hint": "They did not, so false." },
+    { "field": "level2Owner", "meaning": "The next rung's owner.", "type": "string", "example": "\"People Ops Lead\"", "group": "Level 2", "lookFor": "escalate to?", "hint": "The People Ops Lead." },
+    { "field": "finalDeadline", "meaning": "The firm final deadline.", "type": "string", "example": "\"SD-1\"", "group": "Level 2", "lookFor": "final by when?", "hint": "SD-1 (tighter)." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd give the owner a deadline, and if they went silent, take it to their lead with a firm date rather than letting it drift.",
+      "tools": {
+        "powerAutomate": "a wait-with-timeout; on no response, reassign to the next owner",
+        "zapier": "a delay + check; escalate to level 2 if unresolved",
+        "python": "if not responded_by(deadline): escalate(level2, final_deadline)"
+      }
+    },
+    "heading": "Ladder captured",
+    "points": [
+      "You escalated past an unresponsive owner to the next rung.",
+      "The level-2 deadline is firmer as the start date nears.",
+      "The ladder climbs toward broader accountability (People Ops Lead).",
+      "A silent owner no longer stalls the hire indefinitely.",
+      "The workflow can now keep a stuck task moving when an owner goes quiet."
+    ],
+    "artifactName": "escalation-record.json"
+  }
+}

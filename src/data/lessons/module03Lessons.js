@@ -38,6 +38,13 @@ import lessonDayOnePackageMedium from './lesson-day-one-package-medium.json'
 import lessonManagerHandoffMedium from './lesson-manager-handoff-medium.json'
 import lessonOnboardingArchiveMedium from './lesson-onboarding-archive-medium.json'
 import lessonProfileFeedbackMedium from './lesson-profile-feedback-medium.json'
+// Hard tier
+import lessonReadinessGateHard from './lesson-readiness-gate-hard.json'
+import lessonSlaPolicyHard from './lesson-sla-policy-hard.json'
+import lessonEscalationPathHard from './lesson-escalation-path-hard.json'
+import lessonDayOnePackageHard from './lesson-day-one-package-hard.json'
+import lessonAccountsTaskHard from './lesson-accounts-task-hard.json'
+import lessonTaskTrackerHard from './lesson-task-tracker-hard.json'
 
 const module03Lessons = {
   // Easy tier
@@ -74,6 +81,13 @@ const module03Lessons = {
   'lesson-manager-handoff-medium': lessonManagerHandoffMedium,
   'lesson-onboarding-archive-medium': lessonOnboardingArchiveMedium,
   'lesson-profile-feedback-medium': lessonProfileFeedbackMedium,
+  // Hard tier
+  'lesson-readiness-gate-hard': lessonReadinessGateHard,
+  'lesson-sla-policy-hard': lessonSlaPolicyHard,
+  'lesson-escalation-path-hard': lessonEscalationPathHard,
+  'lesson-day-one-package-hard': lessonDayOnePackageHard,
+  'lesson-accounts-task-hard': lessonAccountsTaskHard,
+  'lesson-task-tracker-hard': lessonTaskTrackerHard,
 }
 
 export default module03Lessons

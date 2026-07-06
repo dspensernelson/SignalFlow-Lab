@@ -1,0 +1,82 @@
+{
+  "id": "lesson-day-one-package-hard",
+  "nodeId": "day-one-package",
+  "title": "Decide: Start Anyway or Delay",
+  "difficulty": "Hard",
+  "skill": "Governed judgement",
+  "scenario": "A hire has a blocked task the evening before start. Someone must decide: start anyway with a workaround, or delay the start. This is a governed judgement, not a gut call. Encode the decision and the rule that justifies it, so the same call is made the same way every time.",
+  "inputType": "text",
+  "inputLabel": "Degraded-mode decision",
+  "input": "Hire H-4022, evening before start. Blocked task: hardware (laptop backordered). A loaner is available (a workaround). No critical task is blocked - accounts, access, and payroll are all done. Governed rule: START ANYWAY when the only blocks are non-critical AND a workaround exists; DELAY when a critical task (accounts, access, or payroll) is blocked with no workaround. Encode the decision.",
+  "instructions": [
+    "Record whether a critical task is blocked (accounts, access, or payroll).",
+    "Record whether a workaround is available.",
+    "Apply the rule to set the decision (start-anyway or delay).",
+    "Return one JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"blockedTask\": \"hardware\",\n  \"criticalBlocked\": true,\n  \"workaroundAvailable\": false,\n  \"decision\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["blockedTask", "criticalBlocked", "workaroundAvailable", "decision"],
+    "expected": {
+      "blockedTask": "hardware",
+      "criticalBlocked": false,
+      "workaroundAvailable": true,
+      "decision": "start-anyway"
+    }
+  },
+  "copilotPrompt": "Encode the degraded-mode decision: blockedTask hardware, criticalBlocked false (accounts/access/payroll are done), workaroundAvailable true (loaner), so decision start-anyway per the governed rule.",
+  "successMessage": "Decision governed. A non-critical block with a workaround means start anyway - and the rule says why.",
+  "validateLabel": "Validate Decision",
+  "editorHelper": "Apply the rule - the decision must follow from the inputs.",
+  "intro": {
+    "heading": "Judgement, encoded",
+    "sections": [
+      {
+        "title": "Not every block delays a start",
+        "body": "A missing laptop with a loaner on hand should not cost someone their start date. A missing payroll enrollment might. The difference is what critical means - and the rule makes it explicit."
+      },
+      {
+        "title": "Critical vs non-critical",
+        "body": "Accounts, access, and payroll gate the hire's ability to work and be paid - critical. Hardware has workarounds. Naming which blocks are critical is what turns a judgement into a repeatable rule."
+      },
+      {
+        "title": "The decision must follow the rule",
+        "body": "Given non-critical block plus a workaround, the answer is start-anyway - every time, for every reviewer. A governed decision removes the coin-flip and the favoritism."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A decision record whose value is entailed by its inputs and the rule - auditable, consistent, defensible."
+      }
+    ],
+    "jsonExample": "{\n  \"criticalBlocked\": false,\n  \"decision\": \"start-anyway\"\n}",
+    "skill": "Governed judgement",
+    "artifactName": "day-one-decision.json"
+  },
+  "fieldGuide": [
+    { "field": "blockedTask", "meaning": "The blocked task under review.", "type": "string", "example": "\"hardware\"", "group": "Inputs", "lookFor": "what is blocked?", "hint": "Hardware." },
+    { "field": "criticalBlocked", "meaning": "Whether a critical task (accounts/access/payroll) is blocked.", "type": "boolean", "example": "false", "group": "Inputs", "lookFor": "critical blocked?", "hint": "Only hardware is blocked, so false." },
+    { "field": "workaroundAvailable", "meaning": "Whether a workaround exists.", "type": "boolean", "example": "true", "group": "Inputs", "lookFor": "workaround?", "hint": "A loaner exists, so true." },
+    { "field": "decision", "meaning": "The governed decision from the rule.", "type": "string", "example": "\"start-anyway\"", "group": "Decision", "lookFor": "start or delay?", "hint": "Non-critical block + workaround -> start-anyway." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd have a written rule for what counts as a blocker worth delaying a start, so the call is consistent no matter who makes it.",
+      "tools": {
+        "powerAutomate": "a decision table: critical + no workaround -> delay; else start",
+        "zapier": "Paths keyed on criticalBlocked and workaroundAvailable",
+        "python": "decision = 'delay' if critical and not workaround else 'start-anyway'"
+      }
+    },
+    "heading": "Decision governed",
+    "points": [
+      "You encoded a start-vs-delay decision from an explicit rule.",
+      "Critical (accounts/access/payroll) versus non-critical made the call clear.",
+      "A non-critical block with a workaround means start-anyway - consistently.",
+      "The decision follows from its inputs, so it is auditable and fair.",
+      "The workflow can now make the hardest call the same way every time."
+    ],
+    "artifactName": "day-one-decision.json"
+  }
+}
