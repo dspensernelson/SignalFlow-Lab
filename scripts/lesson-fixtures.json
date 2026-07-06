@@ -10,6 +10,33 @@
     "wrong": { "approvedBy": "AP Clerk", "confirms": "Batch complete and control totals correct", "beforeCutoff": "yes" }
   },
 
+  "lesson-signed-offer": {
+    "correct": { "candidateName": "candidate", "role": "role", "startDate": "start", "manager": "manager" },
+    "wrong": { "candidateName": "recruiter", "role": "role", "startDate": "start", "manager": "manager" }
+  },
+  "lesson-onboarding-record": {
+    "correct": { "hireId": "H-4021", "name": "Jordan Lee", "role": "Logistics Coordinator", "department": "Operations", "startDate": "SD", "manager": "Hiring Manager" },
+    "wrong": { "hireId": "H-4021", "name": "Jordan Lee", "role": "Logistics Coordinator", "department": "Operations", "startDate": "SD-1", "manager": "Hiring Manager" }
+  },
+  "lesson-sla-policy": {
+    "correct": { "policyName": "Onboarding SLA Policy", "version": "1.0.0", "owner": "People Ops Lead", "accountsSla": 2, "hardwareSla": 1, "accessSla": 1, "payrollSla": 3 },
+    "wrong": { "policyName": "Onboarding SLA Policy", "version": "1.0.0", "owner": "People Ops Lead", "accountsSla": 2, "hardwareSla": 1, "accessSla": 1, "payrollSla": 1 }
+  },
+  "lesson-provisioning-plan": {
+    "correct": [
+      { "taskId": "accounts", "owner": "IT Provisioner", "due": "SD-2" },
+      { "taskId": "hardware", "owner": "IT Provisioner", "due": "SD-1" },
+      { "taskId": "access", "owner": "Facilities Coordinator", "due": "SD-1" },
+      { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
+    ],
+    "wrong": [
+      { "taskId": "accounts", "owner": "Facilities Coordinator", "due": "SD-2" },
+      { "taskId": "hardware", "owner": "IT Provisioner", "due": "SD-1" },
+      { "taskId": "access", "owner": "Facilities Coordinator", "due": "SD-1" },
+      { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
+    ]
+  },
+
   "lesson-intake": {
     "correct": { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": "$142/MWh", "generationFlag": "Wind underperformed", "approvalRequired": true },
     "wrong": { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": "$142/MWh", "generationFlag": "Wind underperformed", "approvalRequired": false }

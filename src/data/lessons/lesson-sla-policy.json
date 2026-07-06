@@ -1,0 +1,140 @@
+{
+  "id": "lesson-sla-policy",
+  "nodeId": "sla-policy",
+  "title": "Set the Onboarding SLA Policy",
+  "subtitle": "Deadlines in business days before the start date",
+  "clock": "SD-5, 1:00 PM",
+  "difficulty": "Beginner",
+  "skill": "Governance & config-as-rules",
+  "scenario": "It is SD-5. Before the plan can assign due dates, Harbor needs an agreed SLA policy - written once, owned, and versioned - so no provisioning task invents its own deadline. Record each task's deadline as business days before the start date.",
+  "inputType": "text",
+  "inputLabel": "SLA policy brief",
+  "input": "People Ops has agreed onboarding service levels, measured in business days before the start date (SD). Payroll must be enrolled earliest - 3 business days before start (SD-3) - so the hire lands in the first pay cycle. Accounts are due 2 business days before (SD-2). Hardware and building/system access are due 1 business day before (SD-1). The policy is owned by the People Ops Lead and changes are versioned. Record this as version 1.0.0.",
+  "instructions": [
+    "Read the SLA brief and note each task's deadline in business days before start.",
+    "Set accountsSla, hardwareSla, accessSla, and payrollSla as plain numbers (days before SD).",
+    "Record the policy name, owner, and a version.",
+    "Payroll is earliest, so payrollSla must be greater than accountsSla, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"policyName\": \"Onboarding SLA Policy\",\n  \"version\": \"\",\n  \"owner\": \"\",\n  \"accountsSla\": 0,\n  \"hardwareSla\": 0,\n  \"accessSla\": 0,\n  \"payrollSla\": 0\n}",
+  "validation": {
+    "type": "jsonPolicy",
+    "requiredFields": ["policyName", "version", "owner", "accountsSla", "hardwareSla", "accessSla", "payrollSla"],
+    "numericFields": ["accountsSla", "hardwareSla", "accessSla", "payrollSla"],
+    "nonEmptyFields": ["policyName", "version", "owner"],
+    "ordering": { "greater": "payrollSla", "than": "accountsSla" }
+  },
+  "copilotPrompt": "Draft a JSON onboarding SLA policy with policyName, version, owner, and four deadlines as plain numbers of business days before start: accountsSla, hardwareSla, accessSla, payrollSla. Make payroll the earliest (largest days before start).",
+  "successMessage": "SLA policy set and versioned. The provisioning plan can now stamp each task with an owned deadline instead of a guess.",
+  "validateLabel": "Validate Policy",
+  "editorHelper": "Write the deadlines once, as owned config every task reads.",
+  "intro": {
+    "heading": "Before you plan: what 'on time' means",
+    "sections": [
+      {
+        "title": "SLAs are fields, not folklore",
+        "body": "How early each task must finish is a governed value, not something each provisioner remembers differently. Writing it down once means the plan and the gate apply the same deadlines."
+      },
+      {
+        "title": "Relative to the start date",
+        "body": "Every deadline is measured backward from SD - the start date. SD-3 means three business days before. Store the number of days so the plan can compute a real due date from any hire's start."
+      },
+      {
+        "title": "Payroll leads for a reason",
+        "body": "Payroll is due earliest (SD-3) because enrollment has to land before the first pay cycle. Ordering the deadlines encodes that dependency: payroll before accounts before the day-of tasks."
+      },
+      {
+        "title": "Owned and versioned",
+        "body": "The People Ops Lead owns the policy and every change is versioned. A shorter SLA buys margin before day one but strains the provisioning teams - so the number is a governed decision."
+      }
+    ],
+    "jsonExample": "{\n  \"payrollSla\": 3,\n  \"accountsSla\": 2,\n  \"accessSla\": 1\n}",
+    "skill": "Governance & config-as-rules",
+    "artifactName": "sla-policy.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "policyName",
+      "meaning": "The name of this SLA policy.",
+      "type": "string",
+      "example": "\"Onboarding SLA Policy\"",
+      "group": "Governance",
+      "lookFor": "what policy is this?",
+      "hint": "Use the policy name from the brief."
+    },
+    {
+      "field": "version",
+      "meaning": "The version so future changes can be tracked.",
+      "type": "string",
+      "example": "\"1.0.0\"",
+      "group": "Governance",
+      "lookFor": "which version?",
+      "hint": "Record 1.0.0 for the first version."
+    },
+    {
+      "field": "owner",
+      "meaning": "Who owns and approves changes to the policy.",
+      "type": "string",
+      "example": "\"People Ops Lead\"",
+      "group": "Governance",
+      "lookFor": "who owns it?",
+      "hint": "The People Ops Lead owns onboarding SLAs."
+    },
+    {
+      "field": "accountsSla",
+      "meaning": "Business days before start that accounts are due.",
+      "type": "number",
+      "example": "2",
+      "group": "Deadlines",
+      "lookFor": "accounts by when?",
+      "hint": "SD-2 means 2 business days before - store the number 2."
+    },
+    {
+      "field": "hardwareSla",
+      "meaning": "Business days before start that hardware is due.",
+      "type": "number",
+      "example": "1",
+      "group": "Deadlines",
+      "lookFor": "hardware by when?",
+      "hint": "SD-1 means 1 business day before - store 1."
+    },
+    {
+      "field": "accessSla",
+      "meaning": "Business days before start that access is due.",
+      "type": "number",
+      "example": "1",
+      "group": "Deadlines",
+      "lookFor": "access by when?",
+      "hint": "SD-1 means 1 business day before - store 1."
+    },
+    {
+      "field": "payrollSla",
+      "meaning": "Business days before start that payroll is due.",
+      "type": "number",
+      "example": "3",
+      "group": "Deadlines",
+      "lookFor": "payroll by when?",
+      "hint": "SD-3 means 3 business days before - store 3 (the earliest deadline)."
+    }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd write a short SLA table (task -> days before start) your team agrees on, then compute each hire's due dates from their start date.",
+      "tools": {
+        "powerAutomate": "a config list of task SLAs, with due dates computed via addDays from the start date",
+        "zapier": "a lookup table of SLAs feeding a date-math step",
+        "python": "an sla dict of days-before-start, subtracted from the start date"
+      }
+    },
+    "heading": "SLA policy set",
+    "points": [
+      "You recorded each task's deadline as business days before the start date.",
+      "Payroll leads (SD-3) so enrollment lands before the first pay cycle - the ordering is deliberate.",
+      "The People Ops Lead owns the policy and it is versioned, so deadlines are governed, not guessed.",
+      "The plan can now stamp every task with a real due date derived from the hire's start.",
+      "The workflow can now say what 'on time' means for every provisioning task."
+    ],
+    "artifactName": "sla-policy.json"
+  }
+}

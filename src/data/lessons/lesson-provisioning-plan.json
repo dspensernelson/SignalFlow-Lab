@@ -1,0 +1,109 @@
+{
+  "id": "lesson-provisioning-plan",
+  "nodeId": "provisioning-plan",
+  "title": "Expand the Provisioning Plan",
+  "subtitle": "Turn the role profile into owned, dated tasks",
+  "clock": "SD-4, 9:00 AM",
+  "difficulty": "Beginner",
+  "skill": "Expansion & task planning",
+  "scenario": "It is SD-4. You have the onboarding record, the role profile, and the SLA policy. Expand them into the concrete plan the four branches run: one row per task, each with an owner and a due date computed from the start date. This is the plan the whole parallel phase executes against.",
+  "inputType": "text",
+  "inputLabel": "Plan inputs",
+  "input": "Onboarding record: Jordan Lee (H-4021), Logistics Coordinator, start date SD.\nRole profile tasks: accounts, hardware, access, payroll.\nOwners: accounts -> IT Provisioner; hardware -> IT Provisioner; access -> Facilities Coordinator; payroll -> Payroll Specialist.\nSLA policy (business days before start): accounts SD-2, hardware SD-1, access SD-1, payroll SD-3.\nBuild one row per task with taskId, owner, and due (as SD-N).",
+  "instructions": [
+    "Create one row per task: accounts, hardware, access, payroll.",
+    "Set each row's owner from the owners list.",
+    "Set each row's due from the SLA policy, written as SD-N (for example SD-2).",
+    "Return a JSON array of the four task rows, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"taskId\": \"accounts\", \"owner\": \"\", \"due\": \"\" },\n  { \"taskId\": \"hardware\", \"owner\": \"\", \"due\": \"\" },\n  { \"taskId\": \"access\", \"owner\": \"\", \"due\": \"\" },\n  { \"taskId\": \"payroll\", \"owner\": \"\", \"due\": \"\" }\n]",
+  "validation": {
+    "type": "jsonRows",
+    "keyField": "taskId",
+    "rowFields": ["taskId", "owner", "due"],
+    "numericFields": [],
+    "expectedRows": [
+      { "taskId": "accounts", "owner": "IT Provisioner", "due": "SD-2" },
+      { "taskId": "hardware", "owner": "IT Provisioner", "due": "SD-1" },
+      { "taskId": "access", "owner": "Facilities Coordinator", "due": "SD-1" },
+      { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
+    ]
+  },
+  "copilotPrompt": "Build a JSON array of four provisioning tasks (accounts, hardware, access, payroll). Each row has taskId, owner, and due. Set owner from the owners list and due from the SLA policy as SD-N.",
+  "successMessage": "Provisioning plan built. Four owned, dated tasks are ready to run in parallel.",
+  "validateLabel": "Validate Plan",
+  "editorHelper": "One row per task - each with an owner and a due date.",
+  "intro": {
+    "heading": "Before the branches run: the plan",
+    "sections": [
+      {
+        "title": "Expansion turns a role into work",
+        "body": "The role profile says what the hire gets; the plan turns each entitlement into an accountable task. Expansion is the step where 'Logistics Coordinator' becomes four concrete, ownable jobs."
+      },
+      {
+        "title": "Every task has one owner",
+        "body": "A task with no owner is how a start date slips. Each row names exactly one accountable owner, so nothing is 'someone will handle it'."
+      },
+      {
+        "title": "Due dates come from the SLA policy",
+        "body": "You do not invent deadlines here - you apply the governed SLA policy, writing each due date as SD-N. The plan is where policy becomes a schedule."
+      },
+      {
+        "title": "One plan, four parallel branches",
+        "body": "These four rows unlock together and run at the same time. The plan is the shared contract the accounts, hardware, access, and payroll branches all execute against."
+      }
+    ],
+    "jsonExample": "[\n  { \"taskId\": \"accounts\", \"owner\": \"IT Provisioner\", \"due\": \"SD-2\" }\n]",
+    "skill": "Expansion & task planning",
+    "artifactName": "provisioning-plan.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "taskId",
+      "meaning": "The provisioning task this row plans.",
+      "type": "string",
+      "example": "\"accounts\"",
+      "group": "Task",
+      "lookFor": "which task?",
+      "hint": "One of accounts, hardware, access, payroll."
+    },
+    {
+      "field": "owner",
+      "meaning": "The single accountable owner of the task.",
+      "type": "string",
+      "example": "\"IT Provisioner\"",
+      "group": "Task",
+      "lookFor": "who owns it?",
+      "hint": "Copy the owner from the owners list exactly."
+    },
+    {
+      "field": "due",
+      "meaning": "The deadline as business days before start (SD-N).",
+      "type": "string",
+      "example": "\"SD-2\"",
+      "group": "Task",
+      "lookFor": "due when?",
+      "hint": "Apply the SLA policy: accounts SD-2, hardware SD-1, access SD-1, payroll SD-3."
+    }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd expand your onboarding checklist into one row per task with an owner and a due date, then assign them all at once.",
+      "tools": {
+        "powerAutomate": "Apply to each entitlement -> Create a task with an assignee and due date",
+        "zapier": "loop the role's tasks into 'Create Task' with owner and due",
+        "python": "build a list of task dicts from the profile, stamping owner and due"
+      }
+    },
+    "heading": "Provisioning plan built",
+    "points": [
+      "You expanded the role profile into four owned, dated tasks.",
+      "Each task has exactly one accountable owner, so nothing is unassigned.",
+      "Due dates apply the SLA policy (SD-N), not invented deadlines.",
+      "The four rows are the shared contract the parallel branches execute against.",
+      "The workflow can now run four provisioning tasks in parallel against one plan."
+    ],
+    "artifactName": "provisioning-plan.json"
+  }
+}

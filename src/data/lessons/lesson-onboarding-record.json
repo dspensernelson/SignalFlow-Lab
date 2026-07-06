@@ -1,0 +1,136 @@
+{
+  "id": "lesson-onboarding-record",
+  "nodeId": "onboarding-record",
+  "title": "Build the Onboarding Record",
+  "subtitle": "Key the master record from the signed offer",
+  "clock": "SD-5, 11:00 AM",
+  "difficulty": "Beginner",
+  "skill": "Structured capture",
+  "scenario": "It is SD-5. The offer is profiled; now turn it into the master record every provisioning branch reads. Key one structured Onboarding Record - who, role, department, start date, and manager - so nothing downstream ever has to re-read the letter.",
+  "inputType": "text",
+  "inputLabel": "Offer profile (from the Signed Offer)",
+  "input": "From the offer source profile: new hire Jordan Lee (hire id H-4021), role Logistics Coordinator, department Operations, start date SD (Monday), reports to the Hiring Manager.",
+  "instructions": [
+    "Capture the hire id and the new hire's name.",
+    "Record the role and department exactly as the profile states them.",
+    "Set the start date to SD (the authoritative clock) and the manager.",
+    "Return one valid JSON object with those fields, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"hireId\": \"\",\n  \"name\": \"\",\n  \"role\": \"\",\n  \"department\": \"\",\n  \"startDate\": \"\",\n  \"manager\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["hireId", "name", "role", "department", "startDate", "manager"],
+    "expected": {
+      "hireId": "H-4021",
+      "name": "Jordan Lee",
+      "role": "Logistics Coordinator",
+      "department": "Operations",
+      "startDate": "SD",
+      "manager": "Hiring Manager"
+    }
+  },
+  "copilotPrompt": "Build one JSON onboarding record from the offer profile: hireId, name, role, department, startDate (SD), and manager. Copy role and department exactly as stated.",
+  "successMessage": "Onboarding Record built. Every provisioning branch now reads this record instead of the offer letter.",
+  "validateLabel": "Validate Record",
+  "editorHelper": "Create one JSON object the four provisioning branches reuse.",
+  "intro": {
+    "heading": "Before you provision: one master record",
+    "sections": [
+      {
+        "title": "What this record does",
+        "body": "The Onboarding Record is the first trusted object of the run. The plan, all four tasks, the gate, and the package read it - never the raw offer letter."
+      },
+      {
+        "title": "The start date drives everything",
+        "body": "Store the start date as SD, the authoritative clock. Every SLA in the plan is computed backward from it, so this one field ends up in every downstream deadline."
+      },
+      {
+        "title": "Copy exactly",
+        "body": "Role and department must match the catalog's spelling exactly - 'Logistics Coordinator', 'Operations' - because the provisioning plan looks the role up by name."
+      },
+      {
+        "title": "Who reuses it",
+        "body": "One record, many readers. Keying it once and correctly is what lets four branches run in parallel without re-reading the source."
+      }
+    ],
+    "jsonExample": "{\n  \"hireId\": \"H-0000\",\n  \"role\": \"Logistics Coordinator\",\n  \"startDate\": \"SD\"\n}",
+    "skill": "Structured capture",
+    "artifactName": "onboarding-record.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "hireId",
+      "meaning": "Harbor's identifier for this hire.",
+      "type": "string",
+      "example": "\"H-4021\"",
+      "group": "Identity",
+      "lookFor": "which hire is this?",
+      "hint": "The H-#### id from the offer profile."
+    },
+    {
+      "field": "name",
+      "meaning": "The new hire's full name.",
+      "type": "string",
+      "example": "\"Jordan Lee\"",
+      "group": "Identity",
+      "lookFor": "who is being onboarded?",
+      "hint": "The candidate name from the offer."
+    },
+    {
+      "field": "role",
+      "meaning": "The role title that drives entitlements.",
+      "type": "string",
+      "example": "\"Logistics Coordinator\"",
+      "group": "Assignment",
+      "lookFor": "what role are they in?",
+      "hint": "Copy the title exactly so the plan can look it up."
+    },
+    {
+      "field": "department",
+      "meaning": "The department the role sits in.",
+      "type": "string",
+      "example": "\"Operations\"",
+      "group": "Assignment",
+      "lookFor": "which department?",
+      "hint": "The department named on the offer."
+    },
+    {
+      "field": "startDate",
+      "meaning": "The first day - the clock every SLA counts back from.",
+      "type": "string",
+      "example": "\"SD\"",
+      "group": "Schedule",
+      "lookFor": "when do they start?",
+      "hint": "Use SD (start date); the plan derives SD-1, SD-2, SD-3 from it."
+    },
+    {
+      "field": "manager",
+      "meaning": "Who receives the Day-One Package.",
+      "type": "string",
+      "example": "\"Hiring Manager\"",
+      "group": "Assignment",
+      "lookFor": "who do they report to?",
+      "hint": "The 'reports to' from the offer - the Hiring Manager."
+    }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd type the hire's core fields into your onboarding sheet once, then have every checklist item read from that row instead of the offer email.",
+      "tools": {
+        "powerAutomate": "a Dataverse 'Create row' for the new-hire record from the offer trigger",
+        "zapier": "'Create Record' mapping the offer fields into one row",
+        "python": "assemble the fields into a dict / row keyed by hireId"
+      }
+    },
+    "heading": "Onboarding Record built",
+    "points": [
+      "You keyed the master record: hire id, name, role, department, start date, and manager.",
+      "The start date is stored as SD - the clock every SLA in the plan counts backward from.",
+      "Role and department match the catalog exactly, so the plan can look the role up.",
+      "One trusted record now feeds all four provisioning branches instead of the raw offer.",
+      "The workflow can now provision one hire from a single structured record."
+    ],
+    "artifactName": "onboarding-record.json"
+  }
+}

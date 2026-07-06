@@ -1,0 +1,22 @@
+{
+  "_comment": "Machine-checkable canon for Module 3 (Harbor Onboarding), enforced by scripts/lint-lessons.mjs. Same contract as Modules 1-2: each assertion resolves a path inside a lesson JSON and compares it to the canonical value (ops: equals, includes). The prose canon lives in curriculum/module-03/<tier>/_OVERVIEW.md; THIS file prevents cross-lesson drift. Assertions are added per lesson as the tier is built. Dates are relative to the start date (SD); SLA values are in business days.",
+  "module": "module-03",
+  "derivations": [],
+  "assertions": [
+    { "lesson": "lesson-signed-offer", "path": "validation.artifactOnPass.role", "op": "equals", "value": "Logistics Coordinator" },
+    { "lesson": "lesson-signed-offer", "path": "validation.artifactOnPass.startDate", "op": "equals", "value": "SD" },
+    { "lesson": "lesson-role-profile-catalog", "path": "validation.artifactOnPass.role", "op": "equals", "value": "Logistics Coordinator" },
+    { "lesson": "lesson-role-profile-catalog", "path": "validation.artifactOnPass.payClass", "op": "equals", "value": "Non-exempt / Hourly" },
+    { "lesson": "lesson-role-profile-catalog", "path": "validation.artifactOnPass.accessGroups", "op": "includes", "value": "ops-general" },
+    { "lesson": "lesson-role-profile-catalog", "path": "validation.artifactOnPass.accessGroups", "op": "includes", "value": "warehouse-readonly" },
+    { "lesson": "lesson-onboarding-record", "path": "validation.expected.role", "op": "equals", "value": "Logistics Coordinator" },
+    { "lesson": "lesson-onboarding-record", "path": "validation.expected.department", "op": "equals", "value": "Operations" },
+    { "lesson": "lesson-onboarding-record", "path": "validation.expected.startDate", "op": "equals", "value": "SD" },
+    { "lesson": "lesson-onboarding-record", "path": "validation.expected.hireId", "op": "equals", "value": "H-4021" },
+    { "lesson": "lesson-provisioning-plan", "path": "validation.expectedRows[taskId=accounts].due", "op": "equals", "value": "SD-2" },
+    { "lesson": "lesson-provisioning-plan", "path": "validation.expectedRows[taskId=hardware].due", "op": "equals", "value": "SD-1" },
+    { "lesson": "lesson-provisioning-plan", "path": "validation.expectedRows[taskId=access].due", "op": "equals", "value": "SD-1" },
+    { "lesson": "lesson-provisioning-plan", "path": "validation.expectedRows[taskId=payroll].due", "op": "equals", "value": "SD-3" },
+    { "lesson": "lesson-provisioning-plan", "path": "validation.expectedRows[taskId=payroll].owner", "op": "equals", "value": "Payroll Specialist" }
+  ]
+}
