@@ -23,6 +23,13 @@
     { "lesson": "lesson-hardware-task", "path": "validation.artifactOnPass.deliverBy", "op": "equals", "value": "SD-1" },
     { "lesson": "lesson-access-task", "path": "validation.expectedRows[group=ops-general].grantedBy", "op": "equals", "value": "Facilities Coordinator" },
     { "lesson": "lesson-accounts-task", "path": "validation.expected.accountId", "op": "equals", "value": "acct-4021" },
-    { "lesson": "lesson-task-tracker", "path": "validation.expectedRows[taskId=accounts].state", "op": "equals", "value": "done" }
+    { "lesson": "lesson-task-tracker", "path": "validation.expectedRows[taskId=accounts].state", "op": "equals", "value": "done" },
+    { "lesson": "lesson-readiness-gate", "path": "validation.expected.route", "op": "equals", "value": "day-one-package" },
+    { "lesson": "lesson-readiness-gate", "path": "validation.expected.ready", "op": "equals", "value": true },
+    { "lesson": "lesson-day-one-package", "path": "validation.slots[id=role].expected", "op": "equals", "value": "Logistics Coordinator" },
+    { "lesson": "lesson-day-one-package", "path": "validation.slots[id=hireName].expected", "op": "equals", "value": "Jordan Lee" },
+    { "lesson": "lesson-onboarding-archive", "path": "validation.expected.hireId", "op": "equals", "value": "H-4021" },
+    { "lesson": "lesson-profile-feedback", "path": "validation.expected.role", "op": "equals", "value": "Logistics Coordinator" },
+    { "lesson": "lesson-profile-feedback", "path": "validation.expected.routedTo", "op": "equals", "value": "People Ops Lead" }
   ]
 }

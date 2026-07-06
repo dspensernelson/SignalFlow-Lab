@@ -1,0 +1,102 @@
+{
+  "id": "lesson-manager-handoff",
+  "nodeId": "manager-handoff",
+  "title": "Hand Off to the Manager",
+  "subtitle": "Capture the manager's acknowledgement",
+  "clock": "SD-1, 5:30 PM",
+  "difficulty": "Beginner",
+  "skill": "Delivery handoff",
+  "scenario": "It is SD-1, 5:30 PM. The package is assembled; now it goes to the person who owns the new hire's first day. Deliver it to the hiring manager and capture their acknowledgement. A delivery nobody confirmed is not a handoff.",
+  "inputType": "text",
+  "inputLabel": "Delivery (from the Day-One Package)",
+  "input": "The Day-One Package for hire H-4021 is ready. It is delivered to the Hiring Manager for acknowledgement the evening before the start (SD-1). Capture who acknowledged it, that they confirmed the hire is ready, and when.",
+  "instructions": [
+    "Record who acknowledged the package (the hiring manager).",
+    "Confirm they acknowledged the hire is ready.",
+    "Capture when the acknowledgement happened.",
+    "Validate to mint the acknowledgement record."
+  ],
+  "interactionType": "handoffForm",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "handoffForm",
+    "fields": [
+      {
+        "id": "acknowledgedBy",
+        "label": "Acknowledged by",
+        "kind": "select",
+        "options": ["Hiring Manager", "People Ops Lead", "Recruiter"],
+        "expected": "Hiring Manager",
+        "explain": "The hiring manager owns the new hire's first day; they are the one who acknowledges the package, not People Ops or the recruiter."
+      },
+      {
+        "id": "readyConfirmed",
+        "label": "Ready confirmed",
+        "kind": "select",
+        "options": ["yes", "no"],
+        "expected": "yes",
+        "explain": "The acknowledgement is the manager confirming the hire is ready; without it the delivery is unproven."
+      },
+      {
+        "id": "acknowledgedAt",
+        "label": "Acknowledged at",
+        "kind": "select",
+        "options": ["SD-1 5:00 PM", "SD 9:00 AM", "SD+1 9:00 AM"],
+        "expected": "SD-1 5:00 PM",
+        "explain": "Acknowledging the evening before (SD-1) leaves time to fix a surprise; a start-day acknowledgement is too late to react."
+      }
+    ],
+    "artifactOnPass": {
+      "handoff": "manager-handoff",
+      "acknowledgedBy": "Hiring Manager",
+      "readyConfirmed": "yes",
+      "acknowledgedAt": "SD-1 5:00 PM"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Capture the manager handoff for onboarding: who acknowledged the Day-One Package, that they confirmed the hire is ready, and when (the evening before the start).",
+  "successMessage": "Handoff acknowledged. The hiring manager confirmed the hire is ready the evening before day one.",
+  "intro": {
+    "heading": "Before the archive: an accountable receipt",
+    "sections": [
+      {
+        "title": "Delivery is not the same as handoff",
+        "body": "Sending the package is not the end. A handoff is complete only when the receiver acknowledges it. The hiring manager's confirmation is what makes the hire truly owned on day one."
+      },
+      {
+        "title": "Who owns day one",
+        "body": "People Ops and IT provisioned the hire, but the hiring manager owns their first morning. The acknowledgement transfers ownership cleanly to the person who greets them Monday."
+      },
+      {
+        "title": "The evening before matters",
+        "body": "Acknowledging on SD-1 leaves a window to fix a surprise. If the manager spots a gap the night before, there is still time; on the start morning there is not."
+      },
+      {
+        "title": "What you produce here",
+        "body": "An acknowledgement record that closes the delivery loop and gets archived with the run - proof the manager confirmed readiness."
+      }
+    ],
+    "jsonExample": "{\n  \"acknowledgedBy\": \"Hiring Manager\",\n  \"readyConfirmed\": \"yes\"\n}",
+    "skill": "Delivery handoff",
+    "artifactName": "manager-acknowledgement.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd send the readiness summary to the manager and wait for a 'got it, looks good' reply before considering onboarding closed.",
+      "tools": {
+        "powerAutomate": "'Start and wait for an approval' on the package to the manager",
+        "zapier": "send the package, capture the manager's confirmation reply",
+        "python": "record the manager's acknowledgement {by, confirmed, at}"
+      }
+    },
+    "heading": "Handoff acknowledged",
+    "points": [
+      "You captured the hiring manager's acknowledgement of the package.",
+      "The manager confirmed the hire is ready - the delivery is now proven.",
+      "Acknowledging on SD-1 leaves time to fix a surprise before day one.",
+      "Ownership of the first day passed cleanly to the hiring manager.",
+      "The workflow can now close onboarding with an accountable receipt."
+    ],
+    "artifactName": "manager-acknowledgement.json"
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "id": "lesson-profile-feedback",
+  "nodeId": "profile-feedback",
+  "title": "Close the Loop: Profile Feedback",
+  "subtitle": "Turn the archive into a catalog improvement",
+  "clock": "SD, 9:00 AM",
+  "difficulty": "Beginner",
+  "skill": "Reference improvement (loop close)",
+  "scenario": "It is the start date, 9:00 AM. The archived run holds a small lesson: on day one, the Logistics Coordinator needed a handheld scanner that the role profile never listed. Turn that observation into a proposed catalog change and route it to the owner. This is how the workflow gets smarter each run.",
+  "inputType": "text",
+  "inputLabel": "From the onboarding archive",
+  "input": "Archive note for hire H-4021 (Logistics Coordinator): on day one the hire needed a handheld scanner to do the job, but the role profile did not list it (inProfile = false). Propose adding it to the catalog and route the change to the People Ops Lead, who owns the catalog.",
+  "instructions": [
+    "Record the role and what the hire needed.",
+    "Note whether it was already in the profile (inProfile).",
+    "Set the proposed change (add) and route it to the catalog owner.",
+    "Return one valid JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"role\": \"\",\n  \"needed\": \"\",\n  \"inProfile\": true,\n  \"proposedChange\": \"\",\n  \"routedTo\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["role", "needed", "inProfile", "proposedChange", "routedTo"],
+    "expected": {
+      "role": "Logistics Coordinator",
+      "needed": "handheld scanner",
+      "inProfile": false,
+      "proposedChange": "add",
+      "routedTo": "People Ops Lead"
+    }
+  },
+  "copilotPrompt": "Build one JSON profile-feedback record: role, needed, inProfile (boolean), proposedChange, and routedTo. The hire needed a handheld scanner not in the profile, so inProfile is false, proposedChange is add, routed to the People Ops Lead.",
+  "successMessage": "Loop closed. The catalog owner has a concrete, governed proposal from what this run actually taught.",
+  "validateLabel": "Validate Feedback",
+  "editorHelper": "Propose the change - the owner ratifies it, you do not rewrite the catalog.",
+  "intro": {
+    "heading": "The loop close: teach the catalog",
+    "sections": [
+      {
+        "title": "Every run is a lesson",
+        "body": "The archive is not just for audit. It holds what the role actually needed versus what the profile listed. Feeding that back is how the catalog stops being a guess and becomes evidence-based."
+      },
+      {
+        "title": "Propose, do not rewrite",
+        "body": "Feedback routes a proposed change to the People Ops Lead, who owns the catalog. It does not silently edit the matrix - governance still decides. The loop informs; the owner ratifies."
+      },
+      {
+        "title": "Concrete beats vague",
+        "body": "'The profile was incomplete' helps no one. 'Add a handheld scanner for Logistics Coordinator' is a change someone can approve. Specific feedback is what actually improves the next hire."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A profile-feedback record that closes the temporal loop into the role profile catalog - the same catalog the next hire's plan will expand."
+      }
+    ],
+    "jsonExample": "{\n  \"needed\": \"handheld scanner\",\n  \"proposedChange\": \"add\"\n}",
+    "skill": "Reference improvement (loop close)",
+    "artifactName": "profile-feedback.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "role",
+      "meaning": "The role the feedback is about.",
+      "type": "string",
+      "example": "\"Logistics Coordinator\"",
+      "group": "Subject",
+      "lookFor": "which role?",
+      "hint": "The role from the archive: Logistics Coordinator."
+    },
+    {
+      "field": "needed",
+      "meaning": "What the hire actually needed on day one.",
+      "type": "string",
+      "example": "\"handheld scanner\"",
+      "group": "Observation",
+      "lookFor": "what was missing?",
+      "hint": "The item the profile did not list: a handheld scanner."
+    },
+    {
+      "field": "inProfile",
+      "meaning": "Whether it was already in the role profile.",
+      "type": "boolean",
+      "example": "false",
+      "group": "Observation",
+      "lookFor": "already listed?",
+      "hint": "It was not listed, so the boolean false."
+    },
+    {
+      "field": "proposedChange",
+      "meaning": "The change proposed to the catalog.",
+      "type": "string",
+      "example": "\"add\"",
+      "group": "Proposal",
+      "lookFor": "add or remove?",
+      "hint": "Propose to add the missing item."
+    },
+    {
+      "field": "routedTo",
+      "meaning": "The catalog owner who ratifies the change.",
+      "type": "string",
+      "example": "\"People Ops Lead\"",
+      "group": "Proposal",
+      "lookFor": "who approves?",
+      "hint": "The People Ops Lead owns the catalog."
+    }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd jot 'this role also needs a scanner' after onboarding and send it to whoever owns the role checklist to update.",
+      "tools": {
+        "powerAutomate": "create a catalog change-request item assigned to People Ops",
+        "zapier": "append the proposal to a change-request table and notify the owner",
+        "python": "emit a {role, needed, proposedChange} request to the catalog owner"
+      }
+    },
+    "heading": "Loop closed",
+    "points": [
+      "You turned an archive observation into a concrete catalog proposal.",
+      "The change is routed to the People Ops Lead - proposed, not silently applied.",
+      "Specific feedback (add a handheld scanner) is something an owner can act on.",
+      "The feedback closes the temporal loop back into the role profile catalog.",
+      "The workflow can now improve the catalog from what each run actually taught."
+    ],
+    "artifactName": "profile-feedback.json"
+  }
+}
