@@ -15,6 +15,12 @@ import lessonHardwareTask from './lesson-hardware-task.json'
 import lessonAccessTask from './lesson-access-task.json'
 import lessonPayrollTask from './lesson-payroll-task.json'
 import lessonTaskTracker from './lesson-task-tracker.json'
+import lessonReadinessGate from './lesson-readiness-gate.json'
+import lessonEscalationPath from './lesson-escalation-path.json'
+import lessonDayOnePackage from './lesson-day-one-package.json'
+import lessonManagerHandoff from './lesson-manager-handoff.json'
+import lessonOnboardingArchive from './lesson-onboarding-archive.json'
+import lessonProfileFeedback from './lesson-profile-feedback.json'
 
 const module03Lessons = {
   // Easy tier
@@ -28,6 +34,12 @@ const module03Lessons = {
   'lesson-access-task': lessonAccessTask,
   'lesson-payroll-task': lessonPayrollTask,
   'lesson-task-tracker': lessonTaskTracker,
+  'lesson-readiness-gate': lessonReadinessGate,
+  'lesson-escalation-path': lessonEscalationPath,
+  'lesson-day-one-package': lessonDayOnePackage,
+  'lesson-manager-handoff': lessonManagerHandoff,
+  'lesson-onboarding-archive': lessonOnboardingArchive,
+  'lesson-profile-feedback': lessonProfileFeedback,
 }
 
 export default module03Lessons

@@ -72,6 +72,30 @@
       { "taskId": "payroll", "state": "done", "blockedReason": "" }
     ]
   },
+  "lesson-readiness-gate": {
+    "correct": { "allTasksDone": true, "anyBlocked": false, "ready": true, "route": "day-one-package" },
+    "wrong": { "allTasksDone": true, "anyBlocked": false, "ready": false, "route": "escalation-path" }
+  },
+  "lesson-escalation-path": {
+    "correct": { "blockedTask": "background check", "owner": "People Ops Lead", "resolveBy": "SD-2" },
+    "wrong": { "blockedTask": "accounts", "owner": "People Ops Lead", "resolveBy": "SD-2" }
+  },
+  "lesson-day-one-package": {
+    "correct": { "hireName": "Jordan Lee", "role": "Logistics Coordinator", "startDate": "SD", "readiness": "Day-One Ready", "accountsState": "done", "hardwareState": "done", "accessState": "done", "payrollState": "done" },
+    "wrong": { "hireName": "Jordan Lee", "role": "Logistics Coordinator", "startDate": "SD", "readiness": "pending", "accountsState": "done", "hardwareState": "done", "accessState": "done", "payrollState": "done" }
+  },
+  "lesson-manager-handoff": {
+    "correct": { "acknowledgedBy": "Hiring Manager", "readyConfirmed": "yes", "acknowledgedAt": "SD-1 5:00 PM" },
+    "wrong": { "acknowledgedBy": "Recruiter", "readyConfirmed": "yes", "acknowledgedAt": "SD-1 5:00 PM" }
+  },
+  "lesson-onboarding-archive": {
+    "correct": { "hireId": "H-4021", "archivedRun": "onboarding-H-4021", "retention": "7 years", "seedsCatalog": true },
+    "wrong": { "hireId": "H-4021", "archivedRun": "onboarding-H-4021", "retention": "7 years", "seedsCatalog": false }
+  },
+  "lesson-profile-feedback": {
+    "correct": { "role": "Logistics Coordinator", "needed": "handheld scanner", "inProfile": false, "proposedChange": "add", "routedTo": "People Ops Lead" },
+    "wrong": { "role": "Logistics Coordinator", "needed": "handheld scanner", "inProfile": true, "proposedChange": "add", "routedTo": "People Ops Lead" }
+  },
 
   "lesson-intake": {
     "correct": { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": "$142/MWh", "generationFlag": "Wind underperformed", "approvalRequired": true },

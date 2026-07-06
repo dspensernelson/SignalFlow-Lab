@@ -1,0 +1,116 @@
+{
+  "id": "lesson-readiness-gate",
+  "nodeId": "readiness-gate",
+  "title": "Encode the Readiness Gate",
+  "subtitle": "Ready only when ALL four tasks are done",
+  "clock": "SD-1, 4:00 PM",
+  "difficulty": "Beginner",
+  "skill": "Completion gate (fan-in)",
+  "scenario": "It is SD-1, 4:00 PM. The tracker shows all four tasks done. Encode the gate that decides readiness: the hire is Day-One Ready only when every task is done - not most, all. Route a clean hire to the package; anything blocked would go to escalation.",
+  "inputType": "text",
+  "inputLabel": "Task tracker (fan-in input)",
+  "input": "Task tracker for hire H-4021: accounts done, hardware done, access done, payroll done. No task is blocked. Gate rule: ready is true only when ALL four tasks are done AND none is blocked. Ready -> route to day-one-package; not ready -> route to escalation-path.",
+  "instructions": [
+    "Read all four task states from the tracker.",
+    "Set allTasksDone and anyBlocked from the fan-in (all done, none blocked).",
+    "Set ready to true only when every task is done and none is blocked.",
+    "Route a ready hire to day-one-package, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"allTasksDone\": false,\n  \"anyBlocked\": false,\n  \"ready\": false,\n  \"route\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["allTasksDone", "anyBlocked", "ready", "route"],
+    "expected": {
+      "allTasksDone": true,
+      "anyBlocked": false,
+      "ready": true,
+      "route": "day-one-package"
+    }
+  },
+  "copilotPrompt": "Encode a readiness gate as JSON: allTasksDone, anyBlocked, ready (booleans), and route. Ready is true only when all four tasks are done and none is blocked; a ready hire routes to day-one-package.",
+  "successMessage": "Gate encoded. Because every task is done, the hire is Day-One Ready and routes to the package.",
+  "validateLabel": "Validate Gate",
+  "editorHelper": "Ready means ALL done - the fan-in is on every task, not most.",
+  "intro": {
+    "heading": "Before the package: fan in on all",
+    "sections": [
+      {
+        "title": "A gate is a join, not a sum",
+        "body": "The four branches ran in parallel; the gate is where they fan back in. Readiness is not 'most done' or a score - it is an AND across every task. One unfinished task means not ready."
+      },
+      {
+        "title": "The orchestration invariant",
+        "body": "This is the concept the whole module exists to teach: one blocked task blocks the hire no matter how many others succeeded. That is what makes parallel work reliable instead of hopeful."
+      },
+      {
+        "title": "Two clean exits",
+        "body": "The gate has exactly two routes: ready hires go to the package, everything else goes to escalation. No silent third path where a half-ready hire slips through."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A gate result the package and escalation both read. Because this run is clean, it routes to day-one-package; the medium tier blocks a task to send it the other way."
+      }
+    ],
+    "jsonExample": "{\n  \"ready\": true,\n  \"route\": \"day-one-package\"\n}",
+    "skill": "Completion gate (fan-in)",
+    "artifactName": "readiness-gate.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "allTasksDone",
+      "meaning": "Whether every one of the four tasks is done.",
+      "type": "boolean",
+      "example": "true",
+      "group": "Fan-in",
+      "lookFor": "all four done?",
+      "hint": "All four are done, so the boolean true."
+    },
+    {
+      "field": "anyBlocked",
+      "meaning": "Whether any task is blocked.",
+      "type": "boolean",
+      "example": "false",
+      "group": "Fan-in",
+      "lookFor": "anything blocked?",
+      "hint": "None is blocked, so the boolean false."
+    },
+    {
+      "field": "ready",
+      "meaning": "Day-One Ready only when all done and none blocked.",
+      "type": "boolean",
+      "example": "true",
+      "group": "Decision",
+      "lookFor": "ready?",
+      "hint": "All done and none blocked, so true."
+    },
+    {
+      "field": "route",
+      "meaning": "Where the hire goes next.",
+      "type": "string",
+      "example": "\"day-one-package\"",
+      "group": "Decision",
+      "lookFor": "route where?",
+      "hint": "A ready hire routes to day-one-package."
+    }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd only build the package once every checklist item was ticked - one open item and you stop and chase it, not proceed.",
+      "tools": {
+        "powerAutomate": "a Condition that all task statuses equal done before the assemble branch",
+        "zapier": "a Filter that only continues when every task field is done",
+        "python": "all(t['state'] == 'done' for t in tasks) gates the package"
+      }
+    },
+    "heading": "Gate encoded",
+    "points": [
+      "You encoded readiness as an AND across all four tasks - the fan-in.",
+      "One blocked task would block the hire no matter how many others were done.",
+      "The gate has exactly two routes: package when ready, escalation otherwise.",
+      "This clean run is ready, so it routes to day-one-package.",
+      "The workflow can now gate day-one readiness on every task, not most."
+    ],
+    "artifactName": "readiness-gate.json"
+  }
+}
