@@ -30,6 +30,12 @@
     { "lesson": "lesson-day-one-package", "path": "validation.slots[id=hireName].expected", "op": "equals", "value": "Jordan Lee" },
     { "lesson": "lesson-onboarding-archive", "path": "validation.expected.hireId", "op": "equals", "value": "H-4021" },
     { "lesson": "lesson-profile-feedback", "path": "validation.expected.role", "op": "equals", "value": "Logistics Coordinator" },
-    { "lesson": "lesson-profile-feedback", "path": "validation.expected.routedTo", "op": "equals", "value": "People Ops Lead" }
+    { "lesson": "lesson-profile-feedback", "path": "validation.expected.routedTo", "op": "equals", "value": "People Ops Lead" },
+    { "lesson": "lesson-signed-offer-medium", "path": "validation.artifactOnPass.startDate", "op": "equals", "value": "SD" },
+    { "lesson": "lesson-signed-offer-medium", "path": "validation.artifactOnPass.startDateAmended", "op": "equals", "value": true },
+    { "lesson": "lesson-role-profile-catalog-medium", "path": "validation.artifactOnPass.version", "op": "equals", "value": "1.1.0" },
+    { "lesson": "lesson-onboarding-record-medium", "path": "validation.expected.startDateAmended", "op": "equals", "value": true },
+    { "lesson": "lesson-provisioning-plan-medium", "path": "validation.expectedRows[taskId=hardware].due", "op": "equals", "value": "SD-2" },
+    { "lesson": "lesson-provisioning-plan-medium", "path": "validation.expectedRows[taskId=payroll].due", "op": "equals", "value": "SD-3" }
   ]
 }

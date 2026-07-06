@@ -21,6 +21,12 @@ import lessonDayOnePackage from './lesson-day-one-package.json'
 import lessonManagerHandoff from './lesson-manager-handoff.json'
 import lessonOnboardingArchive from './lesson-onboarding-archive.json'
 import lessonProfileFeedback from './lesson-profile-feedback.json'
+// Medium tier
+import lessonSignedOfferMedium from './lesson-signed-offer-medium.json'
+import lessonRoleProfileCatalogMedium from './lesson-role-profile-catalog-medium.json'
+import lessonOnboardingRecordMedium from './lesson-onboarding-record-medium.json'
+import lessonSlaPolicyMedium from './lesson-sla-policy-medium.json'
+import lessonProvisioningPlanMedium from './lesson-provisioning-plan-medium.json'
 
 const module03Lessons = {
   // Easy tier
@@ -40,6 +46,12 @@ const module03Lessons = {
   'lesson-manager-handoff': lessonManagerHandoff,
   'lesson-onboarding-archive': lessonOnboardingArchive,
   'lesson-profile-feedback': lessonProfileFeedback,
+  // Medium tier
+  'lesson-signed-offer-medium': lessonSignedOfferMedium,
+  'lesson-role-profile-catalog-medium': lessonRoleProfileCatalogMedium,
+  'lesson-onboarding-record-medium': lessonOnboardingRecordMedium,
+  'lesson-sla-policy-medium': lessonSlaPolicyMedium,
+  'lesson-provisioning-plan-medium': lessonProvisioningPlanMedium,
 }
 
 export default module03Lessons

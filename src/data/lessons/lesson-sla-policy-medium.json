@@ -1,0 +1,84 @@
+{
+  "id": "lesson-sla-policy-medium",
+  "nodeId": "sla-policy",
+  "title": "Revise the SLA Policy",
+  "subtitle": "Add slack after a near-miss - versioned",
+  "clock": "SD-5, 1:00 PM",
+  "difficulty": "Intermediate",
+  "skill": "Governance & config-as-rules",
+  "scenario": "After a laptop nearly missed a start date, People Ops revised the SLA policy: hardware now has more slack, due 2 business days before start instead of 1. Record the revised, versioned policy - a governed change, not a quiet edit.",
+  "inputType": "text",
+  "inputLabel": "SLA policy revision brief",
+  "input": "Revision after a near-miss: hardware moves from SD-1 to SD-2 so a slow delivery has a day of margin. Unchanged: payroll SD-3 (earliest, for the pay cycle), accounts SD-2, access SD-1. Owned by the People Ops Lead. Bump the version to 1.1.0.",
+  "instructions": [
+    "Set the four deadlines as plain numbers of business days before start.",
+    "Move hardwareSla to 2 (the added slack); keep payroll 3, accounts 2, access 1.",
+    "Record the owner and bump version to 1.1.0.",
+    "Payroll stays earliest, so payrollSla must exceed accessSla, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"policyName\": \"Onboarding SLA Policy\",\n  \"version\": \"\",\n  \"owner\": \"\",\n  \"accountsSla\": 0,\n  \"hardwareSla\": 0,\n  \"accessSla\": 0,\n  \"payrollSla\": 0\n}",
+  "validation": {
+    "type": "jsonPolicy",
+    "requiredFields": ["policyName", "version", "owner", "accountsSla", "hardwareSla", "accessSla", "payrollSla"],
+    "numericFields": ["accountsSla", "hardwareSla", "accessSla", "payrollSla"],
+    "nonEmptyFields": ["policyName", "version", "owner"],
+    "ordering": { "greater": "payrollSla", "than": "accessSla" }
+  },
+  "copilotPrompt": "Draft a revised onboarding SLA policy: hardwareSla now 2 (more slack), payrollSla 3, accountsSla 2, accessSla 1, owner People Ops Lead, version 1.1.0. Payroll stays the earliest.",
+  "successMessage": "Policy revised and versioned. Hardware now has a day of slack, and the change is tracked.",
+  "validateLabel": "Validate Policy",
+  "editorHelper": "A governed change: revise the number, bump the version.",
+  "intro": {
+    "heading": "Before you plan: policy learns too",
+    "sections": [
+      {
+        "title": "Rules change with evidence",
+        "body": "A near-miss is data. Moving hardware to SD-2 builds in margin so a slow shipment does not become a missed start. Governance is how a lesson becomes a rule."
+      },
+      {
+        "title": "Version every change",
+        "body": "Bumping to 1.1.0 keeps the policy auditable: what changed, when, and why. A quiet edit to a deadline is how nobody remembers the rule six months later."
+      },
+      {
+        "title": "Ordering still holds",
+        "body": "Payroll stays earliest for the pay cycle. Changing one deadline must not break the dependencies the ordering encodes."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A revised, versioned SLA policy the plan applies - now with hardware slack."
+      }
+    ],
+    "jsonExample": "{\n  \"hardwareSla\": 2,\n  \"version\": \"1.1.0\"\n}",
+    "skill": "Governance & config-as-rules",
+    "artifactName": "sla-policy.json"
+  },
+  "fieldGuide": [
+    { "field": "policyName", "meaning": "The policy name.", "type": "string", "example": "\"Onboarding SLA Policy\"", "group": "Governance", "lookFor": "which policy?", "hint": "Use the policy name." },
+    { "field": "version", "meaning": "The revised version.", "type": "string", "example": "\"1.1.0\"", "group": "Governance", "lookFor": "which version?", "hint": "Bump to 1.1.0." },
+    { "field": "owner", "meaning": "Who owns the policy.", "type": "string", "example": "\"People Ops Lead\"", "group": "Governance", "lookFor": "who owns it?", "hint": "The People Ops Lead." },
+    { "field": "accountsSla", "meaning": "Days before start accounts are due.", "type": "number", "example": "2", "group": "Deadlines", "lookFor": "accounts when?", "hint": "Unchanged: 2." },
+    { "field": "hardwareSla", "meaning": "Days before start hardware is due.", "type": "number", "example": "2", "group": "Deadlines", "lookFor": "hardware when?", "hint": "Revised to 2 (added slack)." },
+    { "field": "accessSla", "meaning": "Days before start access is due.", "type": "number", "example": "1", "group": "Deadlines", "lookFor": "access when?", "hint": "Unchanged: 1." },
+    { "field": "payrollSla", "meaning": "Days before start payroll is due.", "type": "number", "example": "3", "group": "Deadlines", "lookFor": "payroll when?", "hint": "Unchanged: 3 (earliest)." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd update the SLA table after the near-miss and note the version, so the team plans with the new margin.",
+      "tools": {
+        "powerAutomate": "publish a new version of the SLA config list",
+        "zapier": "update the SLA lookup table and log the change",
+        "python": "bump the sla policy version and the hardware value"
+      }
+    },
+    "heading": "Policy revised",
+    "points": [
+      "You added hardware slack (SD-2) after a near-miss - a governed change.",
+      "The version bump to 1.1.0 keeps the revision auditable.",
+      "Payroll stays earliest; the ordering dependency held.",
+      "The plan will apply the revised deadlines automatically.",
+      "The workflow can now evolve its deadlines from real onboarding experience."
+    ],
+    "artifactName": "sla-policy.json"
+  }
+}

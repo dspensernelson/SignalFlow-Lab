@@ -1,0 +1,88 @@
+{
+  "id": "lesson-onboarding-record-medium",
+  "nodeId": "onboarding-record",
+  "title": "Build the Record for a Moved Start",
+  "subtitle": "Capture the amended start and flag it",
+  "clock": "SD-5, 11:00 AM",
+  "difficulty": "Intermediate",
+  "skill": "Structured capture",
+  "scenario": "The amended offer is profiled. Build Sam Rivera's onboarding record with the AMENDED start date, and flag that the start moved so downstream steps recompute rather than trust a cached plan.",
+  "inputType": "text",
+  "inputLabel": "Offer profile (amended)",
+  "input": "From the offer profile: new hire Sam Rivera (hire id H-4022), role Logistics Coordinator, department Operations, amended start date SD (moved earlier from SD+2), reports to the Hiring Manager. The start was amended, so record startDateAmended = true.",
+  "instructions": [
+    "Capture the hire id and name.",
+    "Record role and department exactly.",
+    "Set startDate to the amended SD and startDateAmended to true.",
+    "Return one valid JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"hireId\": \"\",\n  \"name\": \"\",\n  \"role\": \"\",\n  \"department\": \"\",\n  \"startDate\": \"\",\n  \"startDateAmended\": false\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["hireId", "name", "role", "department", "startDate", "startDateAmended"],
+    "expected": {
+      "hireId": "H-4022",
+      "name": "Sam Rivera",
+      "role": "Logistics Coordinator",
+      "department": "Operations",
+      "startDate": "SD",
+      "startDateAmended": true
+    }
+  },
+  "copilotPrompt": "Build one JSON onboarding record: hireId, name, role, department, startDate (SD), and startDateAmended (boolean true, since the start moved).",
+  "successMessage": "Record built with the amended start flagged. Downstream steps will recompute, not cache.",
+  "validateLabel": "Validate Record",
+  "editorHelper": "Capture the amended start and flag that it moved.",
+  "intro": {
+    "heading": "Before you provision: record the move",
+    "sections": [
+      {
+        "title": "The record is still the master",
+        "body": "Every branch reads this record. If it holds the amended start and flags the move, the whole run works to the right day - one wrong date here propagates everywhere."
+      },
+      {
+        "title": "Flag the amendment",
+        "body": "startDateAmended is not decoration. It tells the plan and gate that any cached deadline is stale and must be recomputed from the new start."
+      },
+      {
+        "title": "Copy exactly",
+        "body": "Role and department still match the catalog spelling so the plan can look the role up - the mess is the date, not the role."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A master record with the authoritative start and an amendment flag the recompute depends on."
+      }
+    ],
+    "jsonExample": "{\n  \"startDate\": \"SD\",\n  \"startDateAmended\": true\n}",
+    "skill": "Structured capture",
+    "artifactName": "onboarding-record.json"
+  },
+  "fieldGuide": [
+    { "field": "hireId", "meaning": "Harbor's id for this hire.", "type": "string", "example": "\"H-4022\"", "group": "Identity", "lookFor": "which hire?", "hint": "The id H-4022." },
+    { "field": "name", "meaning": "The new hire's name.", "type": "string", "example": "\"Sam Rivera\"", "group": "Identity", "lookFor": "who?", "hint": "Sam Rivera." },
+    { "field": "role", "meaning": "The role that drives entitlements.", "type": "string", "example": "\"Logistics Coordinator\"", "group": "Assignment", "lookFor": "what role?", "hint": "Copy the title exactly." },
+    { "field": "department", "meaning": "The department the role sits in.", "type": "string", "example": "\"Operations\"", "group": "Assignment", "lookFor": "which department?", "hint": "Operations." },
+    { "field": "startDate", "meaning": "The authoritative (amended) start.", "type": "string", "example": "\"SD\"", "group": "Schedule", "lookFor": "when do they start?", "hint": "The amended start is SD." },
+    { "field": "startDateAmended", "meaning": "Whether the start moved.", "type": "boolean", "example": "true", "group": "Schedule", "lookFor": "did it move?", "hint": "It moved, so the boolean true." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd update the hire's row with the new start date and a note that it changed, so nobody works to the old day.",
+      "tools": {
+        "powerAutomate": "update the record's start date and set an 'amended' flag",
+        "zapier": "write the new start and a changed marker to the row",
+        "python": "store startDate and startDateAmended together"
+      }
+    },
+    "heading": "Record built",
+    "points": [
+      "You captured the amended start as the authoritative date.",
+      "startDateAmended flags the move so the plan recomputes, not caches.",
+      "Role and department still match the catalog for lookup.",
+      "One master record carries the mess cleanly to every branch.",
+      "The workflow can now provision correctly even when the start date moves."
+    ],
+    "artifactName": "onboarding-record.json"
+  }
+}
