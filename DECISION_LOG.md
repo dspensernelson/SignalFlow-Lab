@@ -2,6 +2,33 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-06 (Module 3 Harbor - easy tier complete + live)
+
+- BUILT the full easy tier: 16 lessons across the 5 phases, one per node, in
+  three waves (offer intake + plan; parallel provisioning; gate/exceptions/
+  package/loop). Deliverable day-one-package.md renders via templateSlots by
+  lookup from the onboarding record, tracker, and gate.
+- Interaction mix meets the cap: choiceCheck 1/16 = 6.25% (well under the 25%
+  module-03 hard error). Spent tagSource (signed-offer), handoffForm
+  (hardware, payroll, escalation, manager), templateSlots (day-one-package),
+  and jsonEditor variants (jsonFields/jsonPolicy/jsonRows/jsonDeltas). The
+  task-tracker board uses jsonDeltas rows (taskId/state/blockedReason) - no new
+  engine type, as decided.
+- GO-LIVE flip: module-03 status planned -> active and module-02 active ->
+  complete in src/data/projects.json (exactly one active project). Harbor is now
+  selectable in the switcher.
+- VERIFIED live no-scroll in the WRONG-answer state at BOTH 1280x800 and
+  1366x650 for a representative surface of every exercise component used:
+  tagSource (signed-offer), templateSlots (day-one-package, 8 slots), jsonEditor
+  (sla-policy, 7 fields - tallest fieldGuide), jsonDeltas (task-tracker). All
+  scrollHeight === clientHeight.
+- Canon: curriculum/module-03/canon.json (126 assertions total across the repo)
+  + curriculum/module-03/easy/_OVERVIEW.md prose spine. npm run check green.
+- REMAINING for the module: medium tier (blocked hardware + escalation, moved
+  start date, idempotent re-run), hard tier (SLA design, unresponsive-owner
+  gate, degraded-mode package) INCLUDING the mandatory Step 7a solo-rebuild
+  artifactImport capstone on readiness-gate. Then the module-wrap PR.
+
 ## 2026-07-06 (Module 3 Harbor - Step 2 map approved; field-notes decision)
 
 - MAP APPROVED (autonomous Gate 3 = charter conformance + `npm run lint:map`
