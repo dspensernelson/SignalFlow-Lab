@@ -96,6 +96,32 @@
     "correct": { "role": "Logistics Coordinator", "needed": "handheld scanner", "inProfile": false, "proposedChange": "add", "routedTo": "People Ops Lead" },
     "wrong": { "role": "Logistics Coordinator", "needed": "handheld scanner", "inProfile": true, "proposedChange": "add", "routedTo": "People Ops Lead" }
   },
+  "lesson-signed-offer-medium": {
+    "correct": { "candidateName": "candidate", "role": "role", "startDate": "amendStart", "manager": "manager" },
+    "wrong": { "candidateName": "candidate", "role": "role", "startDate": "origStart", "manager": "manager" }
+  },
+  "lesson-onboarding-record-medium": {
+    "correct": { "hireId": "H-4022", "name": "Sam Rivera", "role": "Logistics Coordinator", "department": "Operations", "startDate": "SD", "startDateAmended": true },
+    "wrong": { "hireId": "H-4022", "name": "Sam Rivera", "role": "Logistics Coordinator", "department": "Operations", "startDate": "SD", "startDateAmended": false }
+  },
+  "lesson-sla-policy-medium": {
+    "correct": { "policyName": "Onboarding SLA Policy", "version": "1.1.0", "owner": "People Ops Lead", "accountsSla": 2, "hardwareSla": 2, "accessSla": 1, "payrollSla": 3 },
+    "wrong": { "policyName": "Onboarding SLA Policy", "version": "1.1.0", "owner": "People Ops Lead", "accountsSla": 2, "hardwareSla": 2, "accessSla": 1, "payrollSla": 1 }
+  },
+  "lesson-provisioning-plan-medium": {
+    "correct": [
+      { "taskId": "accounts", "owner": "IT Provisioner", "due": "SD-2" },
+      { "taskId": "hardware", "owner": "IT Provisioner", "due": "SD-2" },
+      { "taskId": "access", "owner": "Facilities Coordinator", "due": "SD-1" },
+      { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
+    ],
+    "wrong": [
+      { "taskId": "accounts", "owner": "IT Provisioner", "due": "SD-2" },
+      { "taskId": "hardware", "owner": "IT Provisioner", "due": "SD-1" },
+      { "taskId": "access", "owner": "Facilities Coordinator", "due": "SD-1" },
+      { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
+    ]
+  },
 
   "lesson-intake": {
     "correct": { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": "$142/MWh", "generationFlag": "Wind underperformed", "approvalRequired": true },

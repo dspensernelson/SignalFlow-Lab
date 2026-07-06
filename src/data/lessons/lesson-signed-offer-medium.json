@@ -1,0 +1,120 @@
+{
+  "id": "lesson-signed-offer-medium",
+  "nodeId": "signed-offer",
+  "title": "Inspect an Amended Offer",
+  "subtitle": "Tag the amended start, not the superseded one",
+  "clock": "SD-5, 9:00 AM",
+  "difficulty": "Intermediate",
+  "skill": "Provenance of amendments",
+  "scenario": "A second hire, Sam Rivera, is starting - but the offer was amended: the start date was moved earlier. The letter now shows two dates, the original and the amendment. Tag the fields onboarding depends on, and be careful: the authoritative start is the amended one, not the superseded date still printed above it.",
+  "inputType": "text",
+  "inputLabel": "Amended Offer (OFF-4022)",
+  "input": "OFFER OFF-4022 - Harbor Logistics. Candidate: Sam Rivera. Role: Logistics Coordinator, Operations. Original start: SD+2 (superseded). AMENDED start: SD. Reports to: the Hiring Manager. Compensation: $64,000 / year. Countersigned by the Recruiter.",
+  "instructions": [
+    "Read the amended offer - two dates appear, only one is authoritative.",
+    "Tag the new hire, role, and manager to their spans.",
+    "Tag the AMENDED start date, not the superseded original.",
+    "Validate to mint the offer source profile."
+  ],
+  "interactionType": "tagSource",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "tagSource",
+    "source": {
+      "label": "Amended Offer - OFF-4022",
+      "segments": [
+        { "id": "offerId", "text": "OFF-4022" },
+        { "id": "candidate", "text": "Sam Rivera" },
+        { "id": "role", "text": "Logistics Coordinator" },
+        { "id": "dept", "text": "Operations" },
+        { "id": "origStart", "text": "SD+2 (superseded)" },
+        { "id": "amendStart", "text": "SD (amended start)" },
+        { "id": "manager", "text": "the Hiring Manager" },
+        { "id": "comp", "text": "$64,000 / year" }
+      ]
+    },
+    "fields": [
+      {
+        "id": "candidateName",
+        "label": "New hire",
+        "correctSegmentId": "candidate",
+        "explain": "The new hire is the candidate being provisioned - Sam Rivera - not the recruiter who countersigned."
+      },
+      {
+        "id": "role",
+        "label": "Role",
+        "correctSegmentId": "role",
+        "explain": "Tag the job title that drives entitlements, not the department it sits in."
+      },
+      {
+        "id": "startDate",
+        "label": "Start date (authoritative)",
+        "correctSegmentId": "amendStart",
+        "explain": "An amendment supersedes the original. The authoritative clock is the AMENDED start, not the SD+2 date it replaced."
+      },
+      {
+        "id": "manager",
+        "label": "Reports to",
+        "correctSegmentId": "manager",
+        "explain": "Tag who the hire reports to - the Hiring Manager - not the recruiter."
+      }
+    ],
+    "artifactOnPass": {
+      "source": "signed-offer",
+      "offerId": "OFF-4022",
+      "candidateName": "Sam Rivera",
+      "role": "Logistics Coordinator",
+      "department": "Operations",
+      "startDate": "SD",
+      "startDateAmended": true,
+      "manager": "Hiring Manager",
+      "firstConsumer": "onboarding-record"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Profile an amended offer: tag the new hire, role, manager, and the AUTHORITATIVE (amended) start date - not the superseded original still printed on the letter.",
+  "successMessage": "Amended offer profiled. The authoritative start is the amendment - the plan will recompute from it.",
+  "intro": {
+    "heading": "Before you build: amendments supersede",
+    "sections": [
+      {
+        "title": "Two dates, one truth",
+        "body": "An amended document often still shows what it replaced. Reading provenance means knowing which value is authoritative now - the amendment - and treating the original as history."
+      },
+      {
+        "title": "Why the move matters",
+        "body": "Moving the start date earlier compresses every SLA. Tagging the amended start correctly is what makes the plan recompute the real deadlines instead of working to a stale one."
+      },
+      {
+        "title": "Provenance is a skill",
+        "body": "The superseded SD+2 is a deliberate trap. In real intake, stale values hide in plain sight; the discipline is to tag the authoritative field, not the first date you see."
+      },
+      {
+        "title": "What you produce here",
+        "body": "An offer profile flagged as amended, so downstream steps know the start moved and recompute accordingly."
+      }
+    ],
+    "jsonExample": "{\n  \"startDate\": \"SD\",\n  \"startDateAmended\": true\n}",
+    "skill": "Provenance of amendments",
+    "artifactName": "source-profile-signed-offer.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd read the amended offer and copy the NEW start date, striking through the old one so nobody plans to the wrong day.",
+      "tools": {
+        "powerAutomate": "read the latest amendment record, ignoring superseded fields",
+        "zapier": "map the amended-start field, not the original",
+        "python": "prefer the amendment value when both are present"
+      }
+    },
+    "heading": "Amended offer profiled",
+    "points": [
+      "You tagged the new hire, role, manager, and the authoritative amended start.",
+      "The superseded original was a trap - amendments supersede prior values.",
+      "The amended start compresses the SLAs the plan will recompute.",
+      "Your offer profile is flagged amended so downstream steps recompute.",
+      "The workflow can now trust the authoritative start even when the offer changed."
+    ],
+    "artifactName": "source-profile-signed-offer.json"
+  }
+}

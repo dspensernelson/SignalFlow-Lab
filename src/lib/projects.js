@@ -180,7 +180,13 @@ export const BUILT_LESSONS = {
       'lesson-onboarding-archive',
       'lesson-profile-feedback',
     ],
-    medium: [],
+    medium: [
+      'lesson-signed-offer-medium',
+      'lesson-role-profile-catalog-medium',
+      'lesson-onboarding-record-medium',
+      'lesson-sla-policy-medium',
+      'lesson-provisioning-plan-medium',
+    ],
     hard: [],
   },
 }
