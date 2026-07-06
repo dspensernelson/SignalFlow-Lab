@@ -17,6 +17,12 @@
     { "lesson": "lesson-provisioning-plan", "path": "validation.expectedRows[taskId=hardware].due", "op": "equals", "value": "SD-1" },
     { "lesson": "lesson-provisioning-plan", "path": "validation.expectedRows[taskId=access].due", "op": "equals", "value": "SD-1" },
     { "lesson": "lesson-provisioning-plan", "path": "validation.expectedRows[taskId=payroll].due", "op": "equals", "value": "SD-3" },
-    { "lesson": "lesson-provisioning-plan", "path": "validation.expectedRows[taskId=payroll].owner", "op": "equals", "value": "Payroll Specialist" }
+    { "lesson": "lesson-provisioning-plan", "path": "validation.expectedRows[taskId=payroll].owner", "op": "equals", "value": "Payroll Specialist" },
+    { "lesson": "lesson-payroll-task", "path": "validation.artifactOnPass.payClass", "op": "equals", "value": "Non-exempt / Hourly" },
+    { "lesson": "lesson-payroll-task", "path": "validation.artifactOnPass.sentTo", "op": "equals", "value": "Payroll Specialist" },
+    { "lesson": "lesson-hardware-task", "path": "validation.artifactOnPass.deliverBy", "op": "equals", "value": "SD-1" },
+    { "lesson": "lesson-access-task", "path": "validation.expectedRows[group=ops-general].grantedBy", "op": "equals", "value": "Facilities Coordinator" },
+    { "lesson": "lesson-accounts-task", "path": "validation.expected.accountId", "op": "equals", "value": "acct-4021" },
+    { "lesson": "lesson-task-tracker", "path": "validation.expectedRows[taskId=accounts].state", "op": "equals", "value": "done" }
   ]
 }

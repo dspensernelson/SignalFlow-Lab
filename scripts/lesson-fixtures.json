@@ -36,6 +36,42 @@
       { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
     ]
   },
+  "lesson-accounts-task": {
+    "correct": { "taskId": "accounts", "existingFound": false, "action": "created", "accountId": "acct-4021", "state": "done" },
+    "wrong": { "taskId": "accounts", "existingFound": false, "action": "created", "accountId": "acct-4021", "state": "pending" }
+  },
+  "lesson-hardware-task": {
+    "correct": { "orderedBy": "IT Provisioner", "deliverBy": "SD-1", "confirmationCaptured": "yes" },
+    "wrong": { "orderedBy": "Vendor", "deliverBy": "SD-1", "confirmationCaptured": "yes" }
+  },
+  "lesson-access-task": {
+    "correct": [
+      { "group": "ops-general", "grantedBy": "Facilities Coordinator" },
+      { "group": "warehouse-readonly", "grantedBy": "Facilities Coordinator" }
+    ],
+    "wrong": [
+      { "group": "ops-general", "grantedBy": "IT Provisioner" },
+      { "group": "warehouse-readonly", "grantedBy": "Facilities Coordinator" }
+    ]
+  },
+  "lesson-payroll-task": {
+    "correct": { "sentTo": "Payroll Specialist", "payClass": "Non-exempt / Hourly", "confirmationCaptured": "yes" },
+    "wrong": { "sentTo": "People Ops Lead", "payClass": "Non-exempt / Hourly", "confirmationCaptured": "yes" }
+  },
+  "lesson-task-tracker": {
+    "correct": [
+      { "taskId": "accounts", "state": "done", "blockedReason": "" },
+      { "taskId": "hardware", "state": "done", "blockedReason": "" },
+      { "taskId": "access", "state": "done", "blockedReason": "" },
+      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+    ],
+    "wrong": [
+      { "taskId": "accounts", "state": "done", "blockedReason": "" },
+      { "taskId": "hardware", "state": "pending", "blockedReason": "" },
+      { "taskId": "access", "state": "done", "blockedReason": "" },
+      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+    ]
+  },
 
   "lesson-intake": {
     "correct": { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": "$142/MWh", "generationFlag": "Wind underperformed", "approvalRequired": true },

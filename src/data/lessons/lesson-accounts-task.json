@@ -1,0 +1,126 @@
+{
+  "id": "lesson-accounts-task",
+  "nodeId": "accounts-task",
+  "title": "Run the Accounts Task",
+  "subtitle": "Create the identity once - idempotently",
+  "clock": "SD-2, 9:00 AM",
+  "difficulty": "Beginner",
+  "skill": "Idempotent provisioning",
+  "scenario": "It is SD-2. The plan says create the new hire's core accounts by today. Before creating anything, you check the identity store: no account exists for H-4021 yet. Create it once and record the result - the rule that makes a re-run safe.",
+  "inputType": "text",
+  "inputLabel": "Accounts task (from the plan)",
+  "input": "Task: accounts for hire H-4021 (owner IT Provisioner, due SD-2). Identity store lookup for H-4021: no existing account found. Rule: check first, create only if none exists, and record the account id and final state. A re-run must NOT create a second account.",
+  "instructions": [
+    "Record the taskId and whether an existing account was found (existingFound).",
+    "Because none was found, set action to created and record the new accountId.",
+    "Set the final state to done.",
+    "Return one valid JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"taskId\": \"accounts\",\n  \"existingFound\": false,\n  \"action\": \"\",\n  \"accountId\": \"\",\n  \"state\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["taskId", "existingFound", "action", "accountId", "state"],
+    "expected": {
+      "taskId": "accounts",
+      "existingFound": false,
+      "action": "created",
+      "accountId": "acct-4021",
+      "state": "done"
+    }
+  },
+  "copilotPrompt": "Build one JSON accounts result: taskId, existingFound (boolean), action, accountId, and state. Since no existing account was found, action is created and state is done. Keep existingFound a real boolean.",
+  "successMessage": "Accounts created. Because you checked first, a re-run would reuse this account instead of making a second one.",
+  "validateLabel": "Validate Result",
+  "editorHelper": "Check-then-create: record what you found before what you did.",
+  "intro": {
+    "heading": "Before you create: check first",
+    "sections": [
+      {
+        "title": "Idempotency is the safety rule",
+        "body": "Automated provisioning gets re-run - after a timeout, a partial failure, a retry. The rule that makes that safe is check-then-create: look for an existing account before making a new one."
+      },
+      {
+        "title": "Record what you found",
+        "body": "existingFound is not decoration - it is the evidence the check happened. If it is false you create; if it were true you would reuse. Storing it makes the run auditable."
+      },
+      {
+        "title": "One hire, one account",
+        "body": "The whole point is convergence: no matter how many times the task runs, the hire ends with exactly one account. Two accounts break offboarding and audit later."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A small accounts result - found, action, account id, state - that the task tracker reads. The medium tier re-runs this after a partial failure to prove the rule holds."
+      }
+    ],
+    "jsonExample": "{\n  \"existingFound\": false,\n  \"action\": \"created\",\n  \"state\": \"done\"\n}",
+    "skill": "Idempotent provisioning",
+    "artifactName": "accounts-task.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "taskId",
+      "meaning": "The task this result belongs to.",
+      "type": "string",
+      "example": "\"accounts\"",
+      "group": "Task",
+      "lookFor": "which task?",
+      "hint": "This is the accounts task."
+    },
+    {
+      "field": "existingFound",
+      "meaning": "Whether an account already existed (the check result).",
+      "type": "boolean",
+      "example": "false",
+      "group": "Check",
+      "lookFor": "did one already exist?",
+      "hint": "The lookup found none, so this is the boolean false (not the text 'false')."
+    },
+    {
+      "field": "action",
+      "meaning": "What the task did given the check.",
+      "type": "string",
+      "example": "\"created\"",
+      "group": "Action",
+      "lookFor": "created or reused?",
+      "hint": "No account existed, so the action is created."
+    },
+    {
+      "field": "accountId",
+      "meaning": "The identifier of the account for this hire.",
+      "type": "string",
+      "example": "\"acct-4021\"",
+      "group": "Action",
+      "lookFor": "which account?",
+      "hint": "Use acct-4021 for hire H-4021."
+    },
+    {
+      "field": "state",
+      "meaning": "The final state of the task.",
+      "type": "string",
+      "example": "\"done\"",
+      "group": "Action",
+      "lookFor": "finished?",
+      "hint": "The task completed, so done."
+    }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd search the directory for the person before creating them, so running your script twice never makes two accounts.",
+      "tools": {
+        "powerAutomate": "Get user (filter) -> Condition -> Create user only if none returned",
+        "zapier": "'Find User' then a Filter so 'Create User' runs only when none exists",
+        "python": "look up by employee id; create only when the lookup is empty"
+      }
+    },
+    "heading": "Accounts created",
+    "points": [
+      "You checked for an existing account before creating one - the idempotency rule.",
+      "existingFound records the check, so the run is auditable, not a blind create.",
+      "Because none existed, the action is created and the state is done.",
+      "A re-run would reuse acct-4021, never make a second account.",
+      "The workflow can now provision accounts safely even when it retries."
+    ],
+    "artifactName": "accounts-task.json"
+  }
+}
