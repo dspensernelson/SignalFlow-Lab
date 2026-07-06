@@ -1,0 +1,109 @@
+{
+  "id": "lesson-task-tracker",
+  "nodeId": "task-tracker",
+  "title": "Update the Task Tracker",
+  "subtitle": "One status record over four parallel branches",
+  "clock": "SD-1, 3:00 PM",
+  "difficulty": "Beginner",
+  "skill": "Task-state tracking",
+  "scenario": "It is SD-1 afternoon. All four provisioning branches reported in. Roll their outcomes onto one tracker - each task's state, with a reason only when it is blocked. This single record is what the readiness gate reads to decide if the hire is ready.",
+  "inputType": "text",
+  "inputLabel": "Branch outcomes",
+  "input": "Branch outcomes for hire H-4021:\naccounts -> created, complete\nhardware -> delivered and confirmed, complete\naccess -> granted, complete\npayroll -> enrolled and confirmed, complete\nAllowed states: pending, in-progress, done, blocked. Set blockedReason only when a task is blocked; otherwise leave it empty.",
+  "instructions": [
+    "Write one row per task: accounts, hardware, access, payroll.",
+    "Set each state to done (every branch completed).",
+    "Leave blockedReason empty for done tasks.",
+    "Return a JSON array of the four task-state rows, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"taskId\": \"accounts\", \"state\": \"\", \"blockedReason\": \"\" },\n  { \"taskId\": \"hardware\", \"state\": \"\", \"blockedReason\": \"\" },\n  { \"taskId\": \"access\", \"state\": \"\", \"blockedReason\": \"\" },\n  { \"taskId\": \"payroll\", \"state\": \"\", \"blockedReason\": \"\" }\n]",
+  "validation": {
+    "type": "jsonDeltas",
+    "keyField": "taskId",
+    "requiredFields": ["taskId", "state", "blockedReason"],
+    "numericFields": [],
+    "expectedRows": [
+      { "taskId": "accounts", "state": "done", "blockedReason": "" },
+      { "taskId": "hardware", "state": "done", "blockedReason": "" },
+      { "taskId": "access", "state": "done", "blockedReason": "" },
+      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+    ]
+  },
+  "copilotPrompt": "Build a JSON array of four task-state rows (accounts, hardware, access, payroll). Each has taskId, state, and blockedReason. All four are done, so state is done and blockedReason is empty.",
+  "successMessage": "Tracker updated. Four branches, one status record - the readiness gate can now read it.",
+  "validateLabel": "Validate Tracker",
+  "editorHelper": "One row per task - state now, reason only if blocked.",
+  "intro": {
+    "heading": "Before the gate: one record for four branches",
+    "sections": [
+      {
+        "title": "Parallel work needs one status",
+        "body": "Four branches ran at once. Without a single tracker, 'are we ready?' means chasing four people. The tracker collapses that into one record the gate can read in a glance."
+      },
+      {
+        "title": "A fixed vocabulary of states",
+        "body": "States are not free text: pending, in-progress, done, blocked. A fixed vocabulary is what lets a machine gate on them. 'Almost done' is not a state the gate can act on."
+      },
+      {
+        "title": "Blocked needs a reason",
+        "body": "A blocked task without a reason hides the very thing the gate and escalation need to see. Here every task is done, so blockedReason stays empty - but the field exists for the day it is not."
+      },
+      {
+        "title": "What you produce here",
+        "body": "One status record over four parallel branches. The readiness gate fans in on it; the medium tier sets one task to blocked to show what the gate does then."
+      }
+    ],
+    "jsonExample": "[\n  { \"taskId\": \"accounts\", \"state\": \"done\", \"blockedReason\": \"\" }\n]",
+    "skill": "Task-state tracking",
+    "artifactName": "task-tracker.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "taskId",
+      "meaning": "The provisioning task this row tracks.",
+      "type": "string",
+      "example": "\"accounts\"",
+      "group": "Task",
+      "lookFor": "which task?",
+      "hint": "One row each: accounts, hardware, access, payroll."
+    },
+    {
+      "field": "state",
+      "meaning": "The task's current state from the fixed vocabulary.",
+      "type": "string",
+      "example": "\"done\"",
+      "group": "Status",
+      "lookFor": "what state?",
+      "hint": "One of pending, in-progress, done, blocked. All four are done here."
+    },
+    {
+      "field": "blockedReason",
+      "meaning": "Why a task is blocked - empty unless blocked.",
+      "type": "string",
+      "example": "\"\"",
+      "group": "Status",
+      "lookFor": "blocked? why?",
+      "hint": "Leave it an empty string for done tasks."
+    }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd keep one onboarding checklist with a status column, updating each row as the four teams reported instead of tracking four separate threads.",
+      "tools": {
+        "powerAutomate": "update a Dataverse status row per task from each branch's outcome",
+        "zapier": "update a table row's status field as each branch finishes",
+        "python": "collect the four branch results into one list of {taskId, state}"
+      }
+    },
+    "heading": "Tracker updated",
+    "points": [
+      "You rolled four parallel branches onto one status record.",
+      "States use a fixed vocabulary (pending, in-progress, done, blocked) the gate can act on.",
+      "blockedReason stays empty for done tasks but exists for when it is not.",
+      "All four tasks are done, so the gate has a clean record to read.",
+      "The workflow can now see four parallel branches in one status the gate reads."
+    ],
+    "artifactName": "task-tracker.json"
+  }
+}

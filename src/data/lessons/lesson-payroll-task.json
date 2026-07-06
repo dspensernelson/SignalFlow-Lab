@@ -1,0 +1,103 @@
+{
+  "id": "lesson-payroll-task",
+  "nodeId": "payroll-task",
+  "title": "Run the Payroll Task",
+  "subtitle": "Hand off enrollment and capture the confirmation",
+  "clock": "SD-3, 9:00 AM",
+  "difficulty": "Beginner",
+  "skill": "Enrollment handoff",
+  "scenario": "It is SD-3 - the earliest deadline, because enrollment has to land before the first pay cycle. You hand the new hire's pay class to the Payroll Specialist and capture their confirmation. A payroll handoff without a captured reply is a dropped ball.",
+  "inputType": "text",
+  "inputLabel": "Payroll task (from the plan and role profile)",
+  "input": "Task: payroll for hire H-4021 (owner Payroll Specialist, due SD-3). The role profile pay class for Logistics Coordinator is Non-exempt / Hourly. Send the enrollment to the Payroll Specialist and capture a confirmation so the hire makes the first pay cycle.",
+  "instructions": [
+    "Record who the enrollment is sent to (the payroll task owner).",
+    "Set the pay class from the role profile.",
+    "Confirm an enrollment confirmation was captured.",
+    "Validate to mint the payroll handoff record."
+  ],
+  "interactionType": "handoffForm",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "handoffForm",
+    "fields": [
+      {
+        "id": "sentTo",
+        "label": "Sent to",
+        "kind": "select",
+        "options": ["Payroll Specialist", "People Ops Lead", "IT Provisioner"],
+        "expected": "Payroll Specialist",
+        "explain": "Enrollment is a handoff to the Payroll Specialist, who owns the payroll system - not People Ops or IT."
+      },
+      {
+        "id": "payClass",
+        "label": "Pay class",
+        "kind": "select",
+        "options": ["Non-exempt / Hourly", "Exempt / Salary"],
+        "expected": "Non-exempt / Hourly",
+        "explain": "The pay class comes from the role profile (Logistics Coordinator is Non-exempt / Hourly), not from a guess at enrollment time."
+      },
+      {
+        "id": "confirmationCaptured",
+        "label": "Confirmation captured",
+        "kind": "select",
+        "options": ["yes", "no"],
+        "expected": "yes",
+        "explain": "A handoff without a captured confirmation is a dropped ball; the hire must be enrolled before the first pay cycle."
+      }
+    ],
+    "artifactOnPass": {
+      "task": "payroll",
+      "sentTo": "Payroll Specialist",
+      "payClass": "Non-exempt / Hourly",
+      "confirmationCaptured": "yes",
+      "state": "done"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Capture a payroll handoff for onboarding: who enrollment is sent to, the pay class from the role profile, and whether the enrollment confirmation was captured. The pay class is Non-exempt / Hourly.",
+  "successMessage": "Payroll handed off. The hire is enrolled in the right class with a captured confirmation - in time for the first cycle.",
+  "intro": {
+    "heading": "Before the cycle: enrollment first",
+    "sections": [
+      {
+        "title": "Why payroll leads",
+        "body": "Payroll is the earliest deadline (SD-3) for a hard reason: enrollment must clear before the first pay cycle runs, or the new hire's first check is wrong or late."
+      },
+      {
+        "title": "The class comes from the role",
+        "body": "You do not decide the pay class at enrollment - the role profile does. Logistics Coordinator is Non-exempt / Hourly, and passing that through prevents a costly misclassification."
+      },
+      {
+        "title": "Capture the reply",
+        "body": "This is a handoff to the Payroll Specialist. It is not done when you send it; it is done when they confirm. The captured confirmation is the proof enrollment actually happened."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A payroll handoff record the task tracker reads as this branch's state. It mirrors the hardware handoff on the human-process side of the four branches."
+      }
+    ],
+    "jsonExample": "{\n  \"task\": \"payroll\",\n  \"payClass\": \"Non-exempt / Hourly\",\n  \"state\": \"done\"\n}",
+    "skill": "Enrollment handoff",
+    "artifactName": "payroll-task.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd send the pay class and start date to payroll early, then only tick it off once they confirmed the person was enrolled.",
+      "tools": {
+        "powerAutomate": "start an approval/enrollment to Payroll and wait for the confirmation",
+        "zapier": "send the enrollment request, capture the reply into the record",
+        "python": "post the enrollment to the payroll API and store the returned status"
+      }
+    },
+    "heading": "Payroll handed off",
+    "points": [
+      "You sent enrollment to the Payroll Specialist with the role's pay class.",
+      "The pay class came from the role profile, avoiding a misclassification.",
+      "The confirmation was captured, so the handoff is proven, not assumed.",
+      "Payroll led at SD-3 so the hire makes the first pay cycle.",
+      "The workflow can now enroll payroll on time with a captured confirmation."
+    ],
+    "artifactName": "payroll-task.json"
+  }
+}
