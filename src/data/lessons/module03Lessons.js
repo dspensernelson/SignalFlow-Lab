@@ -32,6 +32,12 @@ import lessonHardwareTaskMedium from './lesson-hardware-task-medium.json'
 import lessonAccessTaskMedium from './lesson-access-task-medium.json'
 import lessonPayrollTaskMedium from './lesson-payroll-task-medium.json'
 import lessonTaskTrackerMedium from './lesson-task-tracker-medium.json'
+import lessonReadinessGateMedium from './lesson-readiness-gate-medium.json'
+import lessonEscalationPathMedium from './lesson-escalation-path-medium.json'
+import lessonDayOnePackageMedium from './lesson-day-one-package-medium.json'
+import lessonManagerHandoffMedium from './lesson-manager-handoff-medium.json'
+import lessonOnboardingArchiveMedium from './lesson-onboarding-archive-medium.json'
+import lessonProfileFeedbackMedium from './lesson-profile-feedback-medium.json'
 
 const module03Lessons = {
   // Easy tier
@@ -62,6 +68,12 @@ const module03Lessons = {
   'lesson-access-task-medium': lessonAccessTaskMedium,
   'lesson-payroll-task-medium': lessonPayrollTaskMedium,
   'lesson-task-tracker-medium': lessonTaskTrackerMedium,
+  'lesson-readiness-gate-medium': lessonReadinessGateMedium,
+  'lesson-escalation-path-medium': lessonEscalationPathMedium,
+  'lesson-day-one-package-medium': lessonDayOnePackageMedium,
+  'lesson-manager-handoff-medium': lessonManagerHandoffMedium,
+  'lesson-onboarding-archive-medium': lessonOnboardingArchiveMedium,
+  'lesson-profile-feedback-medium': lessonProfileFeedbackMedium,
 }
 
 export default module03Lessons

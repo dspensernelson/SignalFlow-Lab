@@ -1,0 +1,86 @@
+{
+  "id": "lesson-profile-feedback-medium",
+  "nodeId": "profile-feedback",
+  "title": "Close the Loop: No Change Needed",
+  "subtitle": "Sometimes the catalog is already right",
+  "clock": "SD, 9:00 AM",
+  "difficulty": "Intermediate",
+  "skill": "Reference improvement (loop close)",
+  "scenario": "Turn the archived run into feedback. This time the role needed the handheld scanner - and the catalog already added it last quarter (it is inProfile now). The honest feedback is: no catalog change needed. Confirming the profile is right is as valid a loop outcome as proposing a change.",
+  "inputType": "text",
+  "inputLabel": "From the onboarding archive",
+  "input": "Archive note for hire H-4022 (Logistics Coordinator): the hire needed the handheld scanner, which the catalog already lists (inProfile = true, added v1.1.0). The only friction was a hardware backorder - a supply issue, not a profile gap. Feedback: proposedChange = none, routed to the People Ops Lead for the record.",
+  "instructions": [
+    "Record the role and what the hire needed.",
+    "Note that it was already in the profile (inProfile true).",
+    "Set proposedChange to none and route it to the catalog owner.",
+    "Return one valid JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"role\": \"\",\n  \"needed\": \"\",\n  \"inProfile\": false,\n  \"proposedChange\": \"\",\n  \"routedTo\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["role", "needed", "inProfile", "proposedChange", "routedTo"],
+    "expected": {
+      "role": "Logistics Coordinator",
+      "needed": "handheld scanner",
+      "inProfile": true,
+      "proposedChange": "none",
+      "routedTo": "People Ops Lead"
+    }
+  },
+  "copilotPrompt": "Build one JSON profile-feedback record: role, needed (handheld scanner), inProfile true (already added), proposedChange none, routedTo People Ops Lead. The catalog was already right.",
+  "successMessage": "Loop closed with 'no change'. Confirming the catalog is right is a real outcome.",
+  "validateLabel": "Validate Feedback",
+  "editorHelper": "No change is a valid, honest conclusion.",
+  "intro": {
+    "heading": "The loop can also confirm",
+    "sections": [
+      {
+        "title": "Not every run demands a change",
+        "body": "Last quarter's feedback already added the scanner. This run confirms that fix worked - the role needed it and had it. 'No change needed' is a real, valuable loop outcome."
+      },
+      {
+        "title": "Separate the profile from the supply issue",
+        "body": "The friction here was a backorder, not a missing entitlement. Good feedback routes each problem to the right place: the catalog was fine; supply is a different lever."
+      },
+      {
+        "title": "Still routed and recorded",
+        "body": "Even a 'no change' goes to the People Ops Lead for the record. The loop is auditable whether it proposes or confirms."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A feedback record that confirms the catalog is right - closing the loop without churn."
+      }
+    ],
+    "jsonExample": "{\n  \"inProfile\": true,\n  \"proposedChange\": \"none\"\n}",
+    "skill": "Reference improvement (loop close)",
+    "artifactName": "profile-feedback.json"
+  },
+  "fieldGuide": [
+    { "field": "role", "meaning": "The role the feedback is about.", "type": "string", "example": "\"Logistics Coordinator\"", "group": "Subject", "lookFor": "which role?", "hint": "Logistics Coordinator." },
+    { "field": "needed", "meaning": "What the hire needed on day one.", "type": "string", "example": "\"handheld scanner\"", "group": "Observation", "lookFor": "what did they need?", "hint": "The handheld scanner." },
+    { "field": "inProfile", "meaning": "Whether it was already in the profile.", "type": "boolean", "example": "true", "group": "Observation", "lookFor": "already listed?", "hint": "It was added last quarter, so true." },
+    { "field": "proposedChange", "meaning": "The change proposed - none if already right.", "type": "string", "example": "\"none\"", "group": "Proposal", "lookFor": "change needed?", "hint": "The catalog is right, so none." },
+    { "field": "routedTo", "meaning": "The catalog owner, for the record.", "type": "string", "example": "\"People Ops Lead\"", "group": "Proposal", "lookFor": "who logs it?", "hint": "The People Ops Lead." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd note 'the checklist was right, the delay was supply' so nobody wastes time re-fixing a solved problem.",
+      "tools": {
+        "powerAutomate": "log a 'no change' feedback item to People Ops for the record",
+        "zapier": "append a confirmation entry to the change log",
+        "python": "emit {proposedChange:'none'} to the catalog owner"
+      }
+    },
+    "heading": "Loop closed - no change",
+    "points": [
+      "You confirmed the catalog already had what the role needed.",
+      "You separated the profile (right) from the supply issue (a backorder).",
+      "'No change needed' is a valid, honest loop outcome.",
+      "The confirmation is still routed and recorded for audit.",
+      "The workflow can now close the loop by confirming the catalog, not only by changing it."
+    ],
+    "artifactName": "profile-feedback.json"
+  }
+}

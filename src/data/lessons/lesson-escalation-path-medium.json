@@ -1,0 +1,104 @@
+{
+  "id": "lesson-escalation-path-medium",
+  "nodeId": "escalation-path",
+  "title": "Escalate the Backordered Laptop",
+  "subtitle": "Resolve a real block with a loaner",
+  "clock": "SD-1, 4:15 PM",
+  "difficulty": "Intermediate",
+  "skill": "Escalation handoff",
+  "scenario": "The gate routed this hire to escalation because hardware is blocked. This is the real thing, not a drill: the laptop is backordered to SD+3. Escalate it to the owner with a concrete resolution - issue a loaner - so the hire can start on time.",
+  "inputType": "text",
+  "inputLabel": "Escalation (real block)",
+  "input": "Hire H-4022 is blocked: the Standard laptop is backordered to SD+3. Escalate to the IT Provisioner (owns hardware). The resolution is to issue a loaner laptop by SD-1 so the hire works from day one while the ordered machine ships. Capture the task, owner, and action.",
+  "instructions": [
+    "Name the blocked task.",
+    "Assign the accountable owner.",
+    "Choose the resolution action that lets the hire start on time.",
+    "Validate to mint the escalation record."
+  ],
+  "interactionType": "handoffForm",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "handoffForm",
+    "fields": [
+      {
+        "id": "blockedTask",
+        "label": "Blocked task",
+        "kind": "select",
+        "options": ["hardware", "accounts", "payroll"],
+        "expected": "hardware",
+        "explain": "Escalate the actually-blocked task - hardware - not one that completed."
+      },
+      {
+        "id": "owner",
+        "label": "Escalation owner",
+        "kind": "select",
+        "options": ["IT Provisioner", "People Ops Lead", "Facilities Coordinator"],
+        "expected": "IT Provisioner",
+        "explain": "Hardware is owned by the IT Provisioner; the escalation goes to whoever can actually resolve it."
+      },
+      {
+        "id": "action",
+        "label": "Resolution",
+        "kind": "select",
+        "options": ["issue loaner", "delay start", "wait and see"],
+        "expected": "issue loaner",
+        "explain": "A loaner lets the hire start on time while the ordered laptop ships; delaying the start or waiting fails the day-one goal."
+      }
+    ],
+    "artifactOnPass": {
+      "handoff": "escalation",
+      "blockedTask": "hardware",
+      "owner": "IT Provisioner",
+      "action": "issue loaner",
+      "resolveBy": "SD-1",
+      "state": "escalated"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Capture a real escalation for a backordered laptop: blocked task hardware, owner IT Provisioner, resolution issue loaner (so the hire starts on time). Route it with an owner and action.",
+  "successMessage": "Escalation resolved with a loaner. The hire starts on time while the ordered laptop ships.",
+  "intro": {
+    "heading": "From blocked to a plan",
+    "sections": [
+      {
+        "title": "Escalation is problem-solving",
+        "body": "The gate found the block; escalation fixes it. A good escalation does not just forward the problem - it names an owner and a concrete action that unblocks the start."
+      },
+      {
+        "title": "Own it to resolve it",
+        "body": "Hardware belongs to the IT Provisioner, so that is where the escalation lands. Sending it to someone who cannot act is how a block sits untouched until the start day."
+      },
+      {
+        "title": "Pick the action that saves day one",
+        "body": "A loaner keeps the day-one promise; delaying the start or waiting for the backorder breaks it. The best resolution is the one that unblocks the goal, not the easiest one."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A resolved escalation record - task, owner, and loaner action - the degraded package will reference."
+      }
+    ],
+    "jsonExample": "{\n  \"blockedTask\": \"hardware\",\n  \"action\": \"issue loaner\"\n}",
+    "skill": "Escalation handoff",
+    "artifactName": "escalation-record.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd grab a spare laptop for day one and keep the backorder moving, rather than delaying the start.",
+      "tools": {
+        "powerAutomate": "create an escalation task to IT with a loaner action and due date",
+        "zapier": "route the block to IT with the resolution captured",
+        "python": "open an escalation {task:'hardware', owner:'IT', action:'issue loaner'}"
+      }
+    },
+    "heading": "Escalation resolved",
+    "points": [
+      "You escalated the real block - hardware - to its owner, the IT Provisioner.",
+      "The resolution issues a loaner so the hire starts on time.",
+      "You picked the action that saves day one, not the easiest one.",
+      "The escalation carries an owner, action, and deadline.",
+      "The workflow can now unblock a stuck hire and still hit the start date."
+    ],
+    "artifactName": "escalation-record.json"
+  }
+}

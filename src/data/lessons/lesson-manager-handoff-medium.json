@@ -1,0 +1,103 @@
+{
+  "id": "lesson-manager-handoff-medium",
+  "nodeId": "manager-handoff",
+  "title": "Hand Off a Conditional Ready",
+  "subtitle": "The manager acknowledges the caveat",
+  "clock": "SD-1, 5:30 PM",
+  "difficulty": "Intermediate",
+  "skill": "Delivery handoff",
+  "scenario": "The package is ready with a loaner. Hand it to the hiring manager - but this time readiness is conditional, and the manager must acknowledge the caveat, not just a clean bill. Capture that they saw the loaner exception and still confirmed the hire can start.",
+  "inputType": "text",
+  "inputLabel": "Delivery (degraded package)",
+  "input": "The degraded Day-One Package for hire H-4022 is ready: the hire starts on a loaner while the ordered laptop ships. Deliver it to the Hiring Manager and capture a CONDITIONAL acknowledgement - they saw the caveat (loaner) and confirmed the start proceeds.",
+  "instructions": [
+    "Record who acknowledged the package.",
+    "Set readyConfirmed to conditional (ready with a caveat).",
+    "Confirm the caveat (the loaner) was noted.",
+    "Validate to mint the acknowledgement record."
+  ],
+  "interactionType": "handoffForm",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "handoffForm",
+    "fields": [
+      {
+        "id": "acknowledgedBy",
+        "label": "Acknowledged by",
+        "kind": "select",
+        "options": ["Hiring Manager", "People Ops Lead", "Recruiter"],
+        "expected": "Hiring Manager",
+        "explain": "The hiring manager owns the first day and must acknowledge the package, caveat and all."
+      },
+      {
+        "id": "readyConfirmed",
+        "label": "Ready confirmed",
+        "kind": "select",
+        "options": ["yes", "conditional", "no"],
+        "expected": "conditional",
+        "explain": "Readiness is conditional on the loaner; recording a clean 'yes' would hide the exception the manager needs to know."
+      },
+      {
+        "id": "caveatNoted",
+        "label": "Caveat noted",
+        "kind": "select",
+        "options": ["yes", "no"],
+        "expected": "yes",
+        "explain": "The manager must have seen the loaner caveat; an acknowledgement that skips the exception is not informed consent."
+      }
+    ],
+    "artifactOnPass": {
+      "handoff": "manager-handoff",
+      "acknowledgedBy": "Hiring Manager",
+      "readyConfirmed": "conditional",
+      "caveatNoted": "yes",
+      "acknowledgedAt": "SD-1 5:30 PM"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Capture a conditional manager handoff: acknowledged by the Hiring Manager, readyConfirmed conditional (loaner caveat), caveatNoted yes. The manager saw the exception and confirmed the start.",
+  "successMessage": "Conditional handoff captured. The manager acknowledged the caveat and confirmed the start.",
+  "intro": {
+    "heading": "Informed acknowledgement",
+    "sections": [
+      {
+        "title": "A caveat is not a footnote",
+        "body": "When readiness is conditional, the acknowledgement must reflect that. A clean 'yes' on a degraded package sets the manager up to be blindsided when the loaner needs returning."
+      },
+      {
+        "title": "Conditional is a real answer",
+        "body": "Recording 'conditional' is honest: the hire can start, on a loaner. It transfers ownership with the exception attached, not buried."
+      },
+      {
+        "title": "Consent must be informed",
+        "body": "caveatNoted confirms the manager actually saw the exception. That is the difference between a rubber stamp and an accountable receipt."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A conditional acknowledgement record that carries the caveat into the archive."
+      }
+    ],
+    "jsonExample": "{\n  \"readyConfirmed\": \"conditional\",\n  \"caveatNoted\": \"yes\"\n}",
+    "skill": "Delivery handoff",
+    "artifactName": "manager-acknowledgement.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd tell the manager 'ready, but on a loaner' and get a clear 'understood, proceed' before closing it out.",
+      "tools": {
+        "powerAutomate": "an approval that captures a conditional decision + the caveat",
+        "zapier": "record the manager's conditional confirmation and the note",
+        "python": "store {readyConfirmed:'conditional', caveatNoted:true}"
+      }
+    },
+    "heading": "Conditional handoff captured",
+    "points": [
+      "You captured a conditional acknowledgement, not a clean yes.",
+      "The manager confirmed the start while seeing the loaner caveat.",
+      "caveatNoted proves the acknowledgement was informed.",
+      "The exception travels with the handoff into the archive.",
+      "The workflow can now hand off a degraded hire with informed consent."
+    ],
+    "artifactName": "manager-acknowledgement.json"
+  }
+}

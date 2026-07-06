@@ -1,0 +1,88 @@
+{
+  "id": "lesson-day-one-package-medium",
+  "nodeId": "day-one-package",
+  "title": "Assemble a Degraded Package",
+  "subtitle": "Ready with a loaner - exceptions named",
+  "clock": "SD-1, 5:00 PM",
+  "difficulty": "Intermediate",
+  "skill": "Assembly from artifacts",
+  "scenario": "Hardware was blocked but escalation issued a loaner, so the hire can start. Assemble the package in degraded mode: honest about the exception, but showing the hire is ready to work. Fill every slot by lookup - the tracker and escalation record hold the truth.",
+  "inputType": "text",
+  "inputLabel": "Assembly rule (degraded)",
+  "input": "Assembly rule: every slot from a stored artifact. Hire name and role from onboarding-record.json. States from task-tracker.json (accounts, access, payroll done; hardware blocked). The escalation issued a loaner, so hardware shows 'loaner' and readiness is 'Ready with loaner'. Start date is SD.",
+  "instructions": [
+    "Fill the header slots from the onboarding record.",
+    "Fill accounts, access, payroll from the tracker (done).",
+    "Show hardware as 'loaner' and readiness as 'Ready with loaner' from the escalation.",
+    "Validate to render the degraded day-one-package.md."
+  ],
+  "interactionType": "templateSlots",
+  "starterAnswer": "{}",
+  "shelf": [
+    { "nodeId": "onboarding-record", "artifactName": "onboarding-record.json", "producedBy": "Build the Record for a Moved Start" },
+    { "nodeId": "task-tracker", "artifactName": "task-tracker.json", "producedBy": "Track a Blocked Branch" },
+    { "nodeId": "escalation-path", "artifactName": "escalation-record.json", "producedBy": "Escalate the Backordered Laptop" }
+  ],
+  "validation": {
+    "type": "templateSlots",
+    "template": "# Harbor Day-One Package - {{hireName}}\n\nRole: {{role}}\nStart date: {{startDate}}\nReadiness: {{readiness}}\n\n## Provisioning summary\n- Accounts: {{accountsState}}\n- Hardware: {{hardwareState}}\n- Access: {{accessState}}\n- Payroll: {{payrollState}}\n\nException: laptop backordered; loaner issued. Assembled on SD-1 for the hiring manager.",
+    "slots": [
+      { "id": "hireName", "label": "Hire name", "numeric": false, "expected": "Sam Rivera", "hint": "The name field in onboarding-record.json." },
+      { "id": "role", "label": "Role", "numeric": false, "expected": "Logistics Coordinator", "hint": "The role field in onboarding-record.json." },
+      { "id": "startDate", "label": "Start date", "numeric": false, "accepted": ["SD", "start date"], "hint": "The startDate field in onboarding-record.json." },
+      { "id": "readiness", "label": "Readiness", "numeric": false, "accepted": ["Ready with loaner", "conditional"], "hint": "Ready, but on a loaner while the laptop ships." },
+      { "id": "accountsState", "label": "Accounts state", "numeric": false, "expected": "done", "hint": "The accounts row in the tracker." },
+      { "id": "hardwareState", "label": "Hardware state", "numeric": false, "accepted": ["loaner", "blocked (loaner)"], "hint": "Blocked, but a loaner was issued." },
+      { "id": "accessState", "label": "Access state", "numeric": false, "expected": "done", "hint": "The access row in the tracker." },
+      { "id": "payrollState", "label": "Payroll state", "numeric": false, "expected": "done", "hint": "The payroll row in the tracker." }
+    ]
+  },
+  "copilotPrompt": "Fill the degraded Day-One Package: hireName, role, startDate from the record; accounts/access/payroll done from the tracker; hardware 'loaner' and readiness 'Ready with loaner' from the escalation.",
+  "successMessage": "Degraded package assembled. It is honest about the exception and shows the hire can start.",
+  "validateLabel": "Render Package",
+  "editorHelper": "Name the exception; still show the hire is ready to work.",
+  "intro": {
+    "heading": "Honest readiness, not perfect readiness",
+    "sections": [
+      {
+        "title": "Degraded is still ready",
+        "body": "Perfect is not the bar - ready is. With a loaner in hand, the hire can work on day one. The package says so, while naming the exception so nobody is surprised."
+      },
+      {
+        "title": "Name the exception",
+        "body": "Hiding the backorder would make the package a lie the day the ordered laptop is late. Showing 'loaner' and the exception line keeps it trustworthy."
+      },
+      {
+        "title": "Still by lookup",
+        "body": "Even in degraded mode you assemble from artifacts - the tracker's states and the escalation's resolution. The exception is data, not a story you write."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A truthful degraded package: ready with a loaner, the exception named, every line traceable."
+      }
+    ],
+    "jsonExample": "{\n  \"readiness\": \"Ready with loaner\",\n  \"hardwareState\": \"loaner\"\n}",
+    "skill": "Assembly from artifacts",
+    "artifactName": "day-one-package.md"
+  },
+  "fieldGuide": [],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd note 'ready, on a loaner' with the backorder flagged, so the manager knows the real state.",
+      "tools": {
+        "powerAutomate": "compose the doc including an exception field from the escalation",
+        "zapier": "merge the tracker states and escalation note into the summary",
+        "python": "render the template with a degraded readiness and exception line"
+      }
+    },
+    "heading": "Degraded package assembled",
+    "points": [
+      "You assembled a package that is ready with a loaner, not blocked.",
+      "The backorder exception is named, so the package stays honest.",
+      "Every slot - including the loaner - came from a stored artifact.",
+      "Readiness is truthful: the hire can work while the laptop ships.",
+      "The workflow can now certify a hire ready in degraded mode without hiding the exception."
+    ],
+    "artifactName": "day-one-package.md"
+  }
+}
