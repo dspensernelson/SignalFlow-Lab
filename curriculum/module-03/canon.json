@@ -41,6 +41,12 @@
     { "lesson": "lesson-accounts-task-medium", "path": "validation.expected.accountId", "op": "equals", "value": "acct-4022" },
     { "lesson": "lesson-hardware-task-medium", "path": "validation.artifactOnPass.state", "op": "equals", "value": "blocked" },
     { "lesson": "lesson-task-tracker-medium", "path": "validation.expectedRows[taskId=hardware].state", "op": "equals", "value": "blocked" },
-    { "lesson": "lesson-payroll-task-medium", "path": "validation.artifactOnPass.priority", "op": "equals", "value": "rush" }
+    { "lesson": "lesson-payroll-task-medium", "path": "validation.artifactOnPass.priority", "op": "equals", "value": "rush" },
+    { "lesson": "lesson-readiness-gate-medium", "path": "validation.expected.route", "op": "equals", "value": "escalation-path" },
+    { "lesson": "lesson-readiness-gate-medium", "path": "validation.expected.ready", "op": "equals", "value": false },
+    { "lesson": "lesson-escalation-path-medium", "path": "validation.artifactOnPass.action", "op": "equals", "value": "issue loaner" },
+    { "lesson": "lesson-onboarding-archive-medium", "path": "validation.expected.exceptionsNoted", "op": "equals", "value": true },
+    { "lesson": "lesson-profile-feedback-medium", "path": "validation.expected.inProfile", "op": "equals", "value": true },
+    { "lesson": "lesson-profile-feedback-medium", "path": "validation.expected.proposedChange", "op": "equals", "value": "none" }
   ]
 }

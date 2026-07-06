@@ -1,0 +1,86 @@
+{
+  "id": "lesson-readiness-gate-medium",
+  "nodeId": "readiness-gate",
+  "title": "Gate a Blocked Hire",
+  "subtitle": "One blocked task routes to escalation",
+  "clock": "SD-1, 4:00 PM",
+  "difficulty": "Intermediate",
+  "skill": "Completion gate (fan-in)",
+  "scenario": "The tracker shows three tasks done and hardware blocked. Encode the gate for this run: because one task is blocked, the hire is NOT ready and routes to escalation - no matter that three of four succeeded. This is the fan-in invariant doing its job.",
+  "inputType": "text",
+  "inputLabel": "Task tracker (one blocked)",
+  "input": "Task tracker for hire H-4022: accounts done, hardware blocked (laptop backordered to SD+3), access done, payroll done. Gate rule: ready only when ALL tasks are done and none is blocked. One blocked task -> ready false -> route to escalation-path. Name the blocked task.",
+  "instructions": [
+    "Read all four states: three done, one blocked.",
+    "Set allTasksDone false and anyBlocked true.",
+    "Set ready false and route to escalation-path.",
+    "Name the blockedTask, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"allTasksDone\": true,\n  \"anyBlocked\": false,\n  \"ready\": true,\n  \"route\": \"\",\n  \"blockedTask\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["allTasksDone", "anyBlocked", "ready", "route", "blockedTask"],
+    "expected": {
+      "allTasksDone": false,
+      "anyBlocked": true,
+      "ready": false,
+      "route": "escalation-path",
+      "blockedTask": "hardware"
+    }
+  },
+  "copilotPrompt": "Encode the readiness gate for a blocked run: allTasksDone false, anyBlocked true, ready false, route escalation-path, blockedTask hardware. One blocked task blocks the whole hire.",
+  "successMessage": "Gate routed to escalation. One blocked task blocked the hire - the fan-in held.",
+  "validateLabel": "Validate Gate",
+  "editorHelper": "Three done and one blocked still means not ready.",
+  "intro": {
+    "heading": "The invariant under pressure",
+    "sections": [
+      {
+        "title": "Most is not all",
+        "body": "Three of four tasks are done. It is tempting to call that ready. The gate says no: readiness is an AND, and one blocked task fails it. That is the invariant the module exists to teach."
+      },
+      {
+        "title": "Name the culprit",
+        "body": "The gate does not just say 'not ready' - it names the blocked task so escalation knows exactly what to chase. A gate that only says no is less useful than one that says why."
+      },
+      {
+        "title": "Route, do not improvise",
+        "body": "A not-ready hire goes to escalation-path - the one defined exit. There is no ad-hoc third option where a blocked hire quietly proceeds."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A gate result that routes to escalation and names hardware as the block - the input escalation acts on."
+      }
+    ],
+    "jsonExample": "{\n  \"ready\": false,\n  \"route\": \"escalation-path\"\n}",
+    "skill": "Completion gate (fan-in)",
+    "artifactName": "readiness-gate.json"
+  },
+  "fieldGuide": [
+    { "field": "allTasksDone", "meaning": "Whether every task is done.", "type": "boolean", "example": "false", "group": "Fan-in", "lookFor": "all done?", "hint": "Hardware is blocked, so false." },
+    { "field": "anyBlocked", "meaning": "Whether any task is blocked.", "type": "boolean", "example": "true", "group": "Fan-in", "lookFor": "any blocked?", "hint": "Hardware is blocked, so true." },
+    { "field": "ready", "meaning": "Ready only when all done and none blocked.", "type": "boolean", "example": "false", "group": "Decision", "lookFor": "ready?", "hint": "One blocked, so false." },
+    { "field": "route", "meaning": "Where the hire goes next.", "type": "string", "example": "\"escalation-path\"", "group": "Decision", "lookFor": "route where?", "hint": "Not ready routes to escalation-path." },
+    { "field": "blockedTask", "meaning": "The task that blocked the gate.", "type": "string", "example": "\"hardware\"", "group": "Decision", "lookFor": "which task blocked it?", "hint": "Hardware is the blocked task." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd refuse to sign off while any item is open, and hand the open item to whoever can unblock it.",
+      "tools": {
+        "powerAutomate": "a Condition failing when any status is not done -> escalation branch",
+        "zapier": "a Filter that routes to escalation when a task is blocked",
+        "python": "if not all(done): route to escalation with the blocked task"
+      }
+    },
+    "heading": "Routed to escalation",
+    "points": [
+      "You held the invariant: one blocked task means not ready.",
+      "The gate named hardware so escalation knows what to chase.",
+      "A not-ready hire took the defined exit - escalation-path.",
+      "Three successes did not override one block.",
+      "The workflow can now route a blocked hire to escalation, not past it."
+    ],
+    "artifactName": "readiness-gate.json"
+  }
+}

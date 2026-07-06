@@ -160,6 +160,30 @@
       { "taskId": "payroll", "state": "done", "blockedReason": "" }
     ]
   },
+  "lesson-readiness-gate-medium": {
+    "correct": { "allTasksDone": false, "anyBlocked": true, "ready": false, "route": "escalation-path", "blockedTask": "hardware" },
+    "wrong": { "allTasksDone": false, "anyBlocked": true, "ready": true, "route": "day-one-package", "blockedTask": "hardware" }
+  },
+  "lesson-escalation-path-medium": {
+    "correct": { "blockedTask": "hardware", "owner": "IT Provisioner", "action": "issue loaner" },
+    "wrong": { "blockedTask": "hardware", "owner": "IT Provisioner", "action": "delay start" }
+  },
+  "lesson-day-one-package-medium": {
+    "correct": { "hireName": "Sam Rivera", "role": "Logistics Coordinator", "startDate": "SD", "readiness": "Ready with loaner", "accountsState": "done", "hardwareState": "loaner", "accessState": "done", "payrollState": "done" },
+    "wrong": { "hireName": "Sam Rivera", "role": "Logistics Coordinator", "startDate": "SD", "readiness": "Day-One Ready", "accountsState": "done", "hardwareState": "done", "accessState": "done", "payrollState": "done" }
+  },
+  "lesson-manager-handoff-medium": {
+    "correct": { "acknowledgedBy": "Hiring Manager", "readyConfirmed": "conditional", "caveatNoted": "yes" },
+    "wrong": { "acknowledgedBy": "Hiring Manager", "readyConfirmed": "yes", "caveatNoted": "yes" }
+  },
+  "lesson-onboarding-archive-medium": {
+    "correct": { "hireId": "H-4022", "archivedRun": "onboarding-H-4022", "retention": "7 years", "exceptionsNoted": true, "seedsCatalog": true },
+    "wrong": { "hireId": "H-4022", "archivedRun": "onboarding-H-4022", "retention": "7 years", "exceptionsNoted": false, "seedsCatalog": true }
+  },
+  "lesson-profile-feedback-medium": {
+    "correct": { "role": "Logistics Coordinator", "needed": "handheld scanner", "inProfile": true, "proposedChange": "none", "routedTo": "People Ops Lead" },
+    "wrong": { "role": "Logistics Coordinator", "needed": "handheld scanner", "inProfile": true, "proposedChange": "add", "routedTo": "People Ops Lead" }
+  },
 
   "lesson-intake": {
     "correct": { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": "$142/MWh", "generationFlag": "Wind underperformed", "approvalRequired": true },
