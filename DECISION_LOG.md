@@ -2,6 +2,39 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-06 (Module 3 Harbor - Step 2 map approved; field-notes decision)
+
+- MAP APPROVED (autonomous Gate 3 = charter conformance + `npm run lint:map`
+  green + this log). Built the module-03 map to the ratified charter
+  (curriculum/charters/module-03-harbor.md): 16 nodes across 5 phases (Offer
+  Intake -> Provisioning Plan -> Parallel Provisioning -> Gate and Exceptions
+  -> Day-One Package), one decision fork (readiness-gate -> day-one-package |
+  escalation-path), one temporal loop (onboarding-archive -> role-profile-
+  catalog, refined by profile-feedback). Files: src/data/projects/module-03/
+  {workflowNodes,workflowEdges,phases,lessonMeta}.json; registered in
+  src/lib/projects.js (PROJECT_DATA + empty BUILT_LESSONS block) and
+  src/data/projects.json (goal/clock; kept status "planned" until the easy tier
+  exists, then it flips to "active" and module-02 to "complete"). lint:map: 3
+  projects, 0 errors.
+- Step 2a recurrence: added the module-03 row to src/data/moduleSkeleton.json
+  (org Harbor; intake=Onboarding Record, reference=Role Profile Catalog,
+  transform=Provisioning Plan, decision=Readiness Gate, handoff=Escalation
+  Path, assembly=Day-One Package, archive=Onboarding Archive).
+- ENGINE: NO new interaction type. The task-tracker board is expressible with
+  the existing `jsonDeltas` validator (rows of taskId/state/blockedReason), as
+  the charter's engine-needs note allows ("prefer that and skip the new type").
+  choiceCheck cap (<=25%, a hard error for module-03+) will be met by spending
+  tagSource on inspection nodes and handoffForm on the handoff nodes.
+- FIELD-NOTES WRAP LESSON: DECIDED NOT to add a separate 17th "field notes"
+  node. Reasons: (1) it would deviate from the ratified 16-node charter map and
+  break the Step 2 conformance gate; (2) its themes are already owned by
+  existing nodes - credentials/secrets by accounts-task (identity-provider
+  rights, idempotency) and access-task (least-privilege); testing by the
+  accounts-task idempotent re-run (medium); when-NOT-to-automate by the human
+  readiness-gate and the Hard degraded-mode drill (start-anyway vs delay);
+  maintenance by the profile-feedback loop-close. These themes will surface in
+  the relevant takeaways' realWorld beats rather than as a bolt-on lesson.
+
 ## 2026-07-05 (build: tagSource + handoffForm interaction types)
 
 - BUILT both approved anti-slop interaction types per

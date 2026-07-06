@@ -1,0 +1,38 @@
+{
+  "LESSON_PATH": [
+    "signed-offer",
+    "role-profile-catalog",
+    "onboarding-record",
+    "sla-policy",
+    "provisioning-plan",
+    "accounts-task",
+    "hardware-task",
+    "access-task",
+    "payroll-task",
+    "task-tracker",
+    "readiness-gate",
+    "escalation-path",
+    "day-one-package",
+    "manager-handoff",
+    "onboarding-archive",
+    "profile-feedback"
+  ],
+  "LESSON_PREREQS": {
+    "signed-offer": [],
+    "role-profile-catalog": ["signed-offer"],
+    "onboarding-record": ["signed-offer"],
+    "sla-policy": ["role-profile-catalog"],
+    "provisioning-plan": ["onboarding-record", "role-profile-catalog", "sla-policy"],
+    "accounts-task": ["provisioning-plan"],
+    "hardware-task": ["provisioning-plan"],
+    "access-task": ["provisioning-plan"],
+    "payroll-task": ["provisioning-plan"],
+    "task-tracker": ["accounts-task", "hardware-task", "access-task", "payroll-task"],
+    "readiness-gate": ["task-tracker"],
+    "escalation-path": ["readiness-gate"],
+    "day-one-package": ["readiness-gate"],
+    "manager-handoff": ["day-one-package"],
+    "onboarding-archive": ["manager-handoff"],
+    "profile-feedback": ["onboarding-archive"]
+  }
+}

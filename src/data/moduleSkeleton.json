@@ -35,6 +35,19 @@
         "assembly": "Payment Run",
         "archive": "Payment Archive"
       }
+    },
+    "module-03": {
+      "org": "Harbor",
+      "deliverable": "Day-One Ready package",
+      "map": {
+        "intake": "Onboarding Record",
+        "reference": "Role Profile Catalog",
+        "transform": "Provisioning Plan",
+        "decision": "Readiness Gate",
+        "handoff": "Escalation Path",
+        "assembly": "Day-One Package",
+        "archive": "Onboarding Archive"
+      }
     }
   }
 }
