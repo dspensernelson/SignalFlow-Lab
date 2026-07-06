@@ -2,6 +2,31 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-06 (Module 3 Harbor - medium + hard tiers complete)
+
+- MEDIUM tier (16 lessons, full tier): a messier second hire (Sam Rivera,
+  H-4022) carrying the charter's three messes - a moved/amended start date
+  (recompute), a backordered laptop (blocked -> escalation -> loaner ->
+  degraded package), and an idempotent re-run (existingFound true -> reused).
+  Governed changes threaded through: role catalog v1.1.0 (scanner added from the
+  loop), SLA policy v1.1.0 (hardware slack SD-2). choiceCheck stays 2 total.
+- HARD tier CURATION (6 lessons; hard is a curated set per the playbook):
+  readiness-gate-hard = the MANDATORY Step 7a solo-rebuild artifactImport
+  CAPSTONE (rebuild onboarding-record + provisioning-plan + task-tracker +
+  readiness-gate outside the app; each graded by its easy validator); plus the
+  charter's three drills - sla-policy-hard (design SLAs from completion data),
+  escalation-path-hard (unresponsive-owner ladder at scale), day-one-package-
+  hard (governed start-anyway vs delay). Two deepenings added to reach six:
+  accounts-task-hard (partial-failure reconciliation, idempotency at the
+  sub-step) and task-tracker-hard (conflicting-status reconciliation, a
+  conservative tie-break). Inspection/governance-only nodes were intentionally
+  NOT deepened into hard, per the playbook guidance.
+- Module 3 now has 38 lessons total (16/16/6). choiceCheck 2/38 = 5.3% (under
+  the module-03 hard cap). All six interaction types are spent (choiceCheck,
+  jsonEditor, templateSlots, tagSource, handoffForm, artifactImport). Canon
+  curriculum/module-03/canon.json now 39 module-03 assertions. npm run check
+  green (120 lessons repo-wide).
+
 ## 2026-07-06 (Module 3 Harbor - easy tier complete + live)
 
 - BUILT the full easy tier: 16 lessons across the 5 phases, one per node, in

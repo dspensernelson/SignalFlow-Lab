@@ -47,6 +47,12 @@
     { "lesson": "lesson-escalation-path-medium", "path": "validation.artifactOnPass.action", "op": "equals", "value": "issue loaner" },
     { "lesson": "lesson-onboarding-archive-medium", "path": "validation.expected.exceptionsNoted", "op": "equals", "value": true },
     { "lesson": "lesson-profile-feedback-medium", "path": "validation.expected.inProfile", "op": "equals", "value": true },
-    { "lesson": "lesson-profile-feedback-medium", "path": "validation.expected.proposedChange", "op": "equals", "value": "none" }
+    { "lesson": "lesson-profile-feedback-medium", "path": "validation.expected.proposedChange", "op": "equals", "value": "none" },
+    { "lesson": "lesson-day-one-package-hard", "path": "validation.expected.decision", "op": "equals", "value": "start-anyway" },
+    { "lesson": "lesson-accounts-task-hard", "path": "validation.expected.action", "op": "equals", "value": "complete-missing" },
+    { "lesson": "lesson-escalation-path-hard", "path": "validation.expected.level2Owner", "op": "equals", "value": "People Ops Lead" },
+    { "lesson": "lesson-task-tracker-hard", "path": "validation.expectedRows[taskId=hardware].state", "op": "equals", "value": "blocked" },
+    { "lesson": "lesson-readiness-gate-hard", "path": "validation.imports[key=readiness-gate].validation.expected.route", "op": "equals", "value": "day-one-package" },
+    { "lesson": "lesson-readiness-gate-hard", "path": "validation.imports[key=onboarding-record].validation.expected.role", "op": "equals", "value": "Logistics Coordinator" }
   ]
 }

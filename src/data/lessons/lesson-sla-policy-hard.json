@@ -1,0 +1,82 @@
+{
+  "id": "lesson-sla-policy-hard",
+  "nodeId": "sla-policy",
+  "title": "Design the SLA Policy from Data",
+  "difficulty": "Hard",
+  "skill": "Governance design",
+  "scenario": "No policy is handed to you this time. Given last quarter's actual completion times, DESIGN the onboarding SLA policy: choose deadlines with enough margin that tasks finish on time, keep payroll earliest, and version it. The validator checks the shape and the ordering; the numbers are your call to defend.",
+  "inputType": "text",
+  "inputLabel": "Past onboarding completion data",
+  "input": "Last quarter, measured in business days before start when each task actually finished: payroll typically cleared 3-4 days out (slowest, cycle-bound); accounts 2-3 days out; hardware 1-3 days out (variable, supply-dependent); access 1-2 days out. Design deadlines with margin so most runs finish on time. Constraints: every SLA is a positive integer number of business days before start, and payroll must remain the earliest (largest). Version the policy 2.0.0.",
+  "instructions": [
+    "Choose each SLA as a positive integer of business days before start, with margin from the data.",
+    "Keep payroll the earliest: payrollSla must exceed accessSla.",
+    "Name the policy, set owner, and version it 2.0.0.",
+    "Return one JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"policyName\": \"Onboarding SLA Policy\",\n  \"version\": \"\",\n  \"owner\": \"\",\n  \"accountsSla\": 0,\n  \"hardwareSla\": 0,\n  \"accessSla\": 0,\n  \"payrollSla\": 0\n}",
+  "validation": {
+    "type": "jsonPolicy",
+    "requiredFields": ["policyName", "version", "owner", "accountsSla", "hardwareSla", "accessSla", "payrollSla"],
+    "numericFields": ["accountsSla", "hardwareSla", "accessSla", "payrollSla"],
+    "nonEmptyFields": ["policyName", "version", "owner"],
+    "ordering": { "greater": "payrollSla", "than": "accessSla" }
+  },
+  "copilotPrompt": "Design an onboarding SLA policy from completion data: pick positive integer deadlines (business days before start) with margin, keep payroll the earliest (payrollSla > accessSla), owner People Ops Lead, version 2.0.0.",
+  "successMessage": "SLA policy designed. Your deadlines have margin from real data, and payroll still leads.",
+  "validateLabel": "Validate Policy",
+  "editorHelper": "Design the numbers - defend them with the data and the ordering.",
+  "intro": {
+    "heading": "Design, do not transcribe",
+    "sections": [
+      {
+        "title": "Policy is a judgement call",
+        "body": "An SLA is a promise the teams must keep. Set it too tight and every run breaches; too loose and there is no urgency. Design means choosing the margin the data justifies."
+      },
+      {
+        "title": "Read the distribution, not the average",
+        "body": "Hardware finished 1-3 days out - so an SLA at its average would breach half the time. Good design leans toward the slow end so most runs finish on time."
+      },
+      {
+        "title": "Constraints still bind",
+        "body": "Payroll stays earliest for the pay cycle. Design is freedom within constraints: your numbers can vary, but the ordering that encodes dependencies must hold."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A versioned SLA policy you designed from evidence - the governed input every future plan applies."
+      }
+    ],
+    "jsonExample": "{\n  \"payrollSla\": 4,\n  \"accessSla\": 2,\n  \"version\": \"2.0.0\"\n}",
+    "skill": "Governance design",
+    "artifactName": "sla-policy.json"
+  },
+  "fieldGuide": [
+    { "field": "policyName", "meaning": "The policy name.", "type": "string", "example": "\"Onboarding SLA Policy\"", "group": "Governance", "lookFor": "which policy?", "hint": "Name it." },
+    { "field": "version", "meaning": "The version of your design.", "type": "string", "example": "\"2.0.0\"", "group": "Governance", "lookFor": "which version?", "hint": "2.0.0." },
+    { "field": "owner", "meaning": "Who owns the policy.", "type": "string", "example": "\"People Ops Lead\"", "group": "Governance", "lookFor": "who owns it?", "hint": "The People Ops Lead." },
+    { "field": "accountsSla", "meaning": "Days before start accounts are due.", "type": "number", "example": "3", "group": "Design", "lookFor": "accounts margin?", "hint": "Lean toward the slow end of 2-3." },
+    { "field": "hardwareSla", "meaning": "Days before start hardware is due.", "type": "number", "example": "3", "group": "Design", "lookFor": "hardware margin?", "hint": "Hardware was variable (1-3) - give it room." },
+    { "field": "accessSla", "meaning": "Days before start access is due.", "type": "number", "example": "2", "group": "Design", "lookFor": "access margin?", "hint": "Access ran 1-2 days out." },
+    { "field": "payrollSla", "meaning": "Days before start payroll is due (earliest).", "type": "number", "example": "4", "group": "Design", "lookFor": "payroll margin?", "hint": "Keep it the largest - payroll leads." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd look at how long each task actually took, pad for the slow cases, and publish deadlines the teams can hit.",
+      "tools": {
+        "powerAutomate": "compute percentiles from history, set SLA config from them",
+        "zapier": "derive SLA values from a completion-time table",
+        "python": "set each sla from a high percentile of past durations"
+      }
+    },
+    "heading": "SLA policy designed",
+    "points": [
+      "You chose deadlines with margin from real completion data.",
+      "You leaned toward the slow end so most runs finish on time.",
+      "Payroll still leads - the ordering constraint held.",
+      "The policy is versioned 2.0.0 and owned.",
+      "The workflow can now run on deadlines you designed and can defend."
+    ],
+    "artifactName": "sla-policy.json"
+  }
+}

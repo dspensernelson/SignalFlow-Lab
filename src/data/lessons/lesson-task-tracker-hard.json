@@ -1,0 +1,83 @@
+{
+  "id": "lesson-task-tracker-hard",
+  "nodeId": "task-tracker",
+  "title": "Reconcile Conflicting Status",
+  "difficulty": "Hard",
+  "skill": "State authority & tie-breaks",
+  "scenario": "Two sources disagree about hardware: the automation marked it done, but the IT Provisioner says it is blocked. The gate cannot act on a contradiction. Reconcile the tracker with an explicit tie-break rule - the conservative state holds until confirmed - so the gate reads one truth.",
+  "inputType": "text",
+  "inputLabel": "Conflicting reports",
+  "input": "Status reports for hire H-4021:\naccounts -> done (agreed)\nhardware -> automation says done, IT Provisioner says blocked (CONFLICT)\naccess -> done (agreed)\npayroll -> done (agreed)\nTie-break rule: on conflict, the CONSERVATIVE state (blocked) holds until a human confirms done. Set hardware blocked with reason 'conflicting reports; held pending confirmation'. The rest are done with empty reason.",
+  "instructions": [
+    "Write one row per task.",
+    "Set accounts, access, payroll to done with empty blockedReason.",
+    "Reconcile hardware to blocked with reason 'conflicting reports; held pending confirmation'.",
+    "Return a JSON array of the four rows, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"taskId\": \"accounts\", \"state\": \"\", \"blockedReason\": \"\" },\n  { \"taskId\": \"hardware\", \"state\": \"\", \"blockedReason\": \"\" },\n  { \"taskId\": \"access\", \"state\": \"\", \"blockedReason\": \"\" },\n  { \"taskId\": \"payroll\", \"state\": \"\", \"blockedReason\": \"\" }\n]",
+  "validation": {
+    "type": "jsonDeltas",
+    "keyField": "taskId",
+    "requiredFields": ["taskId", "state", "blockedReason"],
+    "numericFields": [],
+    "expectedRows": [
+      { "taskId": "accounts", "state": "done", "blockedReason": "" },
+      { "taskId": "hardware", "state": "blocked", "blockedReason": "conflicting reports; held pending confirmation" },
+      { "taskId": "access", "state": "done", "blockedReason": "" },
+      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+    ]
+  },
+  "copilotPrompt": "Reconcile a tracker with a conflict: accounts, access, payroll done; hardware conflicting (automation done vs owner blocked). Apply the conservative tie-break: hardware blocked with reason 'conflicting reports; held pending confirmation'.",
+  "successMessage": "Conflict reconciled. The conservative state holds, so the gate reads one truth, not a contradiction.",
+  "validateLabel": "Validate Tracker",
+  "editorHelper": "On conflict, hold the conservative state until confirmed.",
+  "intro": {
+    "heading": "One record, one truth",
+    "sections": [
+      {
+        "title": "Sources disagree",
+        "body": "Automation and a human can report different states. The tracker cannot hold both - the gate needs a single value. Reconciliation is deciding which source wins, by rule, not by mood."
+      },
+      {
+        "title": "Conservative until confirmed",
+        "body": "When safety is at stake, the cautious state holds: blocked beats done until a human confirms. Assuming done and being wrong sends an unready hire through; holding is recoverable."
+      },
+      {
+        "title": "Record why",
+        "body": "The reason names the conflict, so the hold is not a mystery. A blocked state that explains itself is one a reviewer can resolve quickly."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A reconciled tracker with one authoritative state per task - the contradiction resolved by an explicit rule."
+      }
+    ],
+    "jsonExample": "[\n  { \"taskId\": \"hardware\", \"state\": \"blocked\", \"blockedReason\": \"conflicting reports; held pending confirmation\" }\n]",
+    "skill": "State authority & tie-breaks",
+    "artifactName": "task-tracker.json"
+  },
+  "fieldGuide": [
+    { "field": "taskId", "meaning": "The task this row tracks.", "type": "string", "example": "\"hardware\"", "group": "Task", "lookFor": "which task?", "hint": "accounts, hardware, access, payroll." },
+    { "field": "state", "meaning": "The reconciled state.", "type": "string", "example": "\"blocked\"", "group": "Status", "lookFor": "which state wins?", "hint": "Conservative: hardware blocked; others done." },
+    { "field": "blockedReason", "meaning": "Why held - names the conflict.", "type": "string", "example": "\"conflicting reports; held pending confirmation\"", "group": "Status", "lookFor": "why blocked?", "hint": "Only hardware has a reason." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd treat a disputed item as not-done until someone confirmed it, and note the disagreement so it gets resolved.",
+      "tools": {
+        "powerAutomate": "a rule preferring the blocked report on conflict, with a reason",
+        "zapier": "compare the two sources; keep the conservative value",
+        "python": "state = 'blocked' if sources_disagree else agreed_state"
+      }
+    },
+    "heading": "Conflict reconciled",
+    "points": [
+      "You resolved a two-source conflict with an explicit tie-break rule.",
+      "The conservative state (blocked) held until a human confirms done.",
+      "The reason names the conflict so it can be resolved fast.",
+      "The gate now reads one authoritative state per task, not a contradiction.",
+      "The workflow can now reconcile disagreeing status reports safely."
+    ],
+    "artifactName": "task-tracker.json"
+  }
+}

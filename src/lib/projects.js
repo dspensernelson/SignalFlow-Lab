@@ -198,7 +198,14 @@ export const BUILT_LESSONS = {
       'lesson-onboarding-archive-medium',
       'lesson-profile-feedback-medium',
     ],
-    hard: [],
+    hard: [
+      'lesson-readiness-gate-hard',
+      'lesson-sla-policy-hard',
+      'lesson-escalation-path-hard',
+      'lesson-day-one-package-hard',
+      'lesson-accounts-task-hard',
+      'lesson-task-tracker-hard',
+    ],
   },
 }
 
