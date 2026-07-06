@@ -1,0 +1,85 @@
+{
+  "id": "lesson-task-tracker-medium",
+  "nodeId": "task-tracker",
+  "title": "Track a Blocked Branch",
+  "subtitle": "One task blocked, with a reason",
+  "clock": "SD-1, 3:00 PM",
+  "difficulty": "Intermediate",
+  "skill": "Task-state tracking",
+  "scenario": "The branches reported in and one is not clean: hardware is backordered. Roll the outcomes onto the tracker with hardware BLOCKED and a reason, the other three done. A blocked state without a reason hides exactly what the gate needs to act on.",
+  "inputType": "text",
+  "inputLabel": "Branch outcomes (one blocked)",
+  "input": "Branch outcomes for hire H-4022:\naccounts -> reused, complete\nhardware -> laptop backordered to SD+3, NOT complete\naccess -> reconciled, complete\npayroll -> enrolled (rush), complete\nAllowed states: pending, in-progress, done, blocked. Set hardware to blocked with a reason; the rest are done with no reason.",
+  "instructions": [
+    "Write one row per task: accounts, hardware, access, payroll.",
+    "Set accounts, access, payroll to done with an empty blockedReason.",
+    "Set hardware to blocked with the reason 'laptop backordered to SD+3'.",
+    "Return a JSON array of the four rows, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"taskId\": \"accounts\", \"state\": \"\", \"blockedReason\": \"\" },\n  { \"taskId\": \"hardware\", \"state\": \"\", \"blockedReason\": \"\" },\n  { \"taskId\": \"access\", \"state\": \"\", \"blockedReason\": \"\" },\n  { \"taskId\": \"payroll\", \"state\": \"\", \"blockedReason\": \"\" }\n]",
+  "validation": {
+    "type": "jsonDeltas",
+    "keyField": "taskId",
+    "requiredFields": ["taskId", "state", "blockedReason"],
+    "numericFields": [],
+    "expectedRows": [
+      { "taskId": "accounts", "state": "done", "blockedReason": "" },
+      { "taskId": "hardware", "state": "blocked", "blockedReason": "laptop backordered to SD+3" },
+      { "taskId": "access", "state": "done", "blockedReason": "" },
+      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+    ]
+  },
+  "copilotPrompt": "Build a JSON array of four task-state rows. Accounts, access, payroll are done with empty blockedReason. Hardware is blocked with blockedReason 'laptop backordered to SD+3'.",
+  "successMessage": "Tracker updated with the block visible. The gate can now see exactly why the hire is not ready.",
+  "validateLabel": "Validate Tracker",
+  "editorHelper": "Blocked needs a reason - that is the whole point.",
+  "intro": {
+    "heading": "Before the gate: make the block visible",
+    "sections": [
+      {
+        "title": "One record, honest states",
+        "body": "Three branches are clean and one is not. The tracker's job is to show all four truthfully, so the gate reads one record instead of chasing four people for the bad news."
+      },
+      {
+        "title": "Blocked without a reason is noise",
+        "body": "'blocked' alone tells the gate to stop but not why. The reason - laptop backordered to SD+3 - is what escalation needs to act. A blocked state with an empty reason hides the problem."
+      },
+      {
+        "title": "The vocabulary still holds",
+        "body": "The states are the same fixed set: pending, in-progress, done, blocked. The mess is which state a task is in, not a new kind of state."
+      },
+      {
+        "title": "What you produce here",
+        "body": "One status record with a real blocked row. The gate will fan in on it and route the hire to escalation."
+      }
+    ],
+    "jsonExample": "[\n  { \"taskId\": \"hardware\", \"state\": \"blocked\", \"blockedReason\": \"laptop backordered to SD+3\" }\n]",
+    "skill": "Task-state tracking",
+    "artifactName": "task-tracker.json"
+  },
+  "fieldGuide": [
+    { "field": "taskId", "meaning": "The task this row tracks.", "type": "string", "example": "\"hardware\"", "group": "Task", "lookFor": "which task?", "hint": "accounts, hardware, access, payroll." },
+    { "field": "state", "meaning": "The task's current state.", "type": "string", "example": "\"blocked\"", "group": "Status", "lookFor": "what state?", "hint": "Hardware is blocked; the rest are done." },
+    { "field": "blockedReason", "meaning": "Why a task is blocked - empty unless blocked.", "type": "string", "example": "\"laptop backordered to SD+3\"", "group": "Status", "lookFor": "why blocked?", "hint": "Only hardware has a reason; leave the others empty." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd mark the one stuck item blocked with a note on your checklist, so the reason is right next to the status.",
+      "tools": {
+        "powerAutomate": "set the hardware row status to blocked with a reason field",
+        "zapier": "update the status and reason columns for the blocked task",
+        "python": "record {taskId, state:'blocked', blockedReason} for the stuck branch"
+      }
+    },
+    "heading": "Block made visible",
+    "points": [
+      "You rolled four branches onto one record with three done and one blocked.",
+      "The blocked row carries a reason the gate and escalation can act on.",
+      "The state vocabulary held; only the states differ from a clean run.",
+      "The gate now has an honest record showing why the hire is not ready.",
+      "The workflow can now surface a blocked branch with its reason for the gate."
+    ],
+    "artifactName": "task-tracker.json"
+  }
+}

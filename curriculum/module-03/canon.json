@@ -36,6 +36,11 @@
     { "lesson": "lesson-role-profile-catalog-medium", "path": "validation.artifactOnPass.version", "op": "equals", "value": "1.1.0" },
     { "lesson": "lesson-onboarding-record-medium", "path": "validation.expected.startDateAmended", "op": "equals", "value": true },
     { "lesson": "lesson-provisioning-plan-medium", "path": "validation.expectedRows[taskId=hardware].due", "op": "equals", "value": "SD-2" },
-    { "lesson": "lesson-provisioning-plan-medium", "path": "validation.expectedRows[taskId=payroll].due", "op": "equals", "value": "SD-3" }
+    { "lesson": "lesson-provisioning-plan-medium", "path": "validation.expectedRows[taskId=payroll].due", "op": "equals", "value": "SD-3" },
+    { "lesson": "lesson-accounts-task-medium", "path": "validation.expected.action", "op": "equals", "value": "reused" },
+    { "lesson": "lesson-accounts-task-medium", "path": "validation.expected.accountId", "op": "equals", "value": "acct-4022" },
+    { "lesson": "lesson-hardware-task-medium", "path": "validation.artifactOnPass.state", "op": "equals", "value": "blocked" },
+    { "lesson": "lesson-task-tracker-medium", "path": "validation.expectedRows[taskId=hardware].state", "op": "equals", "value": "blocked" },
+    { "lesson": "lesson-payroll-task-medium", "path": "validation.artifactOnPass.priority", "op": "equals", "value": "rush" }
   ]
 }
