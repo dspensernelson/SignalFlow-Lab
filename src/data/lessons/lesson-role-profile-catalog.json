@@ -1,0 +1,124 @@
+{
+  "id": "lesson-role-profile-catalog",
+  "nodeId": "role-profile-catalog",
+  "title": "Read the Role Profile Catalog",
+  "subtitle": "The governed matrix of what each role gets",
+  "clock": "SD-5, 10:00 AM",
+  "difficulty": "Beginner",
+  "skill": "Reference governance",
+  "scenario": "It is SD-5. Before you plan any provisioning, read the reference People Ops owns: the role profile catalog. It says exactly what a Logistics Coordinator gets on day one - accounts, software, hardware, access groups, and pay class. Understand who owns it and why access is granted by role, not by request.",
+  "inputType": "text",
+  "inputLabel": "Role Profile - Logistics Coordinator",
+  "input": "Role Profile: Logistics Coordinator (Operations). Accounts: identity, email, directory. Software: Logistics Suite, Email/Calendar. Hardware: Standard laptop. Access groups: ops-general, warehouse-readonly. Pay class: Non-exempt / Hourly. Owned by the People Ops Lead; entitlement changes require People Ops sign-off.",
+  "instructions": [
+    "Read the role profile as the governed source for what this role gets.",
+    "Answer the four questions about ownership, least-privilege, and reuse.",
+    "Validate to mint the role profile record."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "Who owns the role profile catalog?",
+        "options": [
+          { "id": "a", "text": "The IT Provisioner, who edits it per hire" },
+          { "id": "b", "text": "The People Ops Lead, who governs entitlement changes" },
+          { "id": "c", "text": "The hiring manager for each new hire" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The People Ops Lead owns the catalog and governs changes. Provisioners read it; they do not edit what a role gets per hire."
+      },
+      {
+        "id": "q2",
+        "prompt": "How is the new hire's access decided?",
+        "options": [
+          { "id": "a", "text": "By the access groups the role profile lists - access by role" },
+          { "id": "b", "text": "By whatever the new hire requests on day one" },
+          { "id": "c", "text": "By copying the last hire in the department" }
+        ],
+        "correctOptionId": "a",
+        "explain": "Access is granted by role, not by request or by copying a colleague. The profile's groups (ops-general, warehouse-readonly) are the least-privilege default."
+      },
+      {
+        "id": "q3",
+        "prompt": "Why does the catalog list a pay class per role?",
+        "options": [
+          { "id": "a", "text": "So the hardware team knows which laptop to order" },
+          { "id": "b", "text": "So the payroll handoff enrolls the hire in the right class without guessing" },
+          { "id": "c", "text": "It is only for display and has no downstream use" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The pay class (Non-exempt / Hourly) flows to the payroll task so enrollment is correct by role, not decided ad hoc."
+      },
+      {
+        "id": "q4",
+        "prompt": "Which later step expands this profile into concrete tasks?",
+        "options": [
+          { "id": "a", "text": "The Readiness Gate" },
+          { "id": "b", "text": "The Provisioning Plan" },
+          { "id": "c", "text": "The Onboarding Archive" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The Provisioning Plan expands the role profile into one owned, dated task per entitlement. The gate only reads the results later."
+      }
+    ],
+    "artifactOnPass": {
+      "reference": "role-profile-catalog",
+      "role": "Logistics Coordinator",
+      "accounts": ["identity", "email", "directory"],
+      "accessGroups": ["ops-general", "warehouse-readonly"],
+      "payClass": "Non-exempt / Hourly",
+      "ownedBy": "People Ops Lead",
+      "firstConsumer": "provisioning-plan"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Explain a role profile catalog for onboarding: who owns it, why access is granted by role rather than by request (least-privilege), why a pay class lives per role, and which step expands it into tasks.",
+  "successMessage": "Role profile read. You now hold the governed matrix the provisioning plan expands.",
+  "intro": {
+    "heading": "Before you plan: what the role gets",
+    "sections": [
+      {
+        "title": "A catalog, not a guess",
+        "body": "What a Logistics Coordinator gets on day one is not decided per hire. It lives in a governed catalog People Ops owns, so every hire in the role gets the same, auditable set."
+      },
+      {
+        "title": "Access by role is least-privilege",
+        "body": "Granting exactly the access groups the profile lists - and nothing more - is how least-privilege is enforced. A grant the profile does not list is a policy exception, not a convenience."
+      },
+      {
+        "title": "One profile, many readers",
+        "body": "The provisioning plan, the access task, and the payroll handoff all read this profile. Getting the catalog right once is what keeps four parallel branches consistent."
+      },
+      {
+        "title": "What you produce here",
+        "body": "Reading the profile mints a role profile record the plan expands. Later, the archive loop feeds real usage back so the catalog keeps improving."
+      }
+    ],
+    "jsonExample": "{\n  \"role\": \"Logistics Coordinator\",\n  \"accessGroups\": [\"ops-general\", \"warehouse-readonly\"],\n  \"payClass\": \"Non-exempt / Hourly\"\n}",
+    "skill": "Reference governance",
+    "artifactName": "role-profile-record.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd keep a table of role to entitlements and read the row for this role, rather than deciding per hire what accounts and access to grant.",
+      "tools": {
+        "powerAutomate": "a Dataverse 'role entitlements' table looked up by role",
+        "zapier": "a lookup table (Storage/Tables) keyed by role title",
+        "python": "a role -> entitlements dict read at plan time"
+      }
+    },
+    "heading": "Role profile read",
+    "points": [
+      "You confirmed the People Ops Lead owns the catalog and governs entitlement changes.",
+      "Access is granted by role (ops-general, warehouse-readonly) - least-privilege by default.",
+      "The pay class flows to payroll so enrollment is correct by role, not by guess.",
+      "Your role profile record is stored for the provisioning plan to expand.",
+      "The workflow can now say exactly what this role gets on day one."
+    ],
+    "artifactName": "role-profile-record.json"
+  }
+}

@@ -162,7 +162,13 @@ export const BUILT_LESSONS = {
     ],
   },
   'module-03': {
-    easy: [],
+    easy: [
+      'lesson-signed-offer',
+      'lesson-role-profile-catalog',
+      'lesson-onboarding-record',
+      'lesson-sla-policy',
+      'lesson-provisioning-plan',
+    ],
     medium: [],
     hard: [],
   },
