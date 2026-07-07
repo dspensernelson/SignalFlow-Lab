@@ -2,6 +2,34 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-07 (Module 4 Relay - easy tier complete + live)
+
+- BUILT the full easy tier: 16 lessons across the 5 phases in three waves
+  (intake + classification; priority + routing; resolution + learning). Follows
+  one clean support day: three tickets, one P1 (TKT-4001 checkout outage),
+  deliverable queue-digest.md at 5:00 PM, misroute -> taxonomy feedback loop.
+- Interaction mix meets the cap: choiceCheck 2/16 = 12.5% (well under the 25%
+  module-04 hard error). Spent tagSource (ticket-inbox), handoffForm
+  (escalation-handoff, queue-assignment), templateSlots (queue-digest), and
+  jsonEditor variants; classification and priority-matrix are the two
+  choiceCheck lessons. Waves sequenced so the ratio never exceeds 25% at a
+  commit. No new engine type.
+- GO-LIVE flip: module-04 status planned -> active and module-03 active ->
+  complete in projects.json (one active project). Relay is now selectable.
+- VERIFIED live no-scroll in the WRONG-answer state at BOTH 1280x800 and
+  1366x650 for the richest new surfaces: classification (choiceCheck, 4
+  questions) and queue-digest (templateSlots, 5 slots). Both scrollHeight ===
+  clientHeight; the other components are already-verified with comparable
+  content.
+- Canon: curriculum/module-04/canon.json + easy/_OVERVIEW.md. npm run check
+  green (136 lessons repo-wide).
+- REMAINING for the module: MEDIUM tier (a two-category ticket, a P1-looking
+  ticket the matrix scores P3, a misroute discovered at resolution) and HARD
+  tier (matrix design from incident history, taxonomy change management,
+  load-shedding over-SLA routing, degraded-mode digest) INCLUDING the mandatory
+  Step 7a solo-rebuild artifactImport capstone on route-decision. Then the
+  module-wrap PR.
+
 ## 2026-07-07 (Module 4 Relay - Step 2 map approved)
 
 - MERGED PR #6 (Module 3 Harbor) to main at owner instruction ("merge then

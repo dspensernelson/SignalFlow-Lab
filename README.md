@@ -6,27 +6,34 @@ The first project is **Meridian Morning Market Brief**, a fictional energy-marke
 
 **Live:** https://signal-flow-lab.vercel.app (production, auto-deployed from green `main`).
 
-## Current Status (2026-07-06, feat/module-03-harbor - MODULE 3 COMPLETE, all tiers)
+## Current Status (2026-07-07, feat/module-04-relay - MODULE 4 EASY tier live)
 
 Where things stand if you are picking this back up:
 
+- **Module 4 (Relay Ticket Triage) EASY tier is COMPLETE and live** (16/16).
+  It teaches CLASSIFICATION and ROUTING: classify each ticket against a governed
+  taxonomy, score priority on an impact-by-urgency matrix, route to a queue
+  (escalating P1s), track SLA timers, catch misroutes, and assemble the 5:00 PM
+  `queue-digest.md`, with a misroute -> taxonomy feedback loop. No new engine
+  type (classification fits choiceCheck, the SLA tracker jsonDeltas, the digest
+  templateSlots). choiceCheck is 12.5% (2/16), under the <=25% cap. Live
+  no-scroll verified at 1280x800 and 1366x650 in the wrong-answer state
+  (choiceCheck classification, templateSlots digest). Module 4 flipped to
+  `active`, Module 3 to `complete`. Canon: `curriculum/module-04/canon.json` +
+  `easy/_OVERVIEW.md`. MEDIUM and HARD tiers remain (medium: two-category
+  ticket, P1-looking-but-P3, discovered misroute; hard: matrix design, taxonomy
+  change management, load-shedding, degraded digest + the mandatory
+  `artifactImport` capstone on route-decision).
 - **Module 3 (Harbor Onboarding) is COMPLETE across all three tiers** (Easy
-  16/16, Medium 16/16, Hard 6/6 = 38 lessons). It teaches ORCHESTRATION:
-  four provisioning branches run in parallel against SLAs, a readiness gate
-  fans in on ALL tasks (one blocked task blocks the hire), and the deliverable
-  is `day-one-package.md`. Easy is a clean hire; Medium is a messy second hire
-  (moved/amended start, backordered laptop -> blocked -> escalation -> loaner ->
-  degraded package, idempotent re-run); Hard is 6 curated drills including the
-  mandatory solo-rebuild `artifactImport` capstone on the readiness gate. No new
-  engine type was needed (the task-tracker board uses `jsonDeltas`). choiceCheck
-  is 5.3% (2/38), well under the <=25% cap. Live no-scroll verified at 1280x800
-  and 1366x650 in the wrong-answer state across every component (tagSource,
-  templateSlots, jsonEditor, jsonDeltas, handoffForm, artifactImport). Canon:
-  `curriculum/module-03/canon.json` + `easy/_OVERVIEW.md`.
+  16/16, Medium 16/16, Hard 6/6 = 38 lessons) and MERGED to main (PR #6). It
+  teaches ORCHESTRATION: four provisioning branches run in parallel against
+  SLAs, a readiness gate fans in on ALL tasks, and the deliverable is
+  `day-one-package.md`. Hard includes the mandatory solo-rebuild `artifactImport`
+  capstone. Canon: `curriculum/module-03/canon.json` + `easy/_OVERVIEW.md`.
 - **The two anti-slop interaction types shipped and are in use.** `tagSource`
-  and `handoffForm` (`ENGINE_ADDITIONS_SPEC_INSPECTION_HANDOFF.md`) were built
-  (merged to `main`) and are spent across Module 3's inspection and handoff
-  nodes to hold the choiceCheck cap.
+  and `handoffForm` (`ENGINE_ADDITIONS_SPEC_INSPECTION_HANDOFF.md`) are spent
+  across Modules 3-4's inspection and handoff nodes to hold the choiceCheck cap.
+
 
 - **Module 2 (Beacon Invoice Desk) is COMPLETE across all three tiers** (Easy
   17/17, Medium 17/17, Hard 5/5). Easy operates the AP pipeline on a clean
