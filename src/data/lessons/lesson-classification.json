@@ -1,0 +1,122 @@
+{
+  "id": "lesson-classification",
+  "nodeId": "classification",
+  "title": "Classify the Ticket",
+  "subtitle": "Interpret prose into a governed category",
+  "clock": "2:09 PM",
+  "difficulty": "Beginner",
+  "skill": "Interpretation to taxonomy",
+  "scenario": "It is 2:09 PM. You have the ticket record and the taxonomy. Now interpret: which category does TKT-4001 belong to? The customer guessed billing, but checkout being down for all users is an outage. Classify the symptom, not the guess.",
+  "inputType": "text",
+  "inputLabel": "Ticket TKT-4001",
+  "input": "Ticket record: TKT-4001, product Checkout, symptom \"Checkout is down for all users\". The customer wrote \"maybe a billing problem\". Taxonomy: outage (service down for many users), bug (a feature broken for some), how-to (a question), billing (invoices/payments).",
+  "instructions": [
+    "Read the symptom against the taxonomy definitions.",
+    "Answer the four questions about the right category and why.",
+    "Validate to mint the classification."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "Which category fits TKT-4001?",
+        "options": [
+          { "id": "a", "text": "billing - the customer guessed a billing problem" },
+          { "id": "b", "text": "outage - service is down for many users" },
+          { "id": "c", "text": "how-to - the customer asked a question" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Checkout down for all users matches the outage definition (service down for many). The customer's billing guess is a distractor; classify the symptom."
+      },
+      {
+        "id": "q2",
+        "prompt": "Why not classify it as the customer's guess (billing)?",
+        "options": [
+          { "id": "a", "text": "Because customers are always wrong" },
+          { "id": "b", "text": "Because you classify the observed symptom, not the guessed cause" },
+          { "id": "c", "text": "Because billing tickets are never urgent" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Classification maps the symptom (what is happening) to the taxonomy. The customer's cause is a hypothesis, not the category."
+      },
+      {
+        "id": "q3",
+        "prompt": "What makes 'outage' the right call over 'bug'?",
+        "options": [
+          { "id": "a", "text": "'All users' means many are affected - the outage definition, not a bug for some" },
+          { "id": "b", "text": "Outage always sounds more serious" },
+          { "id": "c", "text": "There is no difference between them" }
+        ],
+        "correctOptionId": "a",
+        "explain": "The definitions decide: outage is 'down for many users'; a bug is 'broken for some'. 'All users' puts this squarely in outage."
+      },
+      {
+        "id": "q4",
+        "prompt": "Which steps consume this category next?",
+        "options": [
+          { "id": "a", "text": "Only the digest, for counting" },
+          { "id": "b", "text": "Priority assignment and route decision both read the category" },
+          { "id": "c", "text": "None - classification is the last step" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The category feeds priority (impact) and routing (queue). A wrong category here misroutes everything downstream."
+      }
+    ],
+    "artifactOnPass": {
+      "ticketId": "TKT-4001",
+      "category": "outage",
+      "classifiedFrom": "symptom",
+      "taxonomyVersion": "1.0.0",
+      "assignedBy": "Support Agent"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Classify a support ticket against a governed taxonomy: map the reported symptom (checkout down for all users) to the right category (outage), not the customer's guessed cause (billing).",
+  "successMessage": "Ticket classified as outage. You mapped the symptom to the taxonomy, not the customer's guess.",
+  "intro": {
+    "heading": "Interpretation, done at volume",
+    "sections": [
+      {
+        "title": "The human-text-to-signal step",
+        "body": "Classification is where messy customer prose becomes a structured signal. It is judgement, but disciplined judgement: you map to defined categories, not to gut feel."
+      },
+      {
+        "title": "Symptom over cause",
+        "body": "Customers narrate causes ('maybe billing'). Your job is the symptom ('checkout down'). Reading the symptom against the definitions is what keeps classification consistent across agents."
+      },
+      {
+        "title": "Definitions settle it",
+        "body": "When two categories seem to fit, the definitions break the tie. 'Many users' vs 'some users' is exactly why this is an outage, not a bug."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A classification the priority and routing steps read. It is the highest-leverage - and highest-risk - interpretation in the pipeline."
+      }
+    ],
+    "jsonExample": "{\n  \"ticketId\": \"TKT-4001\",\n  \"category\": \"outage\"\n}",
+    "skill": "Interpretation to taxonomy",
+    "artifactName": "classification.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd read the ticket, match the symptom to your category definitions, and tag it - not just echo the customer's words.",
+      "tools": {
+        "powerAutomate": "AI Builder text classification into the taxonomy, with review",
+        "zapier": "a classifier step mapping text to a category",
+        "python": "a rules/ML classifier returning a taxonomy category"
+      }
+    },
+    "heading": "Ticket classified",
+    "points": [
+      "You mapped the symptom to the outage category against the definitions.",
+      "You classified what is happening, not the customer's guessed cause.",
+      "'All users' vs 'some users' made outage the right call over bug.",
+      "Priority and routing both read this category next.",
+      "The workflow can now turn ticket prose into a governed category."
+    ],
+    "artifactName": "classification.json"
+  }
+}

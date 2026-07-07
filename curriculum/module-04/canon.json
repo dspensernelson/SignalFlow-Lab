@@ -1,0 +1,13 @@
+{
+  "_comment": "Machine-checkable canon for Module 4 (Relay Ticket Triage), enforced by scripts/lint-lessons.mjs. Same contract as Modules 1-3: each assertion resolves a path inside a lesson JSON and compares it to the canonical value (ops: equals, includes). Prose canon lives in curriculum/module-04/<tier>/_OVERVIEW.md; THIS file prevents cross-lesson drift. Canon: ticket ids TKT-####, priorities P1-P4, a 4x4 impact/urgency matrix, queue names from the routing table only.",
+  "module": "module-04",
+  "derivations": [],
+  "assertions": [
+    { "lesson": "lesson-ticket-inbox", "path": "validation.artifactOnPass.ticketId", "op": "equals", "value": "TKT-4001" },
+    { "lesson": "lesson-ticket-inbox", "path": "validation.artifactOnPass.productArea", "op": "equals", "value": "Checkout" },
+    { "lesson": "lesson-ticket-record", "path": "validation.expected.ticketId", "op": "equals", "value": "TKT-4001" },
+    { "lesson": "lesson-ticket-record", "path": "validation.expected.productArea", "op": "equals", "value": "Checkout" },
+    { "lesson": "lesson-classification", "path": "validation.artifactOnPass.ticketId", "op": "equals", "value": "TKT-4001" },
+    { "lesson": "lesson-classification", "path": "validation.artifactOnPass.category", "op": "equals", "value": "outage" }
+  ]
+}

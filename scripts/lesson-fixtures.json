@@ -1,6 +1,29 @@
 {
   "_comment": "Per-lesson regression fixtures for scripts/validate-lessons.mjs. Each entry has a `correct` answer (must pass validation and store an artifact) and a `wrong` answer (must fail with no artifact). choiceCheck lessons need no fixture: the runner derives answers from the questions. Answers are the parsed form; the runner JSON-stringifies them before calling validateAnswer.",
 
+  "lesson-ticket-inbox": {
+    "correct": { "ticketId": "id", "channel": "channel", "productArea": "product", "symptom": "symptom" },
+    "wrong": { "ticketId": "id", "channel": "channel", "productArea": "product", "symptom": "guess" }
+  },
+  "lesson-ticket-record": {
+    "correct": { "ticketId": "TKT-4001", "reporter": "acme-corp", "channel": "email", "productArea": "Checkout", "symptom": "Checkout is down for all users" },
+    "wrong": { "ticketId": "TKT-4001", "reporter": "acme-corp", "channel": "email", "productArea": "Checkout", "symptom": "Maybe a billing problem" }
+  },
+  "lesson-intent-taxonomy": {
+    "correct": [
+      { "category": "outage", "definition": "service down for many users" },
+      { "category": "bug", "definition": "a feature broken for some users" },
+      { "category": "how-to", "definition": "a usage question, nothing broken" },
+      { "category": "billing", "definition": "invoices, payments, plan changes" }
+    ],
+    "wrong": [
+      { "category": "outage", "definition": "a billing question" },
+      { "category": "bug", "definition": "a feature broken for some users" },
+      { "category": "how-to", "definition": "a usage question, nothing broken" },
+      { "category": "billing", "definition": "invoices, payments, plan changes" }
+    ]
+  },
+
   "lesson-po-register": {
     "correct": { "poNumber": "po", "vendor": "vendor", "quantityOrdered": "qty", "unitPricePO": "poPrice", "poTotal": "total" },
     "wrong": { "poNumber": "po", "vendor": "vendor", "quantityOrdered": "qty", "unitPricePO": "invoicePrice", "poTotal": "total" }

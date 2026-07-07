@@ -1,0 +1,86 @@
+{
+  "id": "lesson-ticket-record",
+  "nodeId": "ticket-record",
+  "title": "Build the Ticket Record",
+  "subtitle": "Turn the ticket prose into structure",
+  "clock": "2:07 PM",
+  "difficulty": "Beginner",
+  "skill": "Field extraction",
+  "scenario": "It is 2:07 PM. The inbox handed you TKT-4001. A person can read it; the triage workflow cannot. Extract the fields classification and routing need - id, reporter, channel, product, symptom - into one structured Ticket Record every step can trust.",
+  "inputType": "text",
+  "inputLabel": "Ticket source profile",
+  "input": "From the ticket source profile: TKT-4001, reporter acme-corp, channel email, product area Checkout, symptom \"Checkout is down for all users\".",
+  "instructions": [
+    "Capture the ticket id and the reporter.",
+    "Record the channel and product area.",
+    "Capture the reported symptom.",
+    "Return one valid JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"ticketId\": \"\",\n  \"reporter\": \"\",\n  \"channel\": \"\",\n  \"productArea\": \"\",\n  \"symptom\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["ticketId", "reporter", "channel", "productArea", "symptom"],
+    "expected": {
+      "ticketId": "TKT-4001",
+      "reporter": "acme-corp",
+      "channel": "email",
+      "productArea": "Checkout",
+      "symptom": "Checkout is down for all users"
+    }
+  },
+  "copilotPrompt": "Build one JSON ticket record from the source profile: ticketId, reporter, channel, productArea, and symptom. Copy the symptom exactly.",
+  "successMessage": "Ticket Record built. Classification and routing now read this record, not the raw prose.",
+  "validateLabel": "Validate Record",
+  "editorHelper": "Create one JSON object every triage step reuses.",
+  "intro": {
+    "heading": "Before you classify: structure the ticket",
+    "sections": [
+      {
+        "title": "What this record does",
+        "body": "The Ticket Record turns free-text prose into the first structured object triage can trust. Classification, priority, routing, and the digest all read this record - never the raw email."
+      },
+      {
+        "title": "The symptom carries forward",
+        "body": "The symptom field is what classification interprets. Capturing it faithfully here - 'checkout is down for all users' - is what lets the next step assign the right category."
+      },
+      {
+        "title": "Stable fields at volume",
+        "body": "A desk sees hundreds of tickets. Stable field names (ticketId, channel, productArea) are what let automation act on any ticket the same way."
+      },
+      {
+        "title": "Who reuses it",
+        "body": "Classification, priority, routing, and misroute detection all read this record. Extracting it once and well keeps the whole pipeline consistent."
+      }
+    ],
+    "jsonExample": "{\n  \"ticketId\": \"TKT-0000\",\n  \"productArea\": \"Checkout\"\n}",
+    "skill": "Field extraction",
+    "artifactName": "ticket-record.json"
+  },
+  "fieldGuide": [
+    { "field": "ticketId", "meaning": "The ticket's identifier.", "type": "string", "example": "\"TKT-4001\"", "group": "Identity", "lookFor": "which ticket?", "hint": "The TKT-#### id." },
+    { "field": "reporter", "meaning": "Who reported the ticket.", "type": "string", "example": "\"acme-corp\"", "group": "Identity", "lookFor": "who reported it?", "hint": "The customer/account name." },
+    { "field": "channel", "meaning": "How the ticket arrived.", "type": "string", "example": "\"email\"", "group": "Provenance", "lookFor": "which channel?", "hint": "email, web, or chat." },
+    { "field": "productArea", "meaning": "The product area the ticket is about.", "type": "string", "example": "\"Checkout\"", "group": "Subject", "lookFor": "which product?", "hint": "Copy the product area exactly." },
+    { "field": "symptom", "meaning": "The reported symptom classification will read.", "type": "string", "example": "\"Checkout is down for all users\"", "group": "Subject", "lookFor": "what is happening?", "hint": "The symptom, not the customer's guess." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd copy the ticket's key fields into structured columns so every later step reads the row, not the email.",
+      "tools": {
+        "powerAutomate": "a 'Create row' from the parsed ticket fields",
+        "zapier": "'Create Record' mapping the ticket fields",
+        "python": "assemble the fields into a dict keyed by ticketId"
+      }
+    },
+    "heading": "Ticket Record built",
+    "points": [
+      "You keyed the record: id, reporter, channel, product area, and symptom.",
+      "The symptom carries forward for classification to interpret.",
+      "Stable field names let automation act on any ticket the same way.",
+      "One trusted record now feeds classification, priority, and routing.",
+      "The workflow can now triage a ticket from a structured record."
+    ],
+    "artifactName": "ticket-record.json"
+  }
+}

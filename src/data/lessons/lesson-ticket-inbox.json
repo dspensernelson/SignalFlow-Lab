@@ -1,0 +1,116 @@
+{
+  "id": "lesson-ticket-inbox",
+  "nodeId": "ticket-inbox",
+  "title": "Inspect the Ticket Inbox",
+  "subtitle": "Tag the fields triage runs on",
+  "clock": "2:05 PM",
+  "difficulty": "Beginner",
+  "skill": "Source provenance",
+  "scenario": "It is 2:05 PM at Relay's support desk. A ticket just landed and the clock is running - misroute it and a customer outage sits in the wrong inbox. Before you classify anything, read the raw ticket like an automation designer and tag the fields triage depends on. Watch the customer's guess: what they think is wrong is not the same as the symptom.",
+  "inputType": "text",
+  "inputLabel": "Ticket Inbox - TKT-4001",
+  "input": "TKT-4001 | Channel: email | From: acme-corp | Product: Checkout | \"Checkout is down for all our users - nobody can pay. Maybe a billing problem on your end?\" | Received: 2:05 PM.",
+  "instructions": [
+    "Read the ticket as a source, not as data to classify yet.",
+    "Tag the ticket id, channel, and product area to their spans.",
+    "Tag the SYMPTOM the customer reports - not the cause they guess.",
+    "Validate to mint the ticket source profile."
+  ],
+  "interactionType": "tagSource",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "tagSource",
+    "source": {
+      "label": "Ticket Inbox - TKT-4001",
+      "segments": [
+        { "id": "id", "text": "TKT-4001" },
+        { "id": "channel", "text": "email" },
+        { "id": "reporter", "text": "acme-corp" },
+        { "id": "product", "text": "Checkout" },
+        { "id": "symptom", "text": "Checkout is down for all users" },
+        { "id": "guess", "text": "Maybe a billing problem" },
+        { "id": "time", "text": "2:05 PM" }
+      ]
+    },
+    "fields": [
+      {
+        "id": "ticketId",
+        "label": "Ticket id",
+        "correctSegmentId": "id",
+        "explain": "The ticket id (TKT-####) is the key every triage step joins on - tag the identifier, not the timestamp."
+      },
+      {
+        "id": "channel",
+        "label": "Channel",
+        "correctSegmentId": "channel",
+        "explain": "Tag how the ticket arrived (email); the channel is provenance, not the product it is about."
+      },
+      {
+        "id": "productArea",
+        "label": "Product area",
+        "correctSegmentId": "product",
+        "explain": "Tag the product area the ticket is about (Checkout), which anchors classification and routing."
+      },
+      {
+        "id": "symptom",
+        "label": "Reported symptom",
+        "correctSegmentId": "symptom",
+        "explain": "Tag what is actually happening - checkout is down - not the customer's guessed cause ('maybe a billing problem')."
+      }
+    ],
+    "artifactOnPass": {
+      "source": "ticket-inbox",
+      "ticketId": "TKT-4001",
+      "channel": "email",
+      "productArea": "Checkout",
+      "symptom": "Checkout is down for all users",
+      "firstConsumer": "ticket-record"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Profile this support ticket as a triage source: tag the ticket id, channel, and product area, and tag the reported symptom (what is happening) rather than the customer's guessed cause.",
+  "successMessage": "Ticket profiled. You separated the symptom from the customer's guess - next, build the ticket record.",
+  "intro": {
+    "heading": "Before you triage: read the ticket",
+    "sections": [
+      {
+        "title": "Triage fails at the inputs",
+        "body": "Most misroutes start with a misread ticket. Before classifying, a designer profiles the source: the id to join on, the channel it came from, the product it touches, and the real symptom."
+      },
+      {
+        "title": "Symptom, not the customer's cause",
+        "body": "Customers guess. 'Maybe a billing problem' is a guess; 'checkout is down' is the symptom. Tagging the symptom - what is observably happening - is what keeps classification honest."
+      },
+      {
+        "title": "Volume needs structure",
+        "body": "A support desk sees this all day. Turning each free-text ticket into a few tagged fields is what makes triage automatable instead of an inbox someone reads by hand."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A ticket source profile the record is keyed from - proof the ticket is understood before any category is assigned."
+      }
+    ],
+    "jsonExample": "{\n  \"ticketId\": \"TKT-4001\",\n  \"symptom\": \"Checkout is down for all users\"\n}",
+    "skill": "Source provenance",
+    "artifactName": "source-profile-ticket-inbox.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd skim the ticket and jot the id, channel, product, and what is actually broken - ignoring the customer's guess at the cause.",
+      "tools": {
+        "powerAutomate": "an Outlook/helpdesk trigger mapping ticket fields into variables",
+        "zapier": "a 'New ticket' trigger pulling id, channel, and body",
+        "python": "parse the ticket payload into id, channel, product, symptom"
+      }
+    },
+    "heading": "Ticket profiled",
+    "points": [
+      "You tagged the id, channel, and product area triage joins on.",
+      "You tagged the reported symptom, not the customer's guessed cause.",
+      "Separating symptom from guess is what prevents the first misroute.",
+      "Your ticket source profile is stored for the record to key from.",
+      "The workflow can now turn a free-text ticket into structured triage input."
+    ],
+    "artifactName": "source-profile-ticket-inbox.json"
+  }
+}

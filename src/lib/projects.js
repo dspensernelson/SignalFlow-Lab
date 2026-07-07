@@ -219,7 +219,12 @@ export const BUILT_LESSONS = {
     ],
   },
   'module-04': {
-    easy: [],
+    easy: [
+      'lesson-ticket-inbox',
+      'lesson-ticket-record',
+      'lesson-intent-taxonomy',
+      'lesson-classification',
+    ],
     medium: [],
     hard: [],
   },

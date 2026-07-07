@@ -1,0 +1,84 @@
+{
+  "id": "lesson-intent-taxonomy",
+  "nodeId": "intent-taxonomy",
+  "title": "Read the Intent Taxonomy",
+  "subtitle": "The governed category tree",
+  "clock": "2:08 PM",
+  "difficulty": "Beginner",
+  "skill": "Reference governance",
+  "scenario": "Before you can classify a ticket, you need the governed category tree it maps to. Read Relay's intent taxonomy - the owned set of categories with their definitions - and record it. Classification maps to these categories, never to invented free-text labels.",
+  "inputType": "text",
+  "inputLabel": "Intent Taxonomy (Support Ops)",
+  "input": "Relay's intent taxonomy (owned by the Support Ops Analyst) has four top categories:\noutage - service down for many users\nbug - a feature broken for some users\nhow-to - a usage question, nothing broken\nbilling - invoices, payments, plan changes\nRecord each category with its definition.",
+  "instructions": [
+    "Create one row per taxonomy category.",
+    "Record each category with its governed definition.",
+    "Use the categories exactly: outage, bug, how-to, billing.",
+    "Return a JSON array of the four rows, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"category\": \"outage\", \"definition\": \"\" },\n  { \"category\": \"bug\", \"definition\": \"\" },\n  { \"category\": \"how-to\", \"definition\": \"\" },\n  { \"category\": \"billing\", \"definition\": \"\" }\n]",
+  "validation": {
+    "type": "jsonRows",
+    "keyField": "category",
+    "rowFields": ["category", "definition"],
+    "numericFields": [],
+    "expectedRows": [
+      { "category": "outage", "definition": "service down for many users" },
+      { "category": "bug", "definition": "a feature broken for some users" },
+      { "category": "how-to", "definition": "a usage question, nothing broken" },
+      { "category": "billing", "definition": "invoices, payments, plan changes" }
+    ]
+  },
+  "copilotPrompt": "Record the intent taxonomy as a JSON array: one row per category (outage, bug, how-to, billing) with its governed definition.",
+  "successMessage": "Taxonomy recorded. Classification now has the governed categories to map against.",
+  "validateLabel": "Validate Taxonomy",
+  "editorHelper": "One row per governed category - definitions matter.",
+  "intro": {
+    "heading": "Before you classify: the category tree",
+    "sections": [
+      {
+        "title": "A taxonomy, not free text",
+        "body": "What a ticket can be is not open-ended. It maps to a governed set of categories the Support Ops Analyst owns. Free-text labels fracture reporting; a taxonomy keeps every ticket comparable."
+      },
+      {
+        "title": "Definitions do the work",
+        "body": "The category name is not enough - its definition is what a classifier applies. 'Outage: service down for many users' is a testable rule; 'outage' alone is a guess."
+      },
+      {
+        "title": "Owned and versioned",
+        "body": "The Support Ops Analyst owns the taxonomy, and changes are governed. When misroutes pile up, the fix is a proposed taxonomy change - not agents inventing their own labels."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A recorded taxonomy classification maps against. Later, the archive loop tunes it from real misroutes."
+      }
+    ],
+    "jsonExample": "[\n  { \"category\": \"outage\", \"definition\": \"service down for many users\" }\n]",
+    "skill": "Reference governance",
+    "artifactName": "intent-taxonomy-record.json"
+  },
+  "fieldGuide": [
+    { "field": "category", "meaning": "A governed taxonomy category.", "type": "string", "example": "\"outage\"", "group": "Taxonomy", "lookFor": "which category?", "hint": "outage, bug, how-to, billing." },
+    { "field": "definition", "meaning": "The governed definition a classifier applies.", "type": "string", "example": "\"service down for many users\"", "group": "Taxonomy", "lookFor": "what does it mean?", "hint": "Copy the definition exactly." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd keep a short list of categories with clear definitions and map every ticket to one of them, not to ad-hoc labels.",
+      "tools": {
+        "powerAutomate": "a reference list of categories and definitions",
+        "zapier": "a lookup table of the taxonomy",
+        "python": "a dict of category -> definition loaded at classify time"
+      }
+    },
+    "heading": "Taxonomy recorded",
+    "points": [
+      "You recorded the governed categories with their definitions.",
+      "Classification maps to these, never to invented free-text labels.",
+      "Definitions are the testable rules a classifier applies.",
+      "The Support Ops Analyst owns the taxonomy; changes are governed.",
+      "The workflow can now classify tickets against one governed category tree."
+    ],
+    "artifactName": "intent-taxonomy-record.json"
+  }
+}

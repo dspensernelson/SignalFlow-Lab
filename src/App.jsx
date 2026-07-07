@@ -29,6 +29,7 @@ const LESSON_MODULE_LOADERS = {
   'module-01': () => import('./data/lessons/module01Lessons.js'),
   'module-02': () => import('./data/lessons/module02Lessons.js'),
   'module-03': () => import('./data/lessons/module03Lessons.js'),
+  'module-04': () => import('./data/lessons/module04Lessons.js'),
 }
 
 export default function App() {
