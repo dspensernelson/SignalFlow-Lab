@@ -27,6 +27,11 @@ import module03Phases from '../data/projects/module-03/phases.json'
 import module03Edges from '../data/projects/module-03/workflowEdges.json'
 import module03LessonMeta from '../data/projects/module-03/lessonMeta.json'
 
+import module04Nodes from '../data/projects/module-04/workflowNodes.json'
+import module04Phases from '../data/projects/module-04/phases.json'
+import module04Edges from '../data/projects/module-04/workflowEdges.json'
+import module04LessonMeta from '../data/projects/module-04/lessonMeta.json'
+
 export const PROJECT_KEY = 'signalflow_project'
 export const DEFAULT_PROJECT = 'module-01'
 
@@ -56,6 +61,12 @@ const PROJECT_DATA = {
     phases: module03Phases,
     edges: module03Edges,
     lessonMeta: module03LessonMeta,
+  },
+  'module-04': {
+    nodes: module04Nodes,
+    phases: module04Phases,
+    edges: module04Edges,
+    lessonMeta: module04LessonMeta,
   },
 }
 
@@ -206,6 +217,11 @@ export const BUILT_LESSONS = {
       'lesson-accounts-task-hard',
       'lesson-task-tracker-hard',
     ],
+  },
+  'module-04': {
+    easy: [],
+    medium: [],
+    hard: [],
   },
 }
 

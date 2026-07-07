@@ -2,6 +2,31 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-07 (Module 4 Relay - Step 2 map approved)
+
+- MERGED PR #6 (Module 3 Harbor) to main at owner instruction ("merge then
+  move onto Module 4"); main now carries Modules 1-3 and auto-deploys.
+- Also preserved an unrelated, complete + green module-01 opening-arc
+  re-storyboard found uncommitted in the working tree onto its own branch
+  (feat/module-01-opening-arc, PR #7) so it is not lost - authored by a
+  parallel session, committed as-found by the builder, left for owner review.
+- MODULE 4 MAP APPROVED (autonomous Gate 3 = charter conformance +
+  `npm run lint:map` green + this log). Built the module-04 map to the ratified
+  charter (curriculum/charters/module-04-relay.md): 16 nodes across 5 phases
+  (Intake -> Classification -> Priority -> Routing -> Resolution and Learning),
+  one decision fork (route-decision -> escalation-handoff | queue-assignment),
+  one temporal loop (triage-archive -> intent-taxonomy, refined by taxonomy-
+  feedback). Files: src/data/projects/module-04/*.json; registered in
+  src/lib/projects.js (PROJECT_DATA + empty BUILT_LESSONS) and projects.json
+  (goal/clock; status kept "planned" until the easy tier exists, then it flips
+  to "active" and module-03 to "complete"). Step 2a: module-04 row added to
+  moduleSkeleton.json (Relay; Ticket Record / Intent Taxonomy / Classification
+  / Route Decision / Escalation Handoff / Queue Digest / Triage Archive).
+- ENGINE: no new interaction type (charter confirms existing types suffice) -
+  classification/matrix fit choiceCheck + jsonDeltas, the SLA tracker fits
+  jsonDeltas, and the digest fits templateSlots. tagSource + handoffForm will
+  hold the choiceCheck cap on the inspection and handoff nodes.
+
 ## 2026-07-06 (Module 3 Harbor - medium + hard tiers complete)
 
 - MEDIUM tier (16 lessons, full tier): a messier second hire (Sam Rivera,

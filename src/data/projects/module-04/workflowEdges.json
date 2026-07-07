@@ -1,0 +1,23 @@
+[
+  { "from": "ticket-inbox", "to": "ticket-record", "label": "captured into" },
+  { "from": "intent-taxonomy", "to": "classification", "label": "classified against" },
+  { "from": "ticket-record", "to": "classification", "label": "classified" },
+  { "from": "priority-matrix", "to": "priority-assignment", "label": "scored by" },
+  { "from": "classification", "to": "priority-assignment", "label": "category feeds" },
+  { "from": "routing-table", "to": "route-decision", "label": "mapped by" },
+  { "from": "classification", "to": "route-decision", "label": "category to" },
+  { "from": "priority-assignment", "to": "route-decision", "label": "priority to" },
+  { "from": "route-decision", "to": "escalation-handoff", "label": "P1 or safety" },
+  { "from": "route-decision", "to": "queue-assignment", "label": "standard queue" },
+  { "from": "escalation-handoff", "to": "sla-tracker", "label": "timed by" },
+  { "from": "queue-assignment", "to": "sla-tracker", "label": "timed by" },
+  { "from": "sla-tracker", "to": "resolution-record", "label": "worked into" },
+  { "from": "resolution-record", "to": "misroute-check", "label": "worked category checked" },
+  { "from": "classification", "to": "misroute-check", "label": "assigned category compared" },
+  { "from": "misroute-check", "to": "queue-digest", "label": "misroutes feed" },
+  { "from": "sla-tracker", "to": "queue-digest", "label": "breaches feed" },
+  { "from": "queue-digest", "to": "triage-archive", "label": "retained in" },
+  { "from": "triage-archive", "to": "intent-taxonomy", "label": "tunes" },
+  { "from": "triage-archive", "to": "taxonomy-feedback", "label": "mined for" },
+  { "from": "taxonomy-feedback", "to": "intent-taxonomy", "label": "proposes changes to" }
+]

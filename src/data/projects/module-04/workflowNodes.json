@@ -1,0 +1,595 @@
+[
+  {
+    "id": "ticket-inbox",
+    "label": "Ticket Inbox",
+    "type": "source",
+    "thingOrAction": "thing",
+    "phaseId": "intake",
+    "x": 20,
+    "y": 80,
+    "description": "The continuous stream of inbound support tickets across channels - email, web form, chat - arriving with no fixed shape. The raw input the whole triage workflow starts from.",
+    "lesson": {
+      "type": "inspection",
+      "status": "intent",
+      "intent": "Inspect where tickets arrive, in what channels and shape, and tag the fields triage depends on in one raw ticket.",
+      "concepts": ["Ticket stream", "Arrival shape", "Channels as sources"]
+    },
+    "labVersion": "Inspected by you in the Ticket Inbox task; the tickets are local fixtures shared with the Ticket Record task.",
+    "realWorldSources": [
+      "Support email inbox",
+      "Web support form",
+      "Live chat transcripts",
+      "API/webhook ticket feed"
+    ],
+    "accessNeeded": [
+      "Read access to the support channels",
+      "A single intake queue",
+      "Agreement on the required fields"
+    ],
+    "soloRebuildPath": [
+      "Start with a folder of local ticket fixtures",
+      "Tag the fields triage needs: who, what, when, channel",
+      "Later ingest from the helpdesk API"
+    ],
+    "reusedBy": ["ticket-record"],
+    "governanceNote": "Tickets arrive from many channels with no schedule; the intake queue is the single place triage reads, so nothing is worked from a personal inbox.",
+    "auditNote": "Inspection by tagging (tagSource): the learner tags the ticket's spans that become the record's fields, the where-the-structure-comes-from moment.",
+    "taskId": "lesson-ticket-inbox",
+    "artifactName": "source-profile-ticket-inbox.json"
+  },
+  {
+    "id": "ticket-record",
+    "label": "Ticket Record",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "intake",
+    "x": 20,
+    "y": 300,
+    "description": "A trusted structured record extracted from one customer ticket: id, reporter, channel, product area, and the reported symptom. The record every triage step reads instead of the raw prose.",
+    "lesson": {
+      "type": "build",
+      "status": "intent",
+      "intent": "Extract the fields triage acts on from a customer ticket's prose into a validated ticket record.",
+      "concepts": ["Prose to structure", "Field extraction", "Structured capture"]
+    },
+    "labVersion": "Built by you in the Ticket Record task from a ticket fixture in the inbox.",
+    "realWorldSources": [
+      "Helpdesk ticket object",
+      "Form field mapping",
+      "NLP extraction from prose"
+    ],
+    "accessNeeded": [
+      "The raw ticket text",
+      "Agreement on required fields",
+      "Write access to the ticket system"
+    ],
+    "soloRebuildPath": [
+      "Hand-key the fields from one ticket into JSON",
+      "Add extraction from known form fields",
+      "Later wire NLP extraction with human review"
+    ],
+    "reusedBy": ["classification"],
+    "governanceNote": "The extracted record is what triage trusts instead of the customer's prose; its field definitions must be owned and stable.",
+    "auditNote": "Build lesson; classification, priority, and routing all read this record rather than the raw ticket.",
+    "taskId": "lesson-ticket-record",
+    "artifactName": "ticket-record.json"
+  },
+  {
+    "id": "intent-taxonomy",
+    "label": "Intent Taxonomy",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "classification",
+    "x": 270,
+    "y": 80,
+    "description": "The governed category tree tickets are classified against: billing, bug, how-to, outage, and their sub-categories. The single source for what a ticket can be, owned by Support Ops.",
+    "lesson": {
+      "type": "governance",
+      "status": "intent",
+      "intent": "Read the intent taxonomy as governed reference data: the category tree, who may change it, and why classification must map to it, not to free text.",
+      "concepts": ["Category tree", "Governed taxonomy", "Change ownership"]
+    },
+    "labVersion": "Provided as a local taxonomy fixture the classification task maps against.",
+    "realWorldSources": [
+      "Helpdesk category configuration",
+      "Support Ops taxonomy document",
+      "Knowledge-base topic tree"
+    ],
+    "accessNeeded": [
+      "Read access to the taxonomy",
+      "Support Ops Analyst ownership",
+      "A change-control process for edits"
+    ],
+    "soloRebuildPath": [
+      "Start with a local category tree",
+      "Record who owns each category and its definition",
+      "Later integrate with the helpdesk taxonomy"
+    ],
+    "reusedBy": ["classification"],
+    "governanceNote": "The Support Ops Analyst owns the taxonomy; classification maps to its categories, never to invented free-text labels, so reporting and routing stay consistent.",
+    "auditNote": "Governance lesson; the temporal loop (triage-archive -> intent-taxonomy) tunes this taxonomy from real misroutes.",
+    "taskId": "lesson-intent-taxonomy",
+    "artifactName": "intent-taxonomy-record.json"
+  },
+  {
+    "id": "classification",
+    "label": "Classification",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "classification",
+    "x": 270,
+    "y": 300,
+    "description": "Assigning each ticket a category from the governed taxonomy by interpreting the customer's words. The human-text-to-structured-signal step, done at volume.",
+    "lesson": {
+      "type": "interpretation",
+      "status": "intent",
+      "intent": "Interpret a ticket's prose and assign the correct taxonomy category, distinguishing the reported symptom from the customer's guessed cause.",
+      "concepts": ["Interpretation at volume", "Symptom vs cause", "Mapping to taxonomy"]
+    },
+    "labVersion": "Assigned by you in the Classification task against the ticket record and taxonomy fixtures.",
+    "realWorldSources": [
+      "Agent manual classification",
+      "ML text classifier with review",
+      "Keyword/rule-based tagging"
+    ],
+    "accessNeeded": [
+      "The ticket record and taxonomy",
+      "Classification guidelines",
+      "A place to record the category"
+    ],
+    "soloRebuildPath": [
+      "Read the ticket and pick the taxonomy category",
+      "Separate the symptom from the customer's guess",
+      "Later add an ML classifier with human review"
+    ],
+    "reusedBy": ["priority-assignment", "route-decision", "misroute-check"],
+    "governanceNote": "Classify the symptom the customer reports, not the cause they guess; a wrong category at volume is the root of most misroutes.",
+    "auditNote": "Interpretation lesson (choiceCheck); the category the customer names is often a distractor for the real one.",
+    "taskId": "lesson-classification",
+    "artifactName": "classification.json"
+  },
+  {
+    "id": "priority-matrix",
+    "label": "Priority Matrix",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "priority",
+    "x": 520,
+    "y": 80,
+    "description": "The governed 4x4 grid that maps impact (how many, how badly) against urgency (how fast) to a priority P1-P4. The owned config that makes priority a rule, not a mood.",
+    "lesson": {
+      "type": "governance",
+      "status": "intent",
+      "intent": "Read the priority matrix as owned, versioned config: impact by urgency yields a priority, so an angry customer with low impact is not automatically a P1.",
+      "concepts": ["Impact x urgency", "Config as rules", "Priority not vibes"]
+    },
+    "labVersion": "Provided as a local priority-matrix fixture the priority task applies.",
+    "realWorldSources": [
+      "ITIL priority matrix",
+      "Support Ops priority policy",
+      "Helpdesk SLA configuration"
+    ],
+    "accessNeeded": [
+      "Access to the priority matrix",
+      "Support Ops Analyst approval for changes",
+      "Version history"
+    ],
+    "soloRebuildPath": [
+      "Start with a 4x4 impact-by-urgency grid",
+      "Version it and record who approved each change",
+      "Later integrate with the helpdesk priority config"
+    ],
+    "reusedBy": ["priority-assignment"],
+    "governanceNote": "Priority is matrix-derived and auditable; a looser matrix moves tickets faster but floods the P1 queue - the trade-off is a governed decision.",
+    "auditNote": "Governance lesson; the hard tier deepens this into designing the matrix from incident history.",
+    "taskId": "lesson-priority-matrix",
+    "artifactName": "priority-matrix-record.json"
+  },
+  {
+    "id": "priority-assignment",
+    "label": "Priority Assignment",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "priority",
+    "x": 520,
+    "y": 300,
+    "description": "Applying the matrix to a ticket's impact and urgency to derive its priority, including the boundary cases where an emotional ticket scores lower than it feels.",
+    "lesson": {
+      "type": "transformation",
+      "status": "intent",
+      "intent": "Read a ticket's impact and urgency and apply the matrix to derive its priority, defending the P1 boundary against pressure.",
+      "concepts": ["Applying a matrix", "Priority boundaries", "Derived priority"]
+    },
+    "labVersion": "Run by you in the Priority Assignment task using the classification and priority-matrix fixtures.",
+    "realWorldSources": [
+      "Helpdesk priority automation",
+      "Agent-applied priority",
+      "Rules engine"
+    ],
+    "accessNeeded": [
+      "The ticket's impact and urgency",
+      "The priority matrix",
+      "A place to record the priority"
+    ],
+    "soloRebuildPath": [
+      "Read impact and urgency from the ticket",
+      "Look up the priority in the matrix",
+      "Later wire the priority automation"
+    ],
+    "reusedBy": ["route-decision"],
+    "governanceNote": "A P1 comes from the matrix, not the customer's tone; recording impact and urgency separately keeps the derivation auditable.",
+    "auditNote": "Transformation; the medium tier scores a P1-looking ticket as P3 to teach the boundary.",
+    "taskId": "lesson-priority-assignment",
+    "artifactName": "priority-assignment.json"
+  },
+  {
+    "id": "routing-table",
+    "label": "Routing Table",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "routing",
+    "x": 770,
+    "y": 80,
+    "description": "The governed mapping from category and priority to a destination queue. The owned config that turns a classified, prioritized ticket into a routing decision.",
+    "lesson": {
+      "type": "governance",
+      "status": "intent",
+      "intent": "Read the routing table as owned config: category plus priority maps to exactly one queue, so routing is a lookup, not a judgement call.",
+      "concepts": ["Routing as config", "Category+priority key", "Owned mapping"]
+    },
+    "labVersion": "Provided as a local routing-table fixture the route decision applies.",
+    "realWorldSources": [
+      "Helpdesk routing rules",
+      "Queue assignment configuration",
+      "Support Ops routing policy"
+    ],
+    "accessNeeded": [
+      "Access to the routing table",
+      "Queue Lead ownership",
+      "The list of valid queues"
+    ],
+    "soloRebuildPath": [
+      "Start with a category+priority -> queue table",
+      "Keep queue names to the governed list",
+      "Later integrate with the helpdesk routing engine"
+    ],
+    "reusedBy": ["route-decision"],
+    "governanceNote": "The Queue Lead owns the routing table; queue names come only from it, so a ticket is never routed to a queue that does not exist.",
+    "auditNote": "Governance lesson; the hard tier adds load-shedding rules when a queue is over SLA.",
+    "taskId": "lesson-routing-table",
+    "artifactName": "routing-table-record.json"
+  },
+  {
+    "id": "route-decision",
+    "label": "Route Decision",
+    "type": "decision",
+    "thingOrAction": "action",
+    "phaseId": "routing",
+    "x": 770,
+    "y": 230,
+    "description": "The fork: a P1 or safety-flagged ticket escalates to Tier-2/Duty; everything else routes to its standard queue by the routing table. The single decision node of the map.",
+    "lesson": {
+      "type": "decision",
+      "status": "intent",
+      "intent": "Encode the routing rule: escalate P1 or safety-flagged tickets; route the rest to their table queue by category and priority.",
+      "concepts": ["Routing decision", "Escalate vs standard", "Rule encoding"]
+    },
+    "labVersion": "Encoded by you in the Route Decision task from the classification, priority, and routing table.",
+    "realWorldSources": [
+      "Helpdesk workflow routing",
+      "Rules engine",
+      "Business-process automation"
+    ],
+    "accessNeeded": [
+      "The category and priority",
+      "The routing table",
+      "Both downstream paths"
+    ],
+    "soloRebuildPath": [
+      "Escalate when priority is P1 or a safety flag is set",
+      "Otherwise look up the queue in the routing table",
+      "Later wire it into the workflow engine"
+    ],
+    "reusedBy": ["escalation-handoff", "queue-assignment"],
+    "governanceNote": "The rule must be explicit and logged; a P1 escalates even if its queue is busy, and a non-P1 never jumps the escalation path.",
+    "auditNote": "The single decision node (the fork). Hard tier is the solo-rebuild capstone (artifactImport).",
+    "taskId": "lesson-route-decision",
+    "artifactName": "route-decision.json"
+  },
+  {
+    "id": "escalation-handoff",
+    "label": "Escalation Handoff",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "routing",
+    "x": 770,
+    "y": 380,
+    "description": "The P1 path: page Tier-2 or the Duty Manager, capture the acknowledgement, and log who owns the outage. A high-priority handoff that must not be silent.",
+    "lesson": {
+      "type": "handoff",
+      "status": "intent",
+      "intent": "Work a P1 escalation: page the right owner, capture their acknowledgement, and log the handoff so an outage is never sitting unowned.",
+      "concepts": ["Escalation path", "Paged acknowledgement", "Captured ownership"]
+    },
+    "labVersion": "Worked by you in the Escalation Handoff task; the P1 rides from the route-decision result.",
+    "realWorldSources": [
+      "On-call paging (PagerDuty/Opsgenie)",
+      "Incident channel handoff",
+      "Duty Manager escalation"
+    ],
+    "accessNeeded": [
+      "The escalation contacts",
+      "A paging channel",
+      "A place to log the acknowledgement"
+    ],
+    "soloRebuildPath": [
+      "Page the Tier-2 Engineer or Duty Manager",
+      "Capture who acknowledged and when",
+      "Later wire the on-call paging tool"
+    ],
+    "reusedBy": ["sla-tracker"],
+    "governanceNote": "Every P1 escalation captures who acknowledged it; a paged alert with no acknowledgement is an outage nobody owns.",
+    "auditNote": "Handoff (handoffForm) with captured acknowledgement; the P1 branch of the fork.",
+    "taskId": "lesson-escalation-handoff",
+    "artifactName": "escalation-record.json"
+  },
+  {
+    "id": "queue-assignment",
+    "label": "Queue Assignment",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "routing",
+    "x": 770,
+    "y": 520,
+    "description": "The standard path: assign the ticket to its routing-table queue and log the assignment. Even the quiet path records where a ticket went and who owns it.",
+    "lesson": {
+      "type": "handoff",
+      "status": "intent",
+      "intent": "Assign a standard ticket to its queue and record the assignment, so the routine path is as traceable as the escalation path.",
+      "concepts": ["The quiet path still logs", "Queue assignment", "Traceability"]
+    },
+    "labVersion": "Recorded by you in the Queue Assignment task from a standard-routed ticket.",
+    "realWorldSources": [
+      "Helpdesk queue assignment",
+      "Round-robin/skills routing",
+      "Assignment audit log"
+    ],
+    "accessNeeded": [
+      "The routed queue",
+      "The assignment log",
+      "The agent roster"
+    ],
+    "soloRebuildPath": [
+      "Assign the ticket to its table queue",
+      "Log the queue and the assignment time",
+      "Later wire skills-based assignment"
+    ],
+    "reusedBy": ["sla-tracker"],
+    "governanceNote": "Standard does not mean unlogged; the routine lane must be as auditable as escalation (echoes Meridian's routine path).",
+    "auditNote": "Handoff (handoffForm); deliberately mirrors the module pattern that the quiet path still produces a record.",
+    "taskId": "lesson-queue-assignment",
+    "artifactName": "queue-assignment.json"
+  },
+  {
+    "id": "sla-tracker",
+    "label": "SLA Tracker",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "resolution-learning",
+    "x": 1020,
+    "y": 80,
+    "description": "Timers per queue and priority: how long a ticket has until its SLA breach, and a flag when it has. The signal the digest reports and load-shedding acts on.",
+    "lesson": {
+      "type": "transformation",
+      "status": "intent",
+      "intent": "Apply per-priority SLA targets to each ticket and flag whether it is within SLA or breached.",
+      "concepts": ["SLA timers", "Breach flags", "Time as a signal"]
+    },
+    "labVersion": "Run by you in the SLA Tracker task against the routed tickets and the SLA targets.",
+    "realWorldSources": [
+      "Helpdesk SLA timers",
+      "Queue monitoring dashboard",
+      "Custom breach alerts"
+    ],
+    "accessNeeded": [
+      "The routed tickets with timestamps",
+      "The per-priority SLA targets",
+      "A place to record breach flags"
+    ],
+    "soloRebuildPath": [
+      "Compute elapsed time against the SLA target",
+      "Flag within-SLA or breached per ticket",
+      "Later wire the SLA timer service"
+    ],
+    "reusedBy": ["resolution-record", "queue-digest"],
+    "governanceNote": "SLA targets are per priority (a P1 clock is minutes, a P4 is days); a breach flag with no target behind it is meaningless.",
+    "auditNote": "Transformation via jsonDeltas rows (ticketId/withinSla/breachFlag); breaches feed the digest.",
+    "taskId": "lesson-sla-tracker",
+    "artifactName": "sla-tracker.json"
+  },
+  {
+    "id": "resolution-record",
+    "label": "Resolution Record",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "resolution-learning",
+    "x": 1020,
+    "y": 170,
+    "description": "The outcome captured when a ticket is resolved: the fix, and the category it turned out to be when actually worked. The record misroute detection compares against.",
+    "lesson": {
+      "type": "build",
+      "status": "intent",
+      "intent": "Capture a ticket's resolution: the fix applied and the category-as-worked, which may differ from the category it was assigned.",
+      "concepts": ["Outcome capture", "Category-as-worked", "Resolution record"]
+    },
+    "labVersion": "Built by you in the Resolution Record task from a worked ticket.",
+    "realWorldSources": [
+      "Helpdesk resolution notes",
+      "Ticket close fields",
+      "Knowledge-base article link"
+    ],
+    "accessNeeded": [
+      "The worked ticket",
+      "The resolution fields",
+      "The taxonomy for the worked category"
+    ],
+    "soloRebuildPath": [
+      "Record the fix and the category it was actually",
+      "Keep the same taxonomy for the worked category",
+      "Later capture it at ticket close automatically"
+    ],
+    "reusedBy": ["misroute-check"],
+    "governanceNote": "The category-as-worked is the ground truth; capturing it honestly - even when it differs from the assignment - is what makes misroute detection possible.",
+    "auditNote": "Build lesson; feeds the misroute check that compares worked vs assigned category.",
+    "taskId": "lesson-resolution-record",
+    "artifactName": "resolution-record.json"
+  },
+  {
+    "id": "misroute-check",
+    "label": "Misroute Check",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "resolution-learning",
+    "x": 1020,
+    "y": 260,
+    "description": "Comparing the category a ticket was assigned to the category it was actually worked as. A mismatch is a misroute - the signal that tunes the taxonomy.",
+    "lesson": {
+      "type": "transformation",
+      "status": "intent",
+      "intent": "Compare the assigned category to the worked category and flag a misroute when they differ.",
+      "concepts": ["Misroute detection", "Assigned vs worked", "Feedback signal"]
+    },
+    "labVersion": "Run by you in the Misroute Check task from the classification and resolution records.",
+    "realWorldSources": [
+      "Reclassification reports",
+      "Category-change audit",
+      "Support Ops analytics"
+    ],
+    "accessNeeded": [
+      "The assigned category",
+      "The worked category",
+      "A place to record the misroute flag"
+    ],
+    "soloRebuildPath": [
+      "Compare assigned and worked categories",
+      "Flag a misroute when they differ",
+      "Later feed misroutes to taxonomy review"
+    ],
+    "reusedBy": ["queue-digest"],
+    "governanceNote": "A misroute is not blame - it is data; a category that is repeatedly misrouted is a taxonomy problem, not an agent problem.",
+    "auditNote": "Transformation; misroutes feed both the digest and, via the archive, the taxonomy-feedback loop.",
+    "taskId": "lesson-misroute-check",
+    "artifactName": "misroute-check.json"
+  },
+  {
+    "id": "queue-digest",
+    "label": "Queue Digest",
+    "type": "output",
+    "thingOrAction": "thing",
+    "phaseId": "resolution-learning",
+    "x": 1020,
+    "y": 350,
+    "description": "The 5:00 PM queue-health digest: volumes, misroutes, SLA breaches, and taxonomy drift, assembled from the day's triage records. The module's deliverable.",
+    "lesson": {
+      "type": "assembly",
+      "status": "intent",
+      "intent": "Assemble the queue-health digest from the day's records: volume, misroutes, and SLA breaches, by lookup from stored artifacts.",
+      "concepts": ["Assembly", "Health digest", "Business deliverable"]
+    },
+    "labVersion": "Assembled by you in the Queue Digest task from the SLA tracker and misroute check.",
+    "realWorldSources": [
+      "Helpdesk reporting export",
+      "BI dashboard snapshot",
+      "Generated daily digest"
+    ],
+    "accessNeeded": [
+      "The day's triage records",
+      "The SLA and misroute results",
+      "A delivery channel for the digest"
+    ],
+    "soloRebuildPath": [
+      "Total the volumes, misroutes, and breaches",
+      "Assemble them into the digest document",
+      "Later generate and send it on a schedule"
+    ],
+    "reusedBy": ["triage-archive"],
+    "governanceNote": "The digest is only trustworthy if every number traces to a triage record; a hand-tuned figure is a report nobody can audit.",
+    "auditNote": "The assembly node and the module deliverable (queue-digest.md); templateSlots renders it from canon values.",
+    "taskId": "lesson-queue-digest",
+    "artifactName": "queue-digest.md"
+  },
+  {
+    "id": "triage-archive",
+    "label": "Triage Archive",
+    "type": "archive",
+    "thingOrAction": "thing",
+    "phaseId": "resolution-learning",
+    "x": 1020,
+    "y": 440,
+    "description": "The retained record of the day's triage: records, digest, and misroutes. It preserves the day for audit and feeds the taxonomy tuning that keeps classification honest.",
+    "lesson": {
+      "type": "handoff",
+      "status": "intent",
+      "intent": "Archive the day's triage for retention and export the misroutes that tomorrow's taxonomy review reads.",
+      "concepts": ["Retention", "Archive-seeded loop", "Auditability"]
+    },
+    "labVersion": "Archived by you in the Triage Archive task from the completed digest.",
+    "realWorldSources": [
+      "Helpdesk data retention",
+      "Analytics warehouse",
+      "Records system"
+    ],
+    "accessNeeded": [
+      "Write access to the archive",
+      "A retention policy",
+      "The misroute records"
+    ],
+    "soloRebuildPath": [
+      "Write the day's triage to a dated archive",
+      "Export misroutes to the taxonomy review",
+      "Later integrate with the analytics warehouse"
+    ],
+    "reusedBy": ["intent-taxonomy", "taxonomy-feedback"],
+    "governanceNote": "Retention length is a compliance decision; the archive is also the loop input, so the taxonomy improves from real misroutes.",
+    "auditNote": "The archive origin of the temporal loop (triage-archive -> intent-taxonomy), refined by taxonomy-feedback.",
+    "taskId": "lesson-triage-archive",
+    "artifactName": "triage-archive.json"
+  },
+  {
+    "id": "taxonomy-feedback",
+    "label": "Taxonomy Feedback",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "resolution-learning",
+    "x": 1020,
+    "y": 530,
+    "description": "What the misroutes teach the taxonomy: a category that keeps getting reworked needs splitting, renaming, or a clearer definition. The proposal that closes the triage loop.",
+    "lesson": {
+      "type": "transformation",
+      "status": "intent",
+      "intent": "Turn the archived misroutes into a taxonomy change proposal: identify the category that fails and propose the fix, routed to the owner.",
+      "concepts": ["Loop close", "Taxonomy tuning", "Maintained not installed"]
+    },
+    "labVersion": "Run by you in the Taxonomy Feedback task from the triage archive fixture.",
+    "realWorldSources": [
+      "Taxonomy change requests",
+      "Reclassification trend analysis",
+      "Support Ops review"
+    ],
+    "accessNeeded": [
+      "The archived misroutes",
+      "The current taxonomy",
+      "A change-request channel"
+    ],
+    "soloRebuildPath": [
+      "Find the category with repeated misroutes",
+      "Propose a split, rename, or clearer definition",
+      "Later feed reclassification trends automatically"
+    ],
+    "reusedBy": ["intent-taxonomy"],
+    "governanceNote": "Taxonomy changes still go through Support Ops governance; feedback proposes, it does not silently rewrite the category tree.",
+    "auditNote": "Closes the temporal loop into intent-taxonomy; classification systems are maintained, not installed.",
+    "taskId": "lesson-taxonomy-feedback",
+    "artifactName": "taxonomy-feedback.json"
+  }
+]

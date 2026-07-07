@@ -48,6 +48,19 @@
         "assembly": "Day-One Package",
         "archive": "Onboarding Archive"
       }
+    },
+    "module-04": {
+      "org": "Relay",
+      "deliverable": "5:00 PM queue-health digest",
+      "map": {
+        "intake": "Ticket Record",
+        "reference": "Intent Taxonomy",
+        "transform": "Classification",
+        "decision": "Route Decision",
+        "handoff": "Escalation Handoff",
+        "assembly": "Queue Digest",
+        "archive": "Triage Archive"
+      }
     }
   }
 }

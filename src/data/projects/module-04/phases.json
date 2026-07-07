@@ -1,0 +1,52 @@
+[
+  {
+    "id": "intake",
+    "order": 1,
+    "title": "Phase 1: Intake",
+    "goal": "Capture each inbound ticket from customer prose into a trusted structured record.",
+    "statusSource": "ticket-record",
+    "nodeIds": ["ticket-inbox", "ticket-record"],
+    "artifactNames": ["ticket-record.json"],
+    "unlocks": "A validated ticket record the classification and priority steps read."
+  },
+  {
+    "id": "classification",
+    "order": 2,
+    "title": "Phase 2: Classification",
+    "goal": "Assign each ticket a category against the governed intent taxonomy.",
+    "statusSource": "classification",
+    "nodeIds": ["intent-taxonomy", "classification"],
+    "artifactNames": ["classification.json"],
+    "unlocks": "A category the priority and routing steps depend on."
+  },
+  {
+    "id": "priority",
+    "order": 3,
+    "title": "Phase 3: Priority",
+    "goal": "Score each ticket's priority from the governed impact-by-urgency matrix.",
+    "statusSource": "priority-assignment",
+    "nodeIds": ["priority-matrix", "priority-assignment"],
+    "artifactNames": ["priority-assignment.json"],
+    "unlocks": "A matrix-derived priority (P1-P4) that routing acts on."
+  },
+  {
+    "id": "routing",
+    "order": 4,
+    "title": "Phase 4: Routing",
+    "goal": "Map category and priority to a queue, escalating P1s and logging standard assignments.",
+    "statusSource": "route-decision",
+    "nodeIds": ["routing-table", "route-decision", "escalation-handoff", "queue-assignment"],
+    "artifactNames": ["route-decision.json"],
+    "unlocks": "Every ticket in the right queue, with P1s escalated and captured."
+  },
+  {
+    "id": "resolution-learning",
+    "order": 5,
+    "title": "Phase 5: Resolution and Learning",
+    "goal": "Track SLA timers, capture resolutions, catch misroutes, assemble the digest, and feed taxonomy tuning.",
+    "statusSource": "queue-digest",
+    "nodeIds": ["sla-tracker", "resolution-record", "misroute-check", "queue-digest", "triage-archive", "taxonomy-feedback"],
+    "artifactNames": ["queue-digest.md"],
+    "unlocks": "The 5:00 PM queue-health digest and the misroutes that tune tomorrow's taxonomy."
+  }
+]

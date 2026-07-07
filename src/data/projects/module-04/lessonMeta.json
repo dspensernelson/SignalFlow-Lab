@@ -1,0 +1,38 @@
+{
+  "LESSON_PATH": [
+    "ticket-inbox",
+    "intent-taxonomy",
+    "ticket-record",
+    "classification",
+    "priority-matrix",
+    "priority-assignment",
+    "routing-table",
+    "route-decision",
+    "escalation-handoff",
+    "queue-assignment",
+    "sla-tracker",
+    "resolution-record",
+    "misroute-check",
+    "queue-digest",
+    "triage-archive",
+    "taxonomy-feedback"
+  ],
+  "LESSON_PREREQS": {
+    "ticket-inbox": [],
+    "intent-taxonomy": ["ticket-inbox"],
+    "ticket-record": ["ticket-inbox"],
+    "classification": ["ticket-record", "intent-taxonomy"],
+    "priority-matrix": ["classification"],
+    "priority-assignment": ["classification", "priority-matrix"],
+    "routing-table": ["priority-assignment"],
+    "route-decision": ["classification", "priority-assignment", "routing-table"],
+    "escalation-handoff": ["route-decision"],
+    "queue-assignment": ["route-decision"],
+    "sla-tracker": ["escalation-handoff", "queue-assignment"],
+    "resolution-record": ["sla-tracker"],
+    "misroute-check": ["resolution-record"],
+    "queue-digest": ["misroute-check"],
+    "triage-archive": ["queue-digest"],
+    "taxonomy-feedback": ["triage-archive"]
+  }
+}
