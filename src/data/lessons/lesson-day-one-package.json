@@ -1,0 +1,136 @@
+{
+  "id": "lesson-day-one-package",
+  "nodeId": "day-one-package",
+  "title": "Assemble the Day-One Package",
+  "subtitle": "The readiness certificate, by lookup only",
+  "clock": "SD-1, 5:00 PM",
+  "difficulty": "Beginner",
+  "skill": "Assembly from artifacts",
+  "scenario": "It is SD-1, 5:00 PM - the evening before the start. Here is the payoff: every fact the certificate needs already exists in an artifact you built. Fill each slot by LOOKING IT UP from the shelf on your left. If you find yourself retyping a status from memory, stop - the tracker already has it.",
+  "inputType": "text",
+  "inputLabel": "Assembly rule",
+  "input": "Assembly rule: every slot value must come from a stored artifact. The hire name and role are in onboarding-record.json. The four task states are in task-tracker.json (all done). The readiness line comes from readiness-gate.json (Day-One Ready). The start date is SD.",
+  "instructions": [
+    "Open each artifact on the shelf as you need it - do not work from memory.",
+    "Fill the header slots from the onboarding record (hire name, role, start date).",
+    "Fill the four provisioning slots from the task tracker (all done).",
+    "Fill readiness from the gate, then validate to render day-one-package.md."
+  ],
+  "interactionType": "templateSlots",
+  "starterAnswer": "{}",
+  "shelf": [
+    { "nodeId": "onboarding-record", "artifactName": "onboarding-record.json", "producedBy": "Build the Onboarding Record" },
+    { "nodeId": "task-tracker", "artifactName": "task-tracker.json", "producedBy": "Update the Task Tracker" },
+    { "nodeId": "readiness-gate", "artifactName": "readiness-gate.json", "producedBy": "Encode the Readiness Gate" }
+  ],
+  "validation": {
+    "type": "templateSlots",
+    "template": "# Harbor Day-One Package - {{hireName}}\n\nRole: {{role}}\nStart date: {{startDate}}\nReadiness: {{readiness}}\n\n## Provisioning summary\n- Accounts: {{accountsState}}\n- Hardware: {{hardwareState}}\n- Access: {{accessState}}\n- Payroll: {{payrollState}}\n\nAssembled by the Harbor onboarding workflow on SD-1, ready for the hiring manager.",
+    "slots": [
+      {
+        "id": "hireName",
+        "label": "Hire name",
+        "numeric": false,
+        "expected": "Jordan Lee",
+        "hint": "The name field in onboarding-record.json."
+      },
+      {
+        "id": "role",
+        "label": "Role",
+        "numeric": false,
+        "expected": "Logistics Coordinator",
+        "hint": "The role field in onboarding-record.json."
+      },
+      {
+        "id": "startDate",
+        "label": "Start date",
+        "numeric": false,
+        "accepted": ["SD", "start date"],
+        "hint": "The startDate field in onboarding-record.json."
+      },
+      {
+        "id": "readiness",
+        "label": "Readiness",
+        "numeric": false,
+        "accepted": ["Day-One Ready", "ready"],
+        "hint": "The gate said the hire is Day-One Ready."
+      },
+      {
+        "id": "accountsState",
+        "label": "Accounts state",
+        "numeric": false,
+        "expected": "done",
+        "hint": "The accounts row in task-tracker.json."
+      },
+      {
+        "id": "hardwareState",
+        "label": "Hardware state",
+        "numeric": false,
+        "expected": "done",
+        "hint": "The hardware row in task-tracker.json."
+      },
+      {
+        "id": "accessState",
+        "label": "Access state",
+        "numeric": false,
+        "expected": "done",
+        "hint": "The access row in task-tracker.json."
+      },
+      {
+        "id": "payrollState",
+        "label": "Payroll state",
+        "numeric": false,
+        "expected": "done",
+        "hint": "The payroll row in task-tracker.json."
+      }
+    ]
+  },
+  "copilotPrompt": "Fill the Day-One Package template slots by looking up values from the onboarding record (hireName, role, startDate), the task tracker (four states, all done), and the gate (readiness = Day-One Ready). Do not retype from memory.",
+  "successMessage": "Day-One Package assembled. Every line traces to an artifact - the hiring manager can trust it.",
+  "validateLabel": "Render Package",
+  "editorHelper": "Fill each slot by lookup - the shelf has every value.",
+  "intro": {
+    "heading": "The payoff: assemble by lookup",
+    "sections": [
+      {
+        "title": "Everything already exists",
+        "body": "You are not producing new facts here - you are assembling proven ones. The hire's details, the four task states, and the readiness call all live in artifacts you built. Assembly is lookup, not recall."
+      },
+      {
+        "title": "Traceable by construction",
+        "body": "Because every slot is filled from a stored artifact, the certificate is auditable: each line points back to the record that justifies it. That is what makes the hiring manager able to trust it at a glance."
+      },
+      {
+        "title": "The evening before",
+        "body": "The package is assembled on SD-1, the evening before the start. A hire who is ready the night before walks in Monday to a working laptop, live accounts, and a badge - not a scramble."
+      },
+      {
+        "title": "What you produce here",
+        "body": "day-one-package.md - the module's deliverable. It is handed to the hiring manager next and archived after."
+      }
+    ],
+    "jsonExample": "{\n  \"readiness\": \"Day-One Ready\",\n  \"accountsState\": \"done\"\n}",
+    "skill": "Assembly from artifacts",
+    "artifactName": "day-one-package.md"
+  },
+  "fieldGuide": [],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd fill a one-page readiness summary by copying each status from your checklist and records - never re-checking the work, just reporting it.",
+      "tools": {
+        "powerAutomate": "compose the document from Dataverse fields (record + tracker + gate)",
+        "zapier": "a 'Formatter' + document step pulling values from prior steps",
+        "python": "render a Markdown template from the stored artifacts"
+      }
+    },
+    "heading": "Day-One Package assembled",
+    "points": [
+      "You filled every slot by looking it up from a stored artifact, not from memory.",
+      "Each line traces to its source record, so the certificate is auditable.",
+      "Assembled on SD-1, the hire is ready the evening before day one.",
+      "day-one-package.md is the module's deliverable, ready to hand off.",
+      "The workflow can now certify a hire Day-One Ready from traceable evidence."
+    ],
+    "artifactName": "day-one-package.md"
+  }
+}

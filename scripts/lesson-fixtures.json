@@ -10,6 +10,225 @@
     "wrong": { "approvedBy": "AP Clerk", "confirms": "Batch complete and control totals correct", "beforeCutoff": "yes" }
   },
 
+  "lesson-signed-offer": {
+    "correct": { "candidateName": "candidate", "role": "role", "startDate": "start", "manager": "manager" },
+    "wrong": { "candidateName": "recruiter", "role": "role", "startDate": "start", "manager": "manager" }
+  },
+  "lesson-onboarding-record": {
+    "correct": { "hireId": "H-4021", "name": "Jordan Lee", "role": "Logistics Coordinator", "department": "Operations", "startDate": "SD", "manager": "Hiring Manager" },
+    "wrong": { "hireId": "H-4021", "name": "Jordan Lee", "role": "Logistics Coordinator", "department": "Operations", "startDate": "SD-1", "manager": "Hiring Manager" }
+  },
+  "lesson-sla-policy": {
+    "correct": { "policyName": "Onboarding SLA Policy", "version": "1.0.0", "owner": "People Ops Lead", "accountsSla": 2, "hardwareSla": 1, "accessSla": 1, "payrollSla": 3 },
+    "wrong": { "policyName": "Onboarding SLA Policy", "version": "1.0.0", "owner": "People Ops Lead", "accountsSla": 2, "hardwareSla": 1, "accessSla": 1, "payrollSla": 1 }
+  },
+  "lesson-provisioning-plan": {
+    "correct": [
+      { "taskId": "accounts", "owner": "IT Provisioner", "due": "SD-2" },
+      { "taskId": "hardware", "owner": "IT Provisioner", "due": "SD-1" },
+      { "taskId": "access", "owner": "Facilities Coordinator", "due": "SD-1" },
+      { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
+    ],
+    "wrong": [
+      { "taskId": "accounts", "owner": "Facilities Coordinator", "due": "SD-2" },
+      { "taskId": "hardware", "owner": "IT Provisioner", "due": "SD-1" },
+      { "taskId": "access", "owner": "Facilities Coordinator", "due": "SD-1" },
+      { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
+    ]
+  },
+  "lesson-accounts-task": {
+    "correct": { "taskId": "accounts", "existingFound": false, "action": "created", "accountId": "acct-4021", "state": "done" },
+    "wrong": { "taskId": "accounts", "existingFound": false, "action": "created", "accountId": "acct-4021", "state": "pending" }
+  },
+  "lesson-hardware-task": {
+    "correct": { "orderedBy": "IT Provisioner", "deliverBy": "SD-1", "confirmationCaptured": "yes" },
+    "wrong": { "orderedBy": "Vendor", "deliverBy": "SD-1", "confirmationCaptured": "yes" }
+  },
+  "lesson-access-task": {
+    "correct": [
+      { "group": "ops-general", "grantedBy": "Facilities Coordinator" },
+      { "group": "warehouse-readonly", "grantedBy": "Facilities Coordinator" }
+    ],
+    "wrong": [
+      { "group": "ops-general", "grantedBy": "IT Provisioner" },
+      { "group": "warehouse-readonly", "grantedBy": "Facilities Coordinator" }
+    ]
+  },
+  "lesson-payroll-task": {
+    "correct": { "sentTo": "Payroll Specialist", "payClass": "Non-exempt / Hourly", "confirmationCaptured": "yes" },
+    "wrong": { "sentTo": "People Ops Lead", "payClass": "Non-exempt / Hourly", "confirmationCaptured": "yes" }
+  },
+  "lesson-task-tracker": {
+    "correct": [
+      { "taskId": "accounts", "state": "done", "blockedReason": "" },
+      { "taskId": "hardware", "state": "done", "blockedReason": "" },
+      { "taskId": "access", "state": "done", "blockedReason": "" },
+      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+    ],
+    "wrong": [
+      { "taskId": "accounts", "state": "done", "blockedReason": "" },
+      { "taskId": "hardware", "state": "pending", "blockedReason": "" },
+      { "taskId": "access", "state": "done", "blockedReason": "" },
+      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+    ]
+  },
+  "lesson-readiness-gate": {
+    "correct": { "allTasksDone": true, "anyBlocked": false, "ready": true, "route": "day-one-package" },
+    "wrong": { "allTasksDone": true, "anyBlocked": false, "ready": false, "route": "escalation-path" }
+  },
+  "lesson-escalation-path": {
+    "correct": { "blockedTask": "background check", "owner": "People Ops Lead", "resolveBy": "SD-2" },
+    "wrong": { "blockedTask": "accounts", "owner": "People Ops Lead", "resolveBy": "SD-2" }
+  },
+  "lesson-day-one-package": {
+    "correct": { "hireName": "Jordan Lee", "role": "Logistics Coordinator", "startDate": "SD", "readiness": "Day-One Ready", "accountsState": "done", "hardwareState": "done", "accessState": "done", "payrollState": "done" },
+    "wrong": { "hireName": "Jordan Lee", "role": "Logistics Coordinator", "startDate": "SD", "readiness": "pending", "accountsState": "done", "hardwareState": "done", "accessState": "done", "payrollState": "done" }
+  },
+  "lesson-manager-handoff": {
+    "correct": { "acknowledgedBy": "Hiring Manager", "readyConfirmed": "yes", "acknowledgedAt": "SD-1 5:00 PM" },
+    "wrong": { "acknowledgedBy": "Recruiter", "readyConfirmed": "yes", "acknowledgedAt": "SD-1 5:00 PM" }
+  },
+  "lesson-onboarding-archive": {
+    "correct": { "hireId": "H-4021", "archivedRun": "onboarding-H-4021", "retention": "7 years", "seedsCatalog": true },
+    "wrong": { "hireId": "H-4021", "archivedRun": "onboarding-H-4021", "retention": "7 years", "seedsCatalog": false }
+  },
+  "lesson-profile-feedback": {
+    "correct": { "role": "Logistics Coordinator", "needed": "handheld scanner", "inProfile": false, "proposedChange": "add", "routedTo": "People Ops Lead" },
+    "wrong": { "role": "Logistics Coordinator", "needed": "handheld scanner", "inProfile": true, "proposedChange": "add", "routedTo": "People Ops Lead" }
+  },
+  "lesson-signed-offer-medium": {
+    "correct": { "candidateName": "candidate", "role": "role", "startDate": "amendStart", "manager": "manager" },
+    "wrong": { "candidateName": "candidate", "role": "role", "startDate": "origStart", "manager": "manager" }
+  },
+  "lesson-onboarding-record-medium": {
+    "correct": { "hireId": "H-4022", "name": "Sam Rivera", "role": "Logistics Coordinator", "department": "Operations", "startDate": "SD", "startDateAmended": true },
+    "wrong": { "hireId": "H-4022", "name": "Sam Rivera", "role": "Logistics Coordinator", "department": "Operations", "startDate": "SD", "startDateAmended": false }
+  },
+  "lesson-sla-policy-medium": {
+    "correct": { "policyName": "Onboarding SLA Policy", "version": "1.1.0", "owner": "People Ops Lead", "accountsSla": 2, "hardwareSla": 2, "accessSla": 1, "payrollSla": 3 },
+    "wrong": { "policyName": "Onboarding SLA Policy", "version": "1.1.0", "owner": "People Ops Lead", "accountsSla": 2, "hardwareSla": 2, "accessSla": 1, "payrollSla": 1 }
+  },
+  "lesson-provisioning-plan-medium": {
+    "correct": [
+      { "taskId": "accounts", "owner": "IT Provisioner", "due": "SD-2" },
+      { "taskId": "hardware", "owner": "IT Provisioner", "due": "SD-2" },
+      { "taskId": "access", "owner": "Facilities Coordinator", "due": "SD-1" },
+      { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
+    ],
+    "wrong": [
+      { "taskId": "accounts", "owner": "IT Provisioner", "due": "SD-2" },
+      { "taskId": "hardware", "owner": "IT Provisioner", "due": "SD-1" },
+      { "taskId": "access", "owner": "Facilities Coordinator", "due": "SD-1" },
+      { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
+    ]
+  },
+  "lesson-accounts-task-medium": {
+    "correct": { "taskId": "accounts", "existingFound": true, "action": "reused", "accountId": "acct-4022", "state": "done" },
+    "wrong": { "taskId": "accounts", "existingFound": true, "action": "created", "accountId": "acct-4022", "state": "done" }
+  },
+  "lesson-hardware-task-medium": {
+    "correct": { "orderedBy": "IT Provisioner", "deliverBy": "SD+3", "onTrack": "no" },
+    "wrong": { "orderedBy": "IT Provisioner", "deliverBy": "SD+3", "onTrack": "yes" }
+  },
+  "lesson-access-task-medium": {
+    "correct": [
+      { "group": "ops-general", "grantedBy": "Facilities Coordinator", "action": "grant" },
+      { "group": "warehouse-readonly", "grantedBy": "Facilities Coordinator", "action": "grant" },
+      { "group": "finance-readonly", "grantedBy": "Facilities Coordinator", "action": "revoke" }
+    ],
+    "wrong": [
+      { "group": "ops-general", "grantedBy": "Facilities Coordinator", "action": "grant" },
+      { "group": "warehouse-readonly", "grantedBy": "Facilities Coordinator", "action": "grant" },
+      { "group": "finance-readonly", "grantedBy": "Facilities Coordinator", "action": "grant" }
+    ]
+  },
+  "lesson-payroll-task-medium": {
+    "correct": { "sentTo": "Payroll Specialist", "payClass": "Non-exempt / Hourly", "priority": "rush" },
+    "wrong": { "sentTo": "Payroll Specialist", "payClass": "Non-exempt / Hourly", "priority": "standard" }
+  },
+  "lesson-task-tracker-medium": {
+    "correct": [
+      { "taskId": "accounts", "state": "done", "blockedReason": "" },
+      { "taskId": "hardware", "state": "blocked", "blockedReason": "laptop backordered to SD+3" },
+      { "taskId": "access", "state": "done", "blockedReason": "" },
+      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+    ],
+    "wrong": [
+      { "taskId": "accounts", "state": "done", "blockedReason": "" },
+      { "taskId": "hardware", "state": "done", "blockedReason": "" },
+      { "taskId": "access", "state": "done", "blockedReason": "" },
+      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+    ]
+  },
+  "lesson-readiness-gate-medium": {
+    "correct": { "allTasksDone": false, "anyBlocked": true, "ready": false, "route": "escalation-path", "blockedTask": "hardware" },
+    "wrong": { "allTasksDone": false, "anyBlocked": true, "ready": true, "route": "day-one-package", "blockedTask": "hardware" }
+  },
+  "lesson-escalation-path-medium": {
+    "correct": { "blockedTask": "hardware", "owner": "IT Provisioner", "action": "issue loaner" },
+    "wrong": { "blockedTask": "hardware", "owner": "IT Provisioner", "action": "delay start" }
+  },
+  "lesson-day-one-package-medium": {
+    "correct": { "hireName": "Sam Rivera", "role": "Logistics Coordinator", "startDate": "SD", "readiness": "Ready with loaner", "accountsState": "done", "hardwareState": "loaner", "accessState": "done", "payrollState": "done" },
+    "wrong": { "hireName": "Sam Rivera", "role": "Logistics Coordinator", "startDate": "SD", "readiness": "Day-One Ready", "accountsState": "done", "hardwareState": "done", "accessState": "done", "payrollState": "done" }
+  },
+  "lesson-manager-handoff-medium": {
+    "correct": { "acknowledgedBy": "Hiring Manager", "readyConfirmed": "conditional", "caveatNoted": "yes" },
+    "wrong": { "acknowledgedBy": "Hiring Manager", "readyConfirmed": "yes", "caveatNoted": "yes" }
+  },
+  "lesson-onboarding-archive-medium": {
+    "correct": { "hireId": "H-4022", "archivedRun": "onboarding-H-4022", "retention": "7 years", "exceptionsNoted": true, "seedsCatalog": true },
+    "wrong": { "hireId": "H-4022", "archivedRun": "onboarding-H-4022", "retention": "7 years", "exceptionsNoted": false, "seedsCatalog": true }
+  },
+  "lesson-profile-feedback-medium": {
+    "correct": { "role": "Logistics Coordinator", "needed": "handheld scanner", "inProfile": true, "proposedChange": "none", "routedTo": "People Ops Lead" },
+    "wrong": { "role": "Logistics Coordinator", "needed": "handheld scanner", "inProfile": true, "proposedChange": "add", "routedTo": "People Ops Lead" }
+  },
+  "lesson-sla-policy-hard": {
+    "correct": { "policyName": "Onboarding SLA Policy", "version": "2.0.0", "owner": "People Ops Lead", "accountsSla": 3, "hardwareSla": 3, "accessSla": 2, "payrollSla": 4 },
+    "wrong": { "policyName": "Onboarding SLA Policy", "version": "2.0.0", "owner": "People Ops Lead", "accountsSla": 3, "hardwareSla": 3, "accessSla": 2, "payrollSla": 1 }
+  },
+  "lesson-escalation-path-hard": {
+    "correct": { "blockedTask": "hardware", "level1Owner": "IT Provisioner", "level1Deadline": "SD-2", "level1Responded": false, "level2Owner": "People Ops Lead", "finalDeadline": "SD-1" },
+    "wrong": { "blockedTask": "hardware", "level1Owner": "IT Provisioner", "level1Deadline": "SD-2", "level1Responded": false, "level2Owner": "IT Provisioner", "finalDeadline": "SD-1" }
+  },
+  "lesson-day-one-package-hard": {
+    "correct": { "blockedTask": "hardware", "criticalBlocked": false, "workaroundAvailable": true, "decision": "start-anyway" },
+    "wrong": { "blockedTask": "hardware", "criticalBlocked": false, "workaroundAvailable": true, "decision": "delay" }
+  },
+  "lesson-accounts-task-hard": {
+    "correct": { "taskId": "accounts", "identityExists": true, "mailboxExists": false, "action": "complete-missing", "accountId": "acct-4021", "state": "done" },
+    "wrong": { "taskId": "accounts", "identityExists": true, "mailboxExists": false, "action": "recreate", "accountId": "acct-4021", "state": "done" }
+  },
+  "lesson-task-tracker-hard": {
+    "correct": [
+      { "taskId": "accounts", "state": "done", "blockedReason": "" },
+      { "taskId": "hardware", "state": "blocked", "blockedReason": "conflicting reports; held pending confirmation" },
+      { "taskId": "access", "state": "done", "blockedReason": "" },
+      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+    ],
+    "wrong": [
+      { "taskId": "accounts", "state": "done", "blockedReason": "" },
+      { "taskId": "hardware", "state": "done", "blockedReason": "" },
+      { "taskId": "access", "state": "done", "blockedReason": "" },
+      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+    ]
+  },
+  "lesson-readiness-gate-hard": {
+    "correct": {
+      "onboarding-record": "{\"hireId\":\"H-4021\",\"name\":\"Jordan Lee\",\"role\":\"Logistics Coordinator\",\"department\":\"Operations\",\"startDate\":\"SD\",\"manager\":\"Hiring Manager\"}",
+      "provisioning-plan": "[{\"taskId\":\"accounts\",\"owner\":\"IT Provisioner\",\"due\":\"SD-2\"},{\"taskId\":\"hardware\",\"owner\":\"IT Provisioner\",\"due\":\"SD-1\"},{\"taskId\":\"access\",\"owner\":\"Facilities Coordinator\",\"due\":\"SD-1\"},{\"taskId\":\"payroll\",\"owner\":\"Payroll Specialist\",\"due\":\"SD-3\"}]",
+      "task-tracker": "[{\"taskId\":\"accounts\",\"state\":\"done\",\"blockedReason\":\"\"},{\"taskId\":\"hardware\",\"state\":\"done\",\"blockedReason\":\"\"},{\"taskId\":\"access\",\"state\":\"done\",\"blockedReason\":\"\"},{\"taskId\":\"payroll\",\"state\":\"done\",\"blockedReason\":\"\"}]",
+      "readiness-gate": "{\"allTasksDone\":true,\"anyBlocked\":false,\"ready\":true,\"route\":\"day-one-package\"}"
+    },
+    "wrong": {
+      "onboarding-record": "{\"hireId\":\"H-4021\",\"name\":\"Jordan Lee\",\"role\":\"Logistics Coordinator\",\"department\":\"Operations\",\"startDate\":\"SD\",\"manager\":\"Hiring Manager\"}",
+      "provisioning-plan": "[{\"taskId\":\"accounts\",\"owner\":\"IT Provisioner\",\"due\":\"SD-2\"},{\"taskId\":\"hardware\",\"owner\":\"IT Provisioner\",\"due\":\"SD-1\"},{\"taskId\":\"access\",\"owner\":\"Facilities Coordinator\",\"due\":\"SD-1\"},{\"taskId\":\"payroll\",\"owner\":\"Payroll Specialist\",\"due\":\"SD-3\"}]",
+      "task-tracker": "[{\"taskId\":\"accounts\",\"state\":\"done\",\"blockedReason\":\"\"},{\"taskId\":\"hardware\",\"state\":\"done\",\"blockedReason\":\"\"},{\"taskId\":\"access\",\"state\":\"done\",\"blockedReason\":\"\"},{\"taskId\":\"payroll\",\"state\":\"done\",\"blockedReason\":\"\"}]",
+      "readiness-gate": "{\"allTasksDone\":true,\"anyBlocked\":false,\"ready\":false,\"route\":\"escalation-path\"}"
+    }
+  },
+
   "lesson-intake": {
     "correct": { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": "$142/MWh", "generationFlag": "Wind underperformed", "approvalRequired": true },
     "wrong": { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": "$142/MWh", "generationFlag": "Wind underperformed", "approvalRequired": false }

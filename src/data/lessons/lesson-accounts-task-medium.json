@@ -1,0 +1,86 @@
+{
+  "id": "lesson-accounts-task-medium",
+  "nodeId": "accounts-task",
+  "title": "Re-Run the Accounts Task",
+  "subtitle": "A retry must reuse, not duplicate",
+  "clock": "SD-2, 9:00 AM",
+  "difficulty": "Intermediate",
+  "skill": "Idempotent provisioning",
+  "scenario": "The accounts task ran yesterday but timed out mid-way - it is unclear whether the account was created. You re-run it. This time the identity check FINDS an existing account for H-4022. The idempotency rule earns its keep: reuse it, do not create a second one.",
+  "inputType": "text",
+  "inputLabel": "Accounts re-run (after a partial failure)",
+  "input": "Task: accounts for hire H-4022, re-run after a timeout. Identity store lookup for H-4022: an existing account (acct-4022) IS found from the interrupted first run. Rule: check first; if one exists, REUSE it and record action = reused. Never create a second account.",
+  "instructions": [
+    "Record the taskId and that an existing account was found (existingFound = true).",
+    "Because one exists, set action to reused and record the existing accountId.",
+    "Set the final state to done.",
+    "Return one valid JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"taskId\": \"accounts\",\n  \"existingFound\": true,\n  \"action\": \"\",\n  \"accountId\": \"\",\n  \"state\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["taskId", "existingFound", "action", "accountId", "state"],
+    "expected": {
+      "taskId": "accounts",
+      "existingFound": true,
+      "action": "reused",
+      "accountId": "acct-4022",
+      "state": "done"
+    }
+  },
+  "copilotPrompt": "Build one JSON accounts re-run result: taskId, existingFound (boolean true), action (reused), accountId (acct-4022), state (done). An existing account was found, so reuse it - do not create a second.",
+  "successMessage": "Account reused. The retry converged to one account - idempotency held.",
+  "validateLabel": "Validate Result",
+  "editorHelper": "Found one? Reuse it. That is what makes a retry safe.",
+  "intro": {
+    "heading": "Before you retry: converge, do not duplicate",
+    "sections": [
+      {
+        "title": "Retries are normal",
+        "body": "A timeout mid-task is routine in real provisioning. The question is not 'did it run twice?' but 'did running twice do harm?'. Idempotency is the answer that makes retries safe."
+      },
+      {
+        "title": "The check pays off now",
+        "body": "In the easy run, existingFound was false and you created. Here it is true, so you reuse. Same rule, opposite branch - the check-then-create discipline is what prevents a duplicate."
+      },
+      {
+        "title": "One account, always",
+        "body": "Whether the task runs once or five times, the hire ends with exactly one account. That convergence is the whole point; two accounts would break offboarding and audit."
+      },
+      {
+        "title": "What you produce here",
+        "body": "An accounts result showing a reused account - proof the retry was safe. The tracker reads it the same as a created one: done."
+      }
+    ],
+    "jsonExample": "{\n  \"existingFound\": true,\n  \"action\": \"reused\"\n}",
+    "skill": "Idempotent provisioning",
+    "artifactName": "accounts-task.json"
+  },
+  "fieldGuide": [
+    { "field": "taskId", "meaning": "The task this result belongs to.", "type": "string", "example": "\"accounts\"", "group": "Task", "lookFor": "which task?", "hint": "The accounts task." },
+    { "field": "existingFound", "meaning": "Whether an account already existed.", "type": "boolean", "example": "true", "group": "Check", "lookFor": "one exists?", "hint": "The retry found one, so the boolean true." },
+    { "field": "action", "meaning": "What the task did given the check.", "type": "string", "example": "\"reused\"", "group": "Action", "lookFor": "reused or created?", "hint": "One existed, so reused." },
+    { "field": "accountId", "meaning": "The existing account id.", "type": "string", "example": "\"acct-4022\"", "group": "Action", "lookFor": "which account?", "hint": "Reuse acct-4022." },
+    { "field": "state", "meaning": "The final state.", "type": "string", "example": "\"done\"", "group": "Action", "lookFor": "finished?", "hint": "The task is done." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd search before creating, so re-running the same onboarding never spawns a duplicate account.",
+      "tools": {
+        "powerAutomate": "Get user first; branch to reuse when one is returned",
+        "zapier": "'Find User' then reuse the match instead of creating",
+        "python": "if lookup finds an account, return it; else create"
+      }
+    },
+    "heading": "Account reused",
+    "points": [
+      "You re-ran the task and found an existing account.",
+      "Because one existed, you reused it - action reused, not a second create.",
+      "The retry converged to exactly one account: idempotency held.",
+      "The tracker reads a reused account the same as a created one: done.",
+      "The workflow can now retry provisioning safely without duplicating accounts."
+    ],
+    "artifactName": "accounts-task.json"
+  }
+}

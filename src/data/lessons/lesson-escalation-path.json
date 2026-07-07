@@ -1,0 +1,103 @@
+{
+  "id": "lesson-escalation-path",
+  "nodeId": "escalation-path",
+  "title": "File an Escalation",
+  "subtitle": "Name the blocked task, an owner, and a deadline",
+  "clock": "SD-1, 4:15 PM",
+  "difficulty": "Beginner",
+  "skill": "Escalation handoff",
+  "scenario": "It is SD-1. This hire's run is clean - but the gate's other exit is escalation, and you learn it before you need it. Next week's hire has a blocked task: their background check is still pending. File the escalation so a stuck onboarding gets an owner and a deadline instead of quietly going late.",
+  "inputType": "text",
+  "inputLabel": "Blocked task (next week's hire)",
+  "input": "A different hire starting next Monday has a blocked task: the background check is still pending with the vendor. Rule: every escalation names the blocked task, an accountable owner, and a deadline to resolve. Background checks are owned by the People Ops Lead; this one must clear by SD-2 to stay on track.",
+  "instructions": [
+    "Name which task is blocked.",
+    "Assign the accountable owner for that task.",
+    "Set a resolve-by deadline relative to the start date.",
+    "Validate to mint the escalation record."
+  ],
+  "interactionType": "handoffForm",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "handoffForm",
+    "fields": [
+      {
+        "id": "blockedTask",
+        "label": "Blocked task",
+        "kind": "select",
+        "options": ["background check", "accounts", "hardware"],
+        "expected": "background check",
+        "explain": "Escalate the task that is actually blocked - the pending background check - not a task that already completed."
+      },
+      {
+        "id": "owner",
+        "label": "Escalation owner",
+        "kind": "select",
+        "options": ["People Ops Lead", "IT Provisioner", "Hiring Manager"],
+        "expected": "People Ops Lead",
+        "explain": "Background checks are owned by the People Ops Lead; an escalation with no accountable owner is how a start date quietly slips."
+      },
+      {
+        "id": "resolveBy",
+        "label": "Resolve by",
+        "kind": "select",
+        "options": ["SD-2", "SD-1", "SD"],
+        "expected": "SD-2",
+        "explain": "The deadline must leave margin before the start date; SD-2 keeps the hire on track if the check clears in time."
+      }
+    ],
+    "artifactOnPass": {
+      "handoff": "escalation",
+      "blockedTask": "background check",
+      "owner": "People Ops Lead",
+      "resolveBy": "SD-2",
+      "state": "escalated"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Capture an onboarding escalation: which task is blocked, the accountable owner, and a resolve-by deadline relative to the start date. The blocked task is a pending background check owned by People Ops, due SD-2.",
+  "successMessage": "Escalation filed. The blocked task now has a named owner and a deadline - not silent lateness.",
+  "intro": {
+    "heading": "The gate's other exit",
+    "sections": [
+      {
+        "title": "Blocked is not late - yet",
+        "body": "A blocked task only becomes a missed start date if nobody owns it. Escalation is the difference: it turns a stuck task into an accountable, time-boxed action before day one arrives."
+      },
+      {
+        "title": "Owner and deadline, always",
+        "body": "Every escalation names who will resolve it and by when. 'Someone is looking into it' is not an escalation; 'People Ops Lead, by SD-2' is."
+      },
+      {
+        "title": "You learn it before you need it",
+        "body": "This week's hire is clean, so you practice on next week's blocked background check. When a real block hits, the escalation form is already muscle memory."
+      },
+      {
+        "title": "What you produce here",
+        "body": "An escalation record the package can reference in degraded mode. The medium tier routes this hire's own backordered laptop through here for real."
+      }
+    ],
+    "jsonExample": "{\n  \"blockedTask\": \"background check\",\n  \"owner\": \"People Ops Lead\",\n  \"resolveBy\": \"SD-2\"\n}",
+    "skill": "Escalation handoff",
+    "artifactName": "escalation-record.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd raise a ticket naming the blocked item, its owner, and a due date - so a stuck task has a person and a clock, not just a worried feeling.",
+      "tools": {
+        "powerAutomate": "create an escalation task with an assignee and due date, notify the owner",
+        "zapier": "'Create Ticket' with owner and deadline when a task is blocked",
+        "python": "open an escalation record {task, owner, resolveBy} and alert the owner"
+      }
+    },
+    "heading": "Escalation filed",
+    "points": [
+      "You named the blocked task, an accountable owner, and a resolve-by deadline.",
+      "An escalation with an owner and a clock is what prevents silent lateness.",
+      "The gate's non-ready exit is a real path, not a dead end.",
+      "You practiced the form before a real block forced it.",
+      "The workflow can now escalate a blocked hire instead of missing the start date."
+    ],
+    "artifactName": "escalation-record.json"
+  }
+}

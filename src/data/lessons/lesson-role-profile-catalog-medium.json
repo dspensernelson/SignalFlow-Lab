@@ -1,0 +1,124 @@
+{
+  "id": "lesson-role-profile-catalog-medium",
+  "nodeId": "role-profile-catalog",
+  "title": "Read the Updated Role Catalog",
+  "subtitle": "A governed change from the feedback loop",
+  "clock": "SD-5, 10:00 AM",
+  "difficulty": "Intermediate",
+  "skill": "Reference governance & change",
+  "scenario": "The role profile catalog changed since the last hire: a handheld scanner was added to the Logistics Coordinator profile after a prior onboarding's feedback showed the role needed it. Read the updated, versioned catalog and understand how a governed change - not an ad-hoc grant - improves it.",
+  "inputType": "text",
+  "inputLabel": "Role Profile - Logistics Coordinator (v1.1.0)",
+  "input": "Role Profile: Logistics Coordinator (Operations), version 1.1.0. Accounts: identity, email, directory. Software: Logistics Suite, Email/Calendar. Hardware: Standard laptop, handheld scanner (added v1.1.0 from onboarding feedback). Access groups: ops-general, warehouse-readonly. Pay class: Non-exempt / Hourly. Change owned and ratified by the People Ops Lead.",
+  "instructions": [
+    "Read the updated profile and note what changed and why.",
+    "Answer the four questions about governed change, versioning, and least-privilege.",
+    "Validate to mint the updated role profile record."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "Why was the handheld scanner added to the profile?",
+        "options": [
+          { "id": "a", "text": "A prior hire requested it ad hoc on their first day" },
+          { "id": "b", "text": "Onboarding feedback showed the role needed it, and People Ops ratified the change" },
+          { "id": "c", "text": "The IT Provisioner added it without review" }
+        ],
+        "correctOptionId": "b",
+        "explain": "The loop works as designed: profile-feedback proposed it, and the People Ops Lead ratified it into a new version. Governed change, not an ad-hoc grant."
+      },
+      {
+        "id": "q2",
+        "prompt": "What does the version bump to 1.1.0 tell you?",
+        "options": [
+          { "id": "a", "text": "Nothing - versions are decorative" },
+          { "id": "b", "text": "The catalog change is tracked and auditable over time" },
+          { "id": "c", "text": "The whole catalog was rewritten" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Versioning makes the change auditable: you can see what the role got, when, and who approved it - the same discipline as any governed reference."
+      },
+      {
+        "id": "q3",
+        "prompt": "Does adding the scanner break least-privilege?",
+        "options": [
+          { "id": "a", "text": "No - it is now part of the role profile, so it is still granted by role" },
+          { "id": "b", "text": "Yes - any new item is over-provisioning" },
+          { "id": "c", "text": "Only if the hire asks for it" }
+        ],
+        "correctOptionId": "a",
+        "explain": "Least-privilege is about granting by role, not by request. Because the scanner is now in the profile, every Logistics Coordinator gets it consistently and auditably."
+      },
+      {
+        "id": "q4",
+        "prompt": "Who ratifies a change to the catalog?",
+        "options": [
+          { "id": "a", "text": "The People Ops Lead, who owns the catalog" },
+          { "id": "b", "text": "Whoever noticed the gap" },
+          { "id": "c", "text": "The new hire" }
+        ],
+        "correctOptionId": "a",
+        "explain": "Feedback proposes; the People Ops Lead ratifies. Ownership of the change never leaves the catalog owner."
+      }
+    ],
+    "artifactOnPass": {
+      "reference": "role-profile-catalog",
+      "role": "Logistics Coordinator",
+      "version": "1.1.0",
+      "hardware": ["Standard laptop", "handheld scanner"],
+      "accessGroups": ["ops-general", "warehouse-readonly"],
+      "payClass": "Non-exempt / Hourly",
+      "ownedBy": "People Ops Lead"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Explain a governed change to a role profile catalog: why a handheld scanner was added (from onboarding feedback), what a version bump signifies, why it still respects least-privilege, and who ratifies the change.",
+  "successMessage": "Updated profile read. The catalog improved through the loop - governed, versioned, and still least-privilege.",
+  "intro": {
+    "heading": "Before you plan: the catalog learned",
+    "sections": [
+      {
+        "title": "The loop closed",
+        "body": "The scanner is not new noise - it is last quarter's feedback ratified into the profile. What one hire needed became what every hire in the role now gets, by design."
+      },
+      {
+        "title": "Change is versioned",
+        "body": "A governed catalog records its changes. Version 1.1.0 means the addition is tracked and auditable, not a silent edit someone made and forgot."
+      },
+      {
+        "title": "Still least-privilege",
+        "body": "Adding to the profile does not break least-privilege - it extends the role's defined set. Access is still by role, and the scanner is now part of that role for everyone."
+      },
+      {
+        "title": "What you produce here",
+        "body": "An updated role profile record the plan expands - now including the scanner the loop taught the catalog to grant."
+      }
+    ],
+    "jsonExample": "{\n  \"version\": \"1.1.0\",\n  \"hardware\": [\"Standard laptop\", \"handheld scanner\"]\n}",
+    "skill": "Reference governance & change",
+    "artifactName": "role-profile-record.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd update the role checklist once People Ops approved the addition, then use the new version for every hire in that role.",
+      "tools": {
+        "powerAutomate": "read the current published version of the role entitlements",
+        "zapier": "look up the versioned role row, including recent additions",
+        "python": "load the latest ratified role profile, version and all"
+      }
+    },
+    "heading": "Updated profile read",
+    "points": [
+      "You saw a governed change: the scanner added from onboarding feedback.",
+      "The version bump makes the change tracked and auditable.",
+      "Adding to the profile keeps least-privilege - access is still by role.",
+      "The People Ops Lead ratified it; ownership stayed with the catalog owner.",
+      "The workflow can now provision the improved role from a versioned catalog."
+    ],
+    "artifactName": "role-profile-record.json"
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "id": "lesson-hardware-task",
+  "nodeId": "hardware-task",
+  "title": "Run the Hardware Task",
+  "subtitle": "Order the laptop and capture the confirmation",
+  "clock": "SD-1, 10:00 AM",
+  "difficulty": "Beginner",
+  "skill": "Physical-world handoff",
+  "scenario": "It is SD-1. The plan says the laptop must be delivered by tomorrow's start. This is a physical-world task the automation cannot finish itself - it orders, hands off to the people who ship it, and captures the confirmation. Record the handoff so the tracker knows hardware is really on the way.",
+  "inputType": "text",
+  "inputLabel": "Hardware task (from the plan)",
+  "input": "Task: hardware for hire H-4021 (owner IT Provisioner, due SD-1). The role profile lists a Standard laptop. IT places the order and must capture a delivery confirmation showing it lands by the start date. Automation triggers and tracks; it cannot physically ship the box.",
+  "instructions": [
+    "Record who placed the order (the owner of the hardware task).",
+    "Set the delivery target so the laptop lands in time for day one.",
+    "Confirm a delivery confirmation was captured.",
+    "Validate to mint the hardware handoff record."
+  ],
+  "interactionType": "handoffForm",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "handoffForm",
+    "fields": [
+      {
+        "id": "orderedBy",
+        "label": "Ordered by",
+        "kind": "select",
+        "options": ["IT Provisioner", "Facilities Coordinator", "Vendor"],
+        "expected": "IT Provisioner",
+        "explain": "The IT Provisioner owns accounts and hardware; they place the laptop order, not Facilities or the vendor directly."
+      },
+      {
+        "id": "deliverBy",
+        "label": "Deliver by",
+        "kind": "select",
+        "options": ["SD-1", "SD", "SD+1"],
+        "expected": "SD-1",
+        "explain": "The laptop must land by SD-1 so it is on the desk before the start date - delivering on SD or later misses day one."
+      },
+      {
+        "id": "confirmationCaptured",
+        "label": "Confirmation captured",
+        "kind": "select",
+        "options": ["yes", "no"],
+        "expected": "yes",
+        "explain": "A physical handoff without a captured confirmation is a guess; the tracker needs proof the order is really on the way."
+      }
+    ],
+    "artifactOnPass": {
+      "task": "hardware",
+      "orderedBy": "IT Provisioner",
+      "item": "Standard laptop",
+      "deliverBy": "SD-1",
+      "confirmationCaptured": "yes",
+      "state": "done"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Capture a hardware handoff for onboarding: who ordered the laptop, the delivery target relative to the start date, and whether a delivery confirmation was captured. The laptop must arrive by SD-1.",
+  "successMessage": "Hardware handed off. The laptop is ordered, tracked, and confirmed to land before day one.",
+  "intro": {
+    "heading": "Before you track: the physical boundary",
+    "sections": [
+      {
+        "title": "Automation has edges",
+        "body": "Some onboarding tasks end in the physical world. The workflow can trigger the order and track it, but a person and a shipping company put the laptop on the desk. Pretending otherwise is how a hire shows up to nothing."
+      },
+      {
+        "title": "Trigger, track, confirm",
+        "body": "The automation's real job here is to place the order, follow it, and capture a confirmation. The captured confirmation is what turns 'I think it shipped' into a fact the tracker can trust."
+      },
+      {
+        "title": "Timing is part of the task",
+        "body": "Delivering by SD-1 leaves a day of margin before the start. A laptop that lands on the start date itself is already late for someone's first morning."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A hardware handoff record - ordered by, deliver-by, confirmation - the task tracker reads as this branch's state. The medium tier backorders the laptop to teach the blocked state."
+      }
+    ],
+    "jsonExample": "{\n  \"task\": \"hardware\",\n  \"deliverBy\": \"SD-1\",\n  \"state\": \"done\"\n}",
+    "skill": "Physical-world handoff",
+    "artifactName": "hardware-task.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd place the laptop order, note the tracking number and expected date, and only mark it done once you had a shipping confirmation in hand.",
+      "tools": {
+        "powerAutomate": "create a procurement item, then wait for a shipping-confirmation email/flag",
+        "zapier": "'Create Order' then capture the tracking number into the record",
+        "python": "call the asset-order API and store the returned tracking id"
+      }
+    },
+    "heading": "Hardware handed off",
+    "points": [
+      "You captured who ordered the laptop and the delivery target (SD-1).",
+      "The delivery confirmation was captured, so the tracker trusts it is on the way.",
+      "The task is a handoff to the physical world - automation triggers and tracks, it does not ship.",
+      "Delivering by SD-1 leaves margin before the start date.",
+      "The workflow can now provision hardware and prove it, not just assume it."
+    ],
+    "artifactName": "hardware-task.json"
+  }
+}

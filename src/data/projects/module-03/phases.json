@@ -1,0 +1,52 @@
+[
+  {
+    "id": "offer-intake",
+    "order": 1,
+    "title": "Phase 1: Offer Intake",
+    "goal": "Turn a signed offer into a trusted onboarding record, and load the role profile and SLA references the plan will expand.",
+    "statusSource": "onboarding-record",
+    "nodeIds": ["signed-offer", "role-profile-catalog", "onboarding-record"],
+    "artifactNames": ["onboarding-record.json"],
+    "unlocks": "A validated onboarding record and the governed references the provisioning plan is built from."
+  },
+  {
+    "id": "provisioning-plan",
+    "order": 2,
+    "title": "Phase 2: Provisioning Plan",
+    "goal": "Expand the role profile into a concrete task list with per-task SLAs relative to the start date.",
+    "statusSource": "provisioning-plan",
+    "nodeIds": ["sla-policy", "provisioning-plan"],
+    "artifactNames": ["sla-policy.json", "provisioning-plan.json"],
+    "unlocks": "A dated task plan the four provisioning branches run against in parallel."
+  },
+  {
+    "id": "parallel-provisioning",
+    "order": 3,
+    "title": "Phase 3: Parallel Provisioning",
+    "goal": "Run the four provisioning branches in parallel - accounts, hardware, access, payroll - and record each task's state on one tracker.",
+    "statusSource": "task-tracker",
+    "nodeIds": ["accounts-task", "hardware-task", "access-task", "payroll-task", "task-tracker"],
+    "artifactNames": ["task-tracker.json"],
+    "unlocks": "One status record over four parallel branches that the readiness gate reads."
+  },
+  {
+    "id": "gate-exceptions",
+    "order": 4,
+    "title": "Phase 4: Gate and Exceptions",
+    "goal": "Fan in on task status: if every task is done inside its SLA the package is assembled; any blocked or late task is escalated.",
+    "statusSource": "readiness-gate",
+    "nodeIds": ["readiness-gate", "escalation-path"],
+    "artifactNames": ["readiness-gate.json", "escalation-record.json"],
+    "unlocks": "A readiness decision that routes a clean hire to the package and a blocked hire to escalation."
+  },
+  {
+    "id": "day-one-package",
+    "order": 5,
+    "title": "Phase 5: Day-One Package",
+    "goal": "Assemble the Day-One Ready certificate, hand it to the hiring manager, archive the run, and feed what it taught back to the catalog.",
+    "statusSource": "day-one-package",
+    "nodeIds": ["day-one-package", "manager-handoff", "onboarding-archive", "profile-feedback"],
+    "artifactNames": ["day-one-package.md"],
+    "unlocks": "The delivered, acknowledged, archived onboarding that improves the next hire's role profile."
+  }
+]

@@ -1,0 +1,86 @@
+{
+  "id": "lesson-onboarding-archive-medium",
+  "nodeId": "onboarding-archive",
+  "title": "Archive a Run with Exceptions",
+  "subtitle": "Retain the block and the loaner",
+  "clock": "SD, 8:30 AM",
+  "difficulty": "Intermediate",
+  "skill": "Retention & the loop",
+  "scenario": "Sam started on a loaner. Archive the run honestly: retain it, and flag that it carried exceptions (the backorder and loaner). An archive that hides the mess cannot teach the loop anything.",
+  "inputType": "text",
+  "inputLabel": "Completed run (with exceptions)",
+  "input": "Onboarding for hire H-4022 is complete - the hire started on a loaner while the ordered laptop ships. Archive under run id onboarding-H-4022 with 7-year retention. Flag exceptionsNoted = true (backorder + loaner) and seedsCatalog = true.",
+  "instructions": [
+    "Record the hire id and the archived run id.",
+    "Set the retention period.",
+    "Flag exceptionsNoted true (the run had a block) and seedsCatalog true.",
+    "Return one valid JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"hireId\": \"\",\n  \"archivedRun\": \"\",\n  \"retention\": \"\",\n  \"exceptionsNoted\": false,\n  \"seedsCatalog\": false\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["hireId", "archivedRun", "retention", "exceptionsNoted", "seedsCatalog"],
+    "expected": {
+      "hireId": "H-4022",
+      "archivedRun": "onboarding-H-4022",
+      "retention": "7 years",
+      "exceptionsNoted": true,
+      "seedsCatalog": true
+    }
+  },
+  "copilotPrompt": "Build one JSON archive record: hireId H-4022, archivedRun onboarding-H-4022, retention 7 years, exceptionsNoted true (backorder + loaner), seedsCatalog true.",
+  "successMessage": "Run archived with its exceptions. The mess is retained so the loop can learn from it.",
+  "validateLabel": "Validate Archive",
+  "editorHelper": "Retain the run - and flag that it carried exceptions.",
+  "intro": {
+    "heading": "Archive the truth, not a highlight reel",
+    "sections": [
+      {
+        "title": "Exceptions are the lesson",
+        "body": "A clean run teaches little. This run's backorder and loaner are exactly what the loop should learn from - so the archive flags them instead of smoothing them over."
+      },
+      {
+        "title": "Retention still governs",
+        "body": "The 7-year retention applies to messy runs too. The exception flag makes the interesting runs findable when someone asks 'how often does hardware slip?'."
+      },
+      {
+        "title": "Feeds a better catalog",
+        "body": "seedsCatalog true means this run's lessons flow to profile-feedback. A repeated backorder is a signal the policy or a loaner pool should change."
+      },
+      {
+        "title": "What you produce here",
+        "body": "An archive record that retains the run and flags its exceptions for the loop."
+      }
+    ],
+    "jsonExample": "{\n  \"exceptionsNoted\": true,\n  \"seedsCatalog\": true\n}",
+    "skill": "Retention & the loop",
+    "artifactName": "onboarding-archive.json"
+  },
+  "fieldGuide": [
+    { "field": "hireId", "meaning": "The hire whose run is archived.", "type": "string", "example": "\"H-4022\"", "group": "Identity", "lookFor": "whose run?", "hint": "H-4022." },
+    { "field": "archivedRun", "meaning": "The stable archive id.", "type": "string", "example": "\"onboarding-H-4022\"", "group": "Retention", "lookFor": "archived as?", "hint": "onboarding-H-4022." },
+    { "field": "retention", "meaning": "How long it is kept.", "type": "string", "example": "\"7 years\"", "group": "Retention", "lookFor": "kept how long?", "hint": "7 years." },
+    { "field": "exceptionsNoted", "meaning": "Whether the run carried exceptions.", "type": "boolean", "example": "true", "group": "Loop", "lookFor": "any exceptions?", "hint": "Backorder + loaner, so true." },
+    { "field": "seedsCatalog", "meaning": "Whether it feeds the loop.", "type": "boolean", "example": "true", "group": "Loop", "lookFor": "feeds the loop?", "hint": "It seeds the catalog, so true." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd file the run with a note about the backorder and loaner, so the pattern is visible next time.",
+      "tools": {
+        "powerAutomate": "write the run with an exceptions flag and retention label",
+        "zapier": "archive the record and tag it as having exceptions",
+        "python": "store the run with exceptionsNoted for later analysis"
+      }
+    },
+    "heading": "Run archived with exceptions",
+    "points": [
+      "You retained a messy run honestly, exceptions flagged.",
+      "The exception flag makes the interesting runs findable.",
+      "seedsCatalog true sends the lesson to the feedback loop.",
+      "A repeated backorder is now a signal the catalog can act on.",
+      "The workflow can now retain and learn from runs that did not go clean."
+    ],
+    "artifactName": "onboarding-archive.json"
+  }
+}

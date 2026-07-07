@@ -2,6 +2,91 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-07-06 (Module 3 Harbor - medium + hard tiers complete)
+
+- MEDIUM tier (16 lessons, full tier): a messier second hire (Sam Rivera,
+  H-4022) carrying the charter's three messes - a moved/amended start date
+  (recompute), a backordered laptop (blocked -> escalation -> loaner ->
+  degraded package), and an idempotent re-run (existingFound true -> reused).
+  Governed changes threaded through: role catalog v1.1.0 (scanner added from the
+  loop), SLA policy v1.1.0 (hardware slack SD-2). choiceCheck stays 2 total.
+- HARD tier CURATION (6 lessons; hard is a curated set per the playbook):
+  readiness-gate-hard = the MANDATORY Step 7a solo-rebuild artifactImport
+  CAPSTONE (rebuild onboarding-record + provisioning-plan + task-tracker +
+  readiness-gate outside the app; each graded by its easy validator); plus the
+  charter's three drills - sla-policy-hard (design SLAs from completion data),
+  escalation-path-hard (unresponsive-owner ladder at scale), day-one-package-
+  hard (governed start-anyway vs delay). Two deepenings added to reach six:
+  accounts-task-hard (partial-failure reconciliation, idempotency at the
+  sub-step) and task-tracker-hard (conflicting-status reconciliation, a
+  conservative tie-break). Inspection/governance-only nodes were intentionally
+  NOT deepened into hard, per the playbook guidance.
+- Module 3 now has 38 lessons total (16/16/6). choiceCheck 2/38 = 5.3% (under
+  the module-03 hard cap). All six interaction types are spent (choiceCheck,
+  jsonEditor, templateSlots, tagSource, handoffForm, artifactImport). Canon
+  curriculum/module-03/canon.json now 39 module-03 assertions. npm run check
+  green (120 lessons repo-wide).
+
+## 2026-07-06 (Module 3 Harbor - easy tier complete + live)
+
+- BUILT the full easy tier: 16 lessons across the 5 phases, one per node, in
+  three waves (offer intake + plan; parallel provisioning; gate/exceptions/
+  package/loop). Deliverable day-one-package.md renders via templateSlots by
+  lookup from the onboarding record, tracker, and gate.
+- Interaction mix meets the cap: choiceCheck 1/16 = 6.25% (well under the 25%
+  module-03 hard error). Spent tagSource (signed-offer), handoffForm
+  (hardware, payroll, escalation, manager), templateSlots (day-one-package),
+  and jsonEditor variants (jsonFields/jsonPolicy/jsonRows/jsonDeltas). The
+  task-tracker board uses jsonDeltas rows (taskId/state/blockedReason) - no new
+  engine type, as decided.
+- GO-LIVE flip: module-03 status planned -> active and module-02 active ->
+  complete in src/data/projects.json (exactly one active project). Harbor is now
+  selectable in the switcher.
+- VERIFIED live no-scroll in the WRONG-answer state at BOTH 1280x800 and
+  1366x650 for a representative surface of every exercise component used:
+  tagSource (signed-offer), templateSlots (day-one-package, 8 slots), jsonEditor
+  (sla-policy, 7 fields - tallest fieldGuide), jsonDeltas (task-tracker). All
+  scrollHeight === clientHeight.
+- Canon: curriculum/module-03/canon.json (126 assertions total across the repo)
+  + curriculum/module-03/easy/_OVERVIEW.md prose spine. npm run check green.
+- REMAINING for the module: medium tier (blocked hardware + escalation, moved
+  start date, idempotent re-run), hard tier (SLA design, unresponsive-owner
+  gate, degraded-mode package) INCLUDING the mandatory Step 7a solo-rebuild
+  artifactImport capstone on readiness-gate. Then the module-wrap PR.
+
+## 2026-07-06 (Module 3 Harbor - Step 2 map approved; field-notes decision)
+
+- MAP APPROVED (autonomous Gate 3 = charter conformance + `npm run lint:map`
+  green + this log). Built the module-03 map to the ratified charter
+  (curriculum/charters/module-03-harbor.md): 16 nodes across 5 phases (Offer
+  Intake -> Provisioning Plan -> Parallel Provisioning -> Gate and Exceptions
+  -> Day-One Package), one decision fork (readiness-gate -> day-one-package |
+  escalation-path), one temporal loop (onboarding-archive -> role-profile-
+  catalog, refined by profile-feedback). Files: src/data/projects/module-03/
+  {workflowNodes,workflowEdges,phases,lessonMeta}.json; registered in
+  src/lib/projects.js (PROJECT_DATA + empty BUILT_LESSONS block) and
+  src/data/projects.json (goal/clock; kept status "planned" until the easy tier
+  exists, then it flips to "active" and module-02 to "complete"). lint:map: 3
+  projects, 0 errors.
+- Step 2a recurrence: added the module-03 row to src/data/moduleSkeleton.json
+  (org Harbor; intake=Onboarding Record, reference=Role Profile Catalog,
+  transform=Provisioning Plan, decision=Readiness Gate, handoff=Escalation
+  Path, assembly=Day-One Package, archive=Onboarding Archive).
+- ENGINE: NO new interaction type. The task-tracker board is expressible with
+  the existing `jsonDeltas` validator (rows of taskId/state/blockedReason), as
+  the charter's engine-needs note allows ("prefer that and skip the new type").
+  choiceCheck cap (<=25%, a hard error for module-03+) will be met by spending
+  tagSource on inspection nodes and handoffForm on the handoff nodes.
+- FIELD-NOTES WRAP LESSON: DECIDED NOT to add a separate 17th "field notes"
+  node. Reasons: (1) it would deviate from the ratified 16-node charter map and
+  break the Step 2 conformance gate; (2) its themes are already owned by
+  existing nodes - credentials/secrets by accounts-task (identity-provider
+  rights, idempotency) and access-task (least-privilege); testing by the
+  accounts-task idempotent re-run (medium); when-NOT-to-automate by the human
+  readiness-gate and the Hard degraded-mode drill (start-anyway vs delay);
+  maintenance by the profile-feedback loop-close. These themes will surface in
+  the relevant takeaways' realWorld beats rather than as a bolt-on lesson.
+
 ## 2026-07-05 (build: tagSource + handoffForm interaction types)
 
 - BUILT both approved anti-slop interaction types per

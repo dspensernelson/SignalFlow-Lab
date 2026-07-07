@@ -28,6 +28,7 @@ import { loadTheme, saveTheme, applyTheme } from './lib/theme'
 const LESSON_MODULE_LOADERS = {
   'module-01': () => import('./data/lessons/module01Lessons.js'),
   'module-02': () => import('./data/lessons/module02Lessons.js'),
+  'module-03': () => import('./data/lessons/module03Lessons.js'),
 }
 
 export default function App() {

@@ -1,0 +1,104 @@
+{
+  "id": "lesson-payroll-task-medium",
+  "nodeId": "payroll-task",
+  "title": "Rush the Payroll Handoff",
+  "subtitle": "A moved start compresses the window",
+  "clock": "SD-3, 9:00 AM",
+  "difficulty": "Intermediate",
+  "skill": "Enrollment handoff",
+  "scenario": "The start moved earlier, compressing the payroll window - there is less lead time to hit the first cycle. Hand off enrollment to the Payroll Specialist, flag it as a rush so it is not queued behind routine work, and keep the pay class from the profile.",
+  "inputType": "text",
+  "inputLabel": "Payroll task (compressed window)",
+  "input": "Task: payroll for hire H-4022 (owner Payroll Specialist, due SD-3). Pay class from the profile: Non-exempt / Hourly. Because the start moved earlier, the enrollment window is tight - flag this handoff as rush so Payroll prioritizes it to make the first pay cycle.",
+  "instructions": [
+    "Record who the enrollment is sent to.",
+    "Set the pay class from the role profile.",
+    "Flag the priority as rush (the compressed window).",
+    "Validate to mint the payroll handoff record."
+  ],
+  "interactionType": "handoffForm",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "handoffForm",
+    "fields": [
+      {
+        "id": "sentTo",
+        "label": "Sent to",
+        "kind": "select",
+        "options": ["Payroll Specialist", "People Ops Lead", "IT Provisioner"],
+        "expected": "Payroll Specialist",
+        "explain": "Enrollment goes to the Payroll Specialist, who owns the payroll system."
+      },
+      {
+        "id": "payClass",
+        "label": "Pay class",
+        "kind": "select",
+        "options": ["Non-exempt / Hourly", "Exempt / Salary"],
+        "expected": "Non-exempt / Hourly",
+        "explain": "The pay class comes from the role profile, not a guess - Logistics Coordinator is Non-exempt / Hourly."
+      },
+      {
+        "id": "priority",
+        "label": "Priority",
+        "kind": "select",
+        "options": ["standard", "rush"],
+        "expected": "rush",
+        "explain": "The moved start compressed the window; flagging rush is what keeps enrollment ahead of the first pay cycle."
+      }
+    ],
+    "artifactOnPass": {
+      "task": "payroll",
+      "sentTo": "Payroll Specialist",
+      "payClass": "Non-exempt / Hourly",
+      "priority": "rush",
+      "confirmationCaptured": "yes",
+      "state": "done"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Capture a rushed payroll handoff: sent to the Payroll Specialist, pay class Non-exempt / Hourly from the profile, and priority rush because the moved start compressed the enrollment window.",
+  "successMessage": "Payroll rushed. The compressed window is flagged so enrollment still makes the first cycle.",
+  "intro": {
+    "heading": "When the window compresses",
+    "sections": [
+      {
+        "title": "A moved start moves risk",
+        "body": "Payroll was already the earliest deadline. Moving the start earlier squeezes it further. The same handoff now needs a priority flag so it does not sit in a routine queue."
+      },
+      {
+        "title": "Rush is a signal, not a panic",
+        "body": "Flagging rush tells Payroll where the real deadline pressure is. It is how a compressed window becomes an explicit priority rather than a silent risk."
+      },
+      {
+        "title": "The class is still governed",
+        "body": "Speed does not change the pay class - it still comes from the role profile. Rushing the timing must not mean guessing the classification."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A rushed payroll handoff record. The tracker still shows it done, but the priority is captured for audit."
+      }
+    ],
+    "jsonExample": "{\n  \"priority\": \"rush\",\n  \"payClass\": \"Non-exempt / Hourly\"\n}",
+    "skill": "Enrollment handoff",
+    "artifactName": "payroll-task.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd mark the enrollment urgent and send it first, so a tight window still clears the pay cycle.",
+      "tools": {
+        "powerAutomate": "set a high-priority flag on the enrollment task",
+        "zapier": "tag the enrollment as urgent for the payroll team",
+        "python": "attach priority=rush to the enrollment payload"
+      }
+    },
+    "heading": "Payroll rushed",
+    "points": [
+      "You sent enrollment to the Payroll Specialist with the profile's pay class.",
+      "The compressed window is flagged rush so it beats the first pay cycle.",
+      "Speed did not change the governed pay class.",
+      "The priority is captured for audit, and the branch is done.",
+      "The workflow can now flag time pressure explicitly when a start moves."
+    ],
+    "artifactName": "payroll-task.json"
+  }
+}

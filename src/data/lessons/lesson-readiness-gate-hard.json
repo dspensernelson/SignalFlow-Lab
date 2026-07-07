@@ -1,0 +1,132 @@
+{
+  "id": "lesson-readiness-gate-hard",
+  "nodeId": "readiness-gate",
+  "title": "Rebuild the Harbor Onboarding Yourself",
+  "difficulty": "Hard",
+  "skill": "Transfer: rebuild the pipeline in any tool",
+  "scenario": "The lab is behind you. Rebuild the four core artifacts of the Harbor onboarding in any tool you choose - PowerShell, Python, Power Automate, a spreadsheet, or by hand - then import them here to prove the pattern is yours. Each file is graded by the same validator the lab used, so the acceptance bar does not move.",
+  "inputType": "text",
+  "inputLabel": "Rebuild runbook",
+  "input": "You have already built every step of the Harbor onboarding inside the lab. The capstone proves you can do it WITHOUT the lab. Rebuild these four files in ANY tool, then import each one here.\n\n=== 1. onboarding-record.json (one object) ===\nHire Jordan Lee (id H-4021), role Logistics Coordinator, department Operations, start date SD, reports to the Hiring Manager.\nFields: hireId, name, role, department, startDate, manager.\n\n=== 2. provisioning-plan.json (array of 4 rows) ===\nOne row per task with taskId, owner, due (as SD-N): accounts / IT Provisioner / SD-2; hardware / IT Provisioner / SD-1; access / Facilities Coordinator / SD-1; payroll / Payroll Specialist / SD-3.\n\n=== 3. task-tracker.json (array of 4 rows) ===\nOne row per task with taskId, state, blockedReason. All four are done; blockedReason is an empty string. Tasks: accounts, hardware, access, payroll.\n\n=== 4. readiness-gate.json (one object) ===\nAll four tasks done and none blocked, so the hire is ready and routes to the package.\nFields: allTasksDone (true), anyBlocked (false), ready (true), route (day-one-package).\n\nRule: your tooling is free, the acceptance bar is not. Import all four, then validate.",
+  "instructions": [
+    "Rebuild each of the four files in any tool you like, outside the app.",
+    "Import onboarding-record.json, provisioning-plan.json, task-tracker.json, and readiness-gate.json.",
+    "Use the file picker, or paste each file's contents with 'Paste instead'.",
+    "Match the shapes the lab taught: two single objects and two arrays of rows.",
+    "Validate - every file is graded by the validator that built it in the lab."
+  ],
+  "interactionType": "artifactImport",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "artifactImport",
+    "imports": [
+      {
+        "key": "onboarding-record",
+        "label": "onboarding-record.json",
+        "validation": {
+          "type": "jsonFields",
+          "requiredFields": ["hireId", "name", "role", "department", "startDate", "manager"],
+          "expected": {
+            "hireId": "H-4021",
+            "name": "Jordan Lee",
+            "role": "Logistics Coordinator",
+            "department": "Operations",
+            "startDate": "SD",
+            "manager": "Hiring Manager"
+          }
+        }
+      },
+      {
+        "key": "provisioning-plan",
+        "label": "provisioning-plan.json",
+        "validation": {
+          "type": "jsonRows",
+          "keyField": "taskId",
+          "rowFields": ["taskId", "owner", "due"],
+          "numericFields": [],
+          "expectedRows": [
+            { "taskId": "accounts", "owner": "IT Provisioner", "due": "SD-2" },
+            { "taskId": "hardware", "owner": "IT Provisioner", "due": "SD-1" },
+            { "taskId": "access", "owner": "Facilities Coordinator", "due": "SD-1" },
+            { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
+          ]
+        }
+      },
+      {
+        "key": "task-tracker",
+        "label": "task-tracker.json",
+        "validation": {
+          "type": "jsonDeltas",
+          "keyField": "taskId",
+          "requiredFields": ["taskId", "state", "blockedReason"],
+          "numericFields": [],
+          "expectedRows": [
+            { "taskId": "accounts", "state": "done", "blockedReason": "" },
+            { "taskId": "hardware", "state": "done", "blockedReason": "" },
+            { "taskId": "access", "state": "done", "blockedReason": "" },
+            { "taskId": "payroll", "state": "done", "blockedReason": "" }
+          ]
+        }
+      },
+      {
+        "key": "readiness-gate",
+        "label": "readiness-gate.json",
+        "validation": {
+          "type": "jsonFields",
+          "requiredFields": ["allTasksDone", "anyBlocked", "ready", "route"],
+          "expected": {
+            "allTasksDone": true,
+            "anyBlocked": false,
+            "ready": true,
+            "route": "day-one-package"
+          }
+        }
+      }
+    ]
+  },
+  "copilotPrompt": "Rebuild the four Harbor onboarding artifacts outside the app: onboarding-record.json (one object), provisioning-plan.json (4 rows), task-tracker.json (4 rows, all done), readiness-gate.json (one object, ready true, route day-one-package). Match the shapes the lab taught, then import all four.",
+  "successMessage": "Onboarding rebuilt and proven. You ran the whole pattern - intake, plan, track, gate - outside the lab.",
+  "intro": {
+    "heading": "The capstone: rebuild it without the lab",
+    "sections": [
+      {
+        "title": "Transfer, not recall",
+        "body": "Every earlier lesson gave you the app's workspace. Here you leave it: rebuild the onboarding spine in a tool of your choice and prove it by import. If you can do it outside the lab, you have actually learned it."
+      },
+      {
+        "title": "Your tooling is free, the bar is not",
+        "body": "PowerShell, Python, Power Automate, a spreadsheet, or pen and paper are all legal. The app grades each imported file with the exact validator that graded it in the lab, so the acceptance standard does not move."
+      },
+      {
+        "title": "Four files, one pattern",
+        "body": "onboarding-record, provisioning-plan, task-tracker, and readiness-gate are the spine of Harbor onboarding. Rebuilding all four end to end proves the pattern - intake, plan, track, decide - is yours."
+      },
+      {
+        "title": "It lives at the gate",
+        "body": "This capstone attaches to the readiness gate because the gate is the fork where a hire is proven ready. Rebuilding the spine that feeds it is a fitting place to prove yours."
+      }
+    ],
+    "jsonExample": "{\n  \"ready\": true,\n  \"route\": \"day-one-package\"\n}",
+    "skill": "Transfer: rebuild the pipeline in any tool",
+    "artifactName": "rebuilt-onboarding.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd stand up the whole onboarding - intake the offer, plan the tasks, track their states, and gate on all-done - in whatever tools your team actually uses.",
+      "tools": {
+        "powerAutomate": "a flow: parse offer -> create tasks -> track statuses -> Condition gate",
+        "zapier": "a Zap chain building each artifact and a Filter as the gate",
+        "python": "functions for record, plan, tracker, and an all() gate"
+      }
+    },
+    "heading": "Onboarding rebuilt and proven",
+    "points": [
+      "You rebuilt onboarding-record, provisioning-plan, task-tracker, and readiness-gate outside the app and imported all four.",
+      "Each file passed the same validator that graded it in the lab, so the rebuild meets the real acceptance bar.",
+      "You proved the pattern transfers: intake, plan, track, and gate are skills you can run in any tool.",
+      "The gate held - all four done, so the hire routed to the package.",
+      "The workflow can now be rebuilt end to end by you alone, in whatever tooling your team uses."
+    ],
+    "artifactName": "rebuilt-onboarding.json"
+  }
+}

@@ -22,6 +22,11 @@ import module02Phases from '../data/projects/module-02/phases.json'
 import module02Edges from '../data/projects/module-02/workflowEdges.json'
 import module02LessonMeta from '../data/projects/module-02/lessonMeta.json'
 
+import module03Nodes from '../data/projects/module-03/workflowNodes.json'
+import module03Phases from '../data/projects/module-03/phases.json'
+import module03Edges from '../data/projects/module-03/workflowEdges.json'
+import module03LessonMeta from '../data/projects/module-03/lessonMeta.json'
+
 export const PROJECT_KEY = 'signalflow_project'
 export const DEFAULT_PROJECT = 'module-01'
 
@@ -45,6 +50,12 @@ const PROJECT_DATA = {
     phases: module02Phases,
     edges: module02Edges,
     lessonMeta: module02LessonMeta,
+  },
+  'module-03': {
+    nodes: module03Nodes,
+    phases: module03Phases,
+    edges: module03Edges,
+    lessonMeta: module03LessonMeta,
   },
 }
 
@@ -148,6 +159,52 @@ export const BUILT_LESSONS = {
       'lesson-three-way-match-hard',
       'lesson-match-decision-hard',
       'lesson-payment-run-hard',
+    ],
+  },
+  'module-03': {
+    easy: [
+      'lesson-signed-offer',
+      'lesson-role-profile-catalog',
+      'lesson-onboarding-record',
+      'lesson-sla-policy',
+      'lesson-provisioning-plan',
+      'lesson-accounts-task',
+      'lesson-hardware-task',
+      'lesson-access-task',
+      'lesson-payroll-task',
+      'lesson-task-tracker',
+      'lesson-readiness-gate',
+      'lesson-escalation-path',
+      'lesson-day-one-package',
+      'lesson-manager-handoff',
+      'lesson-onboarding-archive',
+      'lesson-profile-feedback',
+    ],
+    medium: [
+      'lesson-signed-offer-medium',
+      'lesson-role-profile-catalog-medium',
+      'lesson-onboarding-record-medium',
+      'lesson-sla-policy-medium',
+      'lesson-provisioning-plan-medium',
+      'lesson-accounts-task-medium',
+      'lesson-hardware-task-medium',
+      'lesson-access-task-medium',
+      'lesson-payroll-task-medium',
+      'lesson-task-tracker-medium',
+      'lesson-readiness-gate-medium',
+      'lesson-escalation-path-medium',
+      'lesson-day-one-package-medium',
+      'lesson-manager-handoff-medium',
+      'lesson-onboarding-archive-medium',
+      'lesson-profile-feedback-medium',
+    ],
+    hard: [
+      'lesson-readiness-gate-hard',
+      'lesson-sla-policy-hard',
+      'lesson-escalation-path-hard',
+      'lesson-day-one-package-hard',
+      'lesson-accounts-task-hard',
+      'lesson-task-tracker-hard',
     ],
   },
 }

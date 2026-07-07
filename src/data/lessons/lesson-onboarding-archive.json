@@ -1,0 +1,116 @@
+{
+  "id": "lesson-onboarding-archive",
+  "nodeId": "onboarding-archive",
+  "title": "Archive the Onboarding",
+  "subtitle": "Retain the run and seed the loop",
+  "clock": "SD, 8:30 AM",
+  "difficulty": "Beginner",
+  "skill": "Retention & the loop",
+  "scenario": "It is the start date, 8:30 AM - the hire is in. Close the run by archiving it: retain the package and tracker for audit, and mark that it seeds the catalog loop. Yesterday's archive is what teaches tomorrow's role profile.",
+  "inputType": "text",
+  "inputLabel": "Completed onboarding (H-4021)",
+  "input": "Onboarding for hire H-4021 is complete and acknowledged. Archive it under the run id onboarding-H-4021 with a 7-year retention. Mark that it seeds the catalog: what this role actually needed feeds the profile-feedback loop.",
+  "instructions": [
+    "Record the hire id and the archived run id.",
+    "Set the retention period.",
+    "Mark that the archive seeds the catalog (seedsCatalog).",
+    "Return one valid JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"hireId\": \"\",\n  \"archivedRun\": \"\",\n  \"retention\": \"\",\n  \"seedsCatalog\": false\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["hireId", "archivedRun", "retention", "seedsCatalog"],
+    "expected": {
+      "hireId": "H-4021",
+      "archivedRun": "onboarding-H-4021",
+      "retention": "7 years",
+      "seedsCatalog": true
+    }
+  },
+  "copilotPrompt": "Build one JSON archive record: hireId, archivedRun, retention, and seedsCatalog (boolean). Retain onboarding-H-4021 for 7 years and mark that it seeds the catalog.",
+  "successMessage": "Onboarding archived. It is retained for audit and marked to seed the catalog loop.",
+  "validateLabel": "Validate Archive",
+  "editorHelper": "Retain the run - and mark that it feeds tomorrow's profile.",
+  "intro": {
+    "heading": "Close the run: retain and seed",
+    "sections": [
+      {
+        "title": "Retention is a compliance decision",
+        "body": "Completed onboardings are kept for a defined period - here 7 years - so an auditor can reconstruct who got what and when. The retention length is a governed choice, not an afterthought."
+      },
+      {
+        "title": "The archive is a loop input",
+        "body": "This archive is not a dead end. It feeds the profile-feedback step: what this hire actually needed becomes a proposal to improve the role catalog. Yesterday's run teaches tomorrow's profile."
+      },
+      {
+        "title": "A stable identity",
+        "body": "The run is archived under a stable id (onboarding-H-4021) so it can be found again. A weak id makes the archive unsearchable and the loop impossible."
+      },
+      {
+        "title": "What you produce here",
+        "body": "An archive record that both satisfies retention and opens the temporal loop back to the role profile catalog."
+      }
+    ],
+    "jsonExample": "{\n  \"archivedRun\": \"onboarding-H-0000\",\n  \"seedsCatalog\": true\n}",
+    "skill": "Retention & the loop",
+    "artifactName": "onboarding-archive.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "hireId",
+      "meaning": "The hire whose onboarding is archived.",
+      "type": "string",
+      "example": "\"H-4021\"",
+      "group": "Identity",
+      "lookFor": "whose run?",
+      "hint": "The hire id H-4021."
+    },
+    {
+      "field": "archivedRun",
+      "meaning": "The stable id the run is archived under.",
+      "type": "string",
+      "example": "\"onboarding-H-4021\"",
+      "group": "Retention",
+      "lookFor": "archived as what?",
+      "hint": "Use onboarding-H-4021."
+    },
+    {
+      "field": "retention",
+      "meaning": "How long the archive is kept.",
+      "type": "string",
+      "example": "\"7 years\"",
+      "group": "Retention",
+      "lookFor": "kept how long?",
+      "hint": "The governed retention: 7 years."
+    },
+    {
+      "field": "seedsCatalog",
+      "meaning": "Whether this archive feeds the catalog loop.",
+      "type": "boolean",
+      "example": "true",
+      "group": "Loop",
+      "lookFor": "feeds the loop?",
+      "hint": "It seeds the catalog, so the boolean true."
+    }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd file the completed onboarding in a dated, retained folder and note what the role really needed for the next time you hire it.",
+      "tools": {
+        "powerAutomate": "write the run to a retained SharePoint/Dataverse store with a retention label",
+        "zapier": "archive the record to storage and append to a 'lessons learned' sheet",
+        "python": "write the run to a dated archive and export role-needs to the feedback step"
+      }
+    },
+    "heading": "Onboarding archived",
+    "points": [
+      "You retained the completed run for 7 years under a stable id.",
+      "The archive is marked to seed the catalog - it is a loop input, not a dead end.",
+      "A stable run id keeps the archive searchable for audit and feedback.",
+      "The run is closed and ready to teach the next hire's profile.",
+      "The workflow can now retain each onboarding and feed it back to the catalog."
+    ],
+    "artifactName": "onboarding-archive.json"
+  }
+}

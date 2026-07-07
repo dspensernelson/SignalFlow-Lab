@@ -1,0 +1,98 @@
+{
+  "id": "lesson-access-task",
+  "nodeId": "access-task",
+  "title": "Run the Access Task",
+  "subtitle": "Grant exactly what the role profile lists",
+  "clock": "SD-1, 9:00 AM",
+  "difficulty": "Beginner",
+  "skill": "Least-privilege access",
+  "scenario": "It is SD-1. The plan says grant the new hire's access today. You do not decide what to grant - you read the role profile and grant exactly its access groups, no more. Least-privilege is enforced by sourcing access from the role, not from a request.",
+  "inputType": "text",
+  "inputLabel": "Access task (from the plan and role profile)",
+  "input": "Task: access for hire H-4021 (owner Facilities Coordinator, due SD-1). Role profile access groups for Logistics Coordinator: ops-general, warehouse-readonly. Rule: grant exactly the profile's groups. Do not add extras (no admin, no finance) - a grant the profile does not list is a policy exception.",
+  "instructions": [
+    "Create one row per access group the role profile lists.",
+    "Grant ops-general and warehouse-readonly - and only those.",
+    "Set grantedBy to the Facilities Coordinator on each row.",
+    "Return a JSON array of the grant rows, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"group\": \"ops-general\", \"grantedBy\": \"\" },\n  { \"group\": \"warehouse-readonly\", \"grantedBy\": \"\" }\n]",
+  "validation": {
+    "type": "jsonRows",
+    "keyField": "group",
+    "rowFields": ["group", "grantedBy"],
+    "numericFields": [],
+    "expectedRows": [
+      { "group": "ops-general", "grantedBy": "Facilities Coordinator" },
+      { "group": "warehouse-readonly", "grantedBy": "Facilities Coordinator" }
+    ]
+  },
+  "copilotPrompt": "Build a JSON array of access grants from the role profile. One row per access group (ops-general, warehouse-readonly), each with grantedBy. Grant only the profile's groups - do not add extras.",
+  "successMessage": "Access granted. The hire has exactly the role's groups - nothing more, nothing less.",
+  "validateLabel": "Validate Grants",
+  "editorHelper": "One row per access group the profile lists - no extras.",
+  "intro": {
+    "heading": "Before you grant: least-privilege",
+    "sections": [
+      {
+        "title": "Access comes from the role",
+        "body": "You are not deciding what this hire can reach - the role profile already did. Granting exactly its access groups is what makes access consistent and auditable across every hire in the role."
+      },
+      {
+        "title": "No extras",
+        "body": "The temptation is to add 'just in case' access. Least-privilege says no: a grant the profile does not list is a policy exception, not a convenience, and it has to be justified separately."
+      },
+      {
+        "title": "Traceable to a profile",
+        "body": "Because every grant points back to a role profile entry, an auditor can answer 'why does this person have this?' with 'their role grants it' - not 'someone asked once'."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A short grant list the task tracker reads. It is the access leg of four parallel branches, and it reuses the same role profile the plan expanded."
+      }
+    ],
+    "jsonExample": "[\n  { \"group\": \"ops-general\", \"grantedBy\": \"Facilities Coordinator\" }\n]",
+    "skill": "Least-privilege access",
+    "artifactName": "access-task.json"
+  },
+  "fieldGuide": [
+    {
+      "field": "group",
+      "meaning": "An access group from the role profile.",
+      "type": "string",
+      "example": "\"ops-general\"",
+      "group": "Grant",
+      "lookFor": "which access group?",
+      "hint": "Only the profile's groups: ops-general, warehouse-readonly."
+    },
+    {
+      "field": "grantedBy",
+      "meaning": "Who granted the access.",
+      "type": "string",
+      "example": "\"Facilities Coordinator\"",
+      "group": "Grant",
+      "lookFor": "who granted it?",
+      "hint": "The Facilities Coordinator owns the access task."
+    }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd add the person to exactly the groups their role lists in your access sheet - resisting the urge to copy a busy colleague's extra access.",
+      "tools": {
+        "powerAutomate": "Apply to each role group -> Add member (only the profile's groups)",
+        "zapier": "loop the role's groups into 'Add to Group'",
+        "python": "iterate the role profile's access_groups and grant each"
+      }
+    },
+    "heading": "Access granted",
+    "points": [
+      "You granted exactly the role profile's groups: ops-general and warehouse-readonly.",
+      "No extras were added - least-privilege is enforced by sourcing access from the role.",
+      "Each grant traces back to a role profile entry, so access is auditable.",
+      "The access leg is done and recorded for the tracker.",
+      "The workflow can now grant role-based access without over-granting."
+    ],
+    "artifactName": "access-task.json"
+  }
+}

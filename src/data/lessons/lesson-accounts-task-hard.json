@@ -1,0 +1,86 @@
+{
+  "id": "lesson-accounts-task-hard",
+  "nodeId": "accounts-task",
+  "title": "Reconcile a Half-Created Account",
+  "difficulty": "Hard",
+  "skill": "Partial-failure recovery",
+  "scenario": "A crash hit the accounts task mid-way: the identity was created but the mailbox was not. A blind re-run would either duplicate the identity or skip the missing mailbox. Reconcile the partial state - keep what exists, complete only what is missing.",
+  "inputType": "text",
+  "inputLabel": "Partial-failure state",
+  "input": "Accounts task for hire H-4021 crashed after creating the identity but before the mailbox. Current state: identityExists = true, mailboxExists = false. Rule: do NOT recreate the identity; complete only the missing mailbox. Record action = complete-missing, keep accountId acct-4021, and set state done once reconciled.",
+  "instructions": [
+    "Record what exists: identityExists true, mailboxExists false.",
+    "Set action to complete-missing (finish only the missing piece).",
+    "Keep the existing accountId; do not recreate the identity.",
+    "Set state to done, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"taskId\": \"accounts\",\n  \"identityExists\": true,\n  \"mailboxExists\": false,\n  \"action\": \"\",\n  \"accountId\": \"\",\n  \"state\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["taskId", "identityExists", "mailboxExists", "action", "accountId", "state"],
+    "expected": {
+      "taskId": "accounts",
+      "identityExists": true,
+      "mailboxExists": false,
+      "action": "complete-missing",
+      "accountId": "acct-4021",
+      "state": "done"
+    }
+  },
+  "copilotPrompt": "Encode a partial-failure reconciliation for accounts: identityExists true, mailboxExists false, action complete-missing (finish the mailbox only), keep accountId acct-4021, state done. Do not recreate the identity.",
+  "successMessage": "Partial state reconciled. You completed the missing mailbox without recreating the identity.",
+  "validateLabel": "Validate Result",
+  "editorHelper": "Keep what exists; complete only what is missing.",
+  "intro": {
+    "heading": "Idempotency at the sub-step",
+    "sections": [
+      {
+        "title": "Failures land mid-task",
+        "body": "Real provisioning is several steps. A crash can leave you half-done: identity yes, mailbox no. The safe recovery is not 'run it all again' - it is reconcile: inspect what exists and finish the rest."
+      },
+      {
+        "title": "Two wrong re-runs",
+        "body": "A naive retry either recreates the identity (a duplicate) or assumes everything failed and redoes finished work. Reconciliation avoids both by checking each sub-step."
+      },
+      {
+        "title": "Complete-missing is the action",
+        "body": "The action name says the intent: keep the identity, create only the mailbox. Idempotency is not just at the task level - it is at every step that can partially fail."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A reconciled accounts result: what existed, what you completed, and a done state - no duplicate, no gap."
+      }
+    ],
+    "jsonExample": "{\n  \"mailboxExists\": false,\n  \"action\": \"complete-missing\"\n}",
+    "skill": "Partial-failure recovery",
+    "artifactName": "accounts-task.json"
+  },
+  "fieldGuide": [
+    { "field": "taskId", "meaning": "The task.", "type": "string", "example": "\"accounts\"", "group": "Task", "lookFor": "which task?", "hint": "accounts." },
+    { "field": "identityExists", "meaning": "Whether the identity was already created.", "type": "boolean", "example": "true", "group": "Check", "lookFor": "identity there?", "hint": "It was, so true." },
+    { "field": "mailboxExists", "meaning": "Whether the mailbox was created.", "type": "boolean", "example": "false", "group": "Check", "lookFor": "mailbox there?", "hint": "It was not, so false." },
+    { "field": "action", "meaning": "The recovery action.", "type": "string", "example": "\"complete-missing\"", "group": "Action", "lookFor": "what to do?", "hint": "Complete only the missing piece." },
+    { "field": "accountId", "meaning": "The existing account id (kept).", "type": "string", "example": "\"acct-4021\"", "group": "Action", "lookFor": "which account?", "hint": "Keep acct-4021." },
+    { "field": "state", "meaning": "Final state once reconciled.", "type": "string", "example": "\"done\"", "group": "Action", "lookFor": "finished?", "hint": "done." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd check which parts of the account already exist and create only the missing ones, rather than re-running blind.",
+      "tools": {
+        "powerAutomate": "Get each resource; Condition per sub-step; create only the missing",
+        "zapier": "Find each part; create only where the lookup is empty",
+        "python": "if identity and not mailbox: create_mailbox() only"
+      }
+    },
+    "heading": "Partial state reconciled",
+    "points": [
+      "You inspected what existed before acting on the failure.",
+      "You completed only the missing mailbox - no duplicate identity.",
+      "Idempotency held at the sub-step, not just the task level.",
+      "The reconciled account reached done cleanly.",
+      "The workflow can now recover from a mid-task crash without duplicating or skipping."
+    ],
+    "artifactName": "accounts-task.json"
+  }
+}

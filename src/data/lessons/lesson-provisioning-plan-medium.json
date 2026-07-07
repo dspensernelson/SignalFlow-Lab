@@ -1,0 +1,85 @@
+{
+  "id": "lesson-provisioning-plan-medium",
+  "nodeId": "provisioning-plan",
+  "title": "Recompute the Provisioning Plan",
+  "subtitle": "New start, revised SLA - re-derive the dates",
+  "clock": "SD-4, 9:00 AM",
+  "difficulty": "Intermediate",
+  "skill": "Expansion & recompute",
+  "scenario": "Two things changed: the start date moved, and the hardware SLA gained slack (SD-2). Rebuild Sam Rivera's plan by re-deriving each due date from the authoritative start and the revised policy - never from the old, cached dates.",
+  "inputType": "text",
+  "inputLabel": "Plan inputs (revised)",
+  "input": "Onboarding record: Sam Rivera (H-4022), Logistics Coordinator, amended start SD.\nOwners: accounts -> IT Provisioner; hardware -> IT Provisioner; access -> Facilities Coordinator; payroll -> Payroll Specialist.\nRevised SLA policy v1.1.0 (business days before start): accounts SD-2, hardware SD-2, access SD-1, payroll SD-3.\nRe-derive every due date from the authoritative start and the revised policy.",
+  "instructions": [
+    "Create one row per task: accounts, hardware, access, payroll.",
+    "Set each owner from the owners list.",
+    "Set each due from the REVISED policy (hardware is now SD-2).",
+    "Return a JSON array of the four rows, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"taskId\": \"accounts\", \"owner\": \"\", \"due\": \"\" },\n  { \"taskId\": \"hardware\", \"owner\": \"\", \"due\": \"\" },\n  { \"taskId\": \"access\", \"owner\": \"\", \"due\": \"\" },\n  { \"taskId\": \"payroll\", \"owner\": \"\", \"due\": \"\" }\n]",
+  "validation": {
+    "type": "jsonRows",
+    "keyField": "taskId",
+    "rowFields": ["taskId", "owner", "due"],
+    "numericFields": [],
+    "expectedRows": [
+      { "taskId": "accounts", "owner": "IT Provisioner", "due": "SD-2" },
+      { "taskId": "hardware", "owner": "IT Provisioner", "due": "SD-2" },
+      { "taskId": "access", "owner": "Facilities Coordinator", "due": "SD-1" },
+      { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
+    ]
+  },
+  "copilotPrompt": "Rebuild the provisioning plan for a moved start and revised policy. Four rows (accounts, hardware, access, payroll) with owner and due. Hardware is now SD-2; re-derive all dates from the authoritative start.",
+  "successMessage": "Plan recomputed. Every due date is re-derived from the authoritative start and revised policy.",
+  "validateLabel": "Validate Plan",
+  "editorHelper": "Re-derive from the start - never reuse the cached dates.",
+  "intro": {
+    "heading": "Before the branches run: recompute",
+    "sections": [
+      {
+        "title": "Cached dates are stale dates",
+        "body": "When the start moves, any due date computed from the old start is wrong. Because deadlines are SD-relative, you re-derive them from the authoritative start rather than editing calendar dates by hand."
+      },
+      {
+        "title": "Two changes, one recompute",
+        "body": "The start moved and the hardware SLA changed. Both flow through the same recompute: apply the current policy to the current start, and the plan is right by construction."
+      },
+      {
+        "title": "Owners are stable",
+        "body": "The mess is dates, not accountability. Each task keeps its single owner; only the due dates move."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A recomputed plan the four branches run against - correct for the moved start and the revised hardware SLA."
+      }
+    ],
+    "jsonExample": "[\n  { \"taskId\": \"hardware\", \"owner\": \"IT Provisioner\", \"due\": \"SD-2\" }\n]",
+    "skill": "Expansion & recompute",
+    "artifactName": "provisioning-plan.json"
+  },
+  "fieldGuide": [
+    { "field": "taskId", "meaning": "The provisioning task.", "type": "string", "example": "\"hardware\"", "group": "Task", "lookFor": "which task?", "hint": "accounts, hardware, access, payroll." },
+    { "field": "owner", "meaning": "The single accountable owner.", "type": "string", "example": "\"IT Provisioner\"", "group": "Task", "lookFor": "who owns it?", "hint": "Copy the owner exactly." },
+    { "field": "due", "meaning": "The re-derived deadline (SD-N).", "type": "string", "example": "\"SD-2\"", "group": "Task", "lookFor": "due when?", "hint": "Revised policy: accounts SD-2, hardware SD-2, access SD-1, payroll SD-3." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd recompute each due date from the new start rather than shifting old dates by hand and hoping.",
+      "tools": {
+        "powerAutomate": "recompute due dates with addDays from the current start date",
+        "zapier": "re-run the date-math step against the amended start",
+        "python": "recompute due = start - sla_days for every task"
+      }
+    },
+    "heading": "Plan recomputed",
+    "points": [
+      "You re-derived every due date from the authoritative start, not cached dates.",
+      "The moved start and the revised hardware SLA both flowed through one recompute.",
+      "Owners stayed stable; only the deadlines moved.",
+      "Hardware now sits at SD-2 with its added slack.",
+      "The workflow can now recompute the plan whenever the start or policy changes."
+    ],
+    "artifactName": "provisioning-plan.json"
+  }
+}

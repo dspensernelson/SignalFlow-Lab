@@ -1,0 +1,119 @@
+{
+  "id": "lesson-signed-offer",
+  "nodeId": "signed-offer",
+  "title": "Inspect the Signed Offer",
+  "subtitle": "Tag the fields onboarding is triggered by",
+  "clock": "SD-5, 9:00 AM",
+  "difficulty": "Beginner",
+  "skill": "Source provenance",
+  "scenario": "It is the Monday before a new hire starts (SD-5). A countersigned offer just landed from the Recruiter. Before anything is provisioned, read it like an automation designer: which fields does onboarding actually depend on? Tag each one in the offer so the onboarding record can be keyed from a trusted source.",
+  "inputType": "text",
+  "inputLabel": "Signed Offer (OFF-4021)",
+  "input": "OFFER OFF-4021 - Harbor Logistics. Candidate: Jordan Lee. Role: Logistics Coordinator, Operations. Start date: Monday (SD). Reports to: the Hiring Manager. Compensation: $62,000 / year. Countersigned by the Recruiter.",
+  "instructions": [
+    "Read the signed offer as the trigger for onboarding, not as data to key yet.",
+    "Tag each field onboarding depends on to the span that holds it.",
+    "Watch the distractors: the recruiter and the salary are not what provisioning needs.",
+    "Validate to mint the offer source profile."
+  ],
+  "interactionType": "tagSource",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "tagSource",
+    "source": {
+      "label": "Signed Offer - OFF-4021",
+      "segments": [
+        { "id": "offerId", "text": "OFF-4021" },
+        { "id": "candidate", "text": "Jordan Lee" },
+        { "id": "role", "text": "Logistics Coordinator" },
+        { "id": "dept", "text": "Operations" },
+        { "id": "start", "text": "Monday (SD)" },
+        { "id": "manager", "text": "the Hiring Manager" },
+        { "id": "comp", "text": "$62,000 / year" },
+        { "id": "recruiter", "text": "the Recruiter" }
+      ]
+    },
+    "fields": [
+      {
+        "id": "candidateName",
+        "label": "New hire",
+        "correctSegmentId": "candidate",
+        "explain": "The new hire is the person being provisioned - the candidate on the offer, not the recruiter who countersigned it."
+      },
+      {
+        "id": "role",
+        "label": "Role",
+        "correctSegmentId": "role",
+        "explain": "The role drives every entitlement in the catalog; tag the job title, not the department it sits in."
+      },
+      {
+        "id": "startDate",
+        "label": "Start date",
+        "correctSegmentId": "start",
+        "explain": "The start date is the authoritative clock every SLA counts backward from; tag the date, not the offer id."
+      },
+      {
+        "id": "manager",
+        "label": "Reports to",
+        "correctSegmentId": "manager",
+        "explain": "The hiring manager receives the Day-One Package; tag who the hire reports to, not the recruiter who sent the offer."
+      }
+    ],
+    "artifactOnPass": {
+      "source": "signed-offer",
+      "offerId": "OFF-4021",
+      "candidateName": "Jordan Lee",
+      "role": "Logistics Coordinator",
+      "department": "Operations",
+      "startDate": "SD",
+      "manager": "Hiring Manager",
+      "firstConsumer": "onboarding-record"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Profile this signed offer as an automation trigger: which fields does onboarding depend on (new hire, role, start date, manager), and which are noise for provisioning (recruiter, salary)? Tag each needed field to its span in the offer.",
+  "successMessage": "Offer profiled. You now know the trigger fields onboarding is keyed from - next, build the onboarding record.",
+  "intro": {
+    "heading": "Before you build: the offer is the trigger",
+    "sections": [
+      {
+        "title": "Why inspect before building",
+        "body": "Onboarding fails at the inputs more often than at the logic. Before keying anything, a designer profiles the trigger: which fields are authoritative and which are noise for the workflow ahead."
+      },
+      {
+        "title": "The start date is the clock",
+        "body": "Every SLA in this module is measured backward from the start date - accounts by SD-2, badge by SD-1. Tagging the start date correctly is what makes the whole plan's deadlines real."
+      },
+      {
+        "title": "Not every field is for you",
+        "body": "The offer carries salary and a recruiter signature. Onboarding does not provision those; tagging only the fields provisioning needs is part of least-privilege thinking from the very first step."
+      },
+      {
+        "title": "What you produce here",
+        "body": "Passing the inspection mints an offer source profile - a small record proving the trigger is understood. The onboarding record is keyed from this profile, not from the raw letter."
+      }
+    ],
+    "jsonExample": "{\n  \"source\": \"signed-offer\",\n  \"role\": \"Logistics Coordinator\",\n  \"startDate\": \"SD\"\n}",
+    "skill": "Source provenance",
+    "artifactName": "source-profile-signed-offer.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd read the signed offer and copy the role, start date, and manager into your onboarding tracker - ignoring the salary and signatures the provisioning teams do not need.",
+      "tools": {
+        "powerAutomate": "an ATS/e-signature trigger that reads the offer fields into variables",
+        "zapier": "a 'New signed document' trigger mapping offer fields to the next step",
+        "python": "parse the offer record and pull role, startDate, and manager into a dict"
+      }
+    },
+    "heading": "Offer profiled",
+    "points": [
+      "You tagged the trigger fields onboarding depends on: new hire, role, start date, and manager.",
+      "The start date is the authoritative clock; every downstream SLA counts backward from it.",
+      "Salary and the recruiter signature are noise for provisioning - least-privilege starts at intake.",
+      "Your offer source profile is stored; the onboarding record is keyed from it, not the raw letter.",
+      "The workflow can now trust where each hire enters the onboarding pipeline."
+    ],
+    "artifactName": "source-profile-signed-offer.json"
+  }
+}
