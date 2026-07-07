@@ -1,0 +1,84 @@
+{
+  "id": "lesson-sla-tracker",
+  "nodeId": "sla-tracker",
+  "title": "Track the SLA Timers",
+  "subtitle": "Per-priority clocks and breach flags",
+  "clock": "4:30 PM",
+  "difficulty": "Beginner",
+  "skill": "SLA tracking",
+  "scenario": "It is 4:30 PM. The day's tickets are routed. Track each one's SLA: the target depends on its priority, and a breach flag says whether the clock ran out. On a clean day nothing breached - but the flags still have to be set.",
+  "inputType": "text",
+  "inputLabel": "Day's tickets and SLA targets",
+  "input": "SLA targets by priority: P1 = 15 min, P3 = 8 hours, P4 = 2 days.\nToday: TKT-4001 (P1) escalated at 2:14, resolved 2:40 - within 15 min. TKT-4002 (P3) worked well within 8 hours. TKT-4003 (P4) within 2 days.\nRecord each ticket's SLA target and breach flag (no for all today).",
+  "instructions": [
+    "Write one row per ticket: TKT-4001, TKT-4002, TKT-4003.",
+    "Set each slaTarget from its priority (15 min, 8 hours, 2 days).",
+    "Set breachFlag to no for all (clean day).",
+    "Return a JSON array of the three rows, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"ticketId\": \"TKT-4001\", \"slaTarget\": \"\", \"breachFlag\": \"\" },\n  { \"ticketId\": \"TKT-4002\", \"slaTarget\": \"\", \"breachFlag\": \"\" },\n  { \"ticketId\": \"TKT-4003\", \"slaTarget\": \"\", \"breachFlag\": \"\" }\n]",
+  "validation": {
+    "type": "jsonDeltas",
+    "keyField": "ticketId",
+    "requiredFields": ["ticketId", "slaTarget", "breachFlag"],
+    "numericFields": [],
+    "expectedRows": [
+      { "ticketId": "TKT-4001", "slaTarget": "15 min", "breachFlag": "no" },
+      { "ticketId": "TKT-4002", "slaTarget": "8 hours", "breachFlag": "no" },
+      { "ticketId": "TKT-4003", "slaTarget": "2 days", "breachFlag": "no" }
+    ]
+  },
+  "copilotPrompt": "Build a JSON array of SLA rows for TKT-4001 (P1, 15 min), TKT-4002 (P3, 8 hours), TKT-4003 (P4, 2 days). Each has ticketId, slaTarget, breachFlag (no for all today).",
+  "successMessage": "SLA tracked. Each ticket has its per-priority target and a breach flag the digest reads.",
+  "validateLabel": "Validate SLA",
+  "editorHelper": "Target comes from priority; breach flag says if the clock ran out.",
+  "intro": {
+    "heading": "Before the digest: the clocks",
+    "sections": [
+      {
+        "title": "Time is a priority-scaled signal",
+        "body": "A P1 clock is minutes; a P4 is days. The SLA target comes from the priority, so the same 'is it late?' question means very different things per ticket."
+      },
+      {
+        "title": "A flag needs a target",
+        "body": "A breach flag only means something against a target. Recording both - the target and whether it was met - is what makes the digest's breach count auditable."
+      },
+      {
+        "title": "Clean days still get tracked",
+        "body": "Today nothing breached, but the flags are set to 'no' anyway. Tracking is not just for fires; the clean baseline is what makes a breach visible when it happens."
+      },
+      {
+        "title": "What you produce here",
+        "body": "SLA rows the digest totals into a breach count and load-shedding acts on when a queue runs hot."
+      }
+    ],
+    "jsonExample": "[\n  { \"ticketId\": \"TKT-4001\", \"slaTarget\": \"15 min\", \"breachFlag\": \"no\" }\n]",
+    "skill": "SLA tracking",
+    "artifactName": "sla-tracker.json"
+  },
+  "fieldGuide": [
+    { "field": "ticketId", "meaning": "The ticket being timed.", "type": "string", "example": "\"TKT-4001\"", "group": "Ticket", "lookFor": "which ticket?", "hint": "TKT-4001, TKT-4002, TKT-4003." },
+    { "field": "slaTarget", "meaning": "The SLA target from the priority.", "type": "string", "example": "\"15 min\"", "group": "SLA", "lookFor": "target?", "hint": "P1 15 min, P3 8 hours, P4 2 days." },
+    { "field": "breachFlag", "meaning": "Whether the SLA was breached.", "type": "string", "example": "\"no\"", "group": "SLA", "lookFor": "breached?", "hint": "no for all today." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd set a due time per ticket based on its priority and flag any that blew past it.",
+      "tools": {
+        "powerAutomate": "compute due = created + SLA(priority); flag if now > due",
+        "zapier": "a delay/deadline per priority with a breach tag",
+        "python": "breach = elapsed > sla_target[priority]"
+      }
+    },
+    "heading": "SLA tracked",
+    "points": [
+      "You set each ticket's SLA target from its priority.",
+      "Breach flags are recorded against those targets, so they are auditable.",
+      "A clean day still gets tracked - the baseline makes breaches visible.",
+      "The digest reads these rows for its breach count.",
+      "The workflow can now measure every ticket against its per-priority clock."
+    ],
+    "artifactName": "sla-tracker.json"
+  }
+}

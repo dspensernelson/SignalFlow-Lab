@@ -1,0 +1,85 @@
+{
+  "id": "lesson-queue-digest",
+  "nodeId": "queue-digest",
+  "title": "Assemble the Queue Digest",
+  "subtitle": "The 5:00 PM health digest, by lookup",
+  "clock": "5:00 PM",
+  "difficulty": "Beginner",
+  "skill": "Assembly from artifacts",
+  "scenario": "It is 5:00 PM. Assemble the queue-health digest - the day's volume, P1s, breaches, and misroutes - by LOOKING each number up from a stored artifact. If you find yourself recounting tickets, stop: the pipeline already tallied them.",
+  "inputType": "text",
+  "inputLabel": "Digest rule",
+  "input": "Assembly rule: every number comes from a stored artifact. Total tickets triaged today: 3. P1 incidents (from classification/priority): 1. SLA breaches (from the SLA tracker): 0. Misroutes (from the misroute check): 0. Top category by volume: outage. Assemble the 5:00 PM digest.",
+  "instructions": [
+    "Fill the volume slot from the day's ticket count (3).",
+    "Fill P1s, breaches, and misroutes from the tracker and checks.",
+    "Fill the top category from the day's classifications.",
+    "Validate to render queue-digest.md."
+  ],
+  "interactionType": "templateSlots",
+  "starterAnswer": "{}",
+  "shelf": [
+    { "nodeId": "classification", "artifactName": "classification.json", "producedBy": "Classify the Ticket" },
+    { "nodeId": "sla-tracker", "artifactName": "sla-tracker.json", "producedBy": "Track the SLA Timers" },
+    { "nodeId": "misroute-check", "artifactName": "misroute-check.json", "producedBy": "Check for a Misroute" }
+  ],
+  "validation": {
+    "type": "templateSlots",
+    "template": "# Relay Queue-Health Digest - end of day\n\nTickets triaged: {{totalTickets}}\nP1 incidents: {{p1Count}}\nSLA breaches: {{breachCount}}\nMisroutes: {{misrouteCount}}\nTop category: {{topCategory}}\n\nAssembled by the Relay triage workflow at 5:00 PM.",
+    "slots": [
+      { "id": "totalTickets", "label": "Tickets triaged", "numeric": true, "expected": 3, "hint": "The day's ticket count." },
+      { "id": "p1Count", "label": "P1 incidents", "numeric": true, "expected": 1, "hint": "One P1 today (TKT-4001)." },
+      { "id": "breachCount", "label": "SLA breaches", "numeric": true, "expected": 0, "hint": "The SLA tracker shows none." },
+      { "id": "misrouteCount", "label": "Misroutes", "numeric": true, "expected": 0, "hint": "The misroute check found none." },
+      { "id": "topCategory", "label": "Top category", "numeric": false, "expected": "outage", "hint": "The most notable category today." }
+    ]
+  },
+  "copilotPrompt": "Fill the queue-digest slots by lookup: totalTickets 3, p1Count 1, breachCount 0, misrouteCount 0, topCategory outage. Do not recount - read from the stored artifacts.",
+  "successMessage": "Digest assembled. Every number traces to a triage artifact - Support Ops can trust it.",
+  "validateLabel": "Render Digest",
+  "editorHelper": "Fill each slot by lookup - the pipeline already tallied.",
+  "intro": {
+    "heading": "The payoff: the daily digest",
+    "sections": [
+      {
+        "title": "Assembly is lookup",
+        "body": "The digest is not new analysis - it is proven numbers gathered. Volume, P1s, breaches, and misroutes all live in artifacts the pipeline built. Recounting is a chance to introduce error."
+      },
+      {
+        "title": "Traceable by construction",
+        "body": "Because every figure comes from a stored artifact, Support Ops can trust the digest and drill into any number. A hand-tuned figure is a report nobody can audit."
+      },
+      {
+        "title": "Health, not just volume",
+        "body": "The digest is a health check: breaches and misroutes matter as much as counts. It is how the desk sees whether the day went well, not just how busy it was."
+      },
+      {
+        "title": "What you produce here",
+        "body": "queue-digest.md - the module's deliverable, sent to the Support DL and archived after."
+      }
+    ],
+    "jsonExample": "{\n  \"totalTickets\": 3,\n  \"misrouteCount\": 0\n}",
+    "skill": "Assembly from artifacts",
+    "artifactName": "queue-digest.md"
+  },
+  "fieldGuide": [],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd pull the day's counts from your tracker into a one-page summary rather than re-tallying tickets by hand.",
+      "tools": {
+        "powerAutomate": "compose the digest from the tracked counts",
+        "zapier": "a Formatter + digest step from prior totals",
+        "python": "render the digest template from the day's artifacts"
+      }
+    },
+    "heading": "Digest assembled",
+    "points": [
+      "You filled every number by lookup, not by recounting.",
+      "Each figure traces to a triage artifact, so the digest is auditable.",
+      "It reports health - breaches and misroutes - not just volume.",
+      "queue-digest.md is the module's deliverable, ready for the Support DL.",
+      "The workflow can now assemble a trustworthy queue-health digest."
+    ],
+    "artifactName": "queue-digest.md"
+  }
+}

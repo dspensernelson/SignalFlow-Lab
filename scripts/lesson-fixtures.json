@@ -53,6 +53,38 @@
     "correct": { "assignedQueue": "bug-queue", "assignedBy": "Queue Lead", "logged": "yes" },
     "wrong": { "assignedQueue": "incident-bridge", "assignedBy": "Queue Lead", "logged": "yes" }
   },
+  "lesson-sla-tracker": {
+    "correct": [
+      { "ticketId": "TKT-4001", "slaTarget": "15 min", "breachFlag": "no" },
+      { "ticketId": "TKT-4002", "slaTarget": "8 hours", "breachFlag": "no" },
+      { "ticketId": "TKT-4003", "slaTarget": "2 days", "breachFlag": "no" }
+    ],
+    "wrong": [
+      { "ticketId": "TKT-4001", "slaTarget": "2 days", "breachFlag": "no" },
+      { "ticketId": "TKT-4002", "slaTarget": "8 hours", "breachFlag": "no" },
+      { "ticketId": "TKT-4003", "slaTarget": "2 days", "breachFlag": "no" }
+    ]
+  },
+  "lesson-resolution-record": {
+    "correct": { "ticketId": "TKT-4001", "fix": "restarted the checkout service", "workedCategory": "outage", "resolvedBy": "Tier-2 Engineer" },
+    "wrong": { "ticketId": "TKT-4001", "fix": "restarted the checkout service", "workedCategory": "billing", "resolvedBy": "Tier-2 Engineer" }
+  },
+  "lesson-misroute-check": {
+    "correct": { "ticketId": "TKT-4001", "assignedCategory": "outage", "workedCategory": "outage", "misrouted": false },
+    "wrong": { "ticketId": "TKT-4001", "assignedCategory": "outage", "workedCategory": "outage", "misrouted": true }
+  },
+  "lesson-queue-digest": {
+    "correct": { "totalTickets": 3, "p1Count": 1, "breachCount": 0, "misrouteCount": 0, "topCategory": "outage" },
+    "wrong": { "totalTickets": 3, "p1Count": 1, "breachCount": 2, "misrouteCount": 0, "topCategory": "outage" }
+  },
+  "lesson-triage-archive": {
+    "correct": { "archiveId": "triage-day-1", "ticketCount": 3, "retention": "1 year", "seedsTaxonomy": true },
+    "wrong": { "archiveId": "triage-day-1", "ticketCount": 3, "retention": "1 year", "seedsTaxonomy": false }
+  },
+  "lesson-taxonomy-feedback": {
+    "correct": { "misrouteCount": 0, "category": "none", "proposedChange": "none", "routedTo": "Support Ops Analyst" },
+    "wrong": { "misrouteCount": 0, "category": "none", "proposedChange": "split billing", "routedTo": "Support Ops Analyst" }
+  },
 
   "lesson-po-register": {
     "correct": { "poNumber": "po", "vendor": "vendor", "quantityOrdered": "qty", "unitPricePO": "poPrice", "poTotal": "total" },

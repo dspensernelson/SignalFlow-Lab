@@ -1,0 +1,84 @@
+{
+  "id": "lesson-triage-archive",
+  "nodeId": "triage-archive",
+  "title": "Archive the Day's Triage",
+  "subtitle": "Retain it and seed the taxonomy loop",
+  "clock": "5:05 PM",
+  "difficulty": "Beginner",
+  "skill": "Retention & the loop",
+  "scenario": "The digest is sent. Close the day by archiving the triage: retain the records and digest for audit, and mark that it seeds the taxonomy loop. Yesterday's misroutes are what tune tomorrow's categories.",
+  "inputType": "text",
+  "inputLabel": "Completed triage day",
+  "input": "Today's triage is complete: 3 tickets, digest assembled. Archive it under archive id triage-day-1 with a 1-year retention. Mark seedsTaxonomy true - the day's misroutes feed the taxonomy-feedback step.",
+  "instructions": [
+    "Record the archive id and the ticket count.",
+    "Set the retention period.",
+    "Mark that it seeds the taxonomy (seedsTaxonomy).",
+    "Return one valid JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"archiveId\": \"\",\n  \"ticketCount\": 0,\n  \"retention\": \"\",\n  \"seedsTaxonomy\": false\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["archiveId", "ticketCount", "retention", "seedsTaxonomy"],
+    "expected": {
+      "archiveId": "triage-day-1",
+      "ticketCount": 3,
+      "retention": "1 year",
+      "seedsTaxonomy": true
+    }
+  },
+  "copilotPrompt": "Build one JSON triage archive record: archiveId triage-day-1, ticketCount 3, retention 1 year, seedsTaxonomy true.",
+  "successMessage": "Triage archived. It is retained for audit and marked to seed the taxonomy loop.",
+  "validateLabel": "Validate Archive",
+  "editorHelper": "Retain the day - and mark that it feeds the taxonomy.",
+  "intro": {
+    "heading": "Close the day: retain and seed",
+    "sections": [
+      {
+        "title": "Retention is a compliance decision",
+        "body": "The day's triage is kept for a defined period so an auditor can reconstruct what was routed where. The retention length is a governed choice, not an afterthought."
+      },
+      {
+        "title": "The archive feeds the loop",
+        "body": "This archive is not a dead end. Its misroutes flow to the taxonomy-feedback step: a category that keeps getting reworked becomes a change proposal. Yesterday tunes tomorrow."
+      },
+      {
+        "title": "A stable id",
+        "body": "The day is archived under a stable id so it can be found again. A weak id makes the archive unsearchable and the loop impossible."
+      },
+      {
+        "title": "What you produce here",
+        "body": "An archive record that satisfies retention and opens the temporal loop back to the taxonomy."
+      }
+    ],
+    "jsonExample": "{\n  \"archiveId\": \"triage-day-1\",\n  \"seedsTaxonomy\": true\n}",
+    "skill": "Retention & the loop",
+    "artifactName": "triage-archive.json"
+  },
+  "fieldGuide": [
+    { "field": "archiveId", "meaning": "The stable id the day is archived under.", "type": "string", "example": "\"triage-day-1\"", "group": "Retention", "lookFor": "archived as?", "hint": "triage-day-1." },
+    { "field": "ticketCount", "meaning": "How many tickets the day triaged.", "type": "number", "example": "3", "group": "Retention", "lookFor": "how many tickets?", "hint": "3 today." },
+    { "field": "retention", "meaning": "How long it is kept.", "type": "string", "example": "\"1 year\"", "group": "Retention", "lookFor": "kept how long?", "hint": "1 year." },
+    { "field": "seedsTaxonomy", "meaning": "Whether it feeds the taxonomy loop.", "type": "boolean", "example": "true", "group": "Loop", "lookFor": "feeds the loop?", "hint": "It seeds the taxonomy, so true." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd file the day's tickets in a retained store and note the misroutes for the taxonomy review.",
+      "tools": {
+        "powerAutomate": "write the day to a retained store with a retention label",
+        "zapier": "archive the records and tag them for review",
+        "python": "write the day to a dated archive; export misroutes"
+      }
+    },
+    "heading": "Triage archived",
+    "points": [
+      "You retained the day's triage under a stable id.",
+      "The archive is marked to seed the taxonomy - a loop input.",
+      "Retention keeps the day findable for audit and learning.",
+      "The day's misroutes now flow to the taxonomy-feedback step.",
+      "The workflow can now retain each day and feed it back to the taxonomy."
+    ],
+    "artifactName": "triage-archive.json"
+  }
+}

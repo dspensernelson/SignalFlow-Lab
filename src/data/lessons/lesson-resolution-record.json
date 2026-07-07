@@ -1,0 +1,84 @@
+{
+  "id": "lesson-resolution-record",
+  "nodeId": "resolution-record",
+  "title": "Capture the Resolution",
+  "subtitle": "The fix and the category-as-worked",
+  "clock": "2:40 PM",
+  "difficulty": "Beginner",
+  "skill": "Outcome capture",
+  "scenario": "TKT-4001 is resolved - Tier-2 restarted the checkout service. Capture the outcome, including the category it turned out to be when actually worked. On a clean ticket the worked category matches the assigned one, but you always record it, because that is what makes misroute detection possible.",
+  "inputType": "text",
+  "inputLabel": "Resolved TKT-4001",
+  "input": "TKT-4001 (assigned category outage) was resolved by the Tier-2 Engineer, who restarted the checkout service. When actually worked, it was indeed an outage. Capture the fix, the worked category, and who resolved it.",
+  "instructions": [
+    "Record the ticket id.",
+    "Record the fix applied.",
+    "Record the category it was actually worked as (workedCategory).",
+    "Record who resolved it, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"ticketId\": \"\",\n  \"fix\": \"\",\n  \"workedCategory\": \"\",\n  \"resolvedBy\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["ticketId", "fix", "workedCategory", "resolvedBy"],
+    "expected": {
+      "ticketId": "TKT-4001",
+      "fix": "restarted the checkout service",
+      "workedCategory": "outage",
+      "resolvedBy": "Tier-2 Engineer"
+    }
+  },
+  "copilotPrompt": "Build one JSON resolution record for TKT-4001: fix 'restarted the checkout service', workedCategory 'outage', resolvedBy 'Tier-2 Engineer'.",
+  "successMessage": "Resolution captured. The worked category is recorded so misroutes can be caught.",
+  "validateLabel": "Validate Resolution",
+  "editorHelper": "Record the fix - and the category it actually was.",
+  "intro": {
+    "heading": "Before you learn: capture the outcome",
+    "sections": [
+      {
+        "title": "The fix is the record",
+        "body": "A resolved ticket without a captured fix teaches nothing. Recording what actually solved it - 'restarted the checkout service' - is what a future agent (or the digest) can rely on."
+      },
+      {
+        "title": "Category-as-worked is ground truth",
+        "body": "The category a ticket was assigned is a hypothesis; the category it was actually worked as is the truth. Capturing the worked category is the whole basis for catching misroutes."
+      },
+      {
+        "title": "Match today, mismatch tomorrow",
+        "body": "This ticket was correctly an outage, so worked matches assigned. You still record it - because the value of the field is exactly the days it does NOT match."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A resolution record the misroute check compares against the assigned category."
+      }
+    ],
+    "jsonExample": "{\n  \"workedCategory\": \"outage\",\n  \"resolvedBy\": \"Tier-2 Engineer\"\n}",
+    "skill": "Outcome capture",
+    "artifactName": "resolution-record.json"
+  },
+  "fieldGuide": [
+    { "field": "ticketId", "meaning": "The resolved ticket.", "type": "string", "example": "\"TKT-4001\"", "group": "Ticket", "lookFor": "which ticket?", "hint": "TKT-4001." },
+    { "field": "fix", "meaning": "What resolved the ticket.", "type": "string", "example": "\"restarted the checkout service\"", "group": "Outcome", "lookFor": "what fixed it?", "hint": "Copy the fix exactly." },
+    { "field": "workedCategory", "meaning": "The category it was actually worked as.", "type": "string", "example": "\"outage\"", "group": "Outcome", "lookFor": "actually which category?", "hint": "It was an outage." },
+    { "field": "resolvedBy", "meaning": "Who resolved it.", "type": "string", "example": "\"Tier-2 Engineer\"", "group": "Outcome", "lookFor": "who resolved it?", "hint": "The Tier-2 Engineer." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd write the fix in the ticket and tag what it really was, so patterns and misroutes surface later.",
+      "tools": {
+        "powerAutomate": "set the resolution and worked-category fields on close",
+        "zapier": "update the ticket with the fix and true category",
+        "python": "record {fix, workedCategory} at resolution"
+      }
+    },
+    "heading": "Resolution captured",
+    "points": [
+      "You recorded the fix that resolved the ticket.",
+      "You captured the category-as-worked, the ground truth for misroutes.",
+      "Worked matched assigned here - but you record it every time.",
+      "The misroute check compares this against the assigned category.",
+      "The workflow can now capture outcomes that feed learning."
+    ],
+    "artifactName": "resolution-record.json"
+  }
+}

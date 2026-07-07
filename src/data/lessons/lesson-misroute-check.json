@@ -1,0 +1,84 @@
+{
+  "id": "lesson-misroute-check",
+  "nodeId": "misroute-check",
+  "title": "Check for a Misroute",
+  "subtitle": "Assigned category vs worked category",
+  "clock": "4:45 PM",
+  "difficulty": "Beginner",
+  "skill": "Misroute detection",
+  "scenario": "The learning step: compare the category a ticket was assigned to the category it was actually worked as. A mismatch is a misroute - the signal that tunes the taxonomy. TKT-4001 was assigned outage and worked as outage, so it is clean.",
+  "inputType": "text",
+  "inputLabel": "TKT-4001 categories",
+  "input": "TKT-4001 was assigned category outage at classification, and the resolution record shows it was worked as outage. Compare them: same category means not misrouted. Record the assigned and worked categories and the misrouted flag.",
+  "instructions": [
+    "Record the ticket id.",
+    "Record the assigned and worked categories.",
+    "Set misrouted false when they match (they do here).",
+    "Return one valid JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"ticketId\": \"\",\n  \"assignedCategory\": \"\",\n  \"workedCategory\": \"\",\n  \"misrouted\": true\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["ticketId", "assignedCategory", "workedCategory", "misrouted"],
+    "expected": {
+      "ticketId": "TKT-4001",
+      "assignedCategory": "outage",
+      "workedCategory": "outage",
+      "misrouted": false
+    }
+  },
+  "copilotPrompt": "Build one JSON misroute check for TKT-4001: assignedCategory outage, workedCategory outage, misrouted false (they match).",
+  "successMessage": "No misroute. Assigned and worked categories match - a clean route.",
+  "validateLabel": "Validate Check",
+  "editorHelper": "Same category = not misrouted; a mismatch is the signal.",
+  "intro": {
+    "heading": "The signal that tunes the taxonomy",
+    "sections": [
+      {
+        "title": "A misroute is data, not blame",
+        "body": "Comparing assigned to worked is not about catching an agent - it is about catching a category that misleads. A misroute is a fact the taxonomy loop learns from."
+      },
+      {
+        "title": "Match here, mismatch elsewhere",
+        "body": "TKT-4001 matched, so it is clean. The check earns its keep on the days it does not match - a ticket assigned billing but worked as a bug points at a confusing category."
+      },
+      {
+        "title": "One flag, big leverage",
+        "body": "A single misrouted flag per ticket, totaled over a day, is what tells Support Ops which categories to split or clarify. Small signal, systemic fix."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A misroute check the digest counts and the taxonomy feedback loop reads."
+      }
+    ],
+    "jsonExample": "{\n  \"misrouted\": false\n}",
+    "skill": "Misroute detection",
+    "artifactName": "misroute-check.json"
+  },
+  "fieldGuide": [
+    { "field": "ticketId", "meaning": "The ticket being checked.", "type": "string", "example": "\"TKT-4001\"", "group": "Ticket", "lookFor": "which ticket?", "hint": "TKT-4001." },
+    { "field": "assignedCategory", "meaning": "The category assigned at classification.", "type": "string", "example": "\"outage\"", "group": "Compare", "lookFor": "assigned what?", "hint": "outage." },
+    { "field": "workedCategory", "meaning": "The category it was actually worked as.", "type": "string", "example": "\"outage\"", "group": "Compare", "lookFor": "worked as what?", "hint": "outage." },
+    { "field": "misrouted", "meaning": "Whether the two differ.", "type": "boolean", "example": "false", "group": "Result", "lookFor": "misrouted?", "hint": "They match, so false." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd compare what a ticket was filed under to what it turned out to be, and note the mismatches for review.",
+      "tools": {
+        "powerAutomate": "a Condition comparing assigned vs worked category",
+        "zapier": "a Filter flagging tickets where the two differ",
+        "python": "misrouted = assigned != worked"
+      }
+    },
+    "heading": "Misroute checked",
+    "points": [
+      "You compared the assigned and worked categories.",
+      "They matched, so TKT-4001 is not a misroute.",
+      "A misroute is data that points at a confusing category, not blame.",
+      "The digest counts this and the taxonomy loop reads it.",
+      "The workflow can now catch misroutes that tune the taxonomy."
+    ],
+    "artifactName": "misroute-check.json"
+  }
+}

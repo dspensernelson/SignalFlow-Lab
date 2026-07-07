@@ -15,6 +15,12 @@ import lessonRoutingTable from './lesson-routing-table.json'
 import lessonRouteDecision from './lesson-route-decision.json'
 import lessonEscalationHandoff from './lesson-escalation-handoff.json'
 import lessonQueueAssignment from './lesson-queue-assignment.json'
+import lessonSlaTracker from './lesson-sla-tracker.json'
+import lessonResolutionRecord from './lesson-resolution-record.json'
+import lessonMisrouteCheck from './lesson-misroute-check.json'
+import lessonQueueDigest from './lesson-queue-digest.json'
+import lessonTriageArchive from './lesson-triage-archive.json'
+import lessonTaxonomyFeedback from './lesson-taxonomy-feedback.json'
 
 const module04Lessons = {
   // Easy tier
@@ -28,6 +34,12 @@ const module04Lessons = {
   'lesson-route-decision': lessonRouteDecision,
   'lesson-escalation-handoff': lessonEscalationHandoff,
   'lesson-queue-assignment': lessonQueueAssignment,
+  'lesson-sla-tracker': lessonSlaTracker,
+  'lesson-resolution-record': lessonResolutionRecord,
+  'lesson-misroute-check': lessonMisrouteCheck,
+  'lesson-queue-digest': lessonQueueDigest,
+  'lesson-triage-archive': lessonTriageArchive,
+  'lesson-taxonomy-feedback': lessonTaxonomyFeedback,
 }
 
 export default module04Lessons

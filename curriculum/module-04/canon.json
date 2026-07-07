@@ -15,6 +15,12 @@
     { "lesson": "lesson-route-decision", "path": "validation.expected.escalate", "op": "equals", "value": true },
     { "lesson": "lesson-route-decision", "path": "validation.expected.route", "op": "equals", "value": "escalation-handoff" },
     { "lesson": "lesson-escalation-handoff", "path": "validation.artifactOnPass.pagedTo", "op": "equals", "value": "Tier-2 Engineer" },
-    { "lesson": "lesson-queue-assignment", "path": "validation.artifactOnPass.assignedQueue", "op": "equals", "value": "bug-queue" }
+    { "lesson": "lesson-queue-assignment", "path": "validation.artifactOnPass.assignedQueue", "op": "equals", "value": "bug-queue" },
+    { "lesson": "lesson-resolution-record", "path": "validation.expected.workedCategory", "op": "equals", "value": "outage" },
+    { "lesson": "lesson-misroute-check", "path": "validation.expected.misrouted", "op": "equals", "value": false },
+    { "lesson": "lesson-queue-digest", "path": "validation.slots[id=totalTickets].expected", "op": "equals", "value": 3 },
+    { "lesson": "lesson-queue-digest", "path": "validation.slots[id=p1Count].expected", "op": "equals", "value": 1 },
+    { "lesson": "lesson-triage-archive", "path": "validation.expected.ticketCount", "op": "equals", "value": 3 },
+    { "lesson": "lesson-taxonomy-feedback", "path": "validation.expected.proposedChange", "op": "equals", "value": "none" }
   ]
 }
