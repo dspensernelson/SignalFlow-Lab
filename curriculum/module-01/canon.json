@@ -20,6 +20,11 @@
     { "lesson": "lesson-risk-evaluation-hard", "path": "validation.expectedRows[hub=MISO].pctMove", "op": "pctMove", "a": 81, "b": 77, "round": 1 }
   ],
   "assertions": [
+    { "lesson": "lesson-analyst-notes", "path": "validation.source.segments[id=peak].text", "op": "equals", "value": "hit $187/MWh briefly" },
+    { "lesson": "lesson-analyst-notes", "path": "validation.source.segments[id=settled].text", "op": "equals", "value": "then settled near $142/MWh" },
+    { "lesson": "lesson-price-feed", "path": "validation.source.segments[id=ercotPeak].text", "op": "equals", "value": "$187/MWh" },
+    { "lesson": "lesson-price-feed", "path": "validation.source.segments[id=ercotSettled].text", "op": "equals", "value": "$142/MWh" },
+    { "lesson": "lesson-price-feed", "path": "validation.source.segments[id=misoPeak].text", "op": "equals", "value": "$74 /MWh" },
     { "lesson": "lesson-intake", "path": "validation.expected.hub", "op": "equals", "value": "ERCOT" },
     { "lesson": "lesson-intake", "path": "validation.acceptedValues.peakPrice", "op": "includes", "value": "187" },
     { "lesson": "lesson-intake", "path": "validation.acceptedValues.settledPrice", "op": "includes", "value": "142" },

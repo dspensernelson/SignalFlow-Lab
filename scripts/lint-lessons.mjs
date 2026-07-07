@@ -22,7 +22,7 @@
 //     row for every validated field and a parseable starterAnswer.
 //  5. Canon: every assertion in curriculum/module-01/canon.json holds.
 //  6. choiceCheck cap: no more than ~1-in-4 lessons per module are choiceCheck
-//     (module-01/02 grandfathered as warnings; module-03+ is an error).
+//     (module-02 grandfathered as a warning; all other modules are an error).
 //
 // Non-ASCII characters in lesson copy are reported as warnings (repo docs are
 // ASCII-only by rule; lesson copy should stay close to it).
@@ -342,10 +342,12 @@ for (const p of PROJECTS) {
 
 // choiceCheck cap (anti-slop, work order 2026-07-04): no more than ~1-in-4
 // lessons per module may be choiceCheck, so the quiz interaction cannot become
-// the default. module-01 (28.6%) and module-02 (47.5%) predate the rule and are
-// grandfathered as WARNINGS; module-03+ must hold the 25% cap (ERROR).
+// the default. module-02 (47.5%) predates the rule and is grandfathered as a
+// WARNING; every other module must hold the 25% cap (ERROR). module-01 left
+// the grandfathered set on 2026-07-06 when the opening-arc re-storyboard
+// converted analyst-notes and price-feed to tagSource (now 10/42 = 23.8%).
 const CHOICECHECK_CAP = 0.25
-const CHOICECHECK_GRANDFATHERED = new Set(['module-01', 'module-02'])
+const CHOICECHECK_GRANDFATHERED = new Set(['module-02'])
 for (const p of PROJECTS) {
   const ids = [...p.tierIds.easy, ...p.tierIds.medium, ...p.tierIds.hard]
     .filter((lid) => lessonsById[lid])

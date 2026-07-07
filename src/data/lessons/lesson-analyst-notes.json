@@ -2,66 +2,68 @@
   "id": "lesson-analyst-notes",
   "nodeId": "analyst-notes",
   "title": "Profile the Overnight Note",
+  "subtitle": "Find the record hiding in the note",
   "difficulty": "Beginner",
   "skill": "Source provenance",
   "clock": "6:05 AM",
-  "scenario": "It is 6:05 AM. Before you build anything, understand the raw material. An overnight note has landed - read it like an automation designer: who wrote it, what shape is it in, what would a system need to ingest it, and who needs it next?",
+  "scenario": "It is 6:05 AM at Meridian Energy, and the brief ships at 7:00 whether it is ready or not. Everything the workflow knows about the 2 AM ERCOT spike is one paragraph the Overnight Desk Analyst typed. Before anything can be automated, prove exactly what that paragraph is carrying.",
   "inputType": "text",
   "inputLabel": "Overnight Analyst Note",
   "input": "Checked overnight prices. ERCOT hub spiked around 2am, hit $187/MWh briefly then settled near $142/MWh. Wind generation underperformed, about 60% of forecast. Gas prices up slightly. Trader flagged the hub spike for review. No action taken yet. Need approval if we move on this.",
   "instructions": [
-    "Read the note as a source, not as content to extract - extraction is the Market Intake Record task.",
-    "Answer the four source questions against the note and the workflow map.",
+    "Read the note once as a person, then again as a designer: which spans carry field values?",
+    "Tag each of the five intake fields to the span that holds its value.",
+    "The leftovers are context, not data - that is the lesson.",
     "Validate to mint the source profile."
   ],
-  "interactionType": "choiceCheck",
-  "starterAnswer": "{}",
+  "interactionType": "tagSource",
+  "starterAnswer": "{\n  \"hub\": \"\",\n  \"peakPrice\": \"\",\n  \"settledPrice\": \"\",\n  \"generationFlag\": \"\",\n  \"approvalRequired\": \"\"\n}",
   "validation": {
-    "type": "choiceCheck",
-    "questions": [
+    "type": "tagSource",
+    "source": {
+      "label": "Overnight Analyst Note - 6:05 AM",
+      "segments": [
+        { "id": "checked", "text": "Checked overnight prices." },
+        { "id": "hub", "text": "ERCOT hub" },
+        { "id": "spikeTime", "text": "spiked around 2am" },
+        { "id": "peak", "text": "hit $187/MWh briefly" },
+        { "id": "settled", "text": "then settled near $142/MWh" },
+        { "id": "wind", "text": "Wind generation underperformed, about 60% of forecast." },
+        { "id": "gas", "text": "Gas prices up slightly." },
+        { "id": "flag", "text": "Trader flagged the hub spike for review. Need approval if we move on this." },
+        { "id": "noAction", "text": "No action taken yet." }
+      ]
+    },
+    "fields": [
       {
-        "id": "q1",
-        "prompt": "Who produces this note?",
-        "options": [
-          { "id": "a", "text": "The Desk Manager, during business hours" },
-          { "id": "b", "text": "The Overnight Desk Analyst, before the market opens" },
-          { "id": "c", "text": "The workflow generates it automatically" }
-        ],
-        "correctOptionId": "b",
-        "explain": "The note reports overnight checks written in first person - a person on the overnight desk wrote it before anyone else was in."
+        "id": "hub",
+        "label": "hub",
+        "correctSegmentId": "hub",
+        "explain": "The hub is the market this whole morning turns on. Only one span names a trading hub - and it is the one that spiked."
       },
       {
-        "id": "q2",
-        "prompt": "What shape does this input arrive in?",
-        "options": [
-          { "id": "a", "text": "Structured JSON with named fields" },
-          { "id": "b", "text": "A CSV table of prices" },
-          { "id": "c", "text": "Unstructured prose a person wrote for people" }
-        ],
-        "correctOptionId": "c",
-        "explain": "Look at the source panel: sentences, approximations ('around 2am', 'about 60%'), no fields. Software cannot act on it as-is."
+        "id": "peakPrice",
+        "label": "peakPrice",
+        "correctSegmentId": "peak",
+        "explain": "The peak is what ERCOT hit briefly at 2 AM; the settle is where it ended. The brief cites both, so the record keeps them as two separate fields."
       },
       {
-        "id": "q3",
-        "prompt": "In a real company, what would ingesting this note require?",
-        "options": [
-          { "id": "a", "text": "Access to the analyst's inbox, desk channel, or terminal notes" },
-          { "id": "b", "text": "Nothing - market notes are public information" },
-          { "id": "c", "text": "A database administrator to create a table" }
-        ],
-        "correctOptionId": "a",
-        "explain": "The note lives wherever the analyst posts it - email, Teams, or a terminal. Reading it programmatically means having permission to that channel. The lab simulates this with a local text fixture."
+        "id": "settledPrice",
+        "label": "settledPrice",
+        "correctSegmentId": "settled",
+        "explain": "Settled is the calmer price after the spike passed - not the brief peak, and not the time it happened."
       },
       {
-        "id": "q4",
-        "prompt": "Which workflow step consumes this note first?",
-        "options": [
-          { "id": "a", "text": "Morning Brief" },
-          { "id": "b", "text": "Market Intake Record" },
-          { "id": "c", "text": "Risk Evaluation" }
-        ],
-        "correctOptionId": "b",
-        "explain": "Follow the map's edge from this node: the note's first stop is the intake step that turns it into a structured record."
+        "id": "generationFlag",
+        "label": "generationFlag",
+        "correctSegmentId": "wind",
+        "explain": "The operating story behind the spike: wind came in around 60% of forecast. That one span carries both the source and its performance - gas moving slightly is background, not the flag."
+      },
+      {
+        "id": "approvalRequired",
+        "label": "approvalRequired",
+        "correctSegmentId": "flag",
+        "explain": "The control signal is the trader's ask: flagged for review plus need approval means approvalRequired is true. 'No action taken yet' describes the past, not the requirement."
       }
     ],
     "artifactOnPass": {
@@ -70,18 +72,57 @@
       "format": "unstructured-text",
       "labVersion": "local text fixture (the note shown in this lesson)",
       "accessNeeded": "inbox or desk channel access",
-      "firstConsumer": "market-intake-record"
+      "firstConsumer": "market-intake-record",
+      "fieldsFound": ["hub", "peakPrice", "settledPrice", "generationFlag", "approvalRequired"]
     }
   },
   "fieldGuide": [],
-  "copilotPrompt": "Profile this input as an automation source: who produces it, what format it arrives in, what access ingesting it would require, and which workflow step consumes it first.",
-  "successMessage": "Source profiled. You now know where the morning signal enters - next, you will turn it into the first trusted record.",
+  "copilotPrompt": "Read this overnight desk note and identify which spans carry the values for these intake fields: hub, peakPrice, settledPrice, generationFlag, approvalRequired. For each field, name the exact phrase that holds its value, and explain why the remaining sentences are context rather than data.",
+  "successMessage": "Source mapped. Every field of the 6:15 intake record now has a proven home in the note - the workflow knows exactly which spans to encode.",
   "intro": {
-    "heading": "Before you inspect: sources come first",
+    "recordName": "Note Source Profile",
+    "mission": "By 7:00 AM the Desk Manager expects an approval-ready brief on the 2 AM ERCOT spike.",
+    "missionSubtext": "Right now the entire case is one paragraph a person typed. Find the record hiding inside it.",
+    "whatCameIn": {
+      "label": "Incoming signals",
+      "noteTitle": "Overnight Analyst Note",
+      "noteSubtitle": "Typed by the Overnight Desk Analyst before the market opens"
+    },
+    "yourJob": {
+      "label": "Map the source",
+      "artifact": "Prove where five fields live",
+      "description": "The intake record needs five fields. Every one of them is buried in this prose - tag the span each one lives in.",
+      "signals": [
+        { "group": "Market", "icon": "market", "detail": "Which hub is this morning about?" },
+        { "group": "Price signal", "icon": "price", "detail": "The spike it hit, and where it settled." },
+        { "group": "Operating signal", "icon": "operating", "detail": "What generation did while prices moved." },
+        { "group": "Control signal", "icon": "control", "detail": "Did a human ask for review before acting?" }
+      ]
+    },
+    "unlocks": {
+      "label": "Waiting consumers",
+      "consumers": [
+        {
+          "name": "Market Intake Record",
+          "icon": "note",
+          "status": "Waiting",
+          "needs": "Cannot be built until someone proves which spans are signal and which are commentary.",
+          "can": "Will key its five fields from exactly the spans you tag."
+        },
+        {
+          "name": "Trader Flag",
+          "icon": "flag",
+          "status": "Next",
+          "needs": "One span you will tag is not data at all - it is a judgment call, interpreted in the next lesson."
+        }
+      ]
+    },
+    "artifactPreviewNote": "These are the five fields of the intake record you will build at 6:15. This lesson proves where each one lives in the source.",
+    "heading": "Before you tag: sources come first",
     "sections": [
       {
         "title": "Why inspect before building",
-        "body": "Automation projects fail at the inputs more often than at the logic. Before extracting anything, a designer profiles the source: who produces it, on what schedule, in what shape, behind what access."
+        "body": "Automation projects fail at the inputs more often than at the logic. Before extracting anything, a designer profiles the source: who produces it, in what shape, behind what access. Here: the Overnight Desk Analyst, prose, and a channel you would need permission to read."
       },
       {
         "title": "Prose is a format too",
@@ -92,29 +133,45 @@
         "body": "In the lab the note is a local text fixture. At work it would be an email, a Teams post, or a terminal note - and ingesting it would need channel access and permission. The workflow map records both realities."
       },
       {
-        "title": "What you produce here",
-        "body": "Passing the inspection mints a source profile - a small record proving this input is understood. Profiling inputs is itself a real deliverable in automation work."
+        "title": "Why the JSON matters",
+        "body": "Downstream automation reads fields, not sentences. Until hub, peakPrice, and approvalRequired exist as named fields, the risk check and the approval route cannot see this morning at all. Tagging proves the fields exist before the intake step mints them."
       }
     ],
-    "jsonExample": "{\n  \"source\": \"analyst-notes\",\n  \"format\": \"unstructured-text\",\n  \"firstConsumer\": \"market-intake-record\"\n}",
+    "jsonExample": "{\n  \"source\": \"analyst-notes\",\n  \"fieldsFound\": [\"hub\", \"peakPrice\", \"approvalRequired\"],\n  \"firstConsumer\": \"market-intake-record\"\n}",
     "skill": "Source provenance",
     "artifactName": "source-profile-analyst-notes.json"
   },
   "takeaway": {
     "realWorld": {
-      "soloRebuildPath": "By hand you'd copy the analyst's email or chat note and hand-key the ticker, direction, and rationale into named columns so later steps read fields, not prose.",
+      "soloRebuildPath": "By hand you'd open the analyst's email, highlight the phrases that carry the hub, both prices, the wind status, and the approval ask, and key each one into a named column - so later steps read fields, not prose.",
       "tools": {
         "powerAutomate": "Outlook 'When a new email arrives' trigger into a SharePoint 'Create item'",
         "zapier": "Email Parser by Zapier extracts fields, then Google Sheets 'Create Row'",
         "python": "imaplib/email to read the note, regex or an LLM call to extract fields into a dict"
       }
     },
-    "heading": "Source profiled",
+    "heading": "Source mapped",
+    "recordBanner": "Source anatomy mapped",
+    "recordSummary": "Five field homes proven inside one paragraph of prose",
+    "capability": "The workflow can now identify where the morning market signal enters the system.",
+    "auditNote": "The note itself stays untouched and available for audit. What you minted is provenance: who produced the source, what access reading it requires, and where each intake field lives inside it.",
+    "nextNodeId": "trader-flag",
+    "consumers": [
+      {
+        "name": "Market Intake Record",
+        "nodeId": "market-intake-record",
+        "note": "will key its five fields from exactly the spans you tagged"
+      },
+      {
+        "name": "Trader Flag",
+        "nodeId": "trader-flag",
+        "note": "one tagged span is a human judgment call - interpreting it precisely is next"
+      }
+    ],
     "points": [
-      "You answered the four source questions: producer, format, access, first consumer.",
-      "The note is a recurring feed that happens to be prose - which is exactly why the next step (intake) must exist.",
-      "The lab honestly simulates the access problem: a local fixture stands in for inbox or channel permissions.",
-      "Your source profile is stored - profiling inputs is the first deliverable of any real automation project.",
+      "You tagged the five spans that become the intake record's fields: hub, peakPrice, settledPrice, generationFlag, approvalRequired.",
+      "Everything you did not tag is commentary - useful to a person, invisible to automation until someone maps it.",
+      "The lab's note is a local fixture; at work this same step is inbox or channel access plus the same field mapping.",
       "The workflow can now identify where the morning market signal enters the system."
     ],
     "artifactName": "source-profile-analyst-notes.json"

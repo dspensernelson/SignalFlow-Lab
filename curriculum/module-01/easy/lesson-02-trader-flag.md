@@ -1,5 +1,10 @@
 # Lesson 02 - Trader Flag (trader-flag)
 
+> REVISED 2026-07-06 (opening-arc re-storyboard): stays choiceCheck (the
+> interpretation has no source span to tag), but the built JSON gained the
+> mission intro, whatCameIn flag card, diagram takeaway, and case-thread copy.
+> See DECISION_LOG.md 2026-07-06. The script below is the original design record.
+
 - Lesson type: interpretation | Interaction: choiceCheck (new)
 - Artifact: signal-interpretation-trader-flag.json | Difficulty: Beginner | Clock: 6:08 AM
 - Build wave: B (requires choiceCheck)
