@@ -23,6 +23,36 @@
       { "category": "billing", "definition": "invoices, payments, plan changes" }
     ]
   },
+  "lesson-priority-assignment": {
+    "correct": { "ticketId": "TKT-4001", "impact": "high", "urgency": "high", "priority": "P1" },
+    "wrong": { "ticketId": "TKT-4001", "impact": "high", "urgency": "high", "priority": "P3" }
+  },
+  "lesson-routing-table": {
+    "correct": [
+      { "category": "outage", "queue": "incident-bridge" },
+      { "category": "bug", "queue": "bug-queue" },
+      { "category": "how-to", "queue": "support-queue" },
+      { "category": "billing", "queue": "billing-queue" }
+    ],
+    "wrong": [
+      { "category": "outage", "queue": "bug-queue" },
+      { "category": "bug", "queue": "bug-queue" },
+      { "category": "how-to", "queue": "support-queue" },
+      { "category": "billing", "queue": "billing-queue" }
+    ]
+  },
+  "lesson-route-decision": {
+    "correct": { "ticketId": "TKT-4001", "category": "outage", "priority": "P1", "escalate": true, "route": "escalation-handoff" },
+    "wrong": { "ticketId": "TKT-4001", "category": "outage", "priority": "P1", "escalate": false, "route": "incident-bridge" }
+  },
+  "lesson-escalation-handoff": {
+    "correct": { "pagedTo": "Tier-2 Engineer", "acknowledged": "yes", "dutyManagerSignoff": "yes" },
+    "wrong": { "pagedTo": "Support Agent", "acknowledged": "yes", "dutyManagerSignoff": "yes" }
+  },
+  "lesson-queue-assignment": {
+    "correct": { "assignedQueue": "bug-queue", "assignedBy": "Queue Lead", "logged": "yes" },
+    "wrong": { "assignedQueue": "incident-bridge", "assignedBy": "Queue Lead", "logged": "yes" }
+  },
 
   "lesson-po-register": {
     "correct": { "poNumber": "po", "vendor": "vendor", "quantityOrdered": "qty", "unitPricePO": "poPrice", "poTotal": "total" },

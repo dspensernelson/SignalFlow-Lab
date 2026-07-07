@@ -8,6 +8,13 @@
     { "lesson": "lesson-ticket-record", "path": "validation.expected.ticketId", "op": "equals", "value": "TKT-4001" },
     { "lesson": "lesson-ticket-record", "path": "validation.expected.productArea", "op": "equals", "value": "Checkout" },
     { "lesson": "lesson-classification", "path": "validation.artifactOnPass.ticketId", "op": "equals", "value": "TKT-4001" },
-    { "lesson": "lesson-classification", "path": "validation.artifactOnPass.category", "op": "equals", "value": "outage" }
+    { "lesson": "lesson-classification", "path": "validation.artifactOnPass.category", "op": "equals", "value": "outage" },
+    { "lesson": "lesson-priority-assignment", "path": "validation.expected.priority", "op": "equals", "value": "P1" },
+    { "lesson": "lesson-routing-table", "path": "validation.expectedRows[category=outage].queue", "op": "equals", "value": "incident-bridge" },
+    { "lesson": "lesson-routing-table", "path": "validation.expectedRows[category=bug].queue", "op": "equals", "value": "bug-queue" },
+    { "lesson": "lesson-route-decision", "path": "validation.expected.escalate", "op": "equals", "value": true },
+    { "lesson": "lesson-route-decision", "path": "validation.expected.route", "op": "equals", "value": "escalation-handoff" },
+    { "lesson": "lesson-escalation-handoff", "path": "validation.artifactOnPass.pagedTo", "op": "equals", "value": "Tier-2 Engineer" },
+    { "lesson": "lesson-queue-assignment", "path": "validation.artifactOnPass.assignedQueue", "op": "equals", "value": "bug-queue" }
   ]
 }

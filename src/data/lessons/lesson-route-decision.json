@@ -1,0 +1,86 @@
+{
+  "id": "lesson-route-decision",
+  "nodeId": "route-decision",
+  "title": "Encode the Route Decision",
+  "subtitle": "Escalate P1, route the rest",
+  "clock": "2:13 PM",
+  "difficulty": "Beginner",
+  "skill": "Decision encoding",
+  "scenario": "It is 2:13 PM. TKT-4001 is an outage scored P1. Encode the fork: a P1 or safety-flagged ticket escalates; everything else routes to its table queue. Because this is a P1, it escalates - the busy queue does not get a say.",
+  "inputType": "text",
+  "inputLabel": "TKT-4001 routing",
+  "input": "Ticket TKT-4001: category outage, priority P1. Routing rule: if priority is P1 OR a safety flag is set, escalate (route -> escalation-handoff); otherwise route to the routing-table queue for the category. TKT-4001 is P1, so it escalates.",
+  "instructions": [
+    "Record the ticket id, category, and priority.",
+    "Apply the rule: P1 (or safety) escalates.",
+    "Set escalate true and route to escalation-handoff.",
+    "Return one valid JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"ticketId\": \"\",\n  \"category\": \"\",\n  \"priority\": \"\",\n  \"escalate\": false,\n  \"route\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["ticketId", "category", "priority", "escalate", "route"],
+    "expected": {
+      "ticketId": "TKT-4001",
+      "category": "outage",
+      "priority": "P1",
+      "escalate": true,
+      "route": "escalation-handoff"
+    }
+  },
+  "copilotPrompt": "Encode the route decision for TKT-4001 (outage, P1): escalate true because it is P1, route escalation-handoff. Non-P1 tickets would route to their table queue instead.",
+  "successMessage": "Routed to escalation. A P1 escalates no matter how busy its queue is.",
+  "validateLabel": "Validate Route",
+  "editorHelper": "P1 or safety escalates; everything else takes its queue.",
+  "intro": {
+    "heading": "The fork: escalate or route",
+    "sections": [
+      {
+        "title": "One rule, two exits",
+        "body": "Every ticket takes one of two paths: escalate (P1 or safety) or route to its standard queue. A single explicit rule is what keeps routing fair and repeatable."
+      },
+      {
+        "title": "P1 jumps nothing and skips nothing",
+        "body": "A P1 escalates even if the incident queue is slammed; a non-P1 never jumps onto the escalation path. The rule, not the pressure of the moment, decides."
+      },
+      {
+        "title": "Safety is its own trigger",
+        "body": "Some tickets escalate regardless of priority - a safety or legal flag. Encoding that as an explicit OR keeps a rare-but-critical case from slipping through."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A route decision the escalation and queue handoffs read. For TKT-4001 it points to escalation."
+      }
+    ],
+    "jsonExample": "{\n  \"escalate\": true,\n  \"route\": \"escalation-handoff\"\n}",
+    "skill": "Decision encoding",
+    "artifactName": "route-decision.json"
+  },
+  "fieldGuide": [
+    { "field": "ticketId", "meaning": "The ticket being routed.", "type": "string", "example": "\"TKT-4001\"", "group": "Ticket", "lookFor": "which ticket?", "hint": "TKT-4001." },
+    { "field": "category", "meaning": "The ticket's category.", "type": "string", "example": "\"outage\"", "group": "Inputs", "lookFor": "category?", "hint": "outage." },
+    { "field": "priority", "meaning": "The ticket's priority.", "type": "string", "example": "\"P1\"", "group": "Inputs", "lookFor": "priority?", "hint": "P1." },
+    { "field": "escalate", "meaning": "Whether the ticket escalates.", "type": "boolean", "example": "true", "group": "Decision", "lookFor": "escalate?", "hint": "P1, so true." },
+    { "field": "route", "meaning": "The destination path.", "type": "string", "example": "\"escalation-handoff\"", "group": "Decision", "lookFor": "route where?", "hint": "P1 routes to escalation-handoff." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd send P1s straight to on-call and everything else to its queue, by a written rule, not by feel.",
+      "tools": {
+        "powerAutomate": "a Condition: priority P1 or safety -> escalation branch",
+        "zapier": "Paths keyed on priority and a safety flag",
+        "python": "escalate = priority == 'P1' or safety_flag"
+      }
+    },
+    "heading": "Route decided",
+    "points": [
+      "You encoded the fork: P1 or safety escalates, the rest routes to queue.",
+      "TKT-4001 is a P1, so it escalates - the busy queue gets no say.",
+      "Safety is an explicit trigger, so a critical edge case cannot slip.",
+      "The escalation handoff reads this decision next.",
+      "The workflow can now route every ticket by an explicit, logged rule."
+    ],
+    "artifactName": "route-decision.json"
+  }
+}

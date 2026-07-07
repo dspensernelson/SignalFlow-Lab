@@ -1,0 +1,122 @@
+{
+  "id": "lesson-priority-matrix",
+  "nodeId": "priority-matrix",
+  "title": "Read the Priority Matrix",
+  "subtitle": "Impact x urgency, not vibes",
+  "clock": "2:10 PM",
+  "difficulty": "Beginner",
+  "skill": "Reference governance",
+  "scenario": "Priority is not how loud the customer is - it is a governed grid. Read Relay's impact-by-urgency matrix and understand how it derives P1 to P4, so an angry customer with low impact does not jump the queue.",
+  "inputType": "text",
+  "inputLabel": "Priority Matrix (Support Ops)",
+  "input": "Relay's priority matrix (owned by the Support Ops Analyst, v1.0.0) maps impact x urgency to a priority:\n- high impact + high urgency = P1\n- high impact + low urgency = P2\n- low impact + high urgency = P3\n- low impact + low urgency = P4\nImpact = how many/how badly affected. Urgency = how fast it must move. Priority is derived, not felt.",
+  "instructions": [
+    "Read the matrix as owned config that derives priority from impact and urgency.",
+    "Answer the four questions about derivation, the P1 boundary, and ownership.",
+    "Validate to mint the priority-matrix record."
+  ],
+  "interactionType": "choiceCheck",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "choiceCheck",
+    "questions": [
+      {
+        "id": "q1",
+        "prompt": "How is a ticket's priority decided?",
+        "options": [
+          { "id": "a", "text": "By how upset the customer sounds" },
+          { "id": "b", "text": "By looking up impact x urgency in the matrix" },
+          { "id": "c", "text": "By the agent's gut feel" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Priority is derived from the matrix: impact (how many/how badly) crossed with urgency (how fast). Tone is not an input."
+      },
+      {
+        "id": "q2",
+        "prompt": "An angry customer reports a typo on a help page. What priority?",
+        "options": [
+          { "id": "a", "text": "P1 - they are very angry" },
+          { "id": "b", "text": "P4 - low impact, low urgency, no matter the tone" },
+          { "id": "c", "text": "P2 - anger raises it one level" }
+        ],
+        "correctOptionId": "b",
+        "explain": "Low impact + low urgency = P4. The matrix protects the P1 queue from emotion; a typo is not an outage."
+      },
+      {
+        "id": "q3",
+        "prompt": "What makes something a P1?",
+        "options": [
+          { "id": "a", "text": "High impact AND high urgency together" },
+          { "id": "b", "text": "Any single high value" },
+          { "id": "c", "text": "The customer asking for a manager" }
+        ],
+        "correctOptionId": "a",
+        "explain": "P1 is the top-left cell: high impact and high urgency. One high value alone is P2 or P3, not P1."
+      },
+      {
+        "id": "q4",
+        "prompt": "Who owns changes to the matrix?",
+        "options": [
+          { "id": "a", "text": "The Support Ops Analyst, and changes are versioned" },
+          { "id": "b", "text": "Each agent, per ticket" },
+          { "id": "c", "text": "The customer" }
+        ],
+        "correctOptionId": "a",
+        "explain": "The Support Ops Analyst owns the matrix and versions changes, so priority stays consistent and auditable."
+      }
+    ],
+    "artifactOnPass": {
+      "reference": "priority-matrix",
+      "shape": "4x4 impact x urgency",
+      "version": "1.0.0",
+      "ownedBy": "Support Ops Analyst",
+      "p1Rule": "high impact and high urgency"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Explain a support priority matrix: priority is impact x urgency looked up in a governed grid (not tone), P1 requires both high, an angry low-impact ticket is still P4, and the Support Ops Analyst owns versioned changes.",
+  "successMessage": "Matrix read. Priority is a lookup, not a feeling - the P1 queue is protected.",
+  "intro": {
+    "heading": "Before you prioritize: the grid",
+    "sections": [
+      {
+        "title": "Priority is derived",
+        "body": "A matrix crosses impact (how many, how badly) with urgency (how fast) to yield P1-P4. Deriving priority from two named inputs is what makes it defensible instead of a gut call."
+      },
+      {
+        "title": "The P1 boundary matters most",
+        "body": "P1 is expensive - it pages people. The matrix guards it: only high impact AND high urgency qualify. An angry customer with a typo is a P4, and the grid says so in writing."
+      },
+      {
+        "title": "Config, owned and versioned",
+        "body": "The matrix is owned by the Support Ops Analyst and versioned. When the mix of priorities drifts, you change the config, not the individual calls."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A priority-matrix record the assignment step applies to every ticket."
+      }
+    ],
+    "jsonExample": "{\n  \"p1Rule\": \"high impact and high urgency\"\n}",
+    "skill": "Reference governance",
+    "artifactName": "priority-matrix-record.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd keep a simple impact-by-urgency grid and look up every ticket's priority in it, rather than rating by how the ticket sounds.",
+      "tools": {
+        "powerAutomate": "a lookup of impact+urgency -> priority",
+        "zapier": "a table mapping the two inputs to a priority",
+        "python": "a 2D dict matrix[impact][urgency] -> priority"
+      }
+    },
+    "heading": "Matrix read",
+    "points": [
+      "Priority is impact x urgency looked up in a governed grid, not tone.",
+      "P1 requires both high impact and high urgency.",
+      "An angry, low-impact ticket is still a P4 - the grid protects P1.",
+      "The Support Ops Analyst owns versioned changes to the matrix.",
+      "The workflow can now derive a defensible priority for every ticket."
+    ],
+    "artifactName": "priority-matrix-record.json"
+  }
+}

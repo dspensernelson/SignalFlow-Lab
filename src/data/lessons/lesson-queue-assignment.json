@@ -1,0 +1,103 @@
+{
+  "id": "lesson-queue-assignment",
+  "nodeId": "queue-assignment",
+  "title": "Assign the Standard Queue",
+  "subtitle": "The quiet path still logs",
+  "clock": "2:20 PM",
+  "difficulty": "Beginner",
+  "skill": "Queue handoff",
+  "scenario": "Not every ticket is a P1. TKT-4002 is a P3 bug - it takes the standard path. Assign it to its routing-table queue and log the assignment, so the routine lane is as traceable as the escalation lane.",
+  "inputType": "text",
+  "inputLabel": "Standard ticket (TKT-4002)",
+  "input": "TKT-4002 (bug, P3): \"The export button throws an error on one report.\" Not a P1, so it routes to its table queue: bug -> bug-queue. Assign it to bug-queue and log the assignment. The Queue Lead owns standard assignment.",
+  "instructions": [
+    "Record which queue the ticket is assigned to (from the routing table).",
+    "Record who assigned it.",
+    "Confirm the assignment was logged.",
+    "Validate to mint the queue assignment record."
+  ],
+  "interactionType": "handoffForm",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "handoffForm",
+    "fields": [
+      {
+        "id": "assignedQueue",
+        "label": "Assigned queue",
+        "kind": "select",
+        "options": ["bug-queue", "incident-bridge", "billing-queue"],
+        "expected": "bug-queue",
+        "explain": "A bug routes to bug-queue per the routing table; incident-bridge is for outages, not standard bugs."
+      },
+      {
+        "id": "assignedBy",
+        "label": "Assigned by",
+        "kind": "select",
+        "options": ["Queue Lead", "Tier-2 Engineer", "Duty Manager"],
+        "expected": "Queue Lead",
+        "explain": "The Queue Lead owns standard assignment; Tier-2 and the Duty Manager are for escalations, not routine routing."
+      },
+      {
+        "id": "logged",
+        "label": "Assignment logged",
+        "kind": "select",
+        "options": ["yes", "no"],
+        "expected": "yes",
+        "explain": "Standard does not mean unlogged; the routine lane must be as auditable as escalation."
+      }
+    ],
+    "artifactOnPass": {
+      "handoff": "queue-assignment",
+      "ticketId": "TKT-4002",
+      "assignedQueue": "bug-queue",
+      "assignedBy": "Queue Lead",
+      "logged": "yes"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Capture a standard queue assignment for TKT-4002 (bug, P3): assigned queue bug-queue (from the routing table), assigned by the Queue Lead, logged yes. The quiet path still records where the ticket went.",
+  "successMessage": "Ticket assigned to bug-queue and logged. The routine path is fully traceable.",
+  "intro": {
+    "heading": "The routine lane still records",
+    "sections": [
+      {
+        "title": "Most tickets are not P1",
+        "body": "The vast majority take the standard path. If only escalations are logged, most of the day's work is invisible - the routine lane needs the same record as the loud one."
+      },
+      {
+        "title": "The table decides the queue",
+        "body": "A bug goes to bug-queue because the routing table says so, not because an agent felt like it. Sourcing the queue from config keeps assignment consistent."
+      },
+      {
+        "title": "Log it anyway",
+        "body": "Recording who assigned it and when means the digest can count it and an auditor can trace it. Silence on the quiet path is how volume becomes a mystery."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A queue assignment record the SLA tracker and digest read, just like the escalation record."
+      }
+    ],
+    "jsonExample": "{\n  \"assignedQueue\": \"bug-queue\",\n  \"logged\": \"yes\"\n}",
+    "skill": "Queue handoff",
+    "artifactName": "queue-assignment.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd drop the ticket in its queue and log who did it, so the routine work is counted, not just the fires.",
+      "tools": {
+        "powerAutomate": "assign to the queue and write an assignment log row",
+        "zapier": "move the ticket to its queue and record it",
+        "python": "assign(queue); log(ticketId, queue, by)"
+      }
+    },
+    "heading": "Ticket assigned",
+    "points": [
+      "You assigned TKT-4002 to bug-queue from the routing table.",
+      "The Queue Lead owns standard assignment, and it was logged.",
+      "The routine lane is as traceable as the escalation lane.",
+      "The SLA tracker and digest read this assignment record.",
+      "The workflow can now route and log standard tickets, not just P1s."
+    ],
+    "artifactName": "queue-assignment.json"
+  }
+}

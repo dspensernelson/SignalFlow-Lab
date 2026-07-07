@@ -1,0 +1,84 @@
+{
+  "id": "lesson-routing-table",
+  "nodeId": "routing-table",
+  "title": "Read the Routing Table",
+  "subtitle": "Category to queue, as config",
+  "clock": "2:12 PM",
+  "difficulty": "Beginner",
+  "skill": "Reference governance",
+  "scenario": "Routing is a lookup, not a judgement. Read Relay's routing table - the governed map from category to its destination queue - and record it. Queue names come only from this table, so a ticket is never sent to a queue that does not exist.",
+  "inputType": "text",
+  "inputLabel": "Routing Table (Queue Lead)",
+  "input": "Relay's routing table (owned by the Queue Lead) maps each category to its standard queue:\noutage -> incident-bridge\nbug -> bug-queue\nhow-to -> support-queue\nbilling -> billing-queue\n(P1 tickets escalate regardless of queue - that is the route decision's job.) Record the category-to-queue mapping.",
+  "instructions": [
+    "Create one row per category.",
+    "Record each category's standard queue from the table.",
+    "Use queue names exactly as the table lists them.",
+    "Return a JSON array of the four rows, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "[\n  { \"category\": \"outage\", \"queue\": \"\" },\n  { \"category\": \"bug\", \"queue\": \"\" },\n  { \"category\": \"how-to\", \"queue\": \"\" },\n  { \"category\": \"billing\", \"queue\": \"\" }\n]",
+  "validation": {
+    "type": "jsonRows",
+    "keyField": "category",
+    "rowFields": ["category", "queue"],
+    "numericFields": [],
+    "expectedRows": [
+      { "category": "outage", "queue": "incident-bridge" },
+      { "category": "bug", "queue": "bug-queue" },
+      { "category": "how-to", "queue": "support-queue" },
+      { "category": "billing", "queue": "billing-queue" }
+    ]
+  },
+  "copilotPrompt": "Record the routing table as a JSON array: one row per category (outage, bug, how-to, billing) with its standard queue. Use the exact queue names.",
+  "successMessage": "Routing table recorded. The route decision now maps each ticket to a real queue.",
+  "validateLabel": "Validate Table",
+  "editorHelper": "One row per category - queue names come only from here.",
+  "intro": {
+    "heading": "Before you route: the map",
+    "sections": [
+      {
+        "title": "Routing is a lookup",
+        "body": "Given a category (and priority), the destination queue is a table lookup, not a per-ticket decision. Config-as-rules is what keeps routing consistent across a whole desk."
+      },
+      {
+        "title": "Queues come from the table",
+        "body": "A ticket can only go to a queue the table names. That constraint is what prevents tickets vanishing into a mistyped or non-existent queue."
+      },
+      {
+        "title": "Owned by the Queue Lead",
+        "body": "The Queue Lead owns the routing table. When queues are added or retired, the table changes once and every ticket follows - no agent re-learning where things go."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A routing-table record the route decision applies, with P1 escalation layered on top."
+      }
+    ],
+    "jsonExample": "[\n  { \"category\": \"bug\", \"queue\": \"bug-queue\" }\n]",
+    "skill": "Reference governance",
+    "artifactName": "routing-table-record.json"
+  },
+  "fieldGuide": [
+    { "field": "category", "meaning": "A taxonomy category.", "type": "string", "example": "\"outage\"", "group": "Routing", "lookFor": "which category?", "hint": "outage, bug, how-to, billing." },
+    { "field": "queue", "meaning": "The standard destination queue.", "type": "string", "example": "\"incident-bridge\"", "group": "Routing", "lookFor": "which queue?", "hint": "Copy the queue name exactly." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd keep a category-to-queue table and route every ticket by looking it up, not by remembering where each kind goes.",
+      "tools": {
+        "powerAutomate": "a lookup list of category -> queue",
+        "zapier": "a routing table (Storage/Tables) keyed by category",
+        "python": "a routing dict category -> queue"
+      }
+    },
+    "heading": "Routing table recorded",
+    "points": [
+      "You recorded the governed category-to-queue mapping.",
+      "Queue names come only from the table, so tickets never vanish.",
+      "Routing is a lookup, not a per-ticket judgement.",
+      "The Queue Lead owns the table; it changes once for everyone.",
+      "The workflow can now map every ticket to a real queue."
+    ],
+    "artifactName": "routing-table-record.json"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "id": "lesson-priority-assignment",
+  "nodeId": "priority-assignment",
+  "title": "Assign the Priority",
+  "subtitle": "Apply the matrix to the ticket",
+  "clock": "2:11 PM",
+  "difficulty": "Beginner",
+  "skill": "Applying a matrix",
+  "scenario": "It is 2:11 PM. TKT-4001 is classified as an outage. Now score it: checkout down for all users is high impact, and nobody can pay right now is high urgency. Apply the matrix - high plus high is P1 - and record impact and urgency separately so the derivation is auditable.",
+  "inputType": "text",
+  "inputLabel": "TKT-4001 for scoring",
+  "input": "Ticket TKT-4001 (outage): \"Checkout is down for all users - nobody can pay.\" Impact: all users affected -> high. Urgency: revenue-blocking, must move now -> high. Matrix: high impact + high urgency = P1. Record impact, urgency, and the derived priority.",
+  "instructions": [
+    "Record the ticket id.",
+    "Set impact and urgency from the ticket (both high here).",
+    "Apply the matrix to set the derived priority (P1).",
+    "Return one valid JSON object, then validate."
+  ],
+  "interactionType": "jsonEditor",
+  "starterAnswer": "{\n  \"ticketId\": \"\",\n  \"impact\": \"\",\n  \"urgency\": \"\",\n  \"priority\": \"\"\n}",
+  "validation": {
+    "type": "jsonFields",
+    "requiredFields": ["ticketId", "impact", "urgency", "priority"],
+    "expected": {
+      "ticketId": "TKT-4001",
+      "impact": "high",
+      "urgency": "high",
+      "priority": "P1"
+    }
+  },
+  "copilotPrompt": "Assign priority for TKT-4001: impact high (all users), urgency high (revenue-blocking), so priority P1 by the matrix. Record impact and urgency separately.",
+  "successMessage": "Priority assigned: P1. You derived it from impact and urgency, not tone.",
+  "validateLabel": "Validate Priority",
+  "editorHelper": "Record the inputs and the derived priority.",
+  "intro": {
+    "heading": "Before you route: score it",
+    "sections": [
+      {
+        "title": "Two inputs, one output",
+        "body": "You do not pick a priority - you compute it. Read the ticket for impact and urgency, then look up the cell. Recording both inputs is what makes the P1 defensible."
+      },
+      {
+        "title": "This one is a real P1",
+        "body": "Checkout down for all users is high impact; revenue blocked now is high urgency. Both high means P1 - the matrix agrees, so the pager is justified."
+      },
+      {
+        "title": "Show your work",
+        "body": "Storing impact and urgency, not just the priority, means anyone can check the call later. A P1 with no inputs behind it is the one that gets questioned."
+      },
+      {
+        "title": "What you produce here",
+        "body": "A priority assignment the route decision reads to escalate or route."
+      }
+    ],
+    "jsonExample": "{\n  \"impact\": \"high\",\n  \"urgency\": \"high\",\n  \"priority\": \"P1\"\n}",
+    "skill": "Applying a matrix",
+    "artifactName": "priority-assignment.json"
+  },
+  "fieldGuide": [
+    { "field": "ticketId", "meaning": "The ticket being scored.", "type": "string", "example": "\"TKT-4001\"", "group": "Ticket", "lookFor": "which ticket?", "hint": "TKT-4001." },
+    { "field": "impact", "meaning": "How many/how badly affected.", "type": "string", "example": "\"high\"", "group": "Inputs", "lookFor": "impact?", "hint": "All users -> high." },
+    { "field": "urgency", "meaning": "How fast it must move.", "type": "string", "example": "\"high\"", "group": "Inputs", "lookFor": "urgency?", "hint": "Revenue-blocking -> high." },
+    { "field": "priority", "meaning": "The matrix-derived priority.", "type": "string", "example": "\"P1\"", "group": "Output", "lookFor": "which priority?", "hint": "high + high = P1." }
+  ],
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd rate impact and urgency, look up the priority cell, and note all three so the score can be checked.",
+      "tools": {
+        "powerAutomate": "read impact+urgency, look up priority, set the field",
+        "zapier": "a Formatter/lookup deriving the priority",
+        "python": "priority = matrix[impact][urgency]"
+      }
+    },
+    "heading": "Priority assigned",
+    "points": [
+      "You derived P1 from high impact and high urgency.",
+      "You recorded both inputs, so the priority is auditable.",
+      "This ticket is a real P1 - the matrix justifies the page.",
+      "The route decision reads this priority next.",
+      "The workflow can now assign a defensible priority from the matrix."
+    ],
+    "artifactName": "priority-assignment.json"
+  }
+}

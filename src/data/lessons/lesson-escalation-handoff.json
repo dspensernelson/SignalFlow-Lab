@@ -1,0 +1,103 @@
+{
+  "id": "lesson-escalation-handoff",
+  "nodeId": "escalation-handoff",
+  "title": "Escalate the P1",
+  "subtitle": "Page, acknowledge, capture",
+  "clock": "2:14 PM",
+  "difficulty": "Beginner",
+  "skill": "Escalation handoff",
+  "scenario": "TKT-4001 escalated. This is a P1 outage - page the right people and capture the acknowledgement so the outage is never sitting unowned. A paged alert with no reply is an incident nobody has picked up.",
+  "inputType": "text",
+  "inputLabel": "P1 escalation (TKT-4001)",
+  "input": "TKT-4001 (outage, P1) routed to escalation. Page the Tier-2 Engineer (the escalation target for outages) and capture their acknowledgement. A P1 also needs the Duty Manager's sign-off. Record who was paged, that they acknowledged, and the duty sign-off.",
+  "instructions": [
+    "Record who the P1 was paged to.",
+    "Confirm the page was acknowledged.",
+    "Capture the Duty Manager sign-off.",
+    "Validate to mint the escalation record."
+  ],
+  "interactionType": "handoffForm",
+  "starterAnswer": "{}",
+  "validation": {
+    "type": "handoffForm",
+    "fields": [
+      {
+        "id": "pagedTo",
+        "label": "Paged to",
+        "kind": "select",
+        "options": ["Tier-2 Engineer", "Support Agent", "Queue Lead"],
+        "expected": "Tier-2 Engineer",
+        "explain": "Outage P1s escalate to the Tier-2 Engineer - the escalation target - not back to a front-line agent or the queue lead."
+      },
+      {
+        "id": "acknowledged",
+        "label": "Acknowledged",
+        "kind": "select",
+        "options": ["yes", "no"],
+        "expected": "yes",
+        "explain": "A page without an acknowledgement is an outage nobody owns; capturing the ack is the point of the handoff."
+      },
+      {
+        "id": "dutyManagerSignoff",
+        "label": "Duty Manager sign-off",
+        "kind": "select",
+        "options": ["yes", "no"],
+        "expected": "yes",
+        "explain": "A P1 needs the Duty Manager's sign-off so there is a named owner accountable for the incident."
+      }
+    ],
+    "artifactOnPass": {
+      "handoff": "escalation",
+      "ticketId": "TKT-4001",
+      "pagedTo": "Tier-2 Engineer",
+      "acknowledged": "yes",
+      "dutyManagerSignoff": "yes"
+    }
+  },
+  "fieldGuide": [],
+  "copilotPrompt": "Capture a P1 escalation handoff for TKT-4001: paged to the Tier-2 Engineer, acknowledged yes, Duty Manager sign-off yes. A paged P1 must be acknowledged and owned.",
+  "successMessage": "P1 escalated and owned. Tier-2 acknowledged and the Duty Manager signed off.",
+  "intro": {
+    "heading": "A P1 must be owned",
+    "sections": [
+      {
+        "title": "Paging is not resolving",
+        "body": "Sending the page is the start, not the end. The handoff is complete only when someone acknowledges. An unacknowledged P1 is an outage sitting in a channel nobody is watching."
+      },
+      {
+        "title": "The right target",
+        "body": "Outage P1s go to the Tier-2 Engineer, the defined escalation target - not back to a front-line agent. Paging the wrong person just adds a hop while customers wait."
+      },
+      {
+        "title": "A named accountable owner",
+        "body": "The Duty Manager sign-off puts a name on the incident. When money and reputation are on the line, 'someone is on it' is not good enough; a specific person owns it."
+      },
+      {
+        "title": "What you produce here",
+        "body": "An escalation record - paged, acknowledged, signed off - that the SLA tracker and digest read."
+      }
+    ],
+    "jsonExample": "{\n  \"pagedTo\": \"Tier-2 Engineer\",\n  \"acknowledged\": \"yes\"\n}",
+    "skill": "Escalation handoff",
+    "artifactName": "escalation-record.json"
+  },
+  "takeaway": {
+    "realWorld": {
+      "soloRebuildPath": "You'd page on-call, wait for an 'I've got it', and note the manager who owns the incident before moving on.",
+      "tools": {
+        "powerAutomate": "trigger a PagerDuty incident and wait for acknowledgement",
+        "zapier": "create an on-call alert and capture the ack",
+        "python": "open an incident, poll for acknowledgement, record the owner"
+      }
+    },
+    "heading": "P1 escalated",
+    "points": [
+      "You paged the Tier-2 Engineer, the defined escalation target.",
+      "You captured the acknowledgement, so the P1 is owned, not just sent.",
+      "The Duty Manager sign-off names an accountable owner.",
+      "The SLA tracker and digest read this escalation record.",
+      "The workflow can now escalate a P1 and prove someone owns it."
+    ],
+    "artifactName": "escalation-record.json"
+  }
+}
