@@ -182,7 +182,7 @@
     "recordBanner": "First trusted structured record",
     "recordSummary": "Structured market observations",
     "auditNote": "Downstream automation reads the Market Intake Record. The original note remains available for audit and provenance.",
-    "nextNodeId": "clean-price-data",
+    "nextNodeId": "price-feed",
     "consumers": [
       { "name": "Risk Evaluation", "nodeId": "risk-evaluation", "note": "can reuse market, price, and operating signals; still needs other inputs" },
       { "name": "Approval Decision", "nodeId": "approval-decision", "note": "can reuse approvalRequired; still needs risk/policy context" },

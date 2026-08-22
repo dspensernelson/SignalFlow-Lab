@@ -1,6 +1,15 @@
 {
   "_comment": "Per-lesson regression fixtures for scripts/validate-lessons.mjs. Each entry has a `correct` answer (must pass validation and store an artifact) and a `wrong` answer (must fail with no artifact). choiceCheck lessons need no fixture: the runner derives answers from the questions. Answers are the parsed form; the runner JSON-stringifies them before calling validateAnswer.",
 
+  "lesson-analyst-notes": {
+    "correct": { "hub": "hub", "peakPrice": "peak", "settledPrice": "settled", "generationFlag": "wind", "approvalRequired": "flag" },
+    "wrong": { "hub": "hub", "peakPrice": "peak", "settledPrice": "settled", "generationFlag": "wind", "approvalRequired": "noAction" }
+  },
+  "lesson-price-feed": {
+    "correct": { "contract": "header", "spikePeak": "ercotPeak", "casingQuirk": "ercotHub", "spacingQuirk": "misoPeak", "schedule": "schedule" },
+    "wrong": { "contract": "header", "spikePeak": "ercotPeak", "casingQuirk": "sppHub", "spacingQuirk": "misoPeak", "schedule": "schedule" }
+  },
+
   "lesson-po-register": {
     "correct": { "poNumber": "po", "vendor": "vendor", "quantityOrdered": "qty", "unitPricePO": "poPrice", "poTotal": "total" },
     "wrong": { "poNumber": "po", "vendor": "vendor", "quantityOrdered": "qty", "unitPricePO": "invoicePrice", "poTotal": "total" }

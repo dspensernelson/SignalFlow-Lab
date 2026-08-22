@@ -24,6 +24,13 @@ function Icon({ name, className = 'h-4 w-4' }) {
           <circle cx="12" cy="12" r="1.5" />
         </svg>
       )
+    case 'clock':
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3 2" />
+        </svg>
+      )
     case 'note':
       return (
         <svg {...common}>
@@ -98,6 +105,19 @@ function Icon({ name, className = 'h-4 w-4' }) {
   }
 }
 
+// Scene-setting line rendered from lesson.scenario on every intro layout.
+// Authoring rules require every scenario to state the clock time and why the
+// artifact is needed NOW; this is the one place the learner reads it.
+function SceneLine({ scenario }) {
+  if (!scenario) return null
+  return (
+    <p className="flex items-start gap-2 px-1 text-sm italic leading-relaxed text-sf-muted">
+      <Icon name="clock" className="mt-0.5 h-4 w-4 flex-none" />
+      <span>{scenario}</span>
+    </p>
+  )
+}
+
 // Step 1 of the reusable lesson template: prepare the user before the exercise.
 // Lessons that define intro.mission render the Hybrid B "mission path" layout;
 // lessons with intro.subtitle (but no mission) render the earlier artifact hero;
@@ -117,6 +137,7 @@ export default function LessonIntro({ lesson, onContinue }) {
     const unlocks = intro.unlocks || {}
     return (
       <div className="flex flex-col gap-4">
+        <SceneLine scenario={lesson.scenario} />
         {actionKind && (
           <div className="flex flex-wrap items-center gap-2">
             <ActionKindChip actionKind={actionKind} />
@@ -265,6 +286,23 @@ export default function LessonIntro({ lesson, onContinue }) {
             </span>
           </div>
         </div>
+
+        {/* Background reading: the intro sections every lesson authors (lint
+            requires them). The mission path keeps them below the CTA so the
+            diagram stays the hero; the Intro step is allowed to scroll. */}
+        {intro.sections && intro.sections.length > 0 && (
+          <div className="rounded-xl border border-sf-border bg-sf-surface p-4 shadow-sf-sm">
+            <h2 className="text-sm font-semibold text-sf-text">{intro.heading}</h2>
+            <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
+              {intro.sections.map((section) => (
+                <div key={section.title}>
+                  <h3 className="text-xs font-semibold text-sf-body">{section.title}</h3>
+                  <p className="mt-0.5 text-xs leading-relaxed text-sf-muted">{section.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     )
   }
@@ -272,6 +310,7 @@ export default function LessonIntro({ lesson, onContinue }) {
   if (!rich) {
     return (
       <div className="flex flex-col gap-4">
+        <SceneLine scenario={lesson.scenario} />
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <section className="lg:col-span-2 rounded-xl border border-sf-border bg-sf-surface p-5 shadow-sf-sm">
             {actionKind && <ActionKindChip actionKind={actionKind} className="mb-3" />}
@@ -327,6 +366,7 @@ export default function LessonIntro({ lesson, onContinue }) {
 
   return (
     <div className="flex flex-col gap-4">
+      <SceneLine scenario={lesson.scenario} />
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <section className="lg:col-span-2 rounded-xl border border-sf-border bg-sf-surface p-5 shadow-sf-sm">
           <div className="flex flex-wrap items-center gap-2">

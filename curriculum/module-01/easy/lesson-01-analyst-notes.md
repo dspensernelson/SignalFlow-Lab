@@ -1,5 +1,11 @@
 # Lesson 01 - Analyst Notes (analyst-notes)
 
+> REVISED 2026-07-06 (opening-arc re-storyboard): converted choiceCheck ->
+> tagSource; the learner now tags the note spans that become the intake
+> record's five fields. Mission intro + diagram takeaway added; the 2 AM ERCOT
+> spike is the named case. The built lesson JSON is the current record; see
+> DECISION_LOG.md 2026-07-06. The script below is the original design record.
+
 - Lesson type: inspection | Interaction: choiceCheck (new - see ENGINE_ADDITIONS_SPEC.md)
 - Artifact: source-profile-analyst-notes.json | Difficulty: Beginner | Clock: 6:05 AM
 - Build wave: B (requires choiceCheck)

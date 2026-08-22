@@ -202,6 +202,7 @@ export default function LessonTakeaway({ lesson, artifact, onReturnToCanvas }) {
     const recordSummary = takeaway.recordSummary || lesson.intro?.concept
     const fieldCount =
       lesson.validation?.requiredFields?.length ||
+      lesson.validation?.fields?.length ||
       (artifact && typeof artifact === 'object' ? Object.keys(artifact).length : null)
 
     return (
@@ -233,7 +234,7 @@ export default function LessonTakeaway({ lesson, artifact, onReturnToCanvas }) {
                   </p>
                 </div>
               ),
-              (
+              came.flagTitle || came.flagCue ? (
                 <div key="flag" className="rounded-lg border border-sf-border bg-sf-surface p-3">
                   <div className="flex items-center gap-2">
                     <Icon name="flag" className="h-4 w-4 flex-none text-sf-muted" />
@@ -256,8 +257,8 @@ export default function LessonTakeaway({ lesson, artifact, onReturnToCanvas }) {
                     )}
                   </div>
                 </div>
-              ),
-            ]}
+              ) : null,
+            ].filter(Boolean)}
             center={
               <div className="w-full rounded-xl border-2 border-sf-complete bg-sf-success-weak p-4 shadow-sf-sm">
                 <p className="text-center text-sm font-semibold text-sf-complete-text">{recordBanner}</p>

@@ -60,6 +60,41 @@ audit across all 120 lessons measured the gap.
   and glossary lints. Module 4 does not merge before 4b.1 and 4b.2.
 
 ## 2026-07-06 (Module 3 Harbor - medium + hard tiers complete)
+## 2026-07-06 (Module 1 opening arc re-storyboard)
+
+- Owner review found the Module 1 easy openers (analyst-notes, trader-flag,
+  price-feed) un-storyboarded: three back-to-back choiceCheck quizzes, no
+  visible mission, and no felt answer to "where does the JSON come from".
+  Root cause confirmed in code: `lesson.scenario` rendered NOWHERE, and the
+  openers used the plain intro/takeaway layouts while the rich mission-path
+  intro and diagram takeaway (built for lesson-intake) sat unused.
+- ENGINE (render-only): LessonIntro now renders `lesson.scenario` as a
+  scene-setting line at the top of all three intro layouts (every lesson's
+  authored clock-time/why-now copy is finally visible), and the mission-path
+  layout renders `intro.sections` as background reading below the CTA (they
+  were lint-required but invisible on that layout). LessonTakeaway's diagram
+  layout: flag input card is now conditional (mirrors LessonIntro), and
+  tagSource lessons report `validation.fields.length` as the field count.
+- INTERACTION CONVERSIONS (Step 7b spend-or-justify): analyst-notes and
+  price-feed converted choiceCheck -> tagSource - the note/CSV literally
+  contain the spans that become the intake record's fields, so tagging IS the
+  where-the-JSON-comes-from moment (mirrors module-03's signed-offer opener
+  and the 2026-07-05 module-02 conversions). trader-flag STAYS choiceCheck:
+  genuinely interpretive - the answer (approvalRequired: true) appears in no
+  source span, so there is nothing to tag. Cap math: module-01 choiceCheck
+  12/42 = 28.6% -> 10/42 = 23.8%; module-01 REMOVED from
+  CHOICECHECK_GRANDFATHERED in lint-lessons.mjs (regressions are now errors).
+- STORY THREAD: the three openers (plus lesson-intake's nextNodeId, fixed
+  from clean-price-data to price-feed to keep the arc continuous) now follow
+  one named case - the 2 AM ERCOT spike ($187 peak / $142 settle, all canon)
+  - toward the 7:00 AM brief, with mission intros, whatCameIn/unlocks
+  context, capability + consumers takeaways, and Next Node chaining:
+  analyst-notes -> trader-flag -> market-intake-record -> price-feed ->
+  forecast-data. Artifacts minted on pass are unchanged in shape (additive
+  keys only), so no storage/consumer impact.
+- Guardrails: canon.json gained 5 assertions pinning the new segment texts
+  that carry canon numbers; fixtures added for both tagSource conversions;
+  npm run check green (120 lessons, 154 assertions, module-01 warning gone).
 
 - MEDIUM tier (16 lessons, full tier): a messier second hire (Sam Rivera,
   H-4022) carrying the charter's three messes - a moved/amended start date
