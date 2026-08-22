@@ -177,12 +177,12 @@ ENGINE_ADDITIONS_SPEC_OPERATIONS.md.
     -> NodeDetail lessons prop and the ecosystem block moved above the 11px
     stack; ToolMapModal built from lesson data; delete the two TOOL_MAP.md
     files; LESSON_AUTHORING_TEMPLATE contract update.
-4b.2 Engine. Two additive validators (connectorConfig composes handoffForm;
+4b.2 Engine (DONE 2026-08-22). Two additive validators (connectorConfig composes handoffForm;
     runInspect is the handoffForm algorithm over a run log); two components
     (React.lazy so the LessonWorkspace chunk stays flat); LessonExercise
     branches; lint shapes; fixtures; garbage fixtures in the Phase 1.3 harness;
     giveaway lint taught both shapes; VERIFICATION_PLAYBOOK.
-4b.3 Operations nodes for modules 1-3. Map edits x3 (node, archive edge,
+4b.3 Operations nodes for modules 1-3 (DONE 2026-08-22). Map edits x3 (node, archive edge,
     phase, lessonMeta, column re-spacing); moduleSkeleton `operate` stage plus
     a row for every module INCLUDING anchor module-01 in the same commit, and
     the HumanMoments "seven-stage" copy becomes data-driven; 9 lessons (3 per

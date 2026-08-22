@@ -1,0 +1,149 @@
+{
+  "id": "lesson-onboarding-operations-hard",
+  "nodeId": "run-operations",
+  "title": "Write the Harbor Test Plan",
+  "subtitle": "Prove the automation behaves before it touches production",
+  "clock": "SD-5, 9:00 AM",
+  "difficulty": "Hard",
+  "skill": "Testing an automation",
+  "opsTopics": [
+    "test-plan",
+    "environments",
+    "when-not-to-automate"
+  ],
+  "scenario": "The automation works on the happy path, which is the least interesting thing about it. Before it is promoted from test to prod, write the test plan: four cases, each naming the outcome the workflow's OWN RULES produce. You are not told the outcomes. Apply the rules to each case and work them out - that is the whole exercise, and it is also how you find out whether the rules are actually complete.",
+  "inputType": "text",
+  "input": "THE RULES THIS WORKFLOW APPLIES\nEvery provisioning task must reach done within its SLA for the readiness gate to open. One blocked task blocks the hire and routes to escalation. A start date that moves recomputes every task deadline from the new SD. A grant not listed on the role profile is a policy exception and stays manual.\n\nCASES TO COVER (run each in the test environment)\n- TC-1: All four provisioning tasks done before SD-1\n- TC-2: Laptop backordered, still blocked at SD-1\n- TC-3: Start date moves from SD to SD+7 after the plan is built\n- TC-4: Manager asks for a group not on the role profile\n\nFor each case, give caseId, scenario, environment, and the expectedOutcome the rules above produce.\nReturn an array of four row objects.",
+  "instructions": [
+    "Read the rules, then work out what each case produces. The outcomes are not given to you.",
+    "Include the clean case, the boundary case, the broken-input case, and the case that should stay manual.",
+    "Run every case in the test environment, never in prod.",
+    "Return an array of four rows with caseId, scenario, environment, and expectedOutcome.",
+    "Validate the plan."
+  ],
+  "interactionType": "jsonEditor",
+  "validation": {
+    "type": "jsonRows",
+    "keyField": "caseId",
+    "rowFields": [
+      "caseId",
+      "scenario",
+      "environment",
+      "expectedOutcome"
+    ],
+    "numericFields": [],
+    "expectedRows": [
+      {
+        "caseId": "TC-1",
+        "scenario": "All four provisioning tasks done before SD-1",
+        "environment": "test",
+        "expectedOutcome": "gate-opens"
+      },
+      {
+        "caseId": "TC-2",
+        "scenario": "Laptop backordered, still blocked at SD-1",
+        "environment": "test",
+        "expectedOutcome": "escalation-path"
+      },
+      {
+        "caseId": "TC-3",
+        "scenario": "Start date moves from SD to SD+7 after the plan is built",
+        "environment": "test",
+        "expectedOutcome": "recompute-deadlines"
+      },
+      {
+        "caseId": "TC-4",
+        "scenario": "Manager asks for a group not on the role profile",
+        "environment": "test",
+        "expectedOutcome": "stays-manual"
+      }
+    ]
+  },
+  "starterAnswer": "[\n  {\n    \"caseId\": \"TC-1\",\n    \"scenario\": \"All four provisioning tasks done before SD-1\",\n    \"environment\": \"\",\n    \"expectedOutcome\": \"\"\n  },\n  {\n    \"caseId\": \"TC-2\",\n    \"scenario\": \"Laptop backordered, still blocked at SD-1\",\n    \"environment\": \"\",\n    \"expectedOutcome\": \"\"\n  },\n  {\n    \"caseId\": \"TC-3\",\n    \"scenario\": \"Start date moves from SD to SD+7 after the plan is built\",\n    \"environment\": \"\",\n    \"expectedOutcome\": \"\"\n  },\n  {\n    \"caseId\": \"TC-4\",\n    \"scenario\": \"Manager asks for a group not on the role profile\",\n    \"environment\": \"\",\n    \"expectedOutcome\": \"\"\n  }\n]",
+  "fieldGuide": [
+    {
+      "field": "caseId",
+      "meaning": "The identifier for this test case.",
+      "type": "string",
+      "example": "\"TC-1\"",
+      "hint": "Use the ids given in the case list."
+    },
+    {
+      "field": "scenario",
+      "meaning": "What this case exercises, in one line.",
+      "type": "string",
+      "example": "\"Clean run\"",
+      "hint": "Copy the scenario from the case list."
+    },
+    {
+      "field": "environment",
+      "meaning": "Where the case runs.",
+      "type": "string",
+      "example": "\"test\"",
+      "hint": "Never prod. A test that runs in prod is not a test."
+    },
+    {
+      "field": "expectedOutcome",
+      "meaning": "What the workflow's rules produce for this case.",
+      "type": "string",
+      "example": "\"routine-update-path\"",
+      "hint": "Derive it by applying the stated rules. It is not written down for you."
+    }
+  ],
+  "copilotPrompt": "Explain why a test plan for an automation needs a boundary case and a malformed-input case, not just a happy path, and why tests belong in a test environment rather than production.",
+  "successMessage": "Test plan written. The automation can be promoted on evidence.",
+  "validateLabel": "Validate Test Plan",
+  "intro": {
+    "heading": "Before you build: promotion needs evidence",
+    "artifactName": "test-plan.json",
+    "sections": [
+      {
+        "title": "What this record does",
+        "body": "The test plan is what lets someone promote this automation from test to prod and say why. Without it, promotion is a feeling."
+      },
+      {
+        "title": "Dev, test, prod",
+        "body": "An automation is built in dev, proven in test against realistic data, and only then promoted to prod where it touches real money, real hires, or real decisions. Testing in prod means your first real run is also your first test."
+      },
+      {
+        "title": "The cases that matter are the awkward ones",
+        "body": "The happy path proves almost nothing. The boundary case proves you know where your own line is. The malformed input proves you fail safely. The case that should stay manual proves you know the limit of the automation."
+      },
+      {
+        "title": "When NOT to automate",
+        "body": "The fourth case in every plan here is a case the automation should REFUSE. Knowing where automation stops is a design skill, not an admission of failure - an automation that guesses at the edge is worse than one that hands over cleanly."
+      }
+    ]
+  },
+  "takeaway": {
+    "realWorld": {
+      "actionKind": "operate",
+      "soloRebuildPath": "You would write the cases in a sheet, run each one in a test environment, record the actual outcome next to the expected one, and only promote when they match.",
+      "bestFit": [
+        {
+          "tool": "powerAppsCopilot",
+          "how": "Test copilot on sample hires, then promote the managed solution"
+        },
+        {
+          "tool": "python",
+          "how": "a test suite covering the gate, the blocked task, and the moved start date"
+        },
+        {
+          "tool": "make",
+          "how": "Run once against a test hire before the scenario is switched on"
+        }
+      ]
+    },
+    "heading": "Test plan written",
+    "artifactName": "test-plan.json",
+    "before": "The automation worked on the happy path and nobody could say what it did at the edges.",
+    "after": "Four cases name what the rules produce, including the case the automation must refuse.",
+    "capability": "The workflow can now be promoted to production on evidence rather than on optimism.",
+    "auditNote": "The plan records the environment each case ran in, so 'we tested it' has a date, a case list, and a place attached to it.",
+    "points": [
+      "You created test-plan.json by applying the workflow's own rules to four cases, including the boundary.",
+      "One case is a deliberate refusal: knowing where the automation stops is part of designing it.",
+      "The workflow can now be promoted to production on evidence rather than on optimism."
+    ]
+  }
+}

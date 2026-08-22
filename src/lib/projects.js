@@ -65,6 +65,7 @@ const PROJECT_DATA = {
 export const BUILT_LESSONS = {
   'module-01': {
     easy: [
+      'lesson-brief-operations',
       'lesson-intake',
       'lesson-threshold-policy',
       'lesson-clean-price-data',
@@ -84,6 +85,7 @@ export const BUILT_LESSONS = {
       'lesson-morning-brief',
     ],
     medium: [
+      'lesson-brief-operations-medium',
       'lesson-intake-medium',
       'lesson-clean-price-data-medium',
       'lesson-threshold-policy-medium',
@@ -103,6 +105,7 @@ export const BUILT_LESSONS = {
       'lesson-distribution-archive-medium',
     ],
     hard: [
+      'lesson-brief-operations-hard',
       'lesson-intake-hard',
       'lesson-threshold-policy-hard',
       'lesson-price-feed-hard',
@@ -115,6 +118,7 @@ export const BUILT_LESSONS = {
   },
   'module-02': {
     easy: [
+      'lesson-desk-operations',
       'lesson-invoice-inbox',
       'lesson-vendor-master',
       'lesson-po-register',
@@ -134,6 +138,7 @@ export const BUILT_LESSONS = {
       'lesson-payment-archive',
     ],
     medium: [
+      'lesson-desk-operations-medium',
       'lesson-invoice-inbox-medium',
       'lesson-invoice-record-medium',
       'lesson-vendor-master-medium',
@@ -153,6 +158,7 @@ export const BUILT_LESSONS = {
       'lesson-payment-archive-medium',
     ],
     hard: [
+      'lesson-desk-operations-hard',
       'lesson-tolerance-policy-hard',
       'lesson-duplicate-check-hard',
       'lesson-vendor-master-hard',
@@ -163,6 +169,7 @@ export const BUILT_LESSONS = {
   },
   'module-03': {
     easy: [
+      'lesson-onboarding-operations',
       'lesson-signed-offer',
       'lesson-role-profile-catalog',
       'lesson-onboarding-record',
@@ -181,6 +188,7 @@ export const BUILT_LESSONS = {
       'lesson-profile-feedback',
     ],
     medium: [
+      'lesson-onboarding-operations-medium',
       'lesson-signed-offer-medium',
       'lesson-role-profile-catalog-medium',
       'lesson-onboarding-record-medium',
@@ -199,6 +207,7 @@ export const BUILT_LESSONS = {
       'lesson-profile-feedback-medium',
     ],
     hard: [
+      'lesson-onboarding-operations-hard',
       'lesson-readiness-gate-hard',
       'lesson-sla-policy-hard',
       'lesson-escalation-path-hard',

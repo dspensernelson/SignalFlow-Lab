@@ -133,6 +133,43 @@ function garbageFor(validation, lesson) {
       }
       return out
     }
+    case 'connectorConfig': {
+      // Shape-valid: every field present, numbers are numbers, selects are real
+      // options. Substance-wrong: the raw secret pasted, and the first non-answer
+      // option chosen everywhere.
+      const out = {}
+      for (const g of v.groups || []) {
+        for (const f of g.fields || []) {
+          if (f.kind === 'number') {
+            out[f.id] = f.range ? f.range.max + 1000 : GARBAGE_NUMBER
+          } else if (f.kind === 'select') {
+            const ok = new Set([f.expected, ...(f.accepted || [])].filter(Boolean).map(String))
+            const bad = (f.options || []).find((o) => !ok.has(String(o)))
+            out[f.id] = bad !== undefined ? bad : GARBAGE_STRING
+          } else {
+            out[f.id] = GARBAGE_STRING
+          }
+        }
+      }
+      return out
+    }
+    case 'runInspect': {
+      // Shape-valid: a real step id and real options. Substance-wrong: blames a
+      // step that was only skipped, and picks the wrong cause and remedy.
+      const out = {}
+      const steps = v.run?.steps || []
+      for (const f of v.fields || []) {
+        if (f.kind === 'step') {
+          const wrong = steps.find((st) => st.id !== f.expected)
+          out[f.id] = wrong ? wrong.id : GARBAGE_STRING
+        } else {
+          const ok = new Set([f.expected, ...(f.accepted || [])].filter(Boolean).map(String))
+          const bad = (f.options || []).find((o) => !ok.has(String(o)))
+          out[f.id] = bad !== undefined ? bad : GARBAGE_STRING
+        }
+      }
+      return out
+    }
     case 'artifactImport': {
       // Composes other validators: garbage each import with its own rule.
       const out = {}
@@ -195,7 +232,7 @@ for (const t of hollowTypes) {
   if (HOLLOW_ALLOWLIST[t]) console.log(`    why: ${HOLLOW_ALLOWLIST[t]}`)
 }
 
-const solid = ['jsonFields', 'jsonRows', 'jsonDeltas', 'choiceCheck', 'templateSlots', 'tagSource', 'handoffForm', 'artifactImport']
+const solid = ['jsonFields', 'jsonRows', 'jsonDeltas', 'choiceCheck', 'templateSlots', 'tagSource', 'handoffForm', 'artifactImport', 'connectorConfig', 'runInspect']
   .filter((t) => !hollowTypes.includes(t))
 console.log('')
 console.log(`  rejects garbage (judges substance): ${solid.join(', ') || 'none'}`)

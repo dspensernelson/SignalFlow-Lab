@@ -5,8 +5,13 @@
     "title": "Phase 1: Capture",
     "goal": "Turn a messy pile of invoice documents into a trusted structured invoice record.",
     "statusSource": "invoice-record",
-    "nodeIds": ["invoice-inbox", "invoice-record"],
-    "artifactNames": ["invoice-record.json"],
+    "nodeIds": [
+      "invoice-inbox",
+      "invoice-record"
+    ],
+    "artifactNames": [
+      "invoice-record.json"
+    ],
     "unlocks": "A validated invoice record that duplicate detection and matching both reuse."
   },
   {
@@ -15,8 +20,17 @@
     "title": "Phase 2: Reference Data",
     "goal": "Bring in the governed references the match depends on: vendor master, PO register, receipts, tolerances, and the paid-invoice baseline.",
     "statusSource": "tolerance-policy",
-    "nodeIds": ["vendor-master", "po-register", "receipt-log", "tolerance-policy", "payment-history"],
-    "artifactNames": ["vendor-master-record.json", "tolerance-policy.json"],
+    "nodeIds": [
+      "vendor-master",
+      "po-register",
+      "receipt-log",
+      "tolerance-policy",
+      "payment-history"
+    ],
+    "artifactNames": [
+      "vendor-master-record.json",
+      "tolerance-policy.json"
+    ],
     "unlocks": "The reference data the matching engine and the run can trust."
   },
   {
@@ -25,8 +39,15 @@
     "title": "Phase 3: Matching",
     "goal": "Dedupe against history and match each invoice to its PO and receipt within tolerance, then route it.",
     "statusSource": "match-decision",
-    "nodeIds": ["duplicate-check", "three-way-match", "match-decision"],
-    "artifactNames": ["three-way-match.json", "match-decision.json"],
+    "nodeIds": [
+      "duplicate-check",
+      "three-way-match",
+      "match-decision"
+    ],
+    "artifactNames": [
+      "three-way-match.json",
+      "match-decision.json"
+    ],
     "unlocks": "A routing decision that sends clean invoices to auto-approval and the rest to exceptions."
   },
   {
@@ -35,8 +56,16 @@
     "title": "Phase 4: Exceptions and Approval",
     "goal": "Clear exceptions, log auto-approvals, assemble the batch, and capture the manager's sign-off.",
     "statusSource": "run-approval",
-    "nodeIds": ["exception-queue", "auto-approve-path", "payment-batch", "run-approval"],
-    "artifactNames": ["payment-batch.json", "run-approval.json"],
+    "nodeIds": [
+      "exception-queue",
+      "auto-approve-path",
+      "payment-batch",
+      "run-approval"
+    ],
+    "artifactNames": [
+      "payment-batch.json",
+      "run-approval.json"
+    ],
     "unlocks": "An approved payment batch ready to become the 3:00 PM run."
   },
   {
@@ -45,8 +74,15 @@
     "title": "Phase 5: Payment and Archive",
     "goal": "Assemble the traceable payment run, notify vendors, and archive the run to seed tomorrow.",
     "statusSource": "payment-run",
-    "nodeIds": ["payment-run", "remittance-advice", "payment-archive"],
-    "artifactNames": ["payment-run.md"],
+    "nodeIds": [
+      "payment-run",
+      "remittance-advice",
+      "payment-archive",
+      "run-operations"
+    ],
+    "artifactNames": [
+      "payment-run.md"
+    ],
     "unlocks": "The delivered, archived payment run that seeds tomorrow's duplicate baseline."
   }
 ]

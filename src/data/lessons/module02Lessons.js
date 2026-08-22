@@ -48,6 +48,11 @@ import lessonThreeWayMatchHard from './lesson-three-way-match-hard.json'
 import lessonMatchDecisionHard from './lesson-match-decision-hard.json'
 import lessonPaymentRunHard from './lesson-payment-run-hard.json'
 
+// Operations tier (playbook Step 2b/7c)
+import lessonDeskOperations from './lesson-desk-operations.json'
+import lessonDeskOperationsMedium from './lesson-desk-operations-medium.json'
+import lessonDeskOperationsHard from './lesson-desk-operations-hard.json'
+
 const module02Lessons = {
   // Easy tier
   'lesson-invoice-inbox': lessonInvoiceInbox,
@@ -92,6 +97,9 @@ const module02Lessons = {
   'lesson-three-way-match-hard': lessonThreeWayMatchHard,
   'lesson-match-decision-hard': lessonMatchDecisionHard,
   'lesson-payment-run-hard': lessonPaymentRunHard,
+  'lesson-desk-operations': lessonDeskOperations,
+  'lesson-desk-operations-medium': lessonDeskOperationsMedium,
+  'lesson-desk-operations-hard': lessonDeskOperationsHard,
 }
 
 export default module02Lessons

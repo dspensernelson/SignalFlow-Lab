@@ -1,13 +1,46 @@
 {
   "anchor": "module-01",
   "skeleton": [
-    { "id": "intake", "stage": "Intake record", "gloss": "capture the raw input as a trusted record" },
-    { "id": "reference", "stage": "Policy + reference", "gloss": "load the governed rules and lookups" },
-    { "id": "transform", "stage": "Transform", "gloss": "turn raw input into clean, comparable data" },
-    { "id": "decision", "stage": "One decision fork", "gloss": "a single rule routes clean vs. exception" },
-    { "id": "handoff", "stage": "Handoff", "gloss": "pass to a person or queue, capture the reply" },
-    { "id": "assembly", "stage": "Assembly", "gloss": "assemble the traceable deliverable" },
-    { "id": "archive", "stage": "Archive loop", "gloss": "retain it; it seeds tomorrow's intake" }
+    {
+      "id": "intake",
+      "stage": "Intake record",
+      "gloss": "capture the raw input as a trusted record"
+    },
+    {
+      "id": "reference",
+      "stage": "Policy + reference",
+      "gloss": "load the governed rules and lookups"
+    },
+    {
+      "id": "transform",
+      "stage": "Transform",
+      "gloss": "turn raw input into clean, comparable data"
+    },
+    {
+      "id": "decision",
+      "stage": "One decision fork",
+      "gloss": "a single rule routes clean vs. exception"
+    },
+    {
+      "id": "handoff",
+      "stage": "Handoff",
+      "gloss": "pass to a person or queue, capture the reply"
+    },
+    {
+      "id": "assembly",
+      "stage": "Assembly",
+      "gloss": "assemble the traceable deliverable"
+    },
+    {
+      "id": "archive",
+      "stage": "Archive loop",
+      "gloss": "retain it; it seeds tomorrow's intake"
+    },
+    {
+      "id": "operate",
+      "stage": "Operate",
+      "gloss": "connect it, trigger it, watch it fail, test it"
+    }
   ],
   "modules": {
     "module-01": {
@@ -20,7 +53,8 @@
         "decision": "Approval Decision",
         "handoff": "Approval Route",
         "assembly": "Morning Brief",
-        "archive": "Distribution / Archive"
+        "archive": "Distribution / Archive",
+        "operate": "Brief Run Operations"
       }
     },
     "module-02": {
@@ -33,7 +67,8 @@
         "decision": "Match Decision",
         "handoff": "Exception Queue",
         "assembly": "Payment Run",
-        "archive": "Payment Archive"
+        "archive": "Payment Archive",
+        "operate": "Desk Run Operations"
       }
     },
     "module-03": {
@@ -46,7 +81,8 @@
         "decision": "Readiness Gate",
         "handoff": "Escalation Path",
         "assembly": "Day-One Package",
-        "archive": "Onboarding Archive"
+        "archive": "Onboarding Archive",
+        "operate": "Onboarding Run Operations"
       }
     }
   }

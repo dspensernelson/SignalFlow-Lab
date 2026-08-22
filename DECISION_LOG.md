@@ -2,6 +2,64 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-08-22 (Operations node + connectorConfig/runInspect built)
+
+Ecosystem Literacy Plan 4b.2 and 4b.3. `npm run check` green: 129 lessons,
+154 canon assertions, 0 errors.
+
+- ENGINE: built `connectorConfig` and `runInspect` per
+  ENGINE_ADDITIONS_SPEC_OPERATIONS.md (spec committed first, Gate 4).
+  connectorConfig COMPOSES the frozen handoffForm matcher for its select/text/
+  secretRef fields - the artifactImport technique - and only matches numbers
+  itself. runInspect is deliberately the handoffForm algorithm over a different
+  PRESENTATION: the teaching is in the rendered run log, not in a new rule.
+  Both components are React.lazy, so the LessonWorkspace chunk grew only
+  76.7 -> 79.9 kB and the two surfaces ship as 5.65 kB / 6.49 kB chunks.
+- OPERATIONS NODE on modules 1-3 (Gate 3 one-time additive exception). Type
+  `process`, marked `skeletonStage: "operate"`, fed by ONE archive edge
+  labelled "run history". Archive-origin edges are exempt from the cycle check
+  and the temporal-loop check still finds archive -> reference, so no topology
+  rule was touched. Node counts 17/17/16 -> 18/18/17, all inside 15-18. Each
+  module's archive column was re-spaced to the 5-slot grid.
+- LESSON IDS ARE GLOBAL: the three modules' Operations lessons are
+  lesson-brief-operations, lesson-desk-operations, and
+  lesson-onboarding-operations (not one shared id). Caught during the build.
+- 9 LESSONS, three per module: connectorConfig (Easy - connection, identity,
+  secret REFERENCE, trigger, retries, failure path; module-03 adds PII
+  handling), runInspect (Medium - a 5-6 step run with one real failure:
+  auth-expired for Meridian, rate-limit for Beacon, schema-change for Harbor),
+  and a jsonRows test plan (Hard - four cases whose expectedOutcome the learner
+  DERIVES from the module's own rules, including one case the automation must
+  refuse). Every ops Easy intro re-glosses the base operating terms so the
+  glossary lint survives the Phase 4.3 reorder.
+- ROTATION LINT EARNED ITS KEEP: the first draft gave all three module-01 ops
+  lessons the same tool triple, pushing powerAutomate to 62.2% and turning the
+  check red. Fixed by giving each TIER the tools that actually suit it
+  (connections -> Power Automate/n8n/Python; run history -> Zapier/Make/Python;
+  testing -> Copilot Studio/Python/n8n). Better content, and the budget holds.
+- NEW LINTS, all hard errors, no grandfathering: `ops-node` (exactly one
+  operate node, non-decision, in LESSON_PREREQS, matching its skeleton row),
+  `skeleton-row` (every project carries every stage - previously unlinted,
+  which is how the recurrence card could have silently broken),
+  `column-capacity` (<= 5 nodes per canvas column), `ops-coverage` (all three
+  tiers, connectorConfig and runInspect both spent, opsTopicsRequired covered),
+  plus connectorConfig-shape and runInspect-shape. runInspect-shape includes a
+  GIVEAWAY RULE: a step's error text may not contain the expected cause
+  verbatim, so the learner infers the classification from the symptom.
+- COMPACTION PASS (the spec predicted it; every new surface has needed one):
+  connectorConfig first measured 732px against a 650px viewport in the
+  wrong-answer state. Fixed by laying the three groups side by side
+  (lg:grid-cols-3) instead of 2+1 wrapping, and tightening `short:` paddings.
+  Now scrollHeight === clientHeight at BOTH 1280x800 and 1366x650.
+- VERIFIED LIVE, both surfaces, both viewports, wrong-answer state: the
+  connectorConfig lesson flags a pasted raw secret with its teaching message
+  ("Fix this next: Secret"), passes on the vault reference, and mints
+  connector-config.json; the runInspect lesson rejects blaming a skipped step
+  and passes on s2/auth-expired/rotate-credential/s2, minting
+  run-diagnosis.json. Console clean; localStorage cleared after.
+- The validator audit now probes both new types with structurally-valid
+  garbage. Both reject it. jsonPolicy remains the single documented debt.
+
 ## 2026-08-22 (Ecosystem literacy: taxonomy, Operations node, two interaction types)
 
 Owner ratified the Ecosystem Literacy Plan. Driver: the end-goal bar in

@@ -12,7 +12,11 @@
       "type": "inspection",
       "status": "intent",
       "intent": "Inspect where invoices arrive, in what formats, on what schedule, and what access ingesting them would require.",
-      "concepts": ["Documents as a feed", "Arrival contract", "Format variety"]
+      "concepts": [
+        "Documents as a feed",
+        "Arrival contract",
+        "Format variety"
+      ]
     },
     "labVersion": "Inspected by you in the Invoice Inbox task; the invoices are local document fixtures shared with the Invoice Record task.",
     "realWorldSources": [
@@ -31,7 +35,9 @@
       "Move to a watched mailbox that drops attachments",
       "Later replace with portal or EDI ingestion"
     ],
-    "reusedBy": ["invoice-record"],
+    "reusedBy": [
+      "invoice-record"
+    ],
     "governanceNote": "Ingesting from a shared mailbox or portal needs access and a retention policy; every original document must be kept for audit.",
     "auditNote": "Inspection is proven via a choiceCheck quiz that mints a stored source profile, giving the intro lesson a concrete 'what did you learn' beat.",
     "taskId": "lesson-invoice-inbox",
@@ -50,7 +56,11 @@
       "type": "build",
       "status": "intent",
       "intent": "Extract the fields the workflow acts on from a messy invoice document into a validated invoice record.",
-      "concepts": ["Document extraction", "Field validation", "Structured capture"]
+      "concepts": [
+        "Document extraction",
+        "Field validation",
+        "Structured capture"
+      ]
     },
     "labVersion": "Built by you in the Invoice Record task from an invoice document fixture in the inbox.",
     "realWorldSources": [
@@ -68,7 +78,10 @@
       "Add extraction from a known template",
       "Later wire OCR / document AI with human review"
     ],
-    "reusedBy": ["duplicate-check", "three-way-match"],
+    "reusedBy": [
+      "duplicate-check",
+      "three-way-match"
+    ],
     "governanceNote": "The extracted record is what the workflow trusts instead of the document; its field definitions must be owned and versioned.",
     "auditNote": "The build lesson extracts ALL fields; duplicate-check and three-way-match consume this record rather than the raw document.",
     "taskId": "lesson-invoice-record",
@@ -87,7 +100,11 @@
       "type": "governance",
       "status": "intent",
       "intent": "Read the vendor master as governed reference data and understand who owns changes to it and why.",
-      "concepts": ["Master data", "Governed reference", "Change ownership"]
+      "concepts": [
+        "Master data",
+        "Governed reference",
+        "Change ownership"
+      ]
     },
     "labVersion": "Provided as a local vendor master fixture the matching and remittance tasks look up.",
     "realWorldSources": [
@@ -105,7 +122,10 @@
       "Add a change log for edits",
       "Later integrate with the ERP vendor master"
     ],
-    "reusedBy": ["three-way-match", "remittance-advice"],
+    "reusedBy": [
+      "three-way-match",
+      "remittance-advice"
+    ],
     "governanceNote": "Bank-detail and remit-to changes are fraud-sensitive; only the Vendor Relations Desk may change them, and every change is logged and verified.",
     "auditNote": "Master data governance is the module's new concept; the hard tier deepens this into a bank-detail change-management drill.",
     "taskId": "lesson-vendor-master",
@@ -124,7 +144,11 @@
       "type": "inspection",
       "status": "intent",
       "intent": "Inspect the PO register and identify the join keys that link an invoice to its purchase order.",
-      "concepts": ["System of record", "Join keys", "Order authority"]
+      "concepts": [
+        "System of record",
+        "Join keys",
+        "Order authority"
+      ]
     },
     "labVersion": "Provided as a local PO register fixture keyed by PO number that the match task joins against.",
     "realWorldSources": [
@@ -142,7 +166,9 @@
       "Add the fields the match needs (price, quantity, vendor)",
       "Later integrate with the purchasing system"
     ],
-    "reusedBy": ["three-way-match"],
+    "reusedBy": [
+      "three-way-match"
+    ],
     "governanceNote": "The PO register is owned by the Procurement Lead; the invoice-to-PO join key must be agreed and stable.",
     "auditNote": "Inspection lesson; teaches join keys before the transformation lessons rely on them.",
     "taskId": "lesson-po-register",
@@ -161,7 +187,11 @@
       "type": "inspection",
       "status": "intent",
       "intent": "Inspect goods receipts and understand why the match needs proof of delivery, not just an order and an invoice.",
-      "concepts": ["Proof of receipt", "Third leg of the match", "Goods receipt"]
+      "concepts": [
+        "Proof of receipt",
+        "Third leg of the match",
+        "Goods receipt"
+      ]
     },
     "labVersion": "Provided as a local receipt log fixture keyed by PO number that the match task joins against.",
     "realWorldSources": [
@@ -179,7 +209,9 @@
       "Capture received quantity and date",
       "Later integrate with the warehouse system"
     ],
-    "reusedBy": ["three-way-match"],
+    "reusedBy": [
+      "three-way-match"
+    ],
     "governanceNote": "Receipts are owned by the Receiving Desk; a missing receipt is the difference between a two-way and a three-way match.",
     "auditNote": "Medium tier uses a missing receipt to teach two-way vs three-way matching.",
     "taskId": "lesson-receipt-log",
@@ -198,7 +230,11 @@
       "type": "governance",
       "status": "intent",
       "intent": "Read the tolerance policy as owned, versioned config the matching engine applies - not a number buried in code.",
-      "concepts": ["Config as rules", "Tolerances", "Policy versioning"]
+      "concepts": [
+        "Config as rules",
+        "Tolerances",
+        "Policy versioning"
+      ]
     },
     "labVersion": "Provided as a local tolerance-policy fixture the match and decision tasks apply.",
     "realWorldSources": [
@@ -216,7 +252,9 @@
       "Version it and record who approved each change",
       "Later integrate with the ERP tolerance config"
     ],
-    "reusedBy": ["three-way-match"],
+    "reusedBy": [
+      "three-way-match"
+    ],
     "governanceNote": "Tolerance changes are Controller-approved and versioned; a looser tolerance moves money faster but catches fewer errors.",
     "auditNote": "Hard tier deepens this into designing a tolerance policy from vendor history.",
     "taskId": "lesson-tolerance-policy",
@@ -235,7 +273,11 @@
       "type": "inspection",
       "status": "intent",
       "intent": "Inspect the paid-invoice baseline and understand how yesterday's archive becomes today's duplicate-detection reference.",
-      "concepts": ["Archive-seeded reference", "Duplicate baseline", "Temporal loop"]
+      "concepts": [
+        "Archive-seeded reference",
+        "Duplicate baseline",
+        "Temporal loop"
+      ]
     },
     "labVersion": "Provided as a local payment-history fixture; in the loop it is seeded by yesterday's payment archive.",
     "realWorldSources": [
@@ -253,7 +295,9 @@
       "Seed it from yesterday's archived run",
       "Later integrate with the paid-invoice ledger"
     ],
-    "reusedBy": ["duplicate-check"],
+    "reusedBy": [
+      "duplicate-check"
+    ],
     "governanceNote": "The identity key (vendor + invoice number + amount) must be stable; a weak key lets duplicates through or blocks valid re-bills.",
     "auditNote": "This reference node makes the temporal loop archive -> reference explicit, mirroring Meridian's prior-day-reference.",
     "taskId": "lesson-payment-history",
@@ -272,7 +316,11 @@
       "type": "transformation",
       "status": "intent",
       "intent": "Apply a duplicate-detection rule against payment history and flag invoices that were already paid.",
-      "concepts": ["Duplicate detection", "Identity keys", "Dedupe against history"]
+      "concepts": [
+        "Duplicate detection",
+        "Identity keys",
+        "Dedupe against history"
+      ]
     },
     "labVersion": "Run by you in the Duplicate Check task against the invoice record and payment-history fixtures.",
     "realWorldSources": [
@@ -290,7 +338,9 @@
       "Flag exact and near matches",
       "Later add fuzzy matching with human review"
     ],
-    "reusedBy": ["match-decision"],
+    "reusedBy": [
+      "match-decision"
+    ],
     "governanceNote": "A duplicate ALWAYS wins over a clean match; a false negative here pays the same invoice twice.",
     "auditNote": "Feeds the decision alongside the three-way match; the decision node combines both signals.",
     "taskId": "lesson-duplicate-check",
@@ -309,7 +359,11 @@
       "type": "transformation",
       "status": "intent",
       "intent": "Join the invoice record to the PO and receipt and apply the tolerance policy to produce a match result.",
-      "concepts": ["Three-way matching", "Tolerance application", "Join and compare"]
+      "concepts": [
+        "Three-way matching",
+        "Tolerance application",
+        "Join and compare"
+      ]
     },
     "labVersion": "Run by you in the Three-Way Match task using the invoice record, PO register, receipt log, and tolerance policy fixtures.",
     "realWorldSources": [
@@ -327,7 +381,9 @@
       "Compare price and quantity within tolerance",
       "Later wire the ERP matching engine"
     ],
-    "reusedBy": ["match-decision"],
+    "reusedBy": [
+      "match-decision"
+    ],
     "governanceNote": "A variance exactly at tolerance passes (tolerance is inclusive); the rule that decides must be the governed policy, not a guess.",
     "auditNote": "The module's central transformation; boundary case (variance == tolerance) is deliberate canon.",
     "taskId": "lesson-three-way-match",
@@ -346,7 +402,11 @@
       "type": "decision",
       "status": "intent",
       "intent": "Encode the routing rule that sends clean invoices to auto-approval and everything else to exception review.",
-      "concepts": ["Decision encoding", "Routing", "Exception vs auto path"]
+      "concepts": [
+        "Decision encoding",
+        "Routing",
+        "Exception vs auto path"
+      ]
     },
     "labVersion": "Encoded by you in the Match Decision task from the match result and duplicate flag.",
     "realWorldSources": [
@@ -364,7 +424,10 @@
       "Route everything else to exceptions",
       "Later wire it into the workflow engine"
     ],
-    "reusedBy": ["auto-approve-path", "exception-queue"],
+    "reusedBy": [
+      "auto-approve-path",
+      "exception-queue"
+    ],
     "governanceNote": "The rule must be explicit and logged; a duplicate always routes to exceptions even if the amounts match.",
     "auditNote": "The single decision node (the fork); duplicate wins over a clean match is the key boundary.",
     "taskId": "lesson-match-decision",
@@ -383,7 +446,11 @@
       "type": "handoff",
       "status": "intent",
       "intent": "Work an exception: investigate the reason, capture the resolution, and log who decided what.",
-      "concepts": ["Exception queues", "Investigation", "Captured resolution"]
+      "concepts": [
+        "Exception queues",
+        "Investigation",
+        "Captured resolution"
+      ]
     },
     "labVersion": "Worked by you in the Exception Queue task; the exception rides from the match-decision result.",
     "realWorldSources": [
@@ -401,7 +468,9 @@
       "Capture the resolution and approver",
       "Later wire a case-management system"
     ],
-    "reusedBy": ["payment-batch"],
+    "reusedBy": [
+      "payment-batch"
+    ],
     "governanceNote": "Every exception resolution captures who approved it and why; a cleared exception is auditable, not silent.",
     "auditNote": "Handoff with captured response; medium tier routes a vendor-not-in-master case here.",
     "taskId": "lesson-exception-queue",
@@ -420,7 +489,11 @@
       "type": "handoff",
       "status": "intent",
       "intent": "Record an automatic approval so the quiet path is still logged and traceable.",
-      "concepts": ["The quiet path still logs", "Auto-approval", "Auditability"]
+      "concepts": [
+        "The quiet path still logs",
+        "Auto-approval",
+        "Auditability"
+      ]
     },
     "labVersion": "Recorded by you in the Auto-Approve Path task from a cleanly matched invoice.",
     "realWorldSources": [
@@ -438,7 +511,9 @@
       "Keep the same record shape as manual approvals",
       "Later wire straight-through processing"
     ],
-    "reusedBy": ["payment-batch"],
+    "reusedBy": [
+      "payment-batch"
+    ],
     "governanceNote": "Auto does not mean unlogged; the auto lane must be as auditable as the manual one (echoes Meridian's routine path).",
     "auditNote": "Deliberately mirrors Module 1's routine-update-path: the quiet path still produces a record.",
     "taskId": "lesson-auto-approve-path",
@@ -457,7 +532,11 @@
       "type": "build",
       "status": "intent",
       "intent": "Assemble approved invoices into a payment batch, applying the cutoff so only due items are included.",
-      "concepts": ["Batching", "Payment cutoffs", "Assembly prep"]
+      "concepts": [
+        "Batching",
+        "Payment cutoffs",
+        "Assembly prep"
+      ]
     },
     "labVersion": "Built by you in the Payment Batch task from the approved and cleared invoices.",
     "realWorldSources": [
@@ -475,7 +554,10 @@
       "Assemble them into a batch record",
       "Later wire the ERP payment proposal"
     ],
-    "reusedBy": ["run-approval", "payment-run"],
+    "reusedBy": [
+      "run-approval",
+      "payment-run"
+    ],
     "governanceNote": "The cutoff decides what pays today; items past due but unapproved must not slip into the batch unreviewed.",
     "auditNote": "Assembly-prep step; the final payment-run is the true assembly node.",
     "taskId": "lesson-payment-batch",
@@ -494,7 +576,11 @@
       "type": "handoff",
       "status": "intent",
       "intent": "Capture the AP Manager's sign-off on the batch, including any invoices held back and why.",
-      "concepts": ["Approval handoff", "Captured sign-off", "Segregation of duties"]
+      "concepts": [
+        "Approval handoff",
+        "Captured sign-off",
+        "Segregation of duties"
+      ]
     },
     "labVersion": "Captured by you in the Run Approval task from the assembled payment batch.",
     "realWorldSources": [
@@ -512,7 +598,9 @@
       "Capture approve / hold decisions with a reason",
       "Later wire the approval workflow"
     ],
-    "reusedBy": ["payment-run"],
+    "reusedBy": [
+      "payment-run"
+    ],
     "governanceNote": "Segregation of duties: the clerk who built the batch cannot be the manager who approves the run.",
     "auditNote": "Handoff with captured response; gates the payment-run assembly.",
     "taskId": "lesson-run-approval",
@@ -531,7 +619,11 @@
       "type": "assembly",
       "status": "intent",
       "intent": "Assemble the approved batch and its evidence into the payment-run deliverable, traceable end to end.",
-      "concepts": ["Assembly", "Traceability", "Business deliverable"]
+      "concepts": [
+        "Assembly",
+        "Traceability",
+        "Business deliverable"
+      ]
     },
     "labVersion": "Assembled by you in the Payment Run task from the approved batch and its supporting artifacts.",
     "realWorldSources": [
@@ -549,7 +641,10 @@
       "Link each to its match and approval evidence",
       "Later generate the bank payment file"
     ],
-    "reusedBy": ["remittance-advice", "payment-archive"],
+    "reusedBy": [
+      "remittance-advice",
+      "payment-archive"
+    ],
     "governanceNote": "Every paid line must trace to its invoice record, match, and approval; the run is the auditable proof money left correctly.",
     "auditNote": "The assembly node and the module deliverable (payment-run.md).",
     "taskId": "lesson-payment-run",
@@ -562,13 +657,17 @@
     "thingOrAction": "thing",
     "phaseId": "payment-and-archive",
     "x": 1020,
-    "y": 250,
+    "y": 190,
     "description": "The notice sent to each vendor explaining what was paid and against which invoices, using the vendor master's remit-to details.",
     "lesson": {
       "type": "handoff",
       "status": "intent",
       "intent": "Produce the vendor-facing remittance advice from the payment run and the vendor master contact details.",
-      "concepts": ["Vendor communication", "Remittance advice", "Handoff to counterparties"]
+      "concepts": [
+        "Vendor communication",
+        "Remittance advice",
+        "Handoff to counterparties"
+      ]
     },
     "labVersion": "Produced by you in the Remittance Advice task from the payment run and vendor master fixtures.",
     "realWorldSources": [
@@ -599,13 +698,17 @@
     "thingOrAction": "thing",
     "phaseId": "payment-and-archive",
     "x": 1020,
-    "y": 420,
+    "y": 300,
     "description": "The retained record of today's run. It preserves the run for audit and seeds tomorrow's duplicate baseline.",
     "lesson": {
       "type": "handoff",
       "status": "intent",
       "intent": "Archive the completed run for retention and seed the payment history that tomorrow's duplicate check reads.",
-      "concepts": ["Retention", "Archive-seeded loop", "Auditability"]
+      "concepts": [
+        "Retention",
+        "Archive-seeded loop",
+        "Auditability"
+      ]
     },
     "labVersion": "Archived by you in the Payment Archive task from the completed payment run.",
     "realWorldSources": [
@@ -623,10 +726,55 @@
       "Export paid invoice keys to payment history",
       "Later integrate with the records system"
     ],
-    "reusedBy": ["payment-history"],
+    "reusedBy": [
+      "payment-history"
+    ],
     "governanceNote": "Retention length is a compliance decision; the archive is what makes tomorrow's duplicate check possible.",
     "auditNote": "The archive origin of the temporal loop (payment-archive -> payment-history).",
     "taskId": "lesson-payment-archive",
     "artifactName": "payment-archive.json"
+  },
+  {
+    "id": "run-operations",
+    "label": "Desk Run Operations",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "payment-and-archive",
+    "x": 1020,
+    "y": 410,
+    "skeletonStage": "operate",
+    "description": "The payables desk automation is itself a system: it needs a connection to the AP mailbox, a trigger, a failure plan, and a test before it is trusted with money.",
+    "lesson": {
+      "type": "governance",
+      "status": "now",
+      "intent": "Connect the payables automation to its source, set what starts it, and decide what happens when a step fails.",
+      "concepts": [
+        "Connections & credentials",
+        "Triggers",
+        "Run history",
+        "Testing an automation"
+      ]
+    },
+    "labVersion": "Built by you in the Run Operations task by configuring the connection, trigger, and failure behavior of the payables automation.",
+    "realWorldSources": [
+      "A cloud flow's connections and run history",
+      "A mailbox or scheduler trigger",
+      "A secret store or vault"
+    ],
+    "accessNeeded": [
+      "Permission to create a connection as a service account",
+      "Read access to the secret reference",
+      "Access to the run history"
+    ],
+    "soloRebuildPath": [
+      "Open the flow's connections and note what identity it runs as",
+      "Set the trigger and its interval",
+      "Add retries and a failure path, then run it once and read the run"
+    ],
+    "reusedBy": [],
+    "governanceNote": "A payables automation runs as a service account with least privilege. A failed run that nobody sees is worse than a stopped run: failures dead-letter and alert.",
+    "auditNote": "Operations node added 2026-08-22 per MODULE_AUTHORING_PLAYBOOK Step 2b. Fed by the archive node because the retained run record IS what the operator inspects.",
+    "taskId": "lesson-desk-operations",
+    "artifactName": "connector-config.json"
   }
 ]

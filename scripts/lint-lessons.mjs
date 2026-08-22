@@ -42,8 +42,14 @@ const ACTION_KINDS = new Set(taxonomy.actionKinds.map((k) => k.id))
 const ROSTER_TOOLS = new Set(taxonomy.tools.map((t) => t.id))
 const ROTATION = taxonomy.rotation
 
-const VALID_INTERACTIONS = ['jsonEditor', 'choiceCheck', 'templateSlots', 'artifactImport', 'tagSource', 'handoffForm']
-const VALID_VALIDATORS = ['jsonFields', 'jsonPolicy', 'jsonRows', 'jsonDeltas', 'choiceCheck', 'templateSlots', 'artifactImport', 'tagSource', 'handoffForm']
+const VALID_INTERACTIONS = ['jsonEditor', 'choiceCheck', 'templateSlots', 'artifactImport', 'tagSource', 'handoffForm', 'connectorConfig', 'runInspect']
+const VALID_VALIDATORS = ['jsonFields', 'jsonPolicy', 'jsonRows', 'jsonDeltas', 'choiceCheck', 'templateSlots', 'artifactImport', 'tagSource', 'handoffForm', 'connectorConfig', 'runInspect']
+const CONNECTOR_KINDS = ['select', 'text', 'number', 'secretRef']
+const RUN_STATUSES = new Set(taxonomy.runVocabulary.stepStatuses)
+const RUN_ENVIRONMENTS = new Set(taxonomy.runVocabulary.environments)
+const RUN_CAUSES = new Set(taxonomy.runVocabulary.failureCauses)
+const RUN_REMEDIATIONS = new Set(taxonomy.runVocabulary.remediations)
+const OPS_TOPICS = new Set(taxonomy.opsTopics)
 const VALID_DIFFICULTIES = ['Beginner', 'Intermediate', 'Medium', 'Hard']
 
 // Lessons are global (flat, unique ids); each is registered to exactly one
@@ -191,6 +197,17 @@ for (const file of files.sort()) {
   }
   if (!lesson.takeaway?.artifactName) err(id, 'takeaway.artifactName missing')
 
+  // opsTopics belongs only to Operations lessons and must use taxonomy values.
+  if (lesson.opsTopics !== undefined) {
+    if (!Array.isArray(lesson.opsTopics) || lesson.opsTopics.length === 0) {
+      err(id, 'opsTopics must be a non-empty array when present')
+    } else {
+      for (const t of lesson.opsTopics) {
+        if (!OPS_TOPICS.has(t)) err(id, `opsTopics value "${t}" is not in automationTaxonomy.json`)
+      }
+    }
+  }
+
   // 3b. Transfer beat v2 (realworld-shape): every takeaway names the KIND of
   // action this step is (from src/data/automationTaxonomy.json) plus 2-3
   // best-fit tools with a concrete how. The v1 fixed powerAutomate/zapier/
@@ -328,6 +345,137 @@ for (const file of files.sort()) {
         }
       })
     }
+  } else if (lesson.interactionType === 'connectorConfig') {
+    // 2-3 groups, 4-8 fields TOTAL (its own bound; handoffForm's 2-5 is
+    // untouched), valid kinds, expected-or-accepted, numbers carrying exactly
+    // one of expected or range.
+    const groups = lesson.validation?.groups
+    if (!Array.isArray(groups) || groups.length < 2 || groups.length > 3) {
+      err(id, `connectorConfig needs 2-3 groups (has ${groups?.length ?? 0})`)
+    } else {
+      const seenGroup = new Set()
+      const seenField = new Set()
+      const flat = []
+      for (const g of groups) {
+        if (!g.id || !g.label) err(id, 'connectorConfig group needs id and label')
+        if (seenGroup.has(g.id)) err(id, `connectorConfig duplicate group id "${g.id}"`)
+        seenGroup.add(g.id)
+        if (!Array.isArray(g.fields) || g.fields.length === 0) {
+          err(id, `connectorConfig group "${g.id}" has no fields`)
+          continue
+        }
+        flat.push(...g.fields)
+      }
+      if (flat.length < 4 || flat.length > 8) {
+        err(id, `connectorConfig needs 4-8 fields total (has ${flat.length})`)
+      }
+      for (const f of flat) {
+        if (!f.id || !f.label) { err(id, 'connectorConfig field needs id and label'); continue }
+        if (seenField.has(f.id)) err(id, `connectorConfig duplicate field id "${f.id}"`)
+        seenField.add(f.id)
+        if (!CONNECTOR_KINDS.includes(f.kind)) {
+          err(id, `connectorConfig field "${f.id}" kind must be one of ${CONNECTOR_KINDS.join('/')}`)
+        }
+        if (!f.explain || !f.explain.trim()) err(id, `connectorConfig field "${f.id}" needs explain text`)
+        if (f.kind === 'number') {
+          const hasExpected = typeof f.expected === 'number'
+          const hasRange = Boolean(f.range && typeof f.range.min === 'number' && typeof f.range.max === 'number')
+          if (hasExpected === hasRange) {
+            err(id, `connectorConfig number field "${f.id}" needs exactly one of expected or range`)
+          }
+          if (hasRange && f.range.min > f.range.max) {
+            err(id, `connectorConfig field "${f.id}" range min exceeds max`)
+          }
+        } else {
+          const answers = Array.isArray(f.accepted) && f.accepted.length > 0
+            ? f.accepted
+            : f.expected !== undefined ? [f.expected] : []
+          if (answers.length === 0) err(id, `connectorConfig field "${f.id}" needs expected or accepted`)
+          if (f.kind === 'select') {
+            const opts = Array.isArray(f.options) ? f.options : []
+            if (opts.length < 2) err(id, `connectorConfig select "${f.id}" needs at least 2 options`)
+            answers.forEach((a) => {
+              if (!opts.includes(a)) err(id, `connectorConfig select "${f.id}" answer "${a}" is not in options`)
+            })
+          }
+        }
+      }
+    }
+  } else if (lesson.interactionType === 'runInspect') {
+    // A real run with something to diagnose, fields bound to real step ids,
+    // cause/action drawn from the taxonomy, and the giveaway rule: an error
+    // message may not name its own cause.
+    const run = lesson.validation?.run
+    const flds = lesson.validation?.fields
+    if (!run) {
+      err(id, 'runInspect needs validation.run')
+    } else {
+      for (const k of ['id', 'environment', 'trigger', 'startedAt', 'status']) {
+        if (!run[k]) err(id, `runInspect run missing "${k}"`)
+      }
+      if (run.environment && !RUN_ENVIRONMENTS.has(run.environment)) {
+        err(id, `runInspect environment "${run.environment}" is not in the taxonomy`)
+      }
+      const steps = run.steps
+      if (!Array.isArray(steps) || steps.length < 3 || steps.length > 8) {
+        err(id, `runInspect needs 3-8 steps (has ${steps?.length ?? 0})`)
+      } else {
+        const seen = new Set()
+        steps.forEach((st) => {
+          if (!st.id || !st.name) err(id, 'runInspect step needs id and name')
+          if (seen.has(st.id)) err(id, `runInspect duplicate step id "${st.id}"`)
+          seen.add(st.id)
+          if (!RUN_STATUSES.has(st.status)) {
+            err(id, `runInspect step "${st.id}" status "${st.status}" is not in the taxonomy`)
+          }
+        })
+        if (!steps.some((st) => st.status !== 'succeeded')) {
+          err(id, 'runInspect run has no failed step - there is nothing to diagnose')
+        }
+      }
+    }
+    if (!Array.isArray(flds) || flds.length < 2 || flds.length > 5) {
+      err(id, `runInspect needs 2-5 fields (has ${flds?.length ?? 0})`)
+    } else {
+      const stepIds = new Set((run?.steps || []).map((st) => st.id))
+      flds.forEach((f) => {
+        if (!f.id || !f.label) { err(id, 'runInspect field needs id and label'); return }
+        if (f.kind !== 'step' && f.kind !== 'select') {
+          err(id, `runInspect field "${f.id}" kind must be "step" or "select"`)
+        }
+        if (!f.explain || !f.explain.trim()) err(id, `runInspect field "${f.id}" needs explain text`)
+        const answers = Array.isArray(f.accepted) && f.accepted.length > 0
+          ? f.accepted
+          : f.expected !== undefined ? [f.expected] : []
+        if (answers.length === 0) err(id, `runInspect field "${f.id}" needs expected or accepted`)
+        if (f.kind === 'step') {
+          answers.forEach((a) => {
+            if (!stepIds.has(a)) err(id, `runInspect field "${f.id}" answer "${a}" is not a step id`)
+          })
+        } else {
+          const opts = Array.isArray(f.options) ? f.options : []
+          if (opts.length < 2) err(id, `runInspect select "${f.id}" needs at least 2 options`)
+          answers.forEach((a) => {
+            if (!opts.includes(a)) err(id, `runInspect select "${f.id}" answer "${a}" is not in options`)
+          })
+          const vocab = f.id === 'cause' ? RUN_CAUSES : f.id === 'action' ? RUN_REMEDIATIONS : null
+          if (vocab) {
+            opts.forEach((o) => {
+              if (!vocab.has(o)) err(id, `runInspect "${f.id}" option "${o}" is not in the taxonomy vocabulary`)
+            })
+          }
+        }
+      })
+      const cause = flds.find((f) => f.id === 'cause')
+      if (cause?.expected) {
+        const needle = String(cause.expected).replace(/-/g, ' ').toLowerCase()
+        ;(run?.steps || []).forEach((st) => {
+          if (st.error && st.error.replace(/-/g, ' ').toLowerCase().includes(needle)) {
+            err(id, `runInspect step "${st.id}" error names its own cause ("${cause.expected}") - the learner must infer it from the symptom`)
+          }
+        })
+      }
+    }
   } else {
     // jsonEditor
     const guide = lesson.fieldGuide
@@ -439,6 +587,38 @@ for (const p of PROJECTS) {
     const share = n / ids.length
     if (share > ROTATION.maxToolSharePerModule) {
       err(`${p.id} realworld-rotation`, `${tool} appears in ${n}/${ids.length} = ${(share * 100).toFixed(1)}% of lessons (cap ${ROTATION.maxToolSharePerModule * 100}%)`)
+    }
+  }
+}
+
+// 6d. ops-coverage: every module ships Operations lessons in ALL THREE tiers,
+// spending connectorConfig and runInspect, and together covering the required
+// operating topics. Scripted, not prose: the Step 7a capstone and the TOOL_MAP
+// appendix were prose-only mandates and both lapsed after two modules.
+const OPS_COVERAGE_EXEMPT = new Set()
+for (const p of PROJECTS) {
+  if (OPS_COVERAGE_EXEMPT.has(p.id)) continue
+  const all = [...p.tierIds.easy, ...p.tierIds.medium, ...p.tierIds.hard].filter((lid) => lessonsById[lid])
+  if (all.length === 0) continue
+  const opsLessons = all.map((lid) => lessonsById[lid]).filter((l) => Array.isArray(l.opsTopics))
+  if (opsLessons.length === 0) {
+    err(`${p.id} ops-coverage`, 'no Operations lessons found (playbook Step 7c requires one per tier)')
+    continue
+  }
+  for (const tier of ['easy', 'medium', 'hard']) {
+    const inTier = p.tierIds[tier].filter((lid) => lessonsById[lid]?.opsTopics)
+    if (inTier.length === 0) err(`${p.id} ops-coverage`, `no Operations lesson in the ${tier} tier`)
+  }
+  const types = new Set(opsLessons.map((l) => l.interactionType))
+  for (const required of ['connectorConfig', 'runInspect']) {
+    if (!types.has(required)) {
+      err(`${p.id} ops-coverage`, `Operations lessons do not spend "${required}" (playbook Step 7c)`)
+    }
+  }
+  const covered = new Set(opsLessons.flatMap((l) => l.opsTopics))
+  for (const topic of taxonomy.opsTopicsRequired) {
+    if (!covered.has(topic)) {
+      err(`${p.id} ops-coverage`, `no Operations lesson covers the required topic "${topic}"`)
     }
   }
 }

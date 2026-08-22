@@ -50,6 +50,11 @@ import lessonMorningBriefHard from './lesson-morning-brief-hard.json'
 import lessonDistributionArchiveHard from './lesson-distribution-archive-hard.json'
 import lessonApprovalDecisionHard from './lesson-approval-decision-hard.json'
 
+// Operations tier (playbook Step 2b/7c)
+import lessonBriefOperations from './lesson-brief-operations.json'
+import lessonBriefOperationsMedium from './lesson-brief-operations-medium.json'
+import lessonBriefOperationsHard from './lesson-brief-operations-hard.json'
+
 const module01Lessons = {
   // Easy tier
   'lesson-intake': lessonIntake,
@@ -96,6 +101,9 @@ const module01Lessons = {
   'lesson-morning-brief-hard': lessonMorningBriefHard,
   'lesson-distribution-archive-hard': lessonDistributionArchiveHard,
   'lesson-approval-decision-hard': lessonApprovalDecisionHard,
+  'lesson-brief-operations': lessonBriefOperations,
+  'lesson-brief-operations-medium': lessonBriefOperationsMedium,
+  'lesson-brief-operations-hard': lessonBriefOperationsHard,
 }
 
 export default module01Lessons

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import CopilotPromptCard from './CopilotPromptCard'
 import ChoiceCheckExercise from './ChoiceCheckExercise'
 import TemplateSlotsExercise from './TemplateSlotsExercise'
@@ -5,6 +6,19 @@ import ArtifactImportExercise from './ArtifactImportExercise'
 import TagSourceExercise from './TagSourceExercise'
 import HandoffFormExercise from './HandoffFormExercise'
 import { Button, ScrollArea } from './ui'
+
+// Operations surfaces are lazy: only the handful of Operations lessons render
+// them, so the LessonWorkspace chunk stays flat for the other 120 lessons.
+const ConnectorConfigExercise = lazy(() => import('./ConnectorConfigExercise'))
+const RunInspectExercise = lazy(() => import('./RunInspectExercise'))
+
+function LoadingSurface() {
+  return (
+    <div className="rounded-xl border border-sf-border bg-sf-surface p-4 text-sm text-sf-muted shadow-sf-sm">
+      Loading the workbench...
+    </div>
+  )
+}
 
 // The editor renders one JSON field per line; these constants match the
 // textarea's padding (p-3 = 12px) and line-height (leading-6 = 24px) so each
@@ -141,6 +155,36 @@ export default function LessonExercise({
         passed={passed}
         onContinue={onContinue}
       />
+    )
+  }
+  if (lesson.interactionType === 'connectorConfig') {
+    return (
+      <Suspense fallback={<LoadingSurface />}>
+        <ConnectorConfigExercise
+          lesson={lesson}
+          answer={answer}
+          onAnswerChange={onAnswerChange}
+          onValidate={onValidate}
+          results={results}
+          passed={passed}
+          onContinue={onContinue}
+        />
+      </Suspense>
+    )
+  }
+  if (lesson.interactionType === 'runInspect') {
+    return (
+      <Suspense fallback={<LoadingSurface />}>
+        <RunInspectExercise
+          lesson={lesson}
+          answer={answer}
+          onAnswerChange={onAnswerChange}
+          onValidate={onValidate}
+          results={results}
+          passed={passed}
+          onContinue={onContinue}
+        />
+      </Suspense>
     )
   }
 

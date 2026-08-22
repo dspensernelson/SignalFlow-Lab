@@ -1,226 +1,789 @@
 {
   "_comment": "Per-lesson regression fixtures for scripts/validate-lessons.mjs. Each entry has a `correct` answer (must pass validation and store an artifact) and a `wrong` answer (must fail with no artifact). choiceCheck lessons need no fixture: the runner derives answers from the questions. Answers are the parsed form; the runner JSON-stringifies them before calling validateAnswer.",
-
   "lesson-analyst-notes": {
-    "correct": { "hub": "hub", "peakPrice": "peak", "settledPrice": "settled", "generationFlag": "wind", "approvalRequired": "flag" },
-    "wrong": { "hub": "hub", "peakPrice": "peak", "settledPrice": "settled", "generationFlag": "wind", "approvalRequired": "noAction" }
+    "correct": {
+      "hub": "hub",
+      "peakPrice": "peak",
+      "settledPrice": "settled",
+      "generationFlag": "wind",
+      "approvalRequired": "flag"
+    },
+    "wrong": {
+      "hub": "hub",
+      "peakPrice": "peak",
+      "settledPrice": "settled",
+      "generationFlag": "wind",
+      "approvalRequired": "noAction"
+    }
   },
   "lesson-price-feed": {
-    "correct": { "contract": "header", "spikePeak": "ercotPeak", "casingQuirk": "ercotHub", "spacingQuirk": "misoPeak", "schedule": "schedule" },
-    "wrong": { "contract": "header", "spikePeak": "ercotPeak", "casingQuirk": "sppHub", "spacingQuirk": "misoPeak", "schedule": "schedule" }
+    "correct": {
+      "contract": "header",
+      "spikePeak": "ercotPeak",
+      "casingQuirk": "ercotHub",
+      "spacingQuirk": "misoPeak",
+      "schedule": "schedule"
+    },
+    "wrong": {
+      "contract": "header",
+      "spikePeak": "ercotPeak",
+      "casingQuirk": "sppHub",
+      "spacingQuirk": "misoPeak",
+      "schedule": "schedule"
+    }
   },
-
   "lesson-po-register": {
-    "correct": { "poNumber": "po", "vendor": "vendor", "quantityOrdered": "qty", "unitPricePO": "poPrice", "poTotal": "total" },
-    "wrong": { "poNumber": "po", "vendor": "vendor", "quantityOrdered": "qty", "unitPricePO": "invoicePrice", "poTotal": "total" }
+    "correct": {
+      "poNumber": "po",
+      "vendor": "vendor",
+      "quantityOrdered": "qty",
+      "unitPricePO": "poPrice",
+      "poTotal": "total"
+    },
+    "wrong": {
+      "poNumber": "po",
+      "vendor": "vendor",
+      "quantityOrdered": "qty",
+      "unitPricePO": "invoicePrice",
+      "poTotal": "total"
+    }
   },
   "lesson-run-approval": {
-    "correct": { "approvedBy": "AP Manager", "confirms": "Batch complete and control totals correct", "beforeCutoff": "yes" },
-    "wrong": { "approvedBy": "AP Clerk", "confirms": "Batch complete and control totals correct", "beforeCutoff": "yes" }
+    "correct": {
+      "approvedBy": "AP Manager",
+      "confirms": "Batch complete and control totals correct",
+      "beforeCutoff": "yes"
+    },
+    "wrong": {
+      "approvedBy": "AP Clerk",
+      "confirms": "Batch complete and control totals correct",
+      "beforeCutoff": "yes"
+    }
   },
-
   "lesson-signed-offer": {
-    "correct": { "candidateName": "candidate", "role": "role", "startDate": "start", "manager": "manager" },
-    "wrong": { "candidateName": "recruiter", "role": "role", "startDate": "start", "manager": "manager" }
+    "correct": {
+      "candidateName": "candidate",
+      "role": "role",
+      "startDate": "start",
+      "manager": "manager"
+    },
+    "wrong": {
+      "candidateName": "recruiter",
+      "role": "role",
+      "startDate": "start",
+      "manager": "manager"
+    }
   },
   "lesson-onboarding-record": {
-    "correct": { "hireId": "H-4021", "name": "Jordan Lee", "role": "Logistics Coordinator", "department": "Operations", "startDate": "SD", "manager": "Hiring Manager" },
-    "wrong": { "hireId": "H-4021", "name": "Jordan Lee", "role": "Logistics Coordinator", "department": "Operations", "startDate": "SD-1", "manager": "Hiring Manager" }
+    "correct": {
+      "hireId": "H-4021",
+      "name": "Jordan Lee",
+      "role": "Logistics Coordinator",
+      "department": "Operations",
+      "startDate": "SD",
+      "manager": "Hiring Manager"
+    },
+    "wrong": {
+      "hireId": "H-4021",
+      "name": "Jordan Lee",
+      "role": "Logistics Coordinator",
+      "department": "Operations",
+      "startDate": "SD-1",
+      "manager": "Hiring Manager"
+    }
   },
   "lesson-sla-policy": {
-    "correct": { "policyName": "Onboarding SLA Policy", "version": "1.0.0", "owner": "People Ops Lead", "accountsSla": 2, "hardwareSla": 1, "accessSla": 1, "payrollSla": 3 },
-    "wrong": { "policyName": "Onboarding SLA Policy", "version": "1.0.0", "owner": "People Ops Lead", "accountsSla": 2, "hardwareSla": 1, "accessSla": 1, "payrollSla": 1 }
+    "correct": {
+      "policyName": "Onboarding SLA Policy",
+      "version": "1.0.0",
+      "owner": "People Ops Lead",
+      "accountsSla": 2,
+      "hardwareSla": 1,
+      "accessSla": 1,
+      "payrollSla": 3
+    },
+    "wrong": {
+      "policyName": "Onboarding SLA Policy",
+      "version": "1.0.0",
+      "owner": "People Ops Lead",
+      "accountsSla": 2,
+      "hardwareSla": 1,
+      "accessSla": 1,
+      "payrollSla": 1
+    }
   },
   "lesson-provisioning-plan": {
     "correct": [
-      { "taskId": "accounts", "owner": "IT Provisioner", "due": "SD-2" },
-      { "taskId": "hardware", "owner": "IT Provisioner", "due": "SD-1" },
-      { "taskId": "access", "owner": "Facilities Coordinator", "due": "SD-1" },
-      { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
+      {
+        "taskId": "accounts",
+        "owner": "IT Provisioner",
+        "due": "SD-2"
+      },
+      {
+        "taskId": "hardware",
+        "owner": "IT Provisioner",
+        "due": "SD-1"
+      },
+      {
+        "taskId": "access",
+        "owner": "Facilities Coordinator",
+        "due": "SD-1"
+      },
+      {
+        "taskId": "payroll",
+        "owner": "Payroll Specialist",
+        "due": "SD-3"
+      }
     ],
     "wrong": [
-      { "taskId": "accounts", "owner": "Facilities Coordinator", "due": "SD-2" },
-      { "taskId": "hardware", "owner": "IT Provisioner", "due": "SD-1" },
-      { "taskId": "access", "owner": "Facilities Coordinator", "due": "SD-1" },
-      { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
+      {
+        "taskId": "accounts",
+        "owner": "Facilities Coordinator",
+        "due": "SD-2"
+      },
+      {
+        "taskId": "hardware",
+        "owner": "IT Provisioner",
+        "due": "SD-1"
+      },
+      {
+        "taskId": "access",
+        "owner": "Facilities Coordinator",
+        "due": "SD-1"
+      },
+      {
+        "taskId": "payroll",
+        "owner": "Payroll Specialist",
+        "due": "SD-3"
+      }
     ]
   },
   "lesson-accounts-task": {
-    "correct": { "taskId": "accounts", "existingFound": false, "action": "created", "accountId": "acct-4021", "state": "done" },
-    "wrong": { "taskId": "accounts", "existingFound": false, "action": "created", "accountId": "acct-4021", "state": "pending" }
+    "correct": {
+      "taskId": "accounts",
+      "existingFound": false,
+      "action": "created",
+      "accountId": "acct-4021",
+      "state": "done"
+    },
+    "wrong": {
+      "taskId": "accounts",
+      "existingFound": false,
+      "action": "created",
+      "accountId": "acct-4021",
+      "state": "pending"
+    }
   },
   "lesson-hardware-task": {
-    "correct": { "orderedBy": "IT Provisioner", "deliverBy": "SD-1", "confirmationCaptured": "yes" },
-    "wrong": { "orderedBy": "Vendor", "deliverBy": "SD-1", "confirmationCaptured": "yes" }
+    "correct": {
+      "orderedBy": "IT Provisioner",
+      "deliverBy": "SD-1",
+      "confirmationCaptured": "yes"
+    },
+    "wrong": {
+      "orderedBy": "Vendor",
+      "deliverBy": "SD-1",
+      "confirmationCaptured": "yes"
+    }
   },
   "lesson-access-task": {
     "correct": [
-      { "group": "ops-general", "grantedBy": "Facilities Coordinator" },
-      { "group": "warehouse-readonly", "grantedBy": "Facilities Coordinator" }
+      {
+        "group": "ops-general",
+        "grantedBy": "Facilities Coordinator"
+      },
+      {
+        "group": "warehouse-readonly",
+        "grantedBy": "Facilities Coordinator"
+      }
     ],
     "wrong": [
-      { "group": "ops-general", "grantedBy": "IT Provisioner" },
-      { "group": "warehouse-readonly", "grantedBy": "Facilities Coordinator" }
+      {
+        "group": "ops-general",
+        "grantedBy": "IT Provisioner"
+      },
+      {
+        "group": "warehouse-readonly",
+        "grantedBy": "Facilities Coordinator"
+      }
     ]
   },
   "lesson-payroll-task": {
-    "correct": { "sentTo": "Payroll Specialist", "payClass": "Non-exempt / Hourly", "confirmationCaptured": "yes" },
-    "wrong": { "sentTo": "People Ops Lead", "payClass": "Non-exempt / Hourly", "confirmationCaptured": "yes" }
+    "correct": {
+      "sentTo": "Payroll Specialist",
+      "payClass": "Non-exempt / Hourly",
+      "confirmationCaptured": "yes"
+    },
+    "wrong": {
+      "sentTo": "People Ops Lead",
+      "payClass": "Non-exempt / Hourly",
+      "confirmationCaptured": "yes"
+    }
   },
   "lesson-task-tracker": {
     "correct": [
-      { "taskId": "accounts", "state": "done", "blockedReason": "" },
-      { "taskId": "hardware", "state": "done", "blockedReason": "" },
-      { "taskId": "access", "state": "done", "blockedReason": "" },
-      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+      {
+        "taskId": "accounts",
+        "state": "done",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "hardware",
+        "state": "done",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "access",
+        "state": "done",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "payroll",
+        "state": "done",
+        "blockedReason": ""
+      }
     ],
     "wrong": [
-      { "taskId": "accounts", "state": "done", "blockedReason": "" },
-      { "taskId": "hardware", "state": "pending", "blockedReason": "" },
-      { "taskId": "access", "state": "done", "blockedReason": "" },
-      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+      {
+        "taskId": "accounts",
+        "state": "done",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "hardware",
+        "state": "pending",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "access",
+        "state": "done",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "payroll",
+        "state": "done",
+        "blockedReason": ""
+      }
     ]
   },
   "lesson-readiness-gate": {
-    "correct": { "allTasksDone": true, "anyBlocked": false, "ready": true, "route": "day-one-package" },
-    "wrong": { "allTasksDone": true, "anyBlocked": false, "ready": false, "route": "escalation-path" }
+    "correct": {
+      "allTasksDone": true,
+      "anyBlocked": false,
+      "ready": true,
+      "route": "day-one-package"
+    },
+    "wrong": {
+      "allTasksDone": true,
+      "anyBlocked": false,
+      "ready": false,
+      "route": "escalation-path"
+    }
   },
   "lesson-escalation-path": {
-    "correct": { "blockedTask": "background check", "owner": "People Ops Lead", "resolveBy": "SD-2" },
-    "wrong": { "blockedTask": "accounts", "owner": "People Ops Lead", "resolveBy": "SD-2" }
+    "correct": {
+      "blockedTask": "background check",
+      "owner": "People Ops Lead",
+      "resolveBy": "SD-2"
+    },
+    "wrong": {
+      "blockedTask": "accounts",
+      "owner": "People Ops Lead",
+      "resolveBy": "SD-2"
+    }
   },
   "lesson-day-one-package": {
-    "correct": { "hireName": "Jordan Lee", "role": "Logistics Coordinator", "startDate": "SD", "readiness": "Day-One Ready", "accountsState": "done", "hardwareState": "done", "accessState": "done", "payrollState": "done" },
-    "wrong": { "hireName": "Jordan Lee", "role": "Logistics Coordinator", "startDate": "SD", "readiness": "pending", "accountsState": "done", "hardwareState": "done", "accessState": "done", "payrollState": "done" }
+    "correct": {
+      "hireName": "Jordan Lee",
+      "role": "Logistics Coordinator",
+      "startDate": "SD",
+      "readiness": "Day-One Ready",
+      "accountsState": "done",
+      "hardwareState": "done",
+      "accessState": "done",
+      "payrollState": "done"
+    },
+    "wrong": {
+      "hireName": "Jordan Lee",
+      "role": "Logistics Coordinator",
+      "startDate": "SD",
+      "readiness": "pending",
+      "accountsState": "done",
+      "hardwareState": "done",
+      "accessState": "done",
+      "payrollState": "done"
+    }
   },
   "lesson-manager-handoff": {
-    "correct": { "acknowledgedBy": "Hiring Manager", "readyConfirmed": "yes", "acknowledgedAt": "SD-1 5:00 PM" },
-    "wrong": { "acknowledgedBy": "Recruiter", "readyConfirmed": "yes", "acknowledgedAt": "SD-1 5:00 PM" }
+    "correct": {
+      "acknowledgedBy": "Hiring Manager",
+      "readyConfirmed": "yes",
+      "acknowledgedAt": "SD-1 5:00 PM"
+    },
+    "wrong": {
+      "acknowledgedBy": "Recruiter",
+      "readyConfirmed": "yes",
+      "acknowledgedAt": "SD-1 5:00 PM"
+    }
   },
   "lesson-onboarding-archive": {
-    "correct": { "hireId": "H-4021", "archivedRun": "onboarding-H-4021", "retention": "7 years", "seedsCatalog": true },
-    "wrong": { "hireId": "H-4021", "archivedRun": "onboarding-H-4021", "retention": "7 years", "seedsCatalog": false }
+    "correct": {
+      "hireId": "H-4021",
+      "archivedRun": "onboarding-H-4021",
+      "retention": "7 years",
+      "seedsCatalog": true
+    },
+    "wrong": {
+      "hireId": "H-4021",
+      "archivedRun": "onboarding-H-4021",
+      "retention": "7 years",
+      "seedsCatalog": false
+    }
   },
   "lesson-profile-feedback": {
-    "correct": { "role": "Logistics Coordinator", "needed": "handheld scanner", "inProfile": false, "proposedChange": "add", "routedTo": "People Ops Lead" },
-    "wrong": { "role": "Logistics Coordinator", "needed": "handheld scanner", "inProfile": true, "proposedChange": "add", "routedTo": "People Ops Lead" }
+    "correct": {
+      "role": "Logistics Coordinator",
+      "needed": "handheld scanner",
+      "inProfile": false,
+      "proposedChange": "add",
+      "routedTo": "People Ops Lead"
+    },
+    "wrong": {
+      "role": "Logistics Coordinator",
+      "needed": "handheld scanner",
+      "inProfile": true,
+      "proposedChange": "add",
+      "routedTo": "People Ops Lead"
+    }
   },
   "lesson-signed-offer-medium": {
-    "correct": { "candidateName": "candidate", "role": "role", "startDate": "amendStart", "manager": "manager" },
-    "wrong": { "candidateName": "candidate", "role": "role", "startDate": "origStart", "manager": "manager" }
+    "correct": {
+      "candidateName": "candidate",
+      "role": "role",
+      "startDate": "amendStart",
+      "manager": "manager"
+    },
+    "wrong": {
+      "candidateName": "candidate",
+      "role": "role",
+      "startDate": "origStart",
+      "manager": "manager"
+    }
   },
   "lesson-onboarding-record-medium": {
-    "correct": { "hireId": "H-4022", "name": "Sam Rivera", "role": "Logistics Coordinator", "department": "Operations", "startDate": "SD", "startDateAmended": true },
-    "wrong": { "hireId": "H-4022", "name": "Sam Rivera", "role": "Logistics Coordinator", "department": "Operations", "startDate": "SD", "startDateAmended": false }
+    "correct": {
+      "hireId": "H-4022",
+      "name": "Sam Rivera",
+      "role": "Logistics Coordinator",
+      "department": "Operations",
+      "startDate": "SD",
+      "startDateAmended": true
+    },
+    "wrong": {
+      "hireId": "H-4022",
+      "name": "Sam Rivera",
+      "role": "Logistics Coordinator",
+      "department": "Operations",
+      "startDate": "SD",
+      "startDateAmended": false
+    }
   },
   "lesson-sla-policy-medium": {
-    "correct": { "policyName": "Onboarding SLA Policy", "version": "1.1.0", "owner": "People Ops Lead", "accountsSla": 2, "hardwareSla": 2, "accessSla": 1, "payrollSla": 3 },
-    "wrong": { "policyName": "Onboarding SLA Policy", "version": "1.1.0", "owner": "People Ops Lead", "accountsSla": 2, "hardwareSla": 2, "accessSla": 1, "payrollSla": 1 }
+    "correct": {
+      "policyName": "Onboarding SLA Policy",
+      "version": "1.1.0",
+      "owner": "People Ops Lead",
+      "accountsSla": 2,
+      "hardwareSla": 2,
+      "accessSla": 1,
+      "payrollSla": 3
+    },
+    "wrong": {
+      "policyName": "Onboarding SLA Policy",
+      "version": "1.1.0",
+      "owner": "People Ops Lead",
+      "accountsSla": 2,
+      "hardwareSla": 2,
+      "accessSla": 1,
+      "payrollSla": 1
+    }
   },
   "lesson-provisioning-plan-medium": {
     "correct": [
-      { "taskId": "accounts", "owner": "IT Provisioner", "due": "SD-2" },
-      { "taskId": "hardware", "owner": "IT Provisioner", "due": "SD-2" },
-      { "taskId": "access", "owner": "Facilities Coordinator", "due": "SD-1" },
-      { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
+      {
+        "taskId": "accounts",
+        "owner": "IT Provisioner",
+        "due": "SD-2"
+      },
+      {
+        "taskId": "hardware",
+        "owner": "IT Provisioner",
+        "due": "SD-2"
+      },
+      {
+        "taskId": "access",
+        "owner": "Facilities Coordinator",
+        "due": "SD-1"
+      },
+      {
+        "taskId": "payroll",
+        "owner": "Payroll Specialist",
+        "due": "SD-3"
+      }
     ],
     "wrong": [
-      { "taskId": "accounts", "owner": "IT Provisioner", "due": "SD-2" },
-      { "taskId": "hardware", "owner": "IT Provisioner", "due": "SD-1" },
-      { "taskId": "access", "owner": "Facilities Coordinator", "due": "SD-1" },
-      { "taskId": "payroll", "owner": "Payroll Specialist", "due": "SD-3" }
+      {
+        "taskId": "accounts",
+        "owner": "IT Provisioner",
+        "due": "SD-2"
+      },
+      {
+        "taskId": "hardware",
+        "owner": "IT Provisioner",
+        "due": "SD-1"
+      },
+      {
+        "taskId": "access",
+        "owner": "Facilities Coordinator",
+        "due": "SD-1"
+      },
+      {
+        "taskId": "payroll",
+        "owner": "Payroll Specialist",
+        "due": "SD-3"
+      }
     ]
   },
   "lesson-accounts-task-medium": {
-    "correct": { "taskId": "accounts", "existingFound": true, "action": "reused", "accountId": "acct-4022", "state": "done" },
-    "wrong": { "taskId": "accounts", "existingFound": true, "action": "created", "accountId": "acct-4022", "state": "done" }
+    "correct": {
+      "taskId": "accounts",
+      "existingFound": true,
+      "action": "reused",
+      "accountId": "acct-4022",
+      "state": "done"
+    },
+    "wrong": {
+      "taskId": "accounts",
+      "existingFound": true,
+      "action": "created",
+      "accountId": "acct-4022",
+      "state": "done"
+    }
   },
   "lesson-hardware-task-medium": {
-    "correct": { "orderedBy": "IT Provisioner", "deliverBy": "SD+3", "onTrack": "no" },
-    "wrong": { "orderedBy": "IT Provisioner", "deliverBy": "SD+3", "onTrack": "yes" }
+    "correct": {
+      "orderedBy": "IT Provisioner",
+      "deliverBy": "SD+3",
+      "onTrack": "no"
+    },
+    "wrong": {
+      "orderedBy": "IT Provisioner",
+      "deliverBy": "SD+3",
+      "onTrack": "yes"
+    }
   },
   "lesson-access-task-medium": {
     "correct": [
-      { "group": "ops-general", "grantedBy": "Facilities Coordinator", "action": "grant" },
-      { "group": "warehouse-readonly", "grantedBy": "Facilities Coordinator", "action": "grant" },
-      { "group": "finance-readonly", "grantedBy": "Facilities Coordinator", "action": "revoke" }
+      {
+        "group": "ops-general",
+        "grantedBy": "Facilities Coordinator",
+        "action": "grant"
+      },
+      {
+        "group": "warehouse-readonly",
+        "grantedBy": "Facilities Coordinator",
+        "action": "grant"
+      },
+      {
+        "group": "finance-readonly",
+        "grantedBy": "Facilities Coordinator",
+        "action": "revoke"
+      }
     ],
     "wrong": [
-      { "group": "ops-general", "grantedBy": "Facilities Coordinator", "action": "grant" },
-      { "group": "warehouse-readonly", "grantedBy": "Facilities Coordinator", "action": "grant" },
-      { "group": "finance-readonly", "grantedBy": "Facilities Coordinator", "action": "grant" }
+      {
+        "group": "ops-general",
+        "grantedBy": "Facilities Coordinator",
+        "action": "grant"
+      },
+      {
+        "group": "warehouse-readonly",
+        "grantedBy": "Facilities Coordinator",
+        "action": "grant"
+      },
+      {
+        "group": "finance-readonly",
+        "grantedBy": "Facilities Coordinator",
+        "action": "grant"
+      }
     ]
   },
   "lesson-payroll-task-medium": {
-    "correct": { "sentTo": "Payroll Specialist", "payClass": "Non-exempt / Hourly", "priority": "rush" },
-    "wrong": { "sentTo": "Payroll Specialist", "payClass": "Non-exempt / Hourly", "priority": "standard" }
+    "correct": {
+      "sentTo": "Payroll Specialist",
+      "payClass": "Non-exempt / Hourly",
+      "priority": "rush"
+    },
+    "wrong": {
+      "sentTo": "Payroll Specialist",
+      "payClass": "Non-exempt / Hourly",
+      "priority": "standard"
+    }
   },
   "lesson-task-tracker-medium": {
     "correct": [
-      { "taskId": "accounts", "state": "done", "blockedReason": "" },
-      { "taskId": "hardware", "state": "blocked", "blockedReason": "laptop backordered to SD+3" },
-      { "taskId": "access", "state": "done", "blockedReason": "" },
-      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+      {
+        "taskId": "accounts",
+        "state": "done",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "hardware",
+        "state": "blocked",
+        "blockedReason": "laptop backordered to SD+3"
+      },
+      {
+        "taskId": "access",
+        "state": "done",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "payroll",
+        "state": "done",
+        "blockedReason": ""
+      }
     ],
     "wrong": [
-      { "taskId": "accounts", "state": "done", "blockedReason": "" },
-      { "taskId": "hardware", "state": "done", "blockedReason": "" },
-      { "taskId": "access", "state": "done", "blockedReason": "" },
-      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+      {
+        "taskId": "accounts",
+        "state": "done",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "hardware",
+        "state": "done",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "access",
+        "state": "done",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "payroll",
+        "state": "done",
+        "blockedReason": ""
+      }
     ]
   },
   "lesson-readiness-gate-medium": {
-    "correct": { "allTasksDone": false, "anyBlocked": true, "ready": false, "route": "escalation-path", "blockedTask": "hardware" },
-    "wrong": { "allTasksDone": false, "anyBlocked": true, "ready": true, "route": "day-one-package", "blockedTask": "hardware" }
+    "correct": {
+      "allTasksDone": false,
+      "anyBlocked": true,
+      "ready": false,
+      "route": "escalation-path",
+      "blockedTask": "hardware"
+    },
+    "wrong": {
+      "allTasksDone": false,
+      "anyBlocked": true,
+      "ready": true,
+      "route": "day-one-package",
+      "blockedTask": "hardware"
+    }
   },
   "lesson-escalation-path-medium": {
-    "correct": { "blockedTask": "hardware", "owner": "IT Provisioner", "action": "issue loaner" },
-    "wrong": { "blockedTask": "hardware", "owner": "IT Provisioner", "action": "delay start" }
+    "correct": {
+      "blockedTask": "hardware",
+      "owner": "IT Provisioner",
+      "action": "issue loaner"
+    },
+    "wrong": {
+      "blockedTask": "hardware",
+      "owner": "IT Provisioner",
+      "action": "delay start"
+    }
   },
   "lesson-day-one-package-medium": {
-    "correct": { "hireName": "Sam Rivera", "role": "Logistics Coordinator", "startDate": "SD", "readiness": "Ready with loaner", "accountsState": "done", "hardwareState": "loaner", "accessState": "done", "payrollState": "done" },
-    "wrong": { "hireName": "Sam Rivera", "role": "Logistics Coordinator", "startDate": "SD", "readiness": "Day-One Ready", "accountsState": "done", "hardwareState": "done", "accessState": "done", "payrollState": "done" }
+    "correct": {
+      "hireName": "Sam Rivera",
+      "role": "Logistics Coordinator",
+      "startDate": "SD",
+      "readiness": "Ready with loaner",
+      "accountsState": "done",
+      "hardwareState": "loaner",
+      "accessState": "done",
+      "payrollState": "done"
+    },
+    "wrong": {
+      "hireName": "Sam Rivera",
+      "role": "Logistics Coordinator",
+      "startDate": "SD",
+      "readiness": "Day-One Ready",
+      "accountsState": "done",
+      "hardwareState": "done",
+      "accessState": "done",
+      "payrollState": "done"
+    }
   },
   "lesson-manager-handoff-medium": {
-    "correct": { "acknowledgedBy": "Hiring Manager", "readyConfirmed": "conditional", "caveatNoted": "yes" },
-    "wrong": { "acknowledgedBy": "Hiring Manager", "readyConfirmed": "yes", "caveatNoted": "yes" }
+    "correct": {
+      "acknowledgedBy": "Hiring Manager",
+      "readyConfirmed": "conditional",
+      "caveatNoted": "yes"
+    },
+    "wrong": {
+      "acknowledgedBy": "Hiring Manager",
+      "readyConfirmed": "yes",
+      "caveatNoted": "yes"
+    }
   },
   "lesson-onboarding-archive-medium": {
-    "correct": { "hireId": "H-4022", "archivedRun": "onboarding-H-4022", "retention": "7 years", "exceptionsNoted": true, "seedsCatalog": true },
-    "wrong": { "hireId": "H-4022", "archivedRun": "onboarding-H-4022", "retention": "7 years", "exceptionsNoted": false, "seedsCatalog": true }
+    "correct": {
+      "hireId": "H-4022",
+      "archivedRun": "onboarding-H-4022",
+      "retention": "7 years",
+      "exceptionsNoted": true,
+      "seedsCatalog": true
+    },
+    "wrong": {
+      "hireId": "H-4022",
+      "archivedRun": "onboarding-H-4022",
+      "retention": "7 years",
+      "exceptionsNoted": false,
+      "seedsCatalog": true
+    }
   },
   "lesson-profile-feedback-medium": {
-    "correct": { "role": "Logistics Coordinator", "needed": "handheld scanner", "inProfile": true, "proposedChange": "none", "routedTo": "People Ops Lead" },
-    "wrong": { "role": "Logistics Coordinator", "needed": "handheld scanner", "inProfile": true, "proposedChange": "add", "routedTo": "People Ops Lead" }
+    "correct": {
+      "role": "Logistics Coordinator",
+      "needed": "handheld scanner",
+      "inProfile": true,
+      "proposedChange": "none",
+      "routedTo": "People Ops Lead"
+    },
+    "wrong": {
+      "role": "Logistics Coordinator",
+      "needed": "handheld scanner",
+      "inProfile": true,
+      "proposedChange": "add",
+      "routedTo": "People Ops Lead"
+    }
   },
   "lesson-sla-policy-hard": {
-    "correct": { "policyName": "Onboarding SLA Policy", "version": "2.0.0", "owner": "People Ops Lead", "accountsSla": 3, "hardwareSla": 3, "accessSla": 2, "payrollSla": 4 },
-    "wrong": { "policyName": "Onboarding SLA Policy", "version": "2.0.0", "owner": "People Ops Lead", "accountsSla": 3, "hardwareSla": 3, "accessSla": 2, "payrollSla": 1 }
+    "correct": {
+      "policyName": "Onboarding SLA Policy",
+      "version": "2.0.0",
+      "owner": "People Ops Lead",
+      "accountsSla": 3,
+      "hardwareSla": 3,
+      "accessSla": 2,
+      "payrollSla": 4
+    },
+    "wrong": {
+      "policyName": "Onboarding SLA Policy",
+      "version": "2.0.0",
+      "owner": "People Ops Lead",
+      "accountsSla": 3,
+      "hardwareSla": 3,
+      "accessSla": 2,
+      "payrollSla": 1
+    }
   },
   "lesson-escalation-path-hard": {
-    "correct": { "blockedTask": "hardware", "level1Owner": "IT Provisioner", "level1Deadline": "SD-2", "level1Responded": false, "level2Owner": "People Ops Lead", "finalDeadline": "SD-1" },
-    "wrong": { "blockedTask": "hardware", "level1Owner": "IT Provisioner", "level1Deadline": "SD-2", "level1Responded": false, "level2Owner": "IT Provisioner", "finalDeadline": "SD-1" }
+    "correct": {
+      "blockedTask": "hardware",
+      "level1Owner": "IT Provisioner",
+      "level1Deadline": "SD-2",
+      "level1Responded": false,
+      "level2Owner": "People Ops Lead",
+      "finalDeadline": "SD-1"
+    },
+    "wrong": {
+      "blockedTask": "hardware",
+      "level1Owner": "IT Provisioner",
+      "level1Deadline": "SD-2",
+      "level1Responded": false,
+      "level2Owner": "IT Provisioner",
+      "finalDeadline": "SD-1"
+    }
   },
   "lesson-day-one-package-hard": {
-    "correct": { "blockedTask": "hardware", "criticalBlocked": false, "workaroundAvailable": true, "decision": "start-anyway" },
-    "wrong": { "blockedTask": "hardware", "criticalBlocked": false, "workaroundAvailable": true, "decision": "delay" }
+    "correct": {
+      "blockedTask": "hardware",
+      "criticalBlocked": false,
+      "workaroundAvailable": true,
+      "decision": "start-anyway"
+    },
+    "wrong": {
+      "blockedTask": "hardware",
+      "criticalBlocked": false,
+      "workaroundAvailable": true,
+      "decision": "delay"
+    }
   },
   "lesson-accounts-task-hard": {
-    "correct": { "taskId": "accounts", "identityExists": true, "mailboxExists": false, "action": "complete-missing", "accountId": "acct-4021", "state": "done" },
-    "wrong": { "taskId": "accounts", "identityExists": true, "mailboxExists": false, "action": "recreate", "accountId": "acct-4021", "state": "done" }
+    "correct": {
+      "taskId": "accounts",
+      "identityExists": true,
+      "mailboxExists": false,
+      "action": "complete-missing",
+      "accountId": "acct-4021",
+      "state": "done"
+    },
+    "wrong": {
+      "taskId": "accounts",
+      "identityExists": true,
+      "mailboxExists": false,
+      "action": "recreate",
+      "accountId": "acct-4021",
+      "state": "done"
+    }
   },
   "lesson-task-tracker-hard": {
     "correct": [
-      { "taskId": "accounts", "state": "done", "blockedReason": "" },
-      { "taskId": "hardware", "state": "blocked", "blockedReason": "conflicting reports; held pending confirmation" },
-      { "taskId": "access", "state": "done", "blockedReason": "" },
-      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+      {
+        "taskId": "accounts",
+        "state": "done",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "hardware",
+        "state": "blocked",
+        "blockedReason": "conflicting reports; held pending confirmation"
+      },
+      {
+        "taskId": "access",
+        "state": "done",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "payroll",
+        "state": "done",
+        "blockedReason": ""
+      }
     ],
     "wrong": [
-      { "taskId": "accounts", "state": "done", "blockedReason": "" },
-      { "taskId": "hardware", "state": "done", "blockedReason": "" },
-      { "taskId": "access", "state": "done", "blockedReason": "" },
-      { "taskId": "payroll", "state": "done", "blockedReason": "" }
+      {
+        "taskId": "accounts",
+        "state": "done",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "hardware",
+        "state": "done",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "access",
+        "state": "done",
+        "blockedReason": ""
+      },
+      {
+        "taskId": "payroll",
+        "state": "done",
+        "blockedReason": ""
+      }
     ]
   },
   "lesson-readiness-gate-hard": {
@@ -237,194 +800,752 @@
       "readiness-gate": "{\"allTasksDone\":true,\"anyBlocked\":false,\"ready\":false,\"route\":\"escalation-path\"}"
     }
   },
-
   "lesson-intake": {
-    "correct": { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": "$142/MWh", "generationFlag": "Wind underperformed", "approvalRequired": true },
-    "wrong": { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": "$142/MWh", "generationFlag": "Wind underperformed", "approvalRequired": false }
+    "correct": {
+      "hub": "ERCOT",
+      "peakPrice": "$187/MWh",
+      "settledPrice": "$142/MWh",
+      "generationFlag": "Wind underperformed",
+      "approvalRequired": true
+    },
+    "wrong": {
+      "hub": "ERCOT",
+      "peakPrice": "$187/MWh",
+      "settledPrice": "$142/MWh",
+      "generationFlag": "Wind underperformed",
+      "approvalRequired": false
+    }
   },
   "lesson-threshold-policy": {
-    "correct": { "policyName": "ERCOT Hub Threshold Policy", "version": "1.0.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "routineThreshold": 5, "escalationThreshold": 12 },
-    "wrong": { "policyName": "ERCOT Hub Threshold Policy", "version": "1.0.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "routineThreshold": 12, "escalationThreshold": 5 }
+    "correct": {
+      "policyName": "ERCOT Hub Threshold Policy",
+      "version": "1.0.0",
+      "owner": "Risk Desk Lead",
+      "approver": "Desk Manager",
+      "routineThreshold": 5,
+      "escalationThreshold": 12
+    },
+    "wrong": {
+      "policyName": "ERCOT Hub Threshold Policy",
+      "version": "1.0.0",
+      "owner": "Risk Desk Lead",
+      "approver": "Desk Manager",
+      "routineThreshold": 12,
+      "escalationThreshold": 5
+    }
   },
   "lesson-clean-price-data": {
     "correct": [
-      { "hub": "ERCOT", "peakPrice": 187, "settledPrice": 142 },
-      { "hub": "SPP", "peakPrice": 96, "settledPrice": 88 },
-      { "hub": "MISO", "peakPrice": 74, "settledPrice": 70 }
+      {
+        "hub": "ERCOT",
+        "peakPrice": 187,
+        "settledPrice": 142
+      },
+      {
+        "hub": "SPP",
+        "peakPrice": 96,
+        "settledPrice": 88
+      },
+      {
+        "hub": "MISO",
+        "peakPrice": 74,
+        "settledPrice": 70
+      }
     ],
     "wrong": [
-      { "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": 142 },
-      { "hub": "SPP", "peakPrice": 96, "settledPrice": 88 },
-      { "hub": "MISO", "peakPrice": 74, "settledPrice": 70 }
+      {
+        "hub": "ERCOT",
+        "peakPrice": "$187/MWh",
+        "settledPrice": 142
+      },
+      {
+        "hub": "SPP",
+        "peakPrice": 96,
+        "settledPrice": 88
+      },
+      {
+        "hub": "MISO",
+        "peakPrice": 74,
+        "settledPrice": 70
+      }
     ]
   },
   "lesson-variance-check": {
     "correct": [
-      { "hub": "ERCOT", "vsForecast": 17, "vsPriorDay": 22, "material": true },
-      { "hub": "SPP", "vsForecast": 0, "vsPriorDay": 4, "material": false },
-      { "hub": "MISO", "vsForecast": -6, "vsPriorDay": -4, "material": false }
+      {
+        "hub": "ERCOT",
+        "vsForecast": 17,
+        "vsPriorDay": 22,
+        "material": true
+      },
+      {
+        "hub": "SPP",
+        "vsForecast": 0,
+        "vsPriorDay": 4,
+        "material": false
+      },
+      {
+        "hub": "MISO",
+        "vsForecast": -6,
+        "vsPriorDay": -4,
+        "material": false
+      }
     ],
     "wrong": [
-      { "hub": "ERCOT", "vsForecast": 10, "vsPriorDay": 22 },
-      { "hub": "SPP", "vsForecast": 0, "vsPriorDay": 4 },
-      { "hub": "MISO", "vsForecast": -6, "vsPriorDay": -4 }
+      {
+        "hub": "ERCOT",
+        "vsForecast": 10,
+        "vsPriorDay": 22
+      },
+      {
+        "hub": "SPP",
+        "vsForecast": 0,
+        "vsPriorDay": 4
+      },
+      {
+        "hub": "MISO",
+        "vsForecast": -6,
+        "vsPriorDay": -4
+      }
     ]
   },
   "lesson-risk-evaluation": {
     "correct": [
-      { "hub": "ERCOT", "pctMove": 13.3, "status": "escalate" },
-      { "hub": "SPP", "pctMove": 4.3, "status": "normal" },
-      { "hub": "MISO", "pctMove": -5.1, "status": "routine" }
+      {
+        "hub": "ERCOT",
+        "pctMove": 13.3,
+        "status": "escalate"
+      },
+      {
+        "hub": "SPP",
+        "pctMove": 4.3,
+        "status": "normal"
+      },
+      {
+        "hub": "MISO",
+        "pctMove": -5.1,
+        "status": "routine"
+      }
     ],
     "wrong": [
-      { "hub": "ERCOT", "pctMove": 13.3, "status": "routine" },
-      { "hub": "SPP", "pctMove": 4.3, "status": "normal" },
-      { "hub": "MISO", "pctMove": -5.1, "status": "routine" }
+      {
+        "hub": "ERCOT",
+        "pctMove": 13.3,
+        "status": "routine"
+      },
+      {
+        "hub": "SPP",
+        "pctMove": 4.3,
+        "status": "normal"
+      },
+      {
+        "hub": "MISO",
+        "pctMove": -5.1,
+        "status": "routine"
+      }
     ]
   },
   "lesson-approval-template": {
-    "correct": { "templateName": "Brief Approval Request", "version": "1.0.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "subjectFormat": "APPROVAL NEEDED: <hub> <move>% - morning brief", "responseDeadlineMinutes": 30 },
-    "wrong": { "templateName": "Brief Approval Request", "version": "1.0.0", "owner": "", "approver": "Desk Manager", "subjectFormat": "APPROVAL NEEDED", "responseDeadlineMinutes": "30" }
+    "correct": {
+      "templateName": "Brief Approval Request",
+      "version": "1.0.0",
+      "owner": "Risk Desk Lead",
+      "approver": "Desk Manager",
+      "subjectFormat": "APPROVAL NEEDED: <hub> <move>% - morning brief",
+      "responseDeadlineMinutes": 30
+    },
+    "wrong": {
+      "templateName": "Brief Approval Request",
+      "version": "1.0.0",
+      "owner": "",
+      "approver": "Desk Manager",
+      "subjectFormat": "APPROVAL NEEDED",
+      "responseDeadlineMinutes": "30"
+    }
   },
   "lesson-approval-decision": {
     "correct": [
-      { "day": "day-1", "biggestMovePct": 13.3, "escalationRequired": true, "route": "approval-route" },
-      { "day": "day-2", "biggestMovePct": 12, "escalationRequired": true, "route": "approval-route" },
-      { "day": "day-3", "biggestMovePct": 11.9, "escalationRequired": false, "route": "routine-update-path" }
+      {
+        "day": "day-1",
+        "biggestMovePct": 13.3,
+        "escalationRequired": true,
+        "route": "approval-route"
+      },
+      {
+        "day": "day-2",
+        "biggestMovePct": 12,
+        "escalationRequired": true,
+        "route": "approval-route"
+      },
+      {
+        "day": "day-3",
+        "biggestMovePct": 11.9,
+        "escalationRequired": false,
+        "route": "routine-update-path"
+      }
     ],
     "wrong": [
-      { "day": "day-1", "biggestMovePct": 13.3, "escalationRequired": true, "route": "approval-route" },
-      { "day": "day-2", "biggestMovePct": 12, "escalationRequired": false, "route": "routine-update-path" },
-      { "day": "day-3", "biggestMovePct": 11.9, "escalationRequired": false, "route": "routine-update-path" }
+      {
+        "day": "day-1",
+        "biggestMovePct": 13.3,
+        "escalationRequired": true,
+        "route": "approval-route"
+      },
+      {
+        "day": "day-2",
+        "biggestMovePct": 12,
+        "escalationRequired": false,
+        "route": "routine-update-path"
+      },
+      {
+        "day": "day-3",
+        "biggestMovePct": 11.9,
+        "escalationRequired": false,
+        "route": "routine-update-path"
+      }
     ]
   },
   "lesson-approval-route": {
-    "correct": { "hub": "ERCOT", "movePct": "13.3", "sentTo": "Desk Manager", "decision": "Approved", "decidedBy": "Desk Manager", "decidedAt": "6:41 AM" },
-    "wrong": { "hub": "ERCOT", "movePct": "13.3", "sentTo": "Desk Manager", "decision": "rejected", "decidedBy": "Desk Manager", "decidedAt": "6:41 AM" }
+    "correct": {
+      "hub": "ERCOT",
+      "movePct": "13.3",
+      "sentTo": "Desk Manager",
+      "decision": "Approved",
+      "decidedBy": "Desk Manager",
+      "decidedAt": "6:41 AM"
+    },
+    "wrong": {
+      "hub": "ERCOT",
+      "movePct": "13.3",
+      "sentTo": "Desk Manager",
+      "decision": "rejected",
+      "decidedBy": "Desk Manager",
+      "decidedAt": "6:41 AM"
+    }
   },
   "lesson-routine-update-path": {
-    "correct": { "day": "day-3", "biggestMovePct": 11.9, "threshold": 12, "outcome": "routine", "briefReleased": true, "loggedBy": "workflow" },
-    "wrong": { "day": "day-3", "biggestMovePct": 11.9, "threshold": 12, "outcome": "routine", "briefReleased": false, "loggedBy": "Desk Manager" }
+    "correct": {
+      "day": "day-3",
+      "biggestMovePct": 11.9,
+      "threshold": 12,
+      "outcome": "routine",
+      "briefReleased": true,
+      "loggedBy": "workflow"
+    },
+    "wrong": {
+      "day": "day-3",
+      "biggestMovePct": 11.9,
+      "threshold": 12,
+      "outcome": "routine",
+      "briefReleased": false,
+      "loggedBy": "Desk Manager"
+    }
   },
   "lesson-distribution-archive": {
-    "correct": { "deliveredTo": "Trading Desk DL", "sendTime": "7:00 AM", "archiveFolder": "briefs-archive", "retentionDays": 30, "seedsTomorrowBaseline": true },
-    "wrong": { "deliveredTo": "Trading Desk DL", "sendTime": "7:00 AM", "archiveFolder": "briefs-archive", "retentionDays": 30, "seedsTomorrowBaseline": false }
+    "correct": {
+      "deliveredTo": "Trading Desk DL",
+      "sendTime": "7:00 AM",
+      "archiveFolder": "briefs-archive",
+      "retentionDays": 30,
+      "seedsTomorrowBaseline": true
+    },
+    "wrong": {
+      "deliveredTo": "Trading Desk DL",
+      "sendTime": "7:00 AM",
+      "archiveFolder": "briefs-archive",
+      "retentionDays": 30,
+      "seedsTomorrowBaseline": false
+    }
   },
   "lesson-morning-brief": {
-    "correct": { "briefDay": "day-1", "approvalStatus": "Approved", "approvedBy": "Desk Manager", "approvedAt": "6:41 AM", "headlineHub": "ERCOT", "headlineMovePct": "13.3", "peakPrice": "187", "settledPrice": "142", "operationsNote": "Wind underperformed" },
-    "wrong": { "briefDay": "day-1", "approvalStatus": "Approved", "approvedBy": "Desk Manager", "approvedAt": "6:41 AM", "headlineHub": "ERCOT", "headlineMovePct": "13", "peakPrice": "187", "settledPrice": "", "operationsNote": "Wind underperformed" }
+    "correct": {
+      "briefDay": "day-1",
+      "approvalStatus": "Approved",
+      "approvedBy": "Desk Manager",
+      "approvedAt": "6:41 AM",
+      "headlineHub": "ERCOT",
+      "headlineMovePct": "13.3",
+      "peakPrice": "187",
+      "settledPrice": "142",
+      "operationsNote": "Wind underperformed"
+    },
+    "wrong": {
+      "briefDay": "day-1",
+      "approvalStatus": "Approved",
+      "approvedBy": "Desk Manager",
+      "approvedAt": "6:41 AM",
+      "headlineHub": "ERCOT",
+      "headlineMovePct": "13",
+      "peakPrice": "187",
+      "settledPrice": "",
+      "operationsNote": "Wind underperformed"
+    }
   },
-
   "lesson-intake-medium": {
-    "correct": { "hub": "ERCOT", "peakPrice": "$204/MWh", "settledPrice": "151", "generationFlag": null, "approvalRequired": true, "authoritativeNoteTime": "6:05 AM" },
-    "wrong": { "hub": "ERCOT", "peakPrice": "$204/MWh", "settledPrice": "155", "generationFlag": "Wind underperformed", "approvalRequired": true, "authoritativeNoteTime": "5:40 AM" }
+    "correct": {
+      "hub": "ERCOT",
+      "peakPrice": "$204/MWh",
+      "settledPrice": "151",
+      "generationFlag": null,
+      "approvalRequired": true,
+      "authoritativeNoteTime": "6:05 AM"
+    },
+    "wrong": {
+      "hub": "ERCOT",
+      "peakPrice": "$204/MWh",
+      "settledPrice": "155",
+      "generationFlag": "Wind underperformed",
+      "approvalRequired": true,
+      "authoritativeNoteTime": "5:40 AM"
+    }
   },
   "lesson-clean-price-data-medium": {
     "correct": [
-      { "hub": "ERCOT", "peakPrice": 204, "settledPrice": 151 },
-      { "hub": "SPP", "peakPrice": 98.5, "settledPrice": 90 },
-      { "hub": "WAUE", "peakPrice": 63, "settledPrice": 58 }
+      {
+        "hub": "ERCOT",
+        "peakPrice": 204,
+        "settledPrice": 151
+      },
+      {
+        "hub": "SPP",
+        "peakPrice": 98.5,
+        "settledPrice": 90
+      },
+      {
+        "hub": "WAUE",
+        "peakPrice": 63,
+        "settledPrice": 58
+      }
     ],
     "wrong": [
-      { "hub": "ERCOT", "peakPrice": 204, "settledPrice": 151 },
-      { "hub": "SPP", "peakPrice": "98.5 /MWh", "settledPrice": 90 },
-      { "hub": "WAUE", "peakPrice": 63, "settledPrice": 58 }
+      {
+        "hub": "ERCOT",
+        "peakPrice": 204,
+        "settledPrice": 151
+      },
+      {
+        "hub": "SPP",
+        "peakPrice": "98.5 /MWh",
+        "settledPrice": 90
+      },
+      {
+        "hub": "WAUE",
+        "peakPrice": 63,
+        "settledPrice": 58
+      }
     ]
   },
   "lesson-threshold-policy-medium": {
-    "correct": { "policyName": "ERCOT Hub Threshold Policy", "version": "1.1.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "routineThreshold": 6, "escalationThreshold": 14, "changeNote": "Raised bands from 5/12; six of eight escalations last quarter were noise." },
-    "wrong": { "policyName": "ERCOT Hub Threshold Policy", "version": "1.1.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "routineThreshold": 14, "escalationThreshold": 6, "changeNote": "" }
+    "correct": {
+      "policyName": "ERCOT Hub Threshold Policy",
+      "version": "1.1.0",
+      "owner": "Risk Desk Lead",
+      "approver": "Desk Manager",
+      "routineThreshold": 6,
+      "escalationThreshold": 14,
+      "changeNote": "Raised bands from 5/12; six of eight escalations last quarter were noise."
+    },
+    "wrong": {
+      "policyName": "ERCOT Hub Threshold Policy",
+      "version": "1.1.0",
+      "owner": "Risk Desk Lead",
+      "approver": "Desk Manager",
+      "routineThreshold": 14,
+      "escalationThreshold": 6,
+      "changeNote": ""
+    }
   },
   "lesson-variance-check-medium": {
     "correct": [
-      { "hub": "ERCOT", "vsForecast": 16, "vsPriorDay": 28 },
-      { "hub": "SPP", "vsForecast": -1.5, "vsPriorDay": 1.5 }
+      {
+        "hub": "ERCOT",
+        "vsForecast": 16,
+        "vsPriorDay": 28
+      },
+      {
+        "hub": "SPP",
+        "vsForecast": -1.5,
+        "vsPriorDay": 1.5
+      }
     ],
     "wrong": [
-      { "hub": "ERCOT", "vsForecast": 16, "vsPriorDay": 28 },
-      { "hub": "SPP", "vsForecast": 1.5, "vsPriorDay": 1.5 }
+      {
+        "hub": "ERCOT",
+        "vsForecast": 16,
+        "vsPriorDay": 28
+      },
+      {
+        "hub": "SPP",
+        "vsForecast": 1.5,
+        "vsPriorDay": 1.5
+      }
     ]
   },
   "lesson-risk-evaluation-medium": {
     "correct": [
-      { "hub": "ERCOT", "pctMove": 15.9, "status": "escalate" },
-      { "hub": "SPP", "pctMove": 1.5, "status": "normal" },
-      { "hub": "WAUE", "pctMove": 6.8, "status": "routine" }
+      {
+        "hub": "ERCOT",
+        "pctMove": 15.9,
+        "status": "escalate"
+      },
+      {
+        "hub": "SPP",
+        "pctMove": 1.5,
+        "status": "normal"
+      },
+      {
+        "hub": "WAUE",
+        "pctMove": 6.8,
+        "status": "routine"
+      }
     ],
     "wrong": [
-      { "hub": "ERCOT", "pctMove": 15.9, "status": "escalate" },
-      { "hub": "SPP", "pctMove": 1.5, "status": "normal" },
-      { "hub": "WAUE", "pctMove": 6.8, "status": "normal" }
+      {
+        "hub": "ERCOT",
+        "pctMove": 15.9,
+        "status": "escalate"
+      },
+      {
+        "hub": "SPP",
+        "pctMove": 1.5,
+        "status": "normal"
+      },
+      {
+        "hub": "WAUE",
+        "pctMove": 6.8,
+        "status": "normal"
+      }
     ]
   },
   "lesson-approval-decision-medium": {
     "correct": [
-      { "day": "day-1", "biggestMovePct": 15.9, "escalationRequired": true, "route": "approval-route" },
-      { "day": "day-2", "biggestMovePct": -14, "escalationRequired": true, "route": "approval-route" },
-      { "day": "day-3", "biggestMovePct": 13.9, "escalationRequired": false, "route": "routine-update-path" },
-      { "day": "day-4", "biggestMovePct": -5.8, "escalationRequired": false, "route": "routine-update-path" }
+      {
+        "day": "day-1",
+        "biggestMovePct": 15.9,
+        "escalationRequired": true,
+        "route": "approval-route"
+      },
+      {
+        "day": "day-2",
+        "biggestMovePct": -14,
+        "escalationRequired": true,
+        "route": "approval-route"
+      },
+      {
+        "day": "day-3",
+        "biggestMovePct": 13.9,
+        "escalationRequired": false,
+        "route": "routine-update-path"
+      },
+      {
+        "day": "day-4",
+        "biggestMovePct": -5.8,
+        "escalationRequired": false,
+        "route": "routine-update-path"
+      }
     ],
     "wrong": [
-      { "day": "day-1", "biggestMovePct": 15.9, "escalationRequired": true, "route": "approval-route" },
-      { "day": "day-2", "biggestMovePct": -14, "escalationRequired": false, "route": "routine-update-path" },
-      { "day": "day-3", "biggestMovePct": 13.9, "escalationRequired": false, "route": "routine-update-path" },
-      { "day": "day-4", "biggestMovePct": -5.8, "escalationRequired": false, "route": "routine-update-path" }
+      {
+        "day": "day-1",
+        "biggestMovePct": 15.9,
+        "escalationRequired": true,
+        "route": "approval-route"
+      },
+      {
+        "day": "day-2",
+        "biggestMovePct": -14,
+        "escalationRequired": false,
+        "route": "routine-update-path"
+      },
+      {
+        "day": "day-3",
+        "biggestMovePct": 13.9,
+        "escalationRequired": false,
+        "route": "routine-update-path"
+      },
+      {
+        "day": "day-4",
+        "biggestMovePct": -5.8,
+        "escalationRequired": false,
+        "route": "routine-update-path"
+      }
     ]
   },
   "lesson-approval-route-medium": {
-    "correct": { "hub": "ERCOT", "movePct": "15.9", "sentTo": "Desk Manager", "decision": "Approved", "decidedBy": "Deputy Desk Manager", "decidedAt": "6:47 AM", "substitution": true, "substitutionReason": "out-of-office" },
-    "wrong": { "hub": "ERCOT", "movePct": "15.9", "sentTo": "Deputy Desk Manager", "decision": "Approved", "decidedBy": "Deputy Desk Manager", "decidedAt": "6:47 AM", "substitution": false, "substitutionReason": "" }
+    "correct": {
+      "hub": "ERCOT",
+      "movePct": "15.9",
+      "sentTo": "Desk Manager",
+      "decision": "Approved",
+      "decidedBy": "Deputy Desk Manager",
+      "decidedAt": "6:47 AM",
+      "substitution": true,
+      "substitutionReason": "out-of-office"
+    },
+    "wrong": {
+      "hub": "ERCOT",
+      "movePct": "15.9",
+      "sentTo": "Deputy Desk Manager",
+      "decision": "Approved",
+      "decidedBy": "Deputy Desk Manager",
+      "decidedAt": "6:47 AM",
+      "substitution": false,
+      "substitutionReason": ""
+    }
   },
   "lesson-approval-template-medium": {
-    "correct": { "templateName": "Brief Approval Request", "version": "1.1.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "delegate": "Deputy Desk Manager", "subjectFormat": "APPROVAL NEEDED: <hub> <move>% - morning brief", "responseDeadlineMinutes": 30, "changeNote": "Added delegate after an unreachable approver stalled a brief." },
-    "wrong": { "templateName": "Brief Approval Request", "version": "1.1.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "delegate": "", "subjectFormat": "APPROVAL NEEDED", "responseDeadlineMinutes": "30", "changeNote": "x" }
+    "correct": {
+      "templateName": "Brief Approval Request",
+      "version": "1.1.0",
+      "owner": "Risk Desk Lead",
+      "approver": "Desk Manager",
+      "delegate": "Deputy Desk Manager",
+      "subjectFormat": "APPROVAL NEEDED: <hub> <move>% - morning brief",
+      "responseDeadlineMinutes": 30,
+      "changeNote": "Added delegate after an unreachable approver stalled a brief."
+    },
+    "wrong": {
+      "templateName": "Brief Approval Request",
+      "version": "1.1.0",
+      "owner": "Risk Desk Lead",
+      "approver": "Desk Manager",
+      "delegate": "",
+      "subjectFormat": "APPROVAL NEEDED",
+      "responseDeadlineMinutes": "30",
+      "changeNote": "x"
+    }
   },
   "lesson-routine-update-path-medium": {
-    "correct": { "day": "day-3", "biggestMovePct": 13.9, "outcome": "routine", "decidedByPolicyVersion": "1.1.0", "wouldHaveEscalatedUnder": "1.0.0", "briefReleased": true, "loggedBy": "workflow" },
-    "wrong": { "day": "day-3", "biggestMovePct": 13.9, "outcome": "routine", "decidedByPolicyVersion": "1.0.0", "wouldHaveEscalatedUnder": "1.1.0", "briefReleased": true, "loggedBy": "workflow" }
+    "correct": {
+      "day": "day-3",
+      "biggestMovePct": 13.9,
+      "outcome": "routine",
+      "decidedByPolicyVersion": "1.1.0",
+      "wouldHaveEscalatedUnder": "1.0.0",
+      "briefReleased": true,
+      "loggedBy": "workflow"
+    },
+    "wrong": {
+      "day": "day-3",
+      "biggestMovePct": 13.9,
+      "outcome": "routine",
+      "decidedByPolicyVersion": "1.0.0",
+      "wouldHaveEscalatedUnder": "1.1.0",
+      "briefReleased": true,
+      "loggedBy": "workflow"
+    }
   },
   "lesson-morning-brief-medium": {
-    "correct": { "briefDay": "day-1", "approvalStatus": "approved", "approvedBy": "Deputy Desk Manager", "approvedAt": "6:47 AM", "substitutionReason": "out-of-office", "headlineHub": "ERCOT", "headlineMovePct": "15.9", "peakPrice": "204", "settledPrice": "151", "droppedHub": "MISO", "missingForecastHub": "WAUE" },
-    "wrong": { "briefDay": "day-1", "approvalStatus": "approved", "approvedBy": "Desk Manager", "approvedAt": "6:47 AM", "substitutionReason": "out-of-office", "headlineHub": "ERCOT", "headlineMovePct": "15.9", "peakPrice": "204", "settledPrice": "151", "droppedHub": "WAUE", "missingForecastHub": "MISO" }
+    "correct": {
+      "briefDay": "day-1",
+      "approvalStatus": "approved",
+      "approvedBy": "Deputy Desk Manager",
+      "approvedAt": "6:47 AM",
+      "substitutionReason": "out-of-office",
+      "headlineHub": "ERCOT",
+      "headlineMovePct": "15.9",
+      "peakPrice": "204",
+      "settledPrice": "151",
+      "droppedHub": "MISO",
+      "missingForecastHub": "WAUE"
+    },
+    "wrong": {
+      "briefDay": "day-1",
+      "approvalStatus": "approved",
+      "approvedBy": "Desk Manager",
+      "approvedAt": "6:47 AM",
+      "substitutionReason": "out-of-office",
+      "headlineHub": "ERCOT",
+      "headlineMovePct": "15.9",
+      "peakPrice": "204",
+      "settledPrice": "151",
+      "droppedHub": "WAUE",
+      "missingForecastHub": "MISO"
+    }
   },
   "lesson-distribution-archive-medium": {
-    "correct": { "deliveredTo": "Trading Desk DL", "sendTime": "7:00 AM", "archiveFolder": "briefs-archive", "retentionDays": 30, "droppedRowHub": "MISO", "missingForecastHub": "WAUE", "exceptionsReportedTo": "Risk Desk Lead", "seedsTomorrowBaseline": true },
-    "wrong": { "deliveredTo": "Trading Desk DL", "sendTime": "7:00 AM", "archiveFolder": "briefs-archive", "retentionDays": 30, "droppedRowHub": "MISO", "missingForecastHub": "WAUE", "exceptionsReportedTo": "Desk Manager", "seedsTomorrowBaseline": true }
+    "correct": {
+      "deliveredTo": "Trading Desk DL",
+      "sendTime": "7:00 AM",
+      "archiveFolder": "briefs-archive",
+      "retentionDays": 30,
+      "droppedRowHub": "MISO",
+      "missingForecastHub": "WAUE",
+      "exceptionsReportedTo": "Risk Desk Lead",
+      "seedsTomorrowBaseline": true
+    },
+    "wrong": {
+      "deliveredTo": "Trading Desk DL",
+      "sendTime": "7:00 AM",
+      "archiveFolder": "briefs-archive",
+      "retentionDays": 30,
+      "droppedRowHub": "MISO",
+      "missingForecastHub": "WAUE",
+      "exceptionsReportedTo": "Desk Manager",
+      "seedsTomorrowBaseline": true
+    }
   },
-
   "lesson-intake-hard": {
-    "correct": { "schemaVersion": "2.0.0", "hub": "ERCOT", "peakPrice": 187, "settledPrice": 142, "priceUnit": "USD/MWh", "operatingSignal": "Wind underperformed", "approvalRequired": true, "migratedFrom": "1.0.0" },
-    "wrong": { "schemaVersion": "2.0.0", "hub": "ERCOT", "peakPrice": "$187/MWh", "settledPrice": 142, "priceUnit": "USD/MWh", "operatingSignal": "Wind underperformed", "approvalRequired": true, "migratedFrom": "1.0.0" }
+    "correct": {
+      "schemaVersion": "2.0.0",
+      "hub": "ERCOT",
+      "peakPrice": 187,
+      "settledPrice": 142,
+      "priceUnit": "USD/MWh",
+      "operatingSignal": "Wind underperformed",
+      "approvalRequired": true,
+      "migratedFrom": "1.0.0"
+    },
+    "wrong": {
+      "schemaVersion": "2.0.0",
+      "hub": "ERCOT",
+      "peakPrice": "$187/MWh",
+      "settledPrice": 142,
+      "priceUnit": "USD/MWh",
+      "operatingSignal": "Wind underperformed",
+      "approvalRequired": true,
+      "migratedFrom": "1.0.0"
+    }
   },
   "lesson-threshold-policy-hard": {
-    "correct": { "policyName": "ERCOT Hub Threshold Policy", "version": "2.0.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "routineThreshold": 6, "escalationThreshold": 16, "rationale": "At 16, 5 of 60 days escalate; at 6, 23 of 60 days are noted." },
-    "wrong": { "policyName": "ERCOT Hub Threshold Policy", "version": "2.0.0", "owner": "Risk Desk Lead", "approver": "Desk Manager", "routineThreshold": "6", "escalationThreshold": 16, "rationale": "" }
+    "correct": {
+      "policyName": "ERCOT Hub Threshold Policy",
+      "version": "2.0.0",
+      "owner": "Risk Desk Lead",
+      "approver": "Desk Manager",
+      "routineThreshold": 6,
+      "escalationThreshold": 16,
+      "rationale": "At 16, 5 of 60 days escalate; at 6, 23 of 60 days are noted."
+    },
+    "wrong": {
+      "policyName": "ERCOT Hub Threshold Policy",
+      "version": "2.0.0",
+      "owner": "Risk Desk Lead",
+      "approver": "Desk Manager",
+      "routineThreshold": "6",
+      "escalationThreshold": 16,
+      "rationale": ""
+    }
   },
   "lesson-price-feed-hard": {
-    "correct": { "incidentType": "late-feed", "expectedAt": "6:15 AM", "detectedAt": "6:20 AM", "arrivedAt": "6:42 AM", "malformedRowHub": "SPP", "malformedRowAction": "quarantined", "briefMode": "degraded", "notified": "Risk Desk Lead" },
-    "wrong": { "incidentType": "late-feed", "expectedAt": "6:15 AM", "detectedAt": "6:20 AM", "arrivedAt": "6:42 AM", "malformedRowHub": "SPP", "malformedRowAction": "dropped", "briefMode": "normal", "notified": "Risk Desk Lead" }
+    "correct": {
+      "incidentType": "late-feed",
+      "expectedAt": "6:15 AM",
+      "detectedAt": "6:20 AM",
+      "arrivedAt": "6:42 AM",
+      "malformedRowHub": "SPP",
+      "malformedRowAction": "quarantined",
+      "briefMode": "degraded",
+      "notified": "Risk Desk Lead"
+    },
+    "wrong": {
+      "incidentType": "late-feed",
+      "expectedAt": "6:15 AM",
+      "detectedAt": "6:20 AM",
+      "arrivedAt": "6:42 AM",
+      "malformedRowHub": "SPP",
+      "malformedRowAction": "dropped",
+      "briefMode": "normal",
+      "notified": "Risk Desk Lead"
+    }
   },
   "lesson-approval-route-hard": {
-    "correct": { "requestSentAt": "6:30 AM", "rung1At": "6:40 AM", "rung1To": "Deputy Desk Manager", "rung2At": "6:50 AM", "rung2To": "Desk Head", "decision": "Approved", "decidedBy": "Desk Head", "decidedAt": "6:55 AM", "rungsUsed": 2, "exhaustedFallback": "release unapproved with incident" },
-    "wrong": { "requestSentAt": "6:30 AM", "rung1At": "6:40 AM", "rung1To": "Desk Head", "rung2At": "6:50 AM", "rung2To": "Deputy Desk Manager", "decision": "Approved", "decidedBy": "Desk Head", "decidedAt": "6:55 AM", "rungsUsed": 3, "exhaustedFallback": "hold the brief" }
+    "correct": {
+      "requestSentAt": "6:30 AM",
+      "rung1At": "6:40 AM",
+      "rung1To": "Deputy Desk Manager",
+      "rung2At": "6:50 AM",
+      "rung2To": "Desk Head",
+      "decision": "Approved",
+      "decidedBy": "Desk Head",
+      "decidedAt": "6:55 AM",
+      "rungsUsed": 2,
+      "exhaustedFallback": "release unapproved with incident"
+    },
+    "wrong": {
+      "requestSentAt": "6:30 AM",
+      "rung1At": "6:40 AM",
+      "rung1To": "Desk Head",
+      "rung2At": "6:50 AM",
+      "rung2To": "Deputy Desk Manager",
+      "decision": "Approved",
+      "decidedBy": "Desk Head",
+      "decidedAt": "6:55 AM",
+      "rungsUsed": 3,
+      "exhaustedFallback": "hold the brief"
+    }
   },
   "lesson-risk-evaluation-hard": {
     "correct": [
-      { "hub": "ERCOT", "pctMove": 15.1, "status": "routine", "degraded": true },
-      { "hub": "MISO", "pctMove": 5.2, "status": "normal", "degraded": true }
+      {
+        "hub": "ERCOT",
+        "pctMove": 15.1,
+        "status": "routine",
+        "degraded": true
+      },
+      {
+        "hub": "MISO",
+        "pctMove": 5.2,
+        "status": "normal",
+        "degraded": true
+      }
     ],
     "wrong": [
-      { "hub": "ERCOT", "pctMove": 15.1, "status": "escalate", "degraded": true },
-      { "hub": "MISO", "pctMove": 5.2, "status": "normal", "degraded": false }
+      {
+        "hub": "ERCOT",
+        "pctMove": 15.1,
+        "status": "escalate",
+        "degraded": true
+      },
+      {
+        "hub": "MISO",
+        "pctMove": 5.2,
+        "status": "normal",
+        "degraded": false
+      }
     ]
   },
   "lesson-morning-brief-hard": {
-    "correct": { "policyVersion": "2.0.0", "headlineHub": "ERCOT", "headlineMovePct": "15.1", "headlineStatus": "routine", "feedExpectedAt": "6:15 AM", "feedArrivedAt": "6:42 AM", "quarantinedHub": "SPP", "briefMode": "degraded" },
-    "wrong": { "policyVersion": "1.0.0", "headlineHub": "ERCOT", "headlineMovePct": "15.1", "headlineStatus": "escalate", "feedExpectedAt": "6:15 AM", "feedArrivedAt": "6:42 AM", "quarantinedHub": "MISO", "briefMode": "normal" }
+    "correct": {
+      "policyVersion": "2.0.0",
+      "headlineHub": "ERCOT",
+      "headlineMovePct": "15.1",
+      "headlineStatus": "routine",
+      "feedExpectedAt": "6:15 AM",
+      "feedArrivedAt": "6:42 AM",
+      "quarantinedHub": "SPP",
+      "briefMode": "degraded"
+    },
+    "wrong": {
+      "policyVersion": "1.0.0",
+      "headlineHub": "ERCOT",
+      "headlineMovePct": "15.1",
+      "headlineStatus": "escalate",
+      "feedExpectedAt": "6:15 AM",
+      "feedArrivedAt": "6:42 AM",
+      "quarantinedHub": "MISO",
+      "briefMode": "normal"
+    }
   },
   "lesson-distribution-archive-hard": {
-    "correct": { "policyName": "Brief Retention Policy", "version": "1.0.0", "owner": "Risk Desk Lead", "approver": "Desk Head", "briefRetentionDays": 120, "incidentRetentionDays": 365, "rationale": "120 exceeds the 90-day floor; incidents at 365 outlive briefs for postmortems; both within the ceiling." },
-    "wrong": { "policyName": "Brief Retention Policy", "version": "1.0.0", "owner": "Risk Desk Lead", "approver": "Desk Head", "briefRetentionDays": 365, "incidentRetentionDays": 120, "rationale": "" }
+    "correct": {
+      "policyName": "Brief Retention Policy",
+      "version": "1.0.0",
+      "owner": "Risk Desk Lead",
+      "approver": "Desk Head",
+      "briefRetentionDays": 120,
+      "incidentRetentionDays": 365,
+      "rationale": "120 exceeds the 90-day floor; incidents at 365 outlive briefs for postmortems; both within the ceiling."
+    },
+    "wrong": {
+      "policyName": "Brief Retention Policy",
+      "version": "1.0.0",
+      "owner": "Risk Desk Lead",
+      "approver": "Desk Head",
+      "briefRetentionDays": 365,
+      "incidentRetentionDays": 120,
+      "rationale": ""
+    }
   },
   "lesson-approval-decision-hard": {
     "correct": {
@@ -440,7 +1561,6 @@
       "risk-evaluation": "[{\"hub\":\"ERCOT\",\"pctMove\":13.3,\"status\":\"escalate\"},{\"hub\":\"SPP\",\"pctMove\":4.3,\"status\":\"normal\"},{\"hub\":\"MISO\",\"pctMove\":-5.1,\"status\":\"routine\"}]"
     }
   },
-
   "lesson-match-decision-hard": {
     "correct": {
       "invoice-record": "{\"invoiceNumber\":\"INV-58831\",\"vendorId\":\"V-1042\",\"poNumber\":\"PO-7742\",\"quantity\":500,\"unitPrice\":2.44,\"invoiceTotal\":1220}",
@@ -455,140 +1575,890 @@
       "match-decision": "{\"withinTolerance\":true,\"qtyMatch\":true,\"isDuplicate\":false,\"route\":\"exception-queue\"}"
     }
   },
-
   "lesson-invoice-record": {
-    "correct": { "invoiceNumber": "INV-58831", "vendorId": "V-1042", "poNumber": "PO-7742", "quantity": 500, "unitPrice": 2.44, "invoiceTotal": 1220 },
-    "wrong": { "invoiceNumber": "INV-58831", "vendorId": "V-1042", "poNumber": "PO-7742", "quantity": 500, "unitPrice": 2.44, "invoiceTotal": 1200 }
+    "correct": {
+      "invoiceNumber": "INV-58831",
+      "vendorId": "V-1042",
+      "poNumber": "PO-7742",
+      "quantity": 500,
+      "unitPrice": 2.44,
+      "invoiceTotal": 1220
+    },
+    "wrong": {
+      "invoiceNumber": "INV-58831",
+      "vendorId": "V-1042",
+      "poNumber": "PO-7742",
+      "quantity": 500,
+      "unitPrice": 2.44,
+      "invoiceTotal": 1200
+    }
   },
   "lesson-tolerance-policy": {
-    "correct": { "version": "1.0.0", "priceTolerancePct": 2, "priceToleranceAbs": 25, "toleranceBasis": "larger", "qtyTolerance": 0, "approvedBy": "Controller", "effective": "day-0" },
-    "wrong": { "version": "1.0.0", "priceTolerancePct": 2, "priceToleranceAbs": 25, "toleranceBasis": "smaller", "qtyTolerance": 0, "approvedBy": "Controller", "effective": "day-0" }
+    "correct": {
+      "version": "1.0.0",
+      "priceTolerancePct": 2,
+      "priceToleranceAbs": 25,
+      "toleranceBasis": "larger",
+      "qtyTolerance": 0,
+      "approvedBy": "Controller",
+      "effective": "day-0"
+    },
+    "wrong": {
+      "version": "1.0.0",
+      "priceTolerancePct": 2,
+      "priceToleranceAbs": 25,
+      "toleranceBasis": "smaller",
+      "qtyTolerance": 0,
+      "approvedBy": "Controller",
+      "effective": "day-0"
+    }
   },
   "lesson-duplicate-check": {
-    "correct": { "invoiceNumber": "INV-58831", "vendorId": "V-1042", "invoiceTotal": 1220, "foundInHistory": false, "isDuplicate": false, "decision": "clear" },
-    "wrong": { "invoiceNumber": "INV-58831", "vendorId": "V-1042", "invoiceTotal": 1220, "foundInHistory": false, "isDuplicate": true, "decision": "clear" }
+    "correct": {
+      "invoiceNumber": "INV-58831",
+      "vendorId": "V-1042",
+      "invoiceTotal": 1220,
+      "foundInHistory": false,
+      "isDuplicate": false,
+      "decision": "clear"
+    },
+    "wrong": {
+      "invoiceNumber": "INV-58831",
+      "vendorId": "V-1042",
+      "invoiceTotal": 1220,
+      "foundInHistory": false,
+      "isDuplicate": true,
+      "decision": "clear"
+    }
   },
   "lesson-three-way-match": {
-    "correct": { "invoiceTotal": 1220, "poTotal": 1200, "variance": 20, "variancePct": 1.67, "toleranceBand": 25, "qtyMatch": true, "withinTolerance": true, "matchResult": "matched" },
-    "wrong": { "invoiceTotal": 1220, "poTotal": 1200, "variance": 20, "variancePct": 1.67, "toleranceBand": 25, "qtyMatch": true, "withinTolerance": false, "matchResult": "matched" }
+    "correct": {
+      "invoiceTotal": 1220,
+      "poTotal": 1200,
+      "variance": 20,
+      "variancePct": 1.67,
+      "toleranceBand": 25,
+      "qtyMatch": true,
+      "withinTolerance": true,
+      "matchResult": "matched"
+    },
+    "wrong": {
+      "invoiceTotal": 1220,
+      "poTotal": 1200,
+      "variance": 20,
+      "variancePct": 1.67,
+      "toleranceBand": 25,
+      "qtyMatch": true,
+      "withinTolerance": false,
+      "matchResult": "matched"
+    }
   },
   "lesson-match-decision": {
-    "correct": { "withinTolerance": true, "qtyMatch": true, "isDuplicate": false, "route": "auto-approve" },
-    "wrong": { "withinTolerance": true, "qtyMatch": true, "isDuplicate": false, "route": "exception-queue" }
+    "correct": {
+      "withinTolerance": true,
+      "qtyMatch": true,
+      "isDuplicate": false,
+      "route": "auto-approve"
+    },
+    "wrong": {
+      "withinTolerance": true,
+      "qtyMatch": true,
+      "isDuplicate": false,
+      "route": "exception-queue"
+    }
   },
   "lesson-payment-batch": {
-    "correct": { "batchDate": "day-1", "cutoff": "3:00 PM", "invoiceCount": 1, "batchTotal": 1220, "heldCount": 0 },
-    "wrong": { "batchDate": "day-1", "cutoff": "3:00 PM", "invoiceCount": 1, "batchTotal": 1200, "heldCount": 0 }
+    "correct": {
+      "batchDate": "day-1",
+      "cutoff": "3:00 PM",
+      "invoiceCount": 1,
+      "batchTotal": 1220,
+      "heldCount": 0
+    },
+    "wrong": {
+      "batchDate": "day-1",
+      "cutoff": "3:00 PM",
+      "invoiceCount": 1,
+      "batchTotal": 1200,
+      "heldCount": 0
+    }
   },
   "lesson-payment-run": {
-    "correct": { "runDate": "day-1", "approvedBy": "AP Manager", "approvedAt": "2:30 PM", "cutoff": "3:00 PM", "invoiceCount": "1", "runTotal": "1220", "payToName": "Northwind Fasteners", "vendorId": "V-1042", "bankOnFile": "ACH ...4021", "deliveredTo": "Payables DL" },
-    "wrong": { "runDate": "day-1", "approvedBy": "AP Manager", "approvedAt": "2:30 PM", "cutoff": "3:00 PM", "invoiceCount": "1", "runTotal": "1200", "payToName": "Northwind Fasteners", "vendorId": "V-1042", "bankOnFile": "ACH ...4021", "deliveredTo": "Payables DL" }
+    "correct": {
+      "runDate": "day-1",
+      "approvedBy": "AP Manager",
+      "approvedAt": "2:30 PM",
+      "cutoff": "3:00 PM",
+      "invoiceCount": "1",
+      "runTotal": "1220",
+      "payToName": "Northwind Fasteners",
+      "vendorId": "V-1042",
+      "bankOnFile": "ACH ...4021",
+      "deliveredTo": "Payables DL"
+    },
+    "wrong": {
+      "runDate": "day-1",
+      "approvedBy": "AP Manager",
+      "approvedAt": "2:30 PM",
+      "cutoff": "3:00 PM",
+      "invoiceCount": "1",
+      "runTotal": "1200",
+      "payToName": "Northwind Fasteners",
+      "vendorId": "V-1042",
+      "bankOnFile": "ACH ...4021",
+      "deliveredTo": "Payables DL"
+    }
   },
   "lesson-remittance-advice": {
-    "correct": { "vendorName": "Northwind Fasteners", "remitTo": "4400 Commerce Way, Tacoma WA 98402", "vendorId": "V-1042", "invoiceNumber": "INV-58831", "amountPaid": "1220", "paidDate": "day-1", "payMethod": "ACH" },
-    "wrong": { "vendorName": "Northwind Fasteners", "remitTo": "4400 Commerce Way, Tacoma WA 98402", "vendorId": "V-1042", "invoiceNumber": "INV-58831", "amountPaid": "1200", "paidDate": "day-1", "payMethod": "ACH" }
+    "correct": {
+      "vendorName": "Northwind Fasteners",
+      "remitTo": "4400 Commerce Way, Tacoma WA 98402",
+      "vendorId": "V-1042",
+      "invoiceNumber": "INV-58831",
+      "amountPaid": "1220",
+      "paidDate": "day-1",
+      "payMethod": "ACH"
+    },
+    "wrong": {
+      "vendorName": "Northwind Fasteners",
+      "remitTo": "4400 Commerce Way, Tacoma WA 98402",
+      "vendorId": "V-1042",
+      "invoiceNumber": "INV-58831",
+      "amountPaid": "1200",
+      "paidDate": "day-1",
+      "payMethod": "ACH"
+    }
   },
-
   "lesson-invoice-record-medium": {
     "correct": [
-      { "invoiceNumber": "INV-59001", "vendorId": "V-1042", "poNumber": "PO-7742", "invoiceTotal": 1200 },
-      { "invoiceNumber": "INV-59002", "vendorId": "V-1108", "poNumber": "PO-7751", "invoiceTotal": 1230 },
-      { "invoiceNumber": "INV-58962", "vendorId": "V-1042", "poNumber": "PO-7738", "invoiceTotal": 640 },
-      { "invoiceNumber": "INV-59004", "vendorId": "V-1205", "poNumber": "PO-7760", "invoiceTotal": 1200 },
-      { "invoiceNumber": "INV-59005", "vendorId": "V-1042", "poNumber": "PO-7763", "invoiceTotal": 1000 }
+      {
+        "invoiceNumber": "INV-59001",
+        "vendorId": "V-1042",
+        "poNumber": "PO-7742",
+        "invoiceTotal": 1200
+      },
+      {
+        "invoiceNumber": "INV-59002",
+        "vendorId": "V-1108",
+        "poNumber": "PO-7751",
+        "invoiceTotal": 1230
+      },
+      {
+        "invoiceNumber": "INV-58962",
+        "vendorId": "V-1042",
+        "poNumber": "PO-7738",
+        "invoiceTotal": 640
+      },
+      {
+        "invoiceNumber": "INV-59004",
+        "vendorId": "V-1205",
+        "poNumber": "PO-7760",
+        "invoiceTotal": 1200
+      },
+      {
+        "invoiceNumber": "INV-59005",
+        "vendorId": "V-1042",
+        "poNumber": "PO-7763",
+        "invoiceTotal": 1000
+      }
     ],
     "wrong": [
-      { "invoiceNumber": "INV-59001", "vendorId": "V-1042", "poNumber": "PO-7742", "invoiceTotal": 1200 },
-      { "invoiceNumber": "INV-59002", "vendorId": "V-1108", "poNumber": "PO-7751", "invoiceTotal": 1140 },
-      { "invoiceNumber": "INV-58962", "vendorId": "V-1042", "poNumber": "PO-7738", "invoiceTotal": 640 },
-      { "invoiceNumber": "INV-59004", "vendorId": "V-1205", "poNumber": "PO-7760", "invoiceTotal": 1200 },
-      { "invoiceNumber": "INV-59005", "vendorId": "V-1042", "poNumber": "PO-7763", "invoiceTotal": 1000 }
+      {
+        "invoiceNumber": "INV-59001",
+        "vendorId": "V-1042",
+        "poNumber": "PO-7742",
+        "invoiceTotal": 1200
+      },
+      {
+        "invoiceNumber": "INV-59002",
+        "vendorId": "V-1108",
+        "poNumber": "PO-7751",
+        "invoiceTotal": 1140
+      },
+      {
+        "invoiceNumber": "INV-58962",
+        "vendorId": "V-1042",
+        "poNumber": "PO-7738",
+        "invoiceTotal": 640
+      },
+      {
+        "invoiceNumber": "INV-59004",
+        "vendorId": "V-1205",
+        "poNumber": "PO-7760",
+        "invoiceTotal": 1200
+      },
+      {
+        "invoiceNumber": "INV-59005",
+        "vendorId": "V-1042",
+        "poNumber": "PO-7763",
+        "invoiceTotal": 1000
+      }
     ]
   },
   "lesson-duplicate-check-medium": {
     "correct": [
-      { "invoiceNumber": "INV-59001", "foundInHistory": false, "isDuplicate": false },
-      { "invoiceNumber": "INV-59002", "foundInHistory": false, "isDuplicate": false },
-      { "invoiceNumber": "INV-58962", "foundInHistory": true, "isDuplicate": true },
-      { "invoiceNumber": "INV-59004", "foundInHistory": false, "isDuplicate": false },
-      { "invoiceNumber": "INV-59005", "foundInHistory": false, "isDuplicate": false }
+      {
+        "invoiceNumber": "INV-59001",
+        "foundInHistory": false,
+        "isDuplicate": false
+      },
+      {
+        "invoiceNumber": "INV-59002",
+        "foundInHistory": false,
+        "isDuplicate": false
+      },
+      {
+        "invoiceNumber": "INV-58962",
+        "foundInHistory": true,
+        "isDuplicate": true
+      },
+      {
+        "invoiceNumber": "INV-59004",
+        "foundInHistory": false,
+        "isDuplicate": false
+      },
+      {
+        "invoiceNumber": "INV-59005",
+        "foundInHistory": false,
+        "isDuplicate": false
+      }
     ],
     "wrong": [
-      { "invoiceNumber": "INV-59001", "foundInHistory": false, "isDuplicate": false },
-      { "invoiceNumber": "INV-59002", "foundInHistory": false, "isDuplicate": false },
-      { "invoiceNumber": "INV-58962", "foundInHistory": false, "isDuplicate": false },
-      { "invoiceNumber": "INV-59004", "foundInHistory": false, "isDuplicate": false },
-      { "invoiceNumber": "INV-59005", "foundInHistory": false, "isDuplicate": false }
+      {
+        "invoiceNumber": "INV-59001",
+        "foundInHistory": false,
+        "isDuplicate": false
+      },
+      {
+        "invoiceNumber": "INV-59002",
+        "foundInHistory": false,
+        "isDuplicate": false
+      },
+      {
+        "invoiceNumber": "INV-58962",
+        "foundInHistory": false,
+        "isDuplicate": false
+      },
+      {
+        "invoiceNumber": "INV-59004",
+        "foundInHistory": false,
+        "isDuplicate": false
+      },
+      {
+        "invoiceNumber": "INV-59005",
+        "foundInHistory": false,
+        "isDuplicate": false
+      }
     ]
   },
   "lesson-three-way-match-medium": {
     "correct": [
-      { "invoiceNumber": "INV-59001", "variance": 0, "variancePct": 0, "toleranceBand": 25, "withinTolerance": true, "qtyMatch": true },
-      { "invoiceNumber": "INV-59002", "variance": 90, "variancePct": 7.89, "toleranceBand": 25, "withinTolerance": false, "qtyMatch": true },
-      { "invoiceNumber": "INV-59005", "variance": 8, "variancePct": 0.81, "toleranceBand": 25, "withinTolerance": true, "qtyMatch": false }
+      {
+        "invoiceNumber": "INV-59001",
+        "variance": 0,
+        "variancePct": 0,
+        "toleranceBand": 25,
+        "withinTolerance": true,
+        "qtyMatch": true
+      },
+      {
+        "invoiceNumber": "INV-59002",
+        "variance": 90,
+        "variancePct": 7.89,
+        "toleranceBand": 25,
+        "withinTolerance": false,
+        "qtyMatch": true
+      },
+      {
+        "invoiceNumber": "INV-59005",
+        "variance": 8,
+        "variancePct": 0.81,
+        "toleranceBand": 25,
+        "withinTolerance": true,
+        "qtyMatch": false
+      }
     ],
     "wrong": [
-      { "invoiceNumber": "INV-59001", "variance": 0, "variancePct": 0, "toleranceBand": 25, "withinTolerance": true, "qtyMatch": true },
-      { "invoiceNumber": "INV-59002", "variance": 90, "variancePct": 7.89, "toleranceBand": 25, "withinTolerance": true, "qtyMatch": true },
-      { "invoiceNumber": "INV-59005", "variance": 8, "variancePct": 0.81, "toleranceBand": 25, "withinTolerance": true, "qtyMatch": false }
+      {
+        "invoiceNumber": "INV-59001",
+        "variance": 0,
+        "variancePct": 0,
+        "toleranceBand": 25,
+        "withinTolerance": true,
+        "qtyMatch": true
+      },
+      {
+        "invoiceNumber": "INV-59002",
+        "variance": 90,
+        "variancePct": 7.89,
+        "toleranceBand": 25,
+        "withinTolerance": true,
+        "qtyMatch": true
+      },
+      {
+        "invoiceNumber": "INV-59005",
+        "variance": 8,
+        "variancePct": 0.81,
+        "toleranceBand": 25,
+        "withinTolerance": true,
+        "qtyMatch": false
+      }
     ]
   },
   "lesson-match-decision-medium": {
     "correct": [
-      { "invoiceNumber": "INV-59001", "route": "auto-approve", "reason": "clean match" },
-      { "invoiceNumber": "INV-59002", "route": "exception", "reason": "price over tolerance" },
-      { "invoiceNumber": "INV-58962", "route": "exception", "reason": "duplicate" },
-      { "invoiceNumber": "INV-59004", "route": "exception", "reason": "vendor not in master" },
-      { "invoiceNumber": "INV-59005", "route": "exception", "reason": "missing receipt" }
+      {
+        "invoiceNumber": "INV-59001",
+        "route": "auto-approve",
+        "reason": "clean match"
+      },
+      {
+        "invoiceNumber": "INV-59002",
+        "route": "exception",
+        "reason": "price over tolerance"
+      },
+      {
+        "invoiceNumber": "INV-58962",
+        "route": "exception",
+        "reason": "duplicate"
+      },
+      {
+        "invoiceNumber": "INV-59004",
+        "route": "exception",
+        "reason": "vendor not in master"
+      },
+      {
+        "invoiceNumber": "INV-59005",
+        "route": "exception",
+        "reason": "missing receipt"
+      }
     ],
     "wrong": [
-      { "invoiceNumber": "INV-59001", "route": "auto-approve", "reason": "clean match" },
-      { "invoiceNumber": "INV-59002", "route": "auto-approve", "reason": "clean match" },
-      { "invoiceNumber": "INV-58962", "route": "exception", "reason": "duplicate" },
-      { "invoiceNumber": "INV-59004", "route": "exception", "reason": "vendor not in master" },
-      { "invoiceNumber": "INV-59005", "route": "exception", "reason": "missing receipt" }
+      {
+        "invoiceNumber": "INV-59001",
+        "route": "auto-approve",
+        "reason": "clean match"
+      },
+      {
+        "invoiceNumber": "INV-59002",
+        "route": "auto-approve",
+        "reason": "clean match"
+      },
+      {
+        "invoiceNumber": "INV-58962",
+        "route": "exception",
+        "reason": "duplicate"
+      },
+      {
+        "invoiceNumber": "INV-59004",
+        "route": "exception",
+        "reason": "vendor not in master"
+      },
+      {
+        "invoiceNumber": "INV-59005",
+        "route": "exception",
+        "reason": "missing receipt"
+      }
     ]
   },
   "lesson-payment-batch-medium": {
-    "correct": { "batchDate": "day-1", "cutoff": "3:00 PM", "invoiceCount": 1, "batchTotal": 1200, "heldCount": 4 },
-    "wrong": { "batchDate": "day-1", "cutoff": "3:00 PM", "invoiceCount": 1, "batchTotal": 1200, "heldCount": 0 }
+    "correct": {
+      "batchDate": "day-1",
+      "cutoff": "3:00 PM",
+      "invoiceCount": 1,
+      "batchTotal": 1200,
+      "heldCount": 4
+    },
+    "wrong": {
+      "batchDate": "day-1",
+      "cutoff": "3:00 PM",
+      "invoiceCount": 1,
+      "batchTotal": 1200,
+      "heldCount": 0
+    }
   },
   "lesson-payment-run-medium": {
-    "correct": { "runDate": "day-1", "approvedBy": "AP Manager", "approvedAt": "2:30 PM", "cutoff": "3:00 PM", "invoiceCount": "1", "runTotal": "1200", "heldCount": "4", "payToName": "Northwind Fasteners", "vendorId": "V-1042", "bankOnFile": "ACH ...4021", "deliveredTo": "Payables DL" },
-    "wrong": { "runDate": "day-1", "approvedBy": "AP Manager", "approvedAt": "2:30 PM", "cutoff": "3:00 PM", "invoiceCount": "1", "runTotal": "1220", "heldCount": "4", "payToName": "Northwind Fasteners", "vendorId": "V-1042", "bankOnFile": "ACH ...4021", "deliveredTo": "Payables DL" }
+    "correct": {
+      "runDate": "day-1",
+      "approvedBy": "AP Manager",
+      "approvedAt": "2:30 PM",
+      "cutoff": "3:00 PM",
+      "invoiceCount": "1",
+      "runTotal": "1200",
+      "heldCount": "4",
+      "payToName": "Northwind Fasteners",
+      "vendorId": "V-1042",
+      "bankOnFile": "ACH ...4021",
+      "deliveredTo": "Payables DL"
+    },
+    "wrong": {
+      "runDate": "day-1",
+      "approvedBy": "AP Manager",
+      "approvedAt": "2:30 PM",
+      "cutoff": "3:00 PM",
+      "invoiceCount": "1",
+      "runTotal": "1220",
+      "heldCount": "4",
+      "payToName": "Northwind Fasteners",
+      "vendorId": "V-1042",
+      "bankOnFile": "ACH ...4021",
+      "deliveredTo": "Payables DL"
+    }
   },
   "lesson-remittance-advice-medium": {
-    "correct": { "vendorName": "Northwind Fasteners", "remitTo": "4400 Commerce Way, Tacoma WA 98402", "vendorId": "V-1042", "invoiceNumber": "INV-59001", "amountPaid": "1200", "paidDate": "day-1", "payMethod": "ACH" },
-    "wrong": { "vendorName": "Northwind Fasteners", "remitTo": "4400 Commerce Way, Tacoma WA 98402", "vendorId": "V-1042", "invoiceNumber": "INV-59001", "amountPaid": "1220", "paidDate": "day-1", "payMethod": "ACH" }
+    "correct": {
+      "vendorName": "Northwind Fasteners",
+      "remitTo": "4400 Commerce Way, Tacoma WA 98402",
+      "vendorId": "V-1042",
+      "invoiceNumber": "INV-59001",
+      "amountPaid": "1200",
+      "paidDate": "day-1",
+      "payMethod": "ACH"
+    },
+    "wrong": {
+      "vendorName": "Northwind Fasteners",
+      "remitTo": "4400 Commerce Way, Tacoma WA 98402",
+      "vendorId": "V-1042",
+      "invoiceNumber": "INV-59001",
+      "amountPaid": "1220",
+      "paidDate": "day-1",
+      "payMethod": "ACH"
+    }
   },
   "lesson-tolerance-policy-hard": {
-    "correct": { "policyName": "Beacon Price Tolerance Policy", "version": "2.0.0", "owner": "AP Manager", "approver": "Controller", "priceTolerancePct": 2, "priceToleranceAbs": 25, "toleranceBasis": "larger", "qtyTolerance": 0, "rationale": "84 of 90 benign variances fell under both 25 and 2%; all 6 overcharges exceeded both. Larger-of lets the 25 floor pass small-PO drift and the 2% leg catch large-PO overcharges." },
-    "wrong": { "policyName": "Beacon Price Tolerance Policy", "version": "2.0.0", "owner": "AP Manager", "approver": "Controller", "priceTolerancePct": 2, "priceToleranceAbs": 25, "toleranceBasis": "larger", "qtyTolerance": "0", "rationale": "" }
+    "correct": {
+      "policyName": "Beacon Price Tolerance Policy",
+      "version": "2.0.0",
+      "owner": "AP Manager",
+      "approver": "Controller",
+      "priceTolerancePct": 2,
+      "priceToleranceAbs": 25,
+      "toleranceBasis": "larger",
+      "qtyTolerance": 0,
+      "rationale": "84 of 90 benign variances fell under both 25 and 2%; all 6 overcharges exceeded both. Larger-of lets the 25 floor pass small-PO drift and the 2% leg catch large-PO overcharges."
+    },
+    "wrong": {
+      "policyName": "Beacon Price Tolerance Policy",
+      "version": "2.0.0",
+      "owner": "AP Manager",
+      "approver": "Controller",
+      "priceTolerancePct": 2,
+      "priceToleranceAbs": 25,
+      "toleranceBasis": "larger",
+      "qtyTolerance": "0",
+      "rationale": ""
+    }
   },
   "lesson-duplicate-check-hard": {
-    "correct": { "ruleName": "Beacon Duplicate Detection Rule", "version": "1.0.0", "owner": "AP Manager", "approver": "Controller", "identityKey": "vendorId + invoiceNumber + invoiceTotal", "lookbackDays": 90, "exactMatchAction": "auto-reject as duplicate", "partialMatchAction": "route to human review", "rationale": "Exact key hit is a certain duplicate and auto-rejects; the resend under a new number shares vendor and total so a partial match routes to a human, as do the split shipment and altered total. 90 days covers the longest billing cycle." },
-    "wrong": { "ruleName": "Beacon Duplicate Detection Rule", "version": "1.0.0", "owner": "AP Manager", "approver": "Controller", "identityKey": "vendorId + invoiceNumber + invoiceTotal", "lookbackDays": "90", "exactMatchAction": "auto-reject as duplicate", "partialMatchAction": "route to human review", "rationale": "" }
+    "correct": {
+      "ruleName": "Beacon Duplicate Detection Rule",
+      "version": "1.0.0",
+      "owner": "AP Manager",
+      "approver": "Controller",
+      "identityKey": "vendorId + invoiceNumber + invoiceTotal",
+      "lookbackDays": 90,
+      "exactMatchAction": "auto-reject as duplicate",
+      "partialMatchAction": "route to human review",
+      "rationale": "Exact key hit is a certain duplicate and auto-rejects; the resend under a new number shares vendor and total so a partial match routes to a human, as do the split shipment and altered total. 90 days covers the longest billing cycle."
+    },
+    "wrong": {
+      "ruleName": "Beacon Duplicate Detection Rule",
+      "version": "1.0.0",
+      "owner": "AP Manager",
+      "approver": "Controller",
+      "identityKey": "vendorId + invoiceNumber + invoiceTotal",
+      "lookbackDays": "90",
+      "exactMatchAction": "auto-reject as duplicate",
+      "partialMatchAction": "route to human review",
+      "rationale": ""
+    }
   },
   "lesson-vendor-master-hard": {
-    "correct": { "changeType": "bank-detail", "vendorId": "V-1042", "requestChannel": "email", "verificationMethod": "callback", "verificationContact": "number on file", "secondApprover": "AP Manager", "paymentsHeld": "true", "status": "pending-verification" },
-    "wrong": { "changeType": "bank-detail", "vendorId": "V-1042", "requestChannel": "email", "verificationMethod": "reply to email", "verificationContact": "number in the request email", "secondApprover": "AP Clerk", "paymentsHeld": "no", "status": "applied" }
+    "correct": {
+      "changeType": "bank-detail",
+      "vendorId": "V-1042",
+      "requestChannel": "email",
+      "verificationMethod": "callback",
+      "verificationContact": "number on file",
+      "secondApprover": "AP Manager",
+      "paymentsHeld": "true",
+      "status": "pending-verification"
+    },
+    "wrong": {
+      "changeType": "bank-detail",
+      "vendorId": "V-1042",
+      "requestChannel": "email",
+      "verificationMethod": "reply to email",
+      "verificationContact": "number in the request email",
+      "secondApprover": "AP Clerk",
+      "paymentsHeld": "no",
+      "status": "applied"
+    }
   },
   "lesson-three-way-match-hard": {
     "correct": [
-      { "invoiceNumber": "INV-59101", "poTotal": 1200, "invoiceTotal": 1224.5, "variance": 24.5, "variancePct": 2.04, "toleranceBand": 25, "withinTolerance": true },
-      { "invoiceNumber": "INV-59102", "poTotal": 1200, "invoiceTotal": 1225, "variance": 25, "variancePct": 2.08, "toleranceBand": 25, "withinTolerance": true },
-      { "invoiceNumber": "INV-59103", "poTotal": 1200, "invoiceTotal": 1225.5, "variance": 25.5, "variancePct": 2.13, "toleranceBand": 25, "withinTolerance": false },
-      { "invoiceNumber": "INV-59104", "poTotal": 2000, "invoiceTotal": 2045, "variance": 45, "variancePct": 2.25, "toleranceBand": 40, "withinTolerance": false }
+      {
+        "invoiceNumber": "INV-59101",
+        "poTotal": 1200,
+        "invoiceTotal": 1224.5,
+        "variance": 24.5,
+        "variancePct": 2.04,
+        "toleranceBand": 25,
+        "withinTolerance": true
+      },
+      {
+        "invoiceNumber": "INV-59102",
+        "poTotal": 1200,
+        "invoiceTotal": 1225,
+        "variance": 25,
+        "variancePct": 2.08,
+        "toleranceBand": 25,
+        "withinTolerance": true
+      },
+      {
+        "invoiceNumber": "INV-59103",
+        "poTotal": 1200,
+        "invoiceTotal": 1225.5,
+        "variance": 25.5,
+        "variancePct": 2.13,
+        "toleranceBand": 25,
+        "withinTolerance": false
+      },
+      {
+        "invoiceNumber": "INV-59104",
+        "poTotal": 2000,
+        "invoiceTotal": 2045,
+        "variance": 45,
+        "variancePct": 2.25,
+        "toleranceBand": 40,
+        "withinTolerance": false
+      }
     ],
     "wrong": [
-      { "invoiceNumber": "INV-59101", "poTotal": 1200, "invoiceTotal": 1224.5, "variance": 24.5, "variancePct": 2.04, "toleranceBand": 25, "withinTolerance": false },
-      { "invoiceNumber": "INV-59102", "poTotal": 1200, "invoiceTotal": 1225, "variance": 25, "variancePct": 2.08, "toleranceBand": 25, "withinTolerance": true },
-      { "invoiceNumber": "INV-59103", "poTotal": 1200, "invoiceTotal": 1225.5, "variance": 25.5, "variancePct": 2.13, "toleranceBand": 25, "withinTolerance": false },
-      { "invoiceNumber": "INV-59104", "poTotal": 2000, "invoiceTotal": 2045, "variance": 45, "variancePct": 2.25, "toleranceBand": 40, "withinTolerance": false }
+      {
+        "invoiceNumber": "INV-59101",
+        "poTotal": 1200,
+        "invoiceTotal": 1224.5,
+        "variance": 24.5,
+        "variancePct": 2.04,
+        "toleranceBand": 25,
+        "withinTolerance": false
+      },
+      {
+        "invoiceNumber": "INV-59102",
+        "poTotal": 1200,
+        "invoiceTotal": 1225,
+        "variance": 25,
+        "variancePct": 2.08,
+        "toleranceBand": 25,
+        "withinTolerance": true
+      },
+      {
+        "invoiceNumber": "INV-59103",
+        "poTotal": 1200,
+        "invoiceTotal": 1225.5,
+        "variance": 25.5,
+        "variancePct": 2.13,
+        "toleranceBand": 25,
+        "withinTolerance": false
+      },
+      {
+        "invoiceNumber": "INV-59104",
+        "poTotal": 2000,
+        "invoiceTotal": 2045,
+        "variance": 45,
+        "variancePct": 2.25,
+        "toleranceBand": 40,
+        "withinTolerance": false
+      }
     ]
   },
   "lesson-payment-run-hard": {
-    "correct": { "cutoff": "3:00 PM", "paidCount": "0", "heldCount": "6", "outageAt": "1:45 PM", "detectedAt": "1:50 PM", "ticketId": "INC-4471", "runMode": "degraded", "approvedBy": "AP Manager", "approvedAt": "2:30 PM" },
-    "wrong": { "cutoff": "3:00 PM", "paidCount": "6", "heldCount": "0", "outageAt": "1:45 PM", "detectedAt": "1:50 PM", "ticketId": "INC-4471", "runMode": "normal", "approvedBy": "AP Manager", "approvedAt": "2:30 PM" }
+    "correct": {
+      "cutoff": "3:00 PM",
+      "paidCount": "0",
+      "heldCount": "6",
+      "outageAt": "1:45 PM",
+      "detectedAt": "1:50 PM",
+      "ticketId": "INC-4471",
+      "runMode": "degraded",
+      "approvedBy": "AP Manager",
+      "approvedAt": "2:30 PM"
+    },
+    "wrong": {
+      "cutoff": "3:00 PM",
+      "paidCount": "6",
+      "heldCount": "0",
+      "outageAt": "1:45 PM",
+      "detectedAt": "1:50 PM",
+      "ticketId": "INC-4471",
+      "runMode": "normal",
+      "approvedBy": "AP Manager",
+      "approvedAt": "2:30 PM"
+    }
+  },
+  "lesson-brief-operations": {
+    "correct": {
+      "system": "Desk shared mailbox",
+      "authMethod": "Service account",
+      "secret": "vault://meridian/desk-mailbox",
+      "mode": "Poll",
+      "intervalMinutes": 5,
+      "retries": 3,
+      "onFailure": "Dead-letter and alert"
+    },
+    "wrong": {
+      "system": "Desk shared mailbox",
+      "authMethod": "Service account",
+      "secret": "ghp_8Kd0PmZq4Rn1Wc7Ty2Lv6Bx3",
+      "mode": "Poll",
+      "intervalMinutes": 5,
+      "retries": 3,
+      "onFailure": "Dead-letter and alert"
+    }
+  },
+  "lesson-brief-operations-medium": {
+    "correct": {
+      "failedStep": "s2",
+      "cause": "auth-expired",
+      "action": "rotate-credential",
+      "rerunFrom": "s2"
+    },
+    "wrong": {
+      "failedStep": "s3",
+      "cause": "auth-expired",
+      "action": "rotate-credential",
+      "rerunFrom": "s2"
+    }
+  },
+  "lesson-brief-operations-hard": {
+    "correct": [
+      {
+        "caseId": "TC-1",
+        "scenario": "Clean overnight run, biggest move 4.2%",
+        "environment": "test",
+        "expectedOutcome": "routine-update-path"
+      },
+      {
+        "caseId": "TC-2",
+        "scenario": "Biggest move exactly 12.0%",
+        "environment": "test",
+        "expectedOutcome": "approval-route"
+      },
+      {
+        "caseId": "TC-3",
+        "scenario": "One price row has a non-numeric value",
+        "environment": "test",
+        "expectedOutcome": "quarantine"
+      },
+      {
+        "caseId": "TC-4",
+        "scenario": "A hub appears with no prior-day baseline",
+        "environment": "test",
+        "expectedOutcome": "stays-manual"
+      }
+    ],
+    "wrong": [
+      {
+        "caseId": "TC-1",
+        "scenario": "Clean overnight run, biggest move 4.2%",
+        "environment": "test",
+        "expectedOutcome": "routine-update-path"
+      },
+      {
+        "caseId": "TC-2",
+        "scenario": "Biggest move exactly 12.0%",
+        "environment": "test",
+        "expectedOutcome": "whatever-feels-right"
+      },
+      {
+        "caseId": "TC-3",
+        "scenario": "One price row has a non-numeric value",
+        "environment": "test",
+        "expectedOutcome": "quarantine"
+      },
+      {
+        "caseId": "TC-4",
+        "scenario": "A hub appears with no prior-day baseline",
+        "environment": "test",
+        "expectedOutcome": "stays-manual"
+      }
+    ]
+  },
+  "lesson-desk-operations": {
+    "correct": {
+      "system": "AP shared mailbox",
+      "authMethod": "Service account",
+      "secret": "vault://beacon/ap-mailbox",
+      "mode": "Poll",
+      "intervalMinutes": 10,
+      "retries": 3,
+      "onFailure": "Dead-letter and alert"
+    },
+    "wrong": {
+      "system": "AP shared mailbox",
+      "authMethod": "Service account",
+      "secret": "xoxb-4471-9920-QpLm2Vt8Zr",
+      "mode": "Poll",
+      "intervalMinutes": 10,
+      "retries": 3,
+      "onFailure": "Dead-letter and alert"
+    }
+  },
+  "lesson-desk-operations-medium": {
+    "correct": {
+      "failedStep": "s3",
+      "cause": "rate-limit",
+      "action": "retry-with-backoff",
+      "rerunFrom": "s3"
+    },
+    "wrong": {
+      "failedStep": "s4",
+      "cause": "rate-limit",
+      "action": "retry-with-backoff",
+      "rerunFrom": "s3"
+    }
+  },
+  "lesson-desk-operations-hard": {
+    "correct": [
+      {
+        "caseId": "TC-1",
+        "scenario": "Invoice $2.40 vs PO $2.40, quantities equal",
+        "environment": "test",
+        "expectedOutcome": "auto-approve-path"
+      },
+      {
+        "caseId": "TC-2",
+        "scenario": "Invoice $2.44 vs PO $2.40 on a $600 PO, quantities equal",
+        "environment": "test",
+        "expectedOutcome": "auto-approve-path"
+      },
+      {
+        "caseId": "TC-3",
+        "scenario": "Same vendor, same invoice number, already paid last week",
+        "environment": "test",
+        "expectedOutcome": "duplicate-blocked"
+      },
+      {
+        "caseId": "TC-4",
+        "scenario": "Invoice from a vendor with no row on the master",
+        "environment": "test",
+        "expectedOutcome": "stays-manual"
+      }
+    ],
+    "wrong": [
+      {
+        "caseId": "TC-1",
+        "scenario": "Invoice $2.40 vs PO $2.40, quantities equal",
+        "environment": "test",
+        "expectedOutcome": "auto-approve-path"
+      },
+      {
+        "caseId": "TC-2",
+        "scenario": "Invoice $2.44 vs PO $2.40 on a $600 PO, quantities equal",
+        "environment": "test",
+        "expectedOutcome": "whatever-feels-right"
+      },
+      {
+        "caseId": "TC-3",
+        "scenario": "Same vendor, same invoice number, already paid last week",
+        "environment": "test",
+        "expectedOutcome": "duplicate-blocked"
+      },
+      {
+        "caseId": "TC-4",
+        "scenario": "Invoice from a vendor with no row on the master",
+        "environment": "test",
+        "expectedOutcome": "stays-manual"
+      }
+    ]
+  },
+  "lesson-onboarding-operations": {
+    "correct": {
+      "system": "Applicant tracking system",
+      "authMethod": "Service account",
+      "secret": "vault://harbor/ats-webhook-secret",
+      "mode": "Webhook",
+      "retries": 3,
+      "onFailure": "Dead-letter and alert",
+      "piiHandling": "Retain per the HR policy"
+    },
+    "wrong": {
+      "system": "Applicant tracking system",
+      "authMethod": "Service account",
+      "secret": "whsec_2ZmQ9xTb51KdVr8Ns",
+      "mode": "Webhook",
+      "retries": 3,
+      "onFailure": "Dead-letter and alert",
+      "piiHandling": "Retain per the HR policy"
+    }
+  },
+  "lesson-onboarding-operations-medium": {
+    "correct": {
+      "failedStep": "s3",
+      "cause": "schema-change",
+      "action": "fix-mapping",
+      "rerunFrom": "s3"
+    },
+    "wrong": {
+      "failedStep": "s4",
+      "cause": "schema-change",
+      "action": "fix-mapping",
+      "rerunFrom": "s3"
+    }
+  },
+  "lesson-onboarding-operations-hard": {
+    "correct": [
+      {
+        "caseId": "TC-1",
+        "scenario": "All four provisioning tasks done before SD-1",
+        "environment": "test",
+        "expectedOutcome": "gate-opens"
+      },
+      {
+        "caseId": "TC-2",
+        "scenario": "Laptop backordered, still blocked at SD-1",
+        "environment": "test",
+        "expectedOutcome": "escalation-path"
+      },
+      {
+        "caseId": "TC-3",
+        "scenario": "Start date moves from SD to SD+7 after the plan is built",
+        "environment": "test",
+        "expectedOutcome": "recompute-deadlines"
+      },
+      {
+        "caseId": "TC-4",
+        "scenario": "Manager asks for a group not on the role profile",
+        "environment": "test",
+        "expectedOutcome": "stays-manual"
+      }
+    ],
+    "wrong": [
+      {
+        "caseId": "TC-1",
+        "scenario": "All four provisioning tasks done before SD-1",
+        "environment": "test",
+        "expectedOutcome": "gate-opens"
+      },
+      {
+        "caseId": "TC-2",
+        "scenario": "Laptop backordered, still blocked at SD-1",
+        "environment": "test",
+        "expectedOutcome": "whatever-feels-right"
+      },
+      {
+        "caseId": "TC-3",
+        "scenario": "Start date moves from SD to SD+7 after the plan is built",
+        "environment": "test",
+        "expectedOutcome": "recompute-deadlines"
+      },
+      {
+        "caseId": "TC-4",
+        "scenario": "Manager asks for a group not on the role profile",
+        "environment": "test",
+        "expectedOutcome": "stays-manual"
+      }
+    ]
   }
 }
