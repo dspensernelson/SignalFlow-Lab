@@ -100,12 +100,22 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "trigger",
       "soloRebuildPath": "You'd read the amended offer and copy the NEW start date, striking through the old one so nobody plans to the wrong day.",
-      "tools": {
-        "powerAutomate": "read the latest amendment record, ignoring superseded fields",
-        "zapier": "map the amended-start field, not the original",
-        "python": "prefer the amendment value when both are present"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "an e-signature or ATS trigger that fires the moment the offer is countersigned"
+        },
+        {
+          "tool": "make",
+          "how": "a Watch module on the ATS, so onboarding starts without anyone remembering to start it"
+        },
+        {
+          "tool": "langgraph",
+          "how": "the graph entry, with the offer parsed into typed state before any provisioning runs"
+        }
+      ]
     },
     "heading": "Amended offer profiled",
     "points": [

@@ -104,12 +104,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "store",
       "soloRebuildPath": "You'd handle the no-exception case: when nothing is flagged, let the run proceed automatically and just log it.",
-      "tools": {
-        "powerAutomate": "the 'yes' branch that completes silently and writes an audit row",
-        "zapier": "the default Path that finishes without human review",
-        "python": "the else branch that commits and logs without escalation"
-      }
+      "bestFit": [
+        {
+          "tool": "zapier",
+          "how": "the quiet Path that writes an audit row and ends, so 'nothing happened' is still recorded"
+        },
+        {
+          "tool": "python",
+          "how": "log the no-action decision with its reason; a silent branch is an unauditable branch"
+        }
+      ]
     },
     "heading": "Routine outcome logged",
     "points": [

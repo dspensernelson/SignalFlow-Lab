@@ -62,12 +62,22 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "You'd combine the clean prices and the policy into one judgement per hub - normal, watch, or breach - so a human sees a single verdict.",
-      "tools": {
-        "powerAutomate": "a 'Switch' on the computed score to assign a risk label",
-        "zapier": "'Paths' branching by score to set a risk-level field",
-        "python": "a scoring function mapping the metrics to a risk label"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "a 'Switch' on the computed score to assign a risk label"
+        },
+        {
+          "tool": "langgraph",
+          "how": "a scoring node that writes the label into state, with the rubric passed in as config"
+        },
+        {
+          "tool": "python",
+          "how": "a scoring function returning both the score and the reason it fired"
+        }
+      ]
     },
     "heading": "Quarantined morning classified",
     "points": [

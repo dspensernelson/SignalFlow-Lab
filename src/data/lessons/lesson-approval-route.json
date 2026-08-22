@@ -103,12 +103,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "approval",
       "soloRebuildPath": "You'd look up who owns this decision (by desk, amount, or region) and send it to the right person instead of a catch-all inbox.",
-      "tools": {
-        "powerAutomate": "a lookup table + 'Start and wait for an approval' addressed to the resolved approver",
-        "zapier": "'Lookup Table' by Formatter to pick the approver, then send",
-        "python": "a routing map {region: approver} and a send call"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "a routing lookup, then 'Start and wait for an approval' addressed to the resolved approver"
+        },
+        {
+          "tool": "powerAppsCopilot",
+          "how": "an approval card in a topic; the reply writes back to the record"
+        }
+      ]
     },
     "heading": "Approval record captured",
     "points": [

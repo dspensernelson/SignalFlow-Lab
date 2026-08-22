@@ -101,12 +101,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "store",
       "soloRebuildPath": "You'd file the paid invoice, the match evidence, and the confirmation together in a dated folder for audit.",
-      "tools": {
-        "powerAutomate": "'Create file' in a dated library + 'Update item' to mark it archived",
-        "zapier": "'Upload File' to Drive + update the record's status",
-        "python": "write the bundle to storage/S3 with a timestamped key"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "'Create file' in a dated library plus 'Update item' to mark the batch archived"
+        },
+        {
+          "tool": "make",
+          "how": "a storage module writing the retained batch that tomorrow's duplicate check reads"
+        }
+      ]
     },
     "heading": "Run archived",
     "points": [

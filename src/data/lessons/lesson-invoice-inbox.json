@@ -102,12 +102,22 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "trigger",
       "soloRebuildPath": "You'd triage the invoice inbox by hand - deciding which emails are real invoices, which are duplicates, and which are spam - before anything gets keyed.",
-      "tools": {
-        "powerAutomate": "Outlook trigger + Condition rules (or AI Builder) to classify each incoming invoice",
-        "zapier": "Email Parser + 'Filter' to keep only genuine invoices",
-        "python": "read the mailbox and classify by sender/subject rules into keep or skip"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "an Outlook trigger on the AP mailbox, with a condition separating invoices from everything else"
+        },
+        {
+          "tool": "make",
+          "how": "a Watch Emails module with a filter on attachments, so only real invoices enter the scenario"
+        },
+        {
+          "tool": "langgraph",
+          "how": "the entry node, classifying each arrival before the pipeline commits to processing it"
+        }
+      ]
     },
     "heading": "Source profiled",
     "points": [

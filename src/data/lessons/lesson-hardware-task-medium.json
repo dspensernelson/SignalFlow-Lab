@@ -85,12 +85,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "send",
       "soloRebuildPath": "You'd record the real backorder date and flag it, rather than writing a delivery date you hope comes true.",
-      "tools": {
-        "powerAutomate": "capture the vendor's real ETA; set a blocked flag when it is past start",
-        "zapier": "store the true delivery date and a not-on-track marker",
-        "python": "record deliverBy and mark blocked when deliverBy > start"
-      }
+      "bestFit": [
+        {
+          "tool": "zapier",
+          "how": "create the procurement ticket and post the tracking number back to the tracker"
+        },
+        {
+          "tool": "make",
+          "how": "a ticket-creation module, then a Wait for the shipping confirmation the vendor sends"
+        }
+      ]
     },
     "heading": "Backorder captured",
     "points": [

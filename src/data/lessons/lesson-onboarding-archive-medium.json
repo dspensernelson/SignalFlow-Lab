@@ -66,12 +66,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "store",
       "soloRebuildPath": "You'd file the run with a note about the backorder and loaner, so the pattern is visible next time.",
-      "tools": {
-        "powerAutomate": "write the run with an exceptions flag and retention label",
-        "zapier": "archive the record and tag it as having exceptions",
-        "python": "store the run with exceptionsNoted for later analysis"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "write the run to a retained store with a retention label matching the HR policy"
+        },
+        {
+          "tool": "make",
+          "how": "a storage module writing the retained run that the catalog feedback later reads"
+        }
+      ]
     },
     "heading": "Run archived with exceptions",
     "points": [

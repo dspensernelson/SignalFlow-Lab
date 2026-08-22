@@ -2,6 +2,63 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-08-22 (Ecosystem literacy: taxonomy, Operations node, two interaction types)
+
+Owner ratified the Ecosystem Literacy Plan. Driver: the end-goal bar in
+GO_LIVE_REVIEW.md ("knowing everything possible about how to ACTUALLY build
+automations and workflows") is not met by the shipped curriculum. A coverage
+audit across all 120 lessons measured the gap.
+
+- FIELD-NOTES DECLINE REVERSED (supersedes 2026-07-06). That entry declined a
+  wrap lesson because its themes were "already owned by existing nodes -
+  credentials/secrets by accounts-task ... testing by the accounts-task
+  idempotent re-run". Verified 2026-08-22: `grep -i "credential\|secret"` over
+  lesson-accounts-task{,-medium,-hard}.json and lesson-access-task{,-medium}.json
+  returns 0 matches in all five files. The coverage claim was not supported.
+  Measured across 120 lessons (teaching prose, excluding realWorld one-liners):
+  runtime error handling 0, run history / failed runs 1, credentials/secrets/auth
+  1, testing an automation 0, triggers + poll-vs-webhook 1, environments/ALM 0,
+  rate limits/backoff 0, PII 0, when-NOT-to-automate 0 by phrase.
+- OPERATIONS NODE, mandatory per module (AUTONOMY_CHARTER Gate 2,
+  MODULE_AUTHORING_PLAYBOOK Step 2b/7c). One `process` node marked
+  `skeletonStage: "operate"`, fed by the archive node, non-decision, no outgoing
+  edges. Three lessons: connectorConfig (Easy), runInspect (Medium), jsonRows
+  test plan (Hard). Lint-enforced by `ops-node` and `ops-coverage` - it is a
+  script, not a wish, because the Step 7a capstone and the TOOL_MAP appendix
+  both silently lapsed when they were prose-only rules.
+- ONE-TIME ADDITIVE MAP CHANGE to shipped modules 1-3 (Gate 3 exception, owner
+  ratified): each gains the Operations node and its single incoming archive
+  edge. Additive only - no existing node, edge, lesson, or artifact changes.
+  Node counts 17 -> 18, 17 -> 18, 16 -> 17; all inside the 15-18 guardrail.
+- GATE 4 EXEMPTION for `connectorConfig` + `runInspect`
+  (ENGINE_ADDITIONS_SPEC_OPERATIONS.md), same reasoning as the 2026-07-05
+  anti-slop pair: two different node behaviors, whole-curriculum benefit. The
+  normal one-new-type-per-module budget resumes after these two. Spec committed
+  BEFORE implementation per Gate 4.
+- CANONICAL VOCABULARY: src/data/automationTaxonomy.json is the single source of
+  truth for nine action kinds, a seven-tool roster (Power Automate, Power Apps /
+  Copilot Studio, Make, n8n, Zapier, Python, LangGraph), opsTopics, and the run
+  vocabulary. Resolves three competing compressions that had drifted apart: the
+  master plan's eight moves (KEPT as pedagogy, now nine, with a crosswalk table),
+  moduleSkeleton.json's seven stages (KEPT as the shape axis, now eight with
+  `operate`), and the TOOL_MAP.md "five moves" (RETIRED with those files).
+- realWorld v2: `takeaway.realWorld` becomes
+  `{ actionKind, soloRebuildPath, bestFit: [{ tool, how }] }`, replacing the
+  fixed powerAutomate/zapier/python triple that was hardcoded in BOTH
+  LessonTakeaway.jsx and lint-lessons.mjs. Tools rotate by relevance, enforced by
+  a `realworld-rotation` lint (>= 5 of 7 tools per module, no tool above 60%).
+  All 120 lessons migrate; there is no dual shape.
+- TOOL_MAP.md RETIRED, superseding GO_LIVE_REVIEW W1 directive item 3. The
+  per-module markdown appendix lapsed after two modules (module-03 shipped
+  without one) and never rendered in the app. Replaced by an in-app Tool map
+  view generated from lesson realWorld data, which cannot lapse.
+- LESSON_DESIGN_FRAMEWORK "no real integrations" clarified to "no LIVE
+  integrations". Gate 8 unchanged: no network, no OAuth, no platform APIs.
+  Simulated platform surfaces built from authored mock data are in scope.
+- SEQUENCING: this work is REMEDIATION_PLAN Phases 4b and 5, after Phases 0-2
+  (lints, validator fixes), so the new types are born covered by the giveaway
+  and glossary lints. Module 4 does not merge before 4b.1 and 4b.2.
+
 ## 2026-07-06 (Module 3 Harbor - medium + hard tiers complete)
 
 - MEDIUM tier (16 lessons, full tier): a messier second hire (Sam Rivera,

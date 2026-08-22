@@ -89,12 +89,22 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "You'd keep one onboarding checklist with a status column, updating each row as the four teams reported instead of tracking four separate threads.",
-      "tools": {
-        "powerAutomate": "update a Dataverse status row per task from each branch's outcome",
-        "zapier": "update a table row's status field as each branch finishes",
-        "python": "collect the four branch results into one list of {taskId, state}"
-      }
+      "bestFit": [
+        {
+          "tool": "python",
+          "how": "one status row per task, updated by task id, so parallel branches cannot overwrite each other"
+        },
+        {
+          "tool": "make",
+          "how": "a data store updated per branch outcome, keyed on task id rather than on position"
+        },
+        {
+          "tool": "n8n",
+          "how": "a database upsert per branch, so re-running one branch does not disturb the others"
+        }
+      ]
     },
     "heading": "Tracker updated",
     "points": [

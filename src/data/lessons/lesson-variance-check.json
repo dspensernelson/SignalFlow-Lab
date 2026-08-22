@@ -88,12 +88,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "You'd add an Excel column comparing today vs prior day and an IF formula that marks any row over the limit.",
-      "tools": {
-        "powerAutomate": "a 'Condition' comparing each value against the policy, tagging breaches",
-        "zapier": "'Filter' or 'Paths' that only continue when the variance exceeds the threshold",
-        "python": "compute (today-prior)/prior and flag rows where abs(pct) > limit"
-      }
+      "bestFit": [
+        {
+          "tool": "make",
+          "how": "a Set Variable module computing the delta once, so downstream routes reuse it"
+        },
+        {
+          "tool": "zapier",
+          "how": "Formatter by Zapier (Numbers) to compute the move, stored as a field"
+        }
+      ]
     },
     "heading": "Variance summary built",
     "points": [

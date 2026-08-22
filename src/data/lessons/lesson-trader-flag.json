@@ -102,12 +102,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "trigger",
       "soloRebuildPath": "You'd take the trader's one-line flag (a chat ping or email) and log it as a row with ticker, severity, and reason so it can be merged with the desk note later.",
-      "tools": {
-        "powerAutomate": "Teams 'When a new message is posted' trigger into a Dataverse 'Create item'",
-        "zapier": "Slack 'New Message Posted' trigger into an Airtable 'Create Record'",
-        "python": "slack_sdk to read the channel, parse the flag text, append to a list or DataFrame"
-      }
+      "bestFit": [
+        {
+          "tool": "zapier",
+          "how": "a Slack or Teams 'New Message Posted to Channel' trigger on the desk channel"
+        },
+        {
+          "tool": "n8n",
+          "how": "a Webhook trigger the chat tool posts to when the flag is raised"
+        }
+      ]
     },
     "heading": "Signal interpreted",
     "points": [

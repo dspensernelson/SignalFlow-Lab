@@ -1,5 +1,6 @@
 import LessonWorkflowStrip from './LessonWorkflowStrip'
-import { Button, SignalFlowDiagram } from './ui'
+import { Button, Chip, SignalFlowDiagram } from './ui'
+import taxonomy from '../data/automationTaxonomy.json'
 
 // Inline icons for the takeaway workflow diagram (stroke-based, currentColor).
 function Icon({ name, className }) {
@@ -69,38 +70,76 @@ const CONSUMER_ICON = {
   'morning-brief': { name: 'doc', color: 'text-sf-accent' },
 }
 
-// Transfer beat: how this same step is rebuilt in the real world, by hand and in
-// the three automation platforms learners are most likely to meet. Rendered on
-// every takeaway layout (the Takeaway screen may scroll, so this is safe).
-const REAL_WORLD_TOOLS = [
-  ['Power Automate', 'powerAutomate'],
-  ['Zapier', 'zapier'],
-  ['Python', 'python'],
-]
+// Transfer beat v2: name the KIND of action this step is, then show the 2-3
+// tools that fit it best - and, collapsed, what the same move is called in every
+// other tool on the roster. Rendered on every takeaway layout (the Takeaway
+// screen may scroll, so this is safe). Data: takeaway.realWorld, validated by
+// the realworld-shape lint against src/data/automationTaxonomy.json.
+const TOOL_LABEL = Object.fromEntries(taxonomy.tools.map((t) => [t.id, t.label]))
+const ACTION_KIND = Object.fromEntries(taxonomy.actionKinds.map((k) => [k.id, k]))
+
+export function ActionKindChip({ actionKind, className = '' }) {
+  const kind = ACTION_KIND[actionKind]
+  if (!kind) return null
+  return (
+    <Chip className={className} title={kind.gloss}>
+      Kind of action: {kind.label}
+    </Chip>
+  )
+}
 
 function RealWorldPanel({ realWorld }) {
   if (!realWorld) return null
-  const tools = realWorld.tools || {}
+  const kind = ACTION_KIND[realWorld.actionKind]
+  const bestFit = Array.isArray(realWorld.bestFit) ? realWorld.bestFit : []
+  const chosen = new Set(bestFit.map((b) => b.tool))
+  const others = kind
+    ? taxonomy.tools.filter((t) => !chosen.has(t.id) && kind.dialect[t.id])
+    : []
   return (
     <section className="rounded-xl border border-sf-border bg-sf-surface p-4 shadow-sf-sm">
-      <h3 className="text-xs font-semibold uppercase tracking-sf-wide text-sf-subtle">
-        Take this to work
-      </h3>
+      <div className="flex flex-wrap items-center gap-2">
+        <h3 className="text-xs font-semibold uppercase tracking-sf-wide text-sf-subtle">
+          Take this to work
+        </h3>
+        <ActionKindChip actionKind={realWorld.actionKind} />
+      </div>
+      {kind && <p className="mt-2 text-xs italic text-sf-subtle">{kind.gloss}</p>}
       {realWorld.soloRebuildPath && (
         <p className="mt-2 text-sm text-sf-body">{realWorld.soloRebuildPath}</p>
       )}
-      <dl className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
-        {REAL_WORLD_TOOLS.map(([name, key]) =>
-          tools[key] ? (
-            <div key={key} className="rounded-lg border border-sf-border-subtle bg-sf-surface-subtle p-3">
+      {bestFit.length > 0 && (
+        <dl className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          {bestFit.map((b) => (
+            <div
+              key={b.tool}
+              className="rounded-lg border border-sf-border-subtle bg-sf-surface-subtle p-3"
+            >
               <dt className="text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">
-                {name}
+                {TOOL_LABEL[b.tool] || b.tool}
               </dt>
-              <dd className="mt-1 text-xs leading-snug text-sf-body">{tools[key]}</dd>
+              <dd className="mt-1 text-xs leading-snug text-sf-body">{b.how}</dd>
             </div>
-          ) : null
-        )}
-      </dl>
+          ))}
+        </dl>
+      )}
+      {others.length > 0 && (
+        <details className="mt-3">
+          <summary className="cursor-pointer text-xs text-sf-subtle hover:text-sf-text">
+            Same move in the other tools
+          </summary>
+          <dl className="mt-2 space-y-1.5">
+            {others.map((t) => (
+              <div key={t.id} className="flex flex-col gap-0.5 sm:flex-row sm:gap-2">
+                <dt className="shrink-0 text-[11px] font-medium text-sf-subtle sm:w-44">
+                  {t.label}
+                </dt>
+                <dd className="text-[11px] leading-snug text-sf-body">{kind.dialect[t.id]}</dd>
+              </div>
+            ))}
+          </dl>
+        </details>
+      )}
     </section>
   )
 }

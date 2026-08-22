@@ -1,6 +1,10 @@
 import { STATUS, isBuildable } from '../lib/progress'
 import { TYPE_COLOR } from '../lib/nodeStyles'
 import { Badge, Button, Chip, SectionLabel, Icon } from './ui'
+import taxonomy from '../data/automationTaxonomy.json'
+
+const TOOL_LABEL = Object.fromEntries(taxonomy.tools.map((t) => [t.id, t.label]))
+const ACTION_KIND = Object.fromEntries(taxonomy.actionKinds.map((k) => [k.id, k]))
 
 const TYPE_LABEL = {
   source: 'Source object',
@@ -124,6 +128,7 @@ function MiniFlow({ inCount, outCount, accent }) {
 }
 
 export default function NodeDetail({
+  lesson: builtLesson,
   node,
   status,
   phase,
@@ -257,6 +262,27 @@ export default function NodeDetail({
           <Chips items={lesson.concepts} />
         </Section>
       )}
+
+      {(() => {
+        // Ecosystem beat, promoted out of the 11px reference stack: what KIND of
+        // action this node is, and which real tools fit it. Sourced from the
+        // built lesson so there is exactly one place the mapping lives.
+        const rw = builtLesson?.takeaway?.realWorld
+        const kind = rw && ACTION_KIND[rw.actionKind]
+        if (!kind) return null
+        const tools = (rw.bestFit || []).map((b) => TOOL_LABEL[b.tool] || b.tool)
+        return (
+          <div className="mb-3 rounded-lg border border-sf-border-subtle bg-sf-surface-subtle p-2.5">
+            <Chip title={kind.gloss}>Kind of action: {kind.label}</Chip>
+            <p className="mt-1.5 text-[11px] leading-snug text-sf-body">{kind.gloss}</p>
+            {tools.length > 0 && (
+              <p className="mt-1.5 text-[11px] leading-snug text-sf-subtle">
+                <span className="font-medium text-sf-body">Best fit:</span> {tools.join(', ')}
+              </p>
+            )}
+          </div>
+        )
+      })()}
 
       <Section title="In the lab">{node.labVersion || '—'}</Section>
       <Section title="At work">

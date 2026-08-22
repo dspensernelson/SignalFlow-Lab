@@ -116,12 +116,22 @@
   "fieldGuide": [],
   "takeaway": {
     "realWorld": {
+      "actionKind": "compose",
       "soloRebuildPath": "You'd fill a one-page readiness summary by copying each status from your checklist and records - never re-checking the work, just reporting it.",
-      "tools": {
-        "powerAutomate": "compose the document from Dataverse fields (record + tracker + gate)",
-        "zapier": "a 'Formatter' + document step pulling values from prior steps",
-        "python": "render a Markdown template from the stored artifacts"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "compose the document from the record, tracker, and gate fields, not from retyped values"
+        },
+        {
+          "tool": "python",
+          "how": "render the package from the three artifacts, so every line traces to the task that produced it"
+        },
+        {
+          "tool": "langgraph",
+          "how": "a synthesis node assembling the package from state, with the artifacts as grounding"
+        }
+      ]
     },
     "heading": "Day-One Package assembled",
     "points": [

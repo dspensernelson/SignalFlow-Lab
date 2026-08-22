@@ -83,12 +83,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "send",
       "soloRebuildPath": "You'd raise a ticket naming the blocked item, its owner, and a due date - so a stuck task has a person and a clock, not just a worried feeling.",
-      "tools": {
-        "powerAutomate": "create an escalation task with an assignee and due date, notify the owner",
-        "zapier": "'Create Ticket' with owner and deadline when a task is blocked",
-        "python": "open an escalation record {task, owner, resolveBy} and alert the owner"
-      }
+      "bestFit": [
+        {
+          "tool": "zapier",
+          "how": "create the escalation task with an assignee and a deadline, then notify the owner's manager"
+        },
+        {
+          "tool": "n8n",
+          "how": "a Wait node on the SLA, then a Send node up the ladder when no response arrived"
+        }
+      ]
     },
     "heading": "Escalation filed",
     "points": [

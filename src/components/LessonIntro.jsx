@@ -1,5 +1,6 @@
 import LessonWorkflowStrip from './LessonWorkflowStrip'
 import { Button, SignalFlowDiagram } from './ui'
+import { ActionKindChip } from './LessonTakeaway'
 
 // Small inline icon set so the mission path reads like a work-order screen
 // without pulling in an icon dependency. Unknown names render nothing.
@@ -105,6 +106,10 @@ export default function LessonIntro({ lesson, onContinue }) {
   const intro = lesson.intro
   const missionPath = Boolean(intro.mission)
   const rich = Boolean(intro.subtitle)
+  // The kind-of-action chip is the one concept label every lesson carries
+  // (intro.concept is authored on only one lesson). It names what this step IS
+  // in any tool, and its tooltip carries the gloss - see automationTaxonomy.json.
+  const actionKind = lesson.takeaway?.realWorld?.actionKind
 
   if (missionPath) {
     const came = intro.whatCameIn || {}
@@ -112,6 +117,11 @@ export default function LessonIntro({ lesson, onContinue }) {
     const unlocks = intro.unlocks || {}
     return (
       <div className="flex flex-col gap-4">
+        {actionKind && (
+          <div className="flex flex-wrap items-center gap-2">
+            <ActionKindChip actionKind={actionKind} />
+          </div>
+        )}
         {/* Mission statement: blocked until the note becomes a record */}
         <div className="flex items-start gap-3 rounded-xl border border-sf-border bg-sf-surface p-4 shadow-sf-sm">
           <span className="mt-0.5 flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-sf-accent-weak text-sf-accent">
@@ -264,6 +274,7 @@ export default function LessonIntro({ lesson, onContinue }) {
       <div className="flex flex-col gap-4">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <section className="lg:col-span-2 rounded-xl border border-sf-border bg-sf-surface p-5 shadow-sf-sm">
+            {actionKind && <ActionKindChip actionKind={actionKind} className="mb-3" />}
             <h2 className="text-lg font-semibold text-sf-text">{intro.heading}</h2>
             <div className="mt-4 flex flex-col gap-4">
               {intro.sections.map((section) => (
@@ -318,11 +329,14 @@ export default function LessonIntro({ lesson, onContinue }) {
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <section className="lg:col-span-2 rounded-xl border border-sf-border bg-sf-surface p-5 shadow-sf-sm">
-          {intro.concept && (
-            <span className="inline-flex items-center rounded-full border border-sf-accent-border bg-sf-accent-weak px-2.5 py-0.5 text-xs font-medium text-sf-accent-text">
-              Concept: {intro.concept}
-            </span>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {intro.concept && (
+              <span className="inline-flex items-center rounded-full border border-sf-accent-border bg-sf-accent-weak px-2.5 py-0.5 text-xs font-medium text-sf-accent-text">
+                Concept: {intro.concept}
+              </span>
+            )}
+            {actionKind && <ActionKindChip actionKind={actionKind} />}
+          </div>
           <h2 className="mt-3 text-2xl font-semibold text-sf-text">
             {intro.recordName || intro.heading}
           </h2>

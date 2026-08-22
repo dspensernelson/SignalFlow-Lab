@@ -84,12 +84,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "approval",
       "soloRebuildPath": "You'd mark the enrollment urgent and send it first, so a tight window still clears the pay cycle.",
-      "tools": {
-        "powerAutomate": "set a high-priority flag on the enrollment task",
-        "zapier": "tag the enrollment as urgent for the payroll team",
-        "python": "attach priority=rush to the enrollment payload"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAppsCopilot",
+          "how": "an enrollment card to Payroll; the confirmation writes back to the task tracker"
+        },
+        {
+          "tool": "zapier",
+          "how": "a delayed step that resumes when Payroll submits the confirmation form"
+        }
+      ]
     },
     "heading": "Payroll rushed",
     "points": [

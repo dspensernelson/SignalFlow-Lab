@@ -106,12 +106,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "send",
       "soloRebuildPath": "You'd jot 'this role also needs a scanner' after onboarding and send it to whoever owns the role checklist to update.",
-      "tools": {
-        "powerAutomate": "create a catalog change-request item assigned to People Ops",
-        "zapier": "append the proposal to a change-request table and notify the owner",
-        "python": "emit a {role, needed, proposedChange} request to the catalog owner"
-      }
+      "bestFit": [
+        {
+          "tool": "zapier",
+          "how": "create a catalog change-request record assigned to People Ops when a run needed something off-profile"
+        },
+        {
+          "tool": "python",
+          "how": "diff what was actually granted against the profile and file the delta as a change request"
+        }
+      ]
     },
     "heading": "Loop closed",
     "points": [

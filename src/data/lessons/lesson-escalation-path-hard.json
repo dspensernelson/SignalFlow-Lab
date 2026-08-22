@@ -66,12 +66,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "send",
       "soloRebuildPath": "You'd give the owner a deadline, and if they went silent, take it to their lead with a firm date rather than letting it drift.",
-      "tools": {
-        "powerAutomate": "a wait-with-timeout; on no response, reassign to the next owner",
-        "zapier": "a delay + check; escalate to level 2 if unresolved",
-        "python": "if not responded_by(deadline): escalate(level2, final_deadline)"
-      }
+      "bestFit": [
+        {
+          "tool": "zapier",
+          "how": "create the escalation task with an assignee and a deadline, then notify the owner's manager"
+        },
+        {
+          "tool": "n8n",
+          "how": "a Wait node on the SLA, then a Send node up the ladder when no response arrived"
+        }
+      ]
     },
     "heading": "Ladder captured",
     "points": [

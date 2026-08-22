@@ -89,12 +89,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "You'd expand your onboarding checklist into one row per task with an owner and a due date, then assign them all at once.",
-      "tools": {
-        "powerAutomate": "Apply to each entitlement -> Create a task with an assignee and due date",
-        "zapier": "loop the role's tasks into 'Create Task' with owner and due",
-        "python": "build a list of task dicts from the profile, stamping owner and due"
-      }
+      "bestFit": [
+        {
+          "tool": "python",
+          "how": "expand the role profile into dated tasks; the plan is data, so a changed role re-expands cleanly"
+        },
+        {
+          "tool": "n8n",
+          "how": "an Item Lists node fanning the entitlements into one task item per branch"
+        }
+      ]
     },
     "heading": "Provisioning plan built",
     "points": [

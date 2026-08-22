@@ -233,6 +233,7 @@ export default function App() {
         </div>
       )}
       <ProjectCanvas
+        lessons={lessons}
         nodes={nodes}
         phases={phases}
         edges={edges}

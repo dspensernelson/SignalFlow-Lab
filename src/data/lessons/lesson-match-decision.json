@@ -102,12 +102,22 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "condition",
       "soloRebuildPath": "You'd stamp the result - matched or exception - so clean invoices move to pay and mismatches go to review.",
-      "tools": {
-        "powerAutomate": "'Switch'/'Condition' setting a match-status field",
-        "zapier": "'Paths' by match result",
-        "python": "return 'matched' or 'exception' with the failing reason"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "a 'Switch' setting the match status, so every invoice leaves with an explicit outcome"
+        },
+        {
+          "tool": "make",
+          "how": "a Router with one filtered route per outcome, including the fall-through"
+        },
+        {
+          "tool": "zapier",
+          "how": "Paths by Zapier, with a final catch-all path so nothing silently stops"
+        }
+      ]
     },
     "heading": "Match decision made",
     "points": [

@@ -96,12 +96,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "condition",
       "soloRebuildPath": "You'd only build the package once every checklist item was ticked - one open item and you stop and chase it, not proceed.",
-      "tools": {
-        "powerAutomate": "a Condition that all task statuses equal done before the assemble branch",
-        "zapier": "a Filter that only continues when every task field is done",
-        "python": "all(t['state'] == 'done' for t in tasks) gates the package"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "a Condition that ALL task statuses equal done before the assemble branch runs"
+        },
+        {
+          "tool": "python",
+          "how": "all() over the tracker rows; one blocked task blocks the gate, by design"
+        }
+      ]
     },
     "heading": "Gate encoded",
     "points": [

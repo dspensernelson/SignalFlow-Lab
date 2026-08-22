@@ -64,12 +64,22 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "lookup",
       "soloRebuildPath": "You'd update the SLA table after the near-miss and note the version, so the team plans with the new margin.",
-      "tools": {
-        "powerAutomate": "publish a new version of the SLA config list",
-        "zapier": "update the SLA lookup table and log the change",
-        "python": "bump the sla policy version and the hardware value"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "a config list of task SLAs, with due dates computed by addDays from the start date"
+        },
+        {
+          "tool": "python",
+          "how": "an SLA table with a version; due dates derive from the start date so a moved date recomputes"
+        },
+        {
+          "tool": "make",
+          "how": "a data store of SLA offsets read once and applied to every task in the plan"
+        }
+      ]
     },
     "heading": "Policy revised",
     "points": [

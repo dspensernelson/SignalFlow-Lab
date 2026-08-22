@@ -37,9 +37,18 @@ stays the deepest lesson. Keep ASCII-only.
 
 Every module also ships, without exception:
 
+- An OPERATIONS node (MODULE_AUTHORING_PLAYBOOK.md Step 2b): one `process`
+  node marked `skeletonStage: "operate"`, fed by the archive node, carrying a
+  lesson in all three tiers (connectorConfig / runInspect / jsonRows test
+  plan). It teaches connect, trigger, observe, test, promote. Lint-enforced by
+  `ops-node` and `ops-coverage`; no grandfathering.
+
 - A MANDATORY Hard-tier solo-rebuild capstone (MODULE_AUTHORING_PLAYBOOK.md
   Step 7a): an artifactImport lesson on the decision-fork node that has the
   learner rebuild the module's four spine artifacts outside the app, each
   graded by its original easy-tier validator.
-- A SPEND-OR-JUSTIFY interaction budget (Step 7b): spend all four exercise
-  types across the tiers, or record in DECISION_LOG.md why one is absent.
+- A SPEND-OR-JUSTIFY interaction budget (Step 7b): spend a variety of the
+  exercise types across the tiers, or record in DECISION_LOG.md why one is
+  absent. Eight types are engine-supported: choiceCheck, jsonEditor,
+  templateSlots, artifactImport, tagSource, handoffForm, connectorConfig,
+  runInspect. The last two are spent by the Step 7c Operations lessons.

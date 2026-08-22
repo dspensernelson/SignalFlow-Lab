@@ -66,12 +66,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "send",
       "soloRebuildPath": "You'd note 'the checklist was right, the delay was supply' so nobody wastes time re-fixing a solved problem.",
-      "tools": {
-        "powerAutomate": "log a 'no change' feedback item to People Ops for the record",
-        "zapier": "append a confirmation entry to the change log",
-        "python": "emit {proposedChange:'none'} to the catalog owner"
-      }
+      "bestFit": [
+        {
+          "tool": "zapier",
+          "how": "create a catalog change-request record assigned to People Ops when a run needed something off-profile"
+        },
+        {
+          "tool": "python",
+          "how": "diff what was actually granted against the profile and file the delta as a change request"
+        }
+      ]
     },
     "heading": "Loop closed - no change",
     "points": [

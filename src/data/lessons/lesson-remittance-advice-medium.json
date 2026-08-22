@@ -103,12 +103,22 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "compose",
       "soloRebuildPath": "You'd email each vendor a remittance notice listing which invoices this payment covers.",
-      "tools": {
-        "powerAutomate": "'Send an email' per vendor with a 'Create HTML table' of paid invoices",
-        "zapier": "'Send Email' with merge fields per vendor",
-        "python": "render a remittance template per vendor and smtplib.send"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "'Create HTML table' of the paid invoices per vendor, then 'Send an email (V2)'"
+        },
+        {
+          "tool": "zapier",
+          "how": "Formatter to build the per-vendor summary, then an email action"
+        },
+        {
+          "tool": "python",
+          "how": "render one remittance per vendor from the batch, citing invoice numbers rather than restating amounts"
+        }
+      ]
     },
     "heading": "Remittance advice sent",
     "points": [

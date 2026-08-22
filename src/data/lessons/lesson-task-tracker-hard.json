@@ -63,12 +63,22 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "You'd treat a disputed item as not-done until someone confirmed it, and note the disagreement so it gets resolved.",
-      "tools": {
-        "powerAutomate": "a rule preferring the blocked report on conflict, with a reason",
-        "zapier": "compare the two sources; keep the conservative value",
-        "python": "state = 'blocked' if sources_disagree else agreed_state"
-      }
+      "bestFit": [
+        {
+          "tool": "python",
+          "how": "one status row per task, updated by task id, so parallel branches cannot overwrite each other"
+        },
+        {
+          "tool": "make",
+          "how": "a data store updated per branch outcome, keyed on task id rather than on position"
+        },
+        {
+          "tool": "n8n",
+          "how": "a database upsert per branch, so re-running one branch does not disturb the others"
+        }
+      ]
     },
     "heading": "Conflict reconciled",
     "points": [

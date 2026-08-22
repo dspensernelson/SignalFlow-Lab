@@ -65,12 +65,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "You'd recompute each due date from the new start rather than shifting old dates by hand and hoping.",
-      "tools": {
-        "powerAutomate": "recompute due dates with addDays from the current start date",
-        "zapier": "re-run the date-math step against the amended start",
-        "python": "recompute due = start - sla_days for every task"
-      }
+      "bestFit": [
+        {
+          "tool": "python",
+          "how": "expand the role profile into dated tasks; the plan is data, so a changed role re-expands cleanly"
+        },
+        {
+          "tool": "n8n",
+          "how": "an Item Lists node fanning the entitlements into one task item per branch"
+        }
+      ]
     },
     "heading": "Plan recomputed",
     "points": [

@@ -103,12 +103,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "trigger",
       "soloRebuildPath": "You'd download the overnight price file (a CSV or an emailed attachment) and load its rows into a table the workflow can read.",
-      "tools": {
-        "powerAutomate": "'When a file is created' (SharePoint/OneDrive) + Excel 'List rows in a table'",
-        "zapier": "'New File in Folder' (Dropbox/Drive) into a 'Create Spreadsheet Row(s)' step",
-        "python": "pandas.read_csv (or requests to the feed API) to load rows into a DataFrame"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "'When a file is created' on the feed folder, then Excel 'List rows in a table'"
+        },
+        {
+          "tool": "n8n",
+          "how": "a Cron trigger plus a Read Binary File node when the vendor drops on a schedule"
+        }
+      ]
     },
     "heading": "Feed profiled",
     "points": [

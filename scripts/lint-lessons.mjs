@@ -35,6 +35,12 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const lessonsDir = path.join(root, 'src', 'data', 'lessons')
 const registry = JSON.parse(readFileSync(path.join(root, 'src', 'data', 'projects.json'), 'utf8'))
 const projectsSource = readFileSync(path.join(root, 'src', 'lib', 'projects.js'), 'utf8')
+const taxonomy = JSON.parse(
+  readFileSync(path.join(root, 'src', 'data', 'automationTaxonomy.json'), 'utf8')
+)
+const ACTION_KINDS = new Set(taxonomy.actionKinds.map((k) => k.id))
+const ROSTER_TOOLS = new Set(taxonomy.tools.map((t) => t.id))
+const ROTATION = taxonomy.rotation
 
 const VALID_INTERACTIONS = ['jsonEditor', 'choiceCheck', 'templateSlots', 'artifactImport', 'tagSource', 'handoffForm']
 const VALID_VALIDATORS = ['jsonFields', 'jsonPolicy', 'jsonRows', 'jsonDeltas', 'choiceCheck', 'templateSlots', 'artifactImport', 'tagSource', 'handoffForm']
@@ -185,18 +191,41 @@ for (const file of files.sort()) {
   }
   if (!lesson.takeaway?.artifactName) err(id, 'takeaway.artifactName missing')
 
-  // 3b. Transfer beat (G2): every takeaway carries a realWorld mapping - how the
-  // step is rebuilt solo, plus the concrete action in each automation platform.
+  // 3b. Transfer beat v2 (realworld-shape): every takeaway names the KIND of
+  // action this step is (from src/data/automationTaxonomy.json) plus 2-3
+  // best-fit tools with a concrete how. The v1 fixed powerAutomate/zapier/
+  // python triple is retired - see DECISION_LOG 2026-08-22.
   const rw = lesson.takeaway?.realWorld
   if (!rw || typeof rw !== 'object') {
-    err(id, 'takeaway.realWorld missing (soloRebuildPath + tools.powerAutomate/zapier/python)')
+    err(id, 'takeaway.realWorld missing (actionKind + soloRebuildPath + bestFit)')
   } else {
+    if (rw.tools) {
+      err(id, 'takeaway.realWorld.tools is the legacy v1 shape; run node scripts/migrate-realworld.mjs')
+    }
     if (typeof rw.soloRebuildPath !== 'string' || !rw.soloRebuildPath.trim()) {
       err(id, 'takeaway.realWorld.soloRebuildPath missing or empty')
     }
-    for (const t of ['powerAutomate', 'zapier', 'python']) {
-      if (typeof rw.tools?.[t] !== 'string' || !rw.tools[t].trim()) {
-        err(id, `takeaway.realWorld.tools.${t} missing or empty`)
+    if (!rw.actionKind || !ACTION_KINDS.has(rw.actionKind)) {
+      err(id, `takeaway.realWorld.actionKind "${rw.actionKind}" is not an id in automationTaxonomy.json`)
+    }
+    const bf = rw.bestFit
+    if (!Array.isArray(bf)) {
+      err(id, 'takeaway.realWorld.bestFit must be an array')
+    } else {
+      if (bf.length < ROTATION.bestFitMin || bf.length > ROTATION.bestFitMax) {
+        err(id, `takeaway.realWorld.bestFit has ${bf.length} entries (need ${ROTATION.bestFitMin}-${ROTATION.bestFitMax})`)
+      }
+      const seen = new Set()
+      for (const b of bf) {
+        if (!b || !ROSTER_TOOLS.has(b.tool)) {
+          err(id, `takeaway.realWorld.bestFit tool "${b?.tool}" is not in the roster`)
+          continue
+        }
+        if (seen.has(b.tool)) err(id, `takeaway.realWorld.bestFit repeats tool "${b.tool}"`)
+        seen.add(b.tool)
+        if (typeof b.how !== 'string' || !b.how.trim()) {
+          err(id, `takeaway.realWorld.bestFit["${b.tool}"].how missing or empty`)
+        }
       }
     }
   }
@@ -359,6 +388,55 @@ for (const p of PROJECTS) {
       warn(`${p.id} choiceCheck`, `${cap} - grandfathered; do not add more choiceCheck lessons here`)
     } else {
       err(`${p.id} choiceCheck`, `${cap} - exceeds the per-module choiceCheck cap; use another interaction type`)
+    }
+  }
+}
+
+// 6b. realworld-tier-consistency: tier variants of one task teach the same
+// KIND of action. If easy says this step is a lookup and hard says it is a
+// condition, one of them is wrong about what the step IS.
+for (const p of PROJECTS) {
+  const byFamily = {}
+  for (const lid of [...p.tierIds.easy, ...p.tierIds.medium, ...p.tierIds.hard]) {
+    const lesson = lessonsById[lid]
+    if (!lesson) continue
+    const fam = lid.replace(/-(medium|hard)$/, '')
+    const kind = lesson.takeaway?.realWorld?.actionKind
+    if (!kind) continue
+    ;(byFamily[fam] || (byFamily[fam] = [])).push({ lid, kind })
+  }
+  for (const [fam, rows] of Object.entries(byFamily)) {
+    const kinds = [...new Set(rows.map((r) => r.kind))]
+    if (kinds.length > 1) {
+      err(`${p.id} ${fam}`, `tier variants disagree on actionKind: ${rows.map((r) => `${r.lid}=${r.kind}`).join(', ')}`)
+    }
+  }
+}
+
+// 6c. realworld-rotation: the tool roster must actually rotate by relevance.
+// Without this the mapping silently collapses back to one house tool on every
+// lesson, which is the v1 failure (120 identical powerAutomate/zapier/python
+// rows). Requires breadth across the module and caps any single tool's share.
+for (const p of PROJECTS) {
+  const ids = [...p.tierIds.easy, ...p.tierIds.medium, ...p.tierIds.hard]
+    .filter((lid) => lessonsById[lid])
+  if (ids.length === 0) continue
+  const counts = {}
+  for (const lid of ids) {
+    const bf = lessonsById[lid].takeaway?.realWorld?.bestFit
+    if (!Array.isArray(bf)) continue
+    for (const tool of new Set(bf.map((b) => b.tool))) {
+      counts[tool] = (counts[tool] || 0) + 1
+    }
+  }
+  const present = Object.keys(counts).length
+  if (present < ROTATION.minToolsPerModule) {
+    err(`${p.id} realworld-rotation`, `only ${present} of ${ROSTER_TOOLS.size} roster tools appear (need >= ${ROTATION.minToolsPerModule})`)
+  }
+  for (const [tool, n] of Object.entries(counts)) {
+    const share = n / ids.length
+    if (share > ROTATION.maxToolSharePerModule) {
+      err(`${p.id} realworld-rotation`, `${tool} appears in ${n}/${ids.length} = ${(share * 100).toFixed(1)}% of lessons (cap ${ROTATION.maxToolSharePerModule * 100}%)`)
     }
   }
 }

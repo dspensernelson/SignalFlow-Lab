@@ -120,12 +120,22 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "lookup",
       "soloRebuildPath": "You'd write a short SLA table (task -> days before start) your team agrees on, then compute each hire's due dates from their start date.",
-      "tools": {
-        "powerAutomate": "a config list of task SLAs, with due dates computed via addDays from the start date",
-        "zapier": "a lookup table of SLAs feeding a date-math step",
-        "python": "an sla dict of days-before-start, subtracted from the start date"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "a config list of task SLAs, with due dates computed by addDays from the start date"
+        },
+        {
+          "tool": "python",
+          "how": "an SLA table with a version; due dates derive from the start date so a moved date recomputes"
+        },
+        {
+          "tool": "make",
+          "how": "a data store of SLA offsets read once and applied to every task in the plan"
+        }
+      ]
     },
     "heading": "SLA policy set",
     "points": [

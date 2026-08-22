@@ -1,0 +1,79 @@
+{
+  "note": "Terms module-01 introduces, and the lesson responsible for teaching each. Enforced by scripts/lint-glossary.mjs. Module-01 is the energy-trading module: it carries the highest domain-vocabulary cost in the curriculum and, before 2026-08-22, the ONLY gloss anywhere in 120 lessons (one parenthetical covering hub, MWh, and settled price). Keep ASCII-only.",
+  "module": "module-01",
+  "terms": [
+    {
+      "term": "hub",
+      "aliases": ["trading hub", "market hub"],
+      "teachesIn": "lesson-analyst-notes",
+      "gloss": "A regional point where electricity is bought and sold. Prices are quoted per hub the way fuel prices are quoted per region."
+    },
+    {
+      "term": "MWh",
+      "aliases": ["megawatt-hour", "$/MWh"],
+      "teachesIn": "lesson-analyst-notes",
+      "gloss": "Megawatt-hour: the unit electricity is priced in. Roughly the power an average home uses in a month, so $/MWh is the wholesale price tag."
+    },
+    {
+      "term": "settled price",
+      "aliases": ["settled"],
+      "teachesIn": "lesson-analyst-notes",
+      "gloss": "The final cleared price for the day, after the intraday spikes stop moving. The spike is the drama; the settled price is what the books use."
+    },
+    {
+      "term": "ERCOT",
+      "teachesIn": "lesson-analyst-notes",
+      "gloss": "The grid operator that runs most of Texas. Here it is simply the name of the hub the desk watches."
+    },
+    {
+      "term": "the desk",
+      "aliases": ["desk", "trading desk"],
+      "teachesIn": "lesson-trader-flag",
+      "gloss": "The team that trades and watches the market. 'The desk' is the group; the analyst and the trader both sit on it."
+    },
+    {
+      "term": "generation",
+      "teachesIn": "lesson-price-feed",
+      "gloss": "How much power was actually produced, by source (wind, gas, solar). Generation missing forecast is usually why a price moved."
+    },
+    {
+      "term": "variance",
+      "teachesIn": "lesson-variance-check",
+      "gloss": "The gap between two numbers you expected to agree - here, today's price against yesterday's. Computed once and stored, so every later step cites the same figure."
+    },
+    {
+      "term": "threshold",
+      "aliases": ["escalation threshold"],
+      "teachesIn": "lesson-threshold-policy",
+      "gloss": "The line that decides routine from escalate. It lives in a policy someone owns, never inside the logic that applies it."
+    },
+    {
+      "term": "artifact",
+      "teachesIn": "lesson-intake",
+      "gloss": "A named, structured object the workflow produces and later steps reuse - market-intake.json, clean-price-data.json. Artifacts are how progress is measured here, not lessons completed."
+    },
+    {
+      "term": "upstream",
+      "aliases": ["downstream"],
+      "teachesIn": "lesson-intake",
+      "gloss": "Upstream is what feeds this step; downstream is what consumes it. The map draws both so you can see what breaks if this step is wrong."
+    },
+    {
+      "term": "schema",
+      "aliases": ["schema version"],
+      "teachesIn": "lesson-intake",
+      "gloss": "The agreed set of field names and types a record must have. Changing it is a breaking change for everything downstream, which is why it carries a version."
+    },
+    {
+      "term": "quarantine",
+      "teachesIn": "lesson-price-feed-hard",
+      "gloss": "Setting a bad row aside instead of guessing at it or dropping it silently. A quarantined row is visible, countable, and someone's job."
+    },
+    {
+      "term": "degraded",
+      "aliases": ["degraded mode", "degraded run"],
+      "teachesIn": "lesson-morning-brief-hard",
+      "gloss": "Producing a deliberately reduced output when an input is missing, and saying so on the face of it - rather than producing a confident-looking output built on a hole."
+    }
+  ]
+}
