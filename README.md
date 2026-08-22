@@ -1,12 +1,22 @@
 # SignalFlow Lab
 
-SignalFlow Lab is a local React learning app for practicing workplace automation by rebuilding real workflow maps one useful artifact at a time.
+A React app for practicing workplace automation by rebuilding real workflow maps one useful artifact at a time. The first project is **Meridian Morning Market Brief**, a fictional energy-market workflow that turns messy overnight market inputs into an approval-ready 7:00 AM brief.
 
-The first project is **Meridian Morning Market Brief**, a fictional energy-market workflow that turns messy overnight market inputs into an approval-ready 7:00 AM brief.
+**Live:** https://signal-flow-lab.vercel.app
 
-**Live:** https://signal-flow-lab.vercel.app (production, auto-deployed from green `main`).
+## Why this exists
 
-## Current Status (2026-07-06, feat/module-03-harbor - MODULE 3 COMPLETE, all tiers)
+It started as a question about the tools, not the subject. I wanted to see how far a model could be pushed to build, and how far it could think. The curriculum was what I picked to find out.
+
+So the documents in this repository are not leftovers. The specs, the decision log, the red-team cases, and the acceptance punchlists are the standard the build had to clear, and they were written before the build. Reading them is the point.
+
+I am the learner here. If it turns out to be worth handing to someone else, it is here.
+
+## Status
+
+Modules 1 through 3 are complete across all three tiers. Module 4 is in progress and I have not walked it yet.
+
+## Build log
 
 Where things stand if you are picking this back up:
 
