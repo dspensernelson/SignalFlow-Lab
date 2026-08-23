@@ -260,7 +260,7 @@ export default function BuilderWorkspace({ moduleData, loadReference, theme, onT
   return (
     <div className="flex h-screen flex-col bg-sf-bg text-left text-sf-text">
       <header className="flex-none border-b border-sf-border bg-sf-surface">
-        <div className="mx-auto flex w-full max-w-[1680px] items-center justify-between gap-3 overflow-x-auto px-4 py-2">
+        <div className="mx-auto flex w-full max-w-[1680px] flex-wrap items-center justify-between gap-x-3 gap-y-1.5 px-4 py-2">
           <div className="flex min-w-0 flex-none items-center gap-3">
             {headerLeft || (
               <span className="hidden whitespace-nowrap xl:inline-flex">
