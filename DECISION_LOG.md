@@ -2,6 +2,36 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-08-22 (PR #8 merged; production deploy verified; local main realigned)
+
+- MERGED PR #8 to main (a1d52d0): the ecosystem literacy work, the Operations
+  node, the two new interaction types, the three new lints, and PR #7's
+  opening-arc changes. PR #7 closed as superseded, with a comment recording
+  exactly what survived the conflict resolution.
+- DEPLOY: Vercel auto-deployed from green main, per the Gate 8 amendment
+  (deploy-from-green-main is pre-authorized after a merge when the check is
+  green). The PR also produced a Vercel PREVIEW build that reported Ready
+  before the merge - useful confirmation the build works on Vercel's
+  infrastructure and not only on the builder's machine.
+- PRODUCTION SMOKE TEST (Gate 8 requirement): https://signal-flow-lab.vercel.app
+  returns 200; the served bundle hash matches the local build byte for byte;
+  both new lazy chunks (ConnectorConfigExercise, RunInspectExercise) return
+  200; the module-01 lesson chunk carries the Operations lesson content; the
+  canvas reports 18 tasks where it reported 17 before, confirming the
+  Operations node is live; the Tool map button renders; console clean.
+- HISTORY NOTE: origin/main was rewritten earlier in the session (the tip
+  pulled at the start, 83280d5, is no longer on origin/main, which now carries
+  c9ffc2f - an identical tree under a different SHA - plus a MIT license and a
+  README rewrite; the original clone was from DSpEnder77/SignalFlow-Lab and
+  origin is now dspensernelson/SignalFlow-Lab). The local `main` branch was
+  left on that orphaned line until now. Verified it held nothing unique in
+  CONTENT - its 64 "ahead" commits are duplicate-SHA copies of commits already
+  on origin/main - then reset it to origin/main. The old tip is preserved as
+  the local ref `main-orphan-pre-rewrite` in case anyone wants to inspect it;
+  it can be deleted once nobody does.
+- Curriculum is now 129 lessons across three modules, with eight gates in
+  `npm run check`.
+
 ## 2026-08-22 (Operations node + connectorConfig/runInspect built)
 
 Ecosystem Literacy Plan 4b.2 and 4b.3. `npm run check` green: 129 lessons,
