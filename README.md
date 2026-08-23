@@ -16,6 +16,27 @@ I am the learner here. If it turns out to be worth handing to someone else, it i
 
 Modules 1 through 3 are complete across all three tiers. Module 4 is in progress and I have not walked it yet.
 
+### Runnable flows (slice, branch `feat/runnable-flows`)
+
+REIMAGINE_BRIEF.md named the problem: every lesson is type-a-value or
+pick-a-value and nothing the learner makes ever runs. The answer on this branch
+is a deterministic in-browser flow runtime and a builder. The learner assembles
+typed steps (trigger, lookup, transform, condition, approval, send, compose,
+store, stop), runs them against a day of real scenario data, watches every
+record walk the steps, and passes a build when the desk's acceptance checks
+hold on the run. Day 2 brings the messy batch and the Day 1 flow pays a
+duplicate, visibly; Day 3 injects an auth-expired failure. The same flow
+renders as Lab, Power Automate, Make, n8n, Zapier, or Python.
+
+- Entry: the canvas banner / "Build it" on Beacon Invoice Desk (module 2).
+- Code: `src/runtime/` (expr, engine, checks, skins, python codegen),
+  `src/builder/` (UI), `src/data/flows/module-02.json` (days, builds, checks),
+  `src/data/flows/module-02.reference.js` (example solution).
+- Proof: `npm run test:runtime` - unit tests plus golden tests that the
+  reference passes all six builds and that the Day 1 flow FAILS Day 2.
+- Design: `docs/superpowers/specs/2026-08-22-runnable-flows-design.md`.
+- The worksheet lesson path is untouched; nothing live regresses.
+
 ## Build log
 
 Where things stand if you are picking this back up:
@@ -123,7 +144,7 @@ Vite usually starts on port 5173 and may fall back to 5174 if 5173 is in use.
 ## Validate
 
 ```powershell
-npm run check    # eslint + lesson lint + lesson regression tests + build
+npm run check    # eslint + lints + lesson regression + validator audit + runtime tests + build
 ```
 
 Individually: `npm run lint`, `npm run lint:lessons`, `npm run test:lessons`,
