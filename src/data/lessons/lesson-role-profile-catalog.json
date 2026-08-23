@@ -104,12 +104,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "lookup",
       "soloRebuildPath": "You'd keep a table of role to entitlements and read the row for this role, rather than deciding per hire what accounts and access to grant.",
-      "tools": {
-        "powerAutomate": "a Dataverse 'role entitlements' table looked up by role",
-        "zapier": "a lookup table (Storage/Tables) keyed by role title",
-        "python": "a role -> entitlements dict read at plan time"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAppsCopilot",
+          "how": "a Dataverse entitlements table with an owner in People Ops, edited through a form"
+        },
+        {
+          "tool": "n8n",
+          "how": "a database read keyed on role, returning the entitlement list the plan expands"
+        }
+      ]
     },
     "heading": "Role profile read",
     "points": [

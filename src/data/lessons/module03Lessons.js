@@ -46,6 +46,11 @@ import lessonDayOnePackageHard from './lesson-day-one-package-hard.json'
 import lessonAccountsTaskHard from './lesson-accounts-task-hard.json'
 import lessonTaskTrackerHard from './lesson-task-tracker-hard.json'
 
+// Operations tier (playbook Step 2b/7c)
+import lessonOnboardingOperations from './lesson-onboarding-operations.json'
+import lessonOnboardingOperationsMedium from './lesson-onboarding-operations-medium.json'
+import lessonOnboardingOperationsHard from './lesson-onboarding-operations-hard.json'
+
 const module03Lessons = {
   // Easy tier
   'lesson-signed-offer': lessonSignedOffer,
@@ -88,6 +93,9 @@ const module03Lessons = {
   'lesson-day-one-package-hard': lessonDayOnePackageHard,
   'lesson-accounts-task-hard': lessonAccountsTaskHard,
   'lesson-task-tracker-hard': lessonTaskTrackerHard,
+  'lesson-onboarding-operations': lessonOnboardingOperations,
+  'lesson-onboarding-operations-medium': lessonOnboardingOperationsMedium,
+  'lesson-onboarding-operations-hard': lessonOnboardingOperationsHard,
 }
 
 export default module03Lessons

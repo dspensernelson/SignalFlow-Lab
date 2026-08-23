@@ -12,7 +12,11 @@
       "type": "inspection",
       "status": "now",
       "intent": "Inspect where this raw note comes from, its real-world sources, and the access ingesting it would require.",
-      "concepts": ["Source provenance", "Unstructured input", "Ingestion"]
+      "concepts": [
+        "Source provenance",
+        "Unstructured input",
+        "Ingestion"
+      ]
     },
     "labVersion": "Inspected by you in the Analyst Notes task; the note itself is a local text fixture shared with the Intake task.",
     "realWorldSources": [
@@ -31,7 +35,9 @@
       "Move to a watched folder where notes are dropped",
       "Later replace with email or API ingestion"
     ],
-    "reusedBy": ["market-intake-record"],
+    "reusedBy": [
+      "market-intake-record"
+    ],
     "governanceNote": "Ingesting from inbox, Teams, or a terminal needs access and permission; the original note's provenance must be retained for audit.",
     "auditNote": "Inspection is proven via a choiceCheck quiz that mints a stored source profile, so the lesson has a concrete 'what did you learn' beat.",
     "taskId": "lesson-analyst-notes",
@@ -50,7 +56,11 @@
       "type": "interpretation",
       "status": "now",
       "intent": "Interpret a human escalation signal and map it to the structured approvalRequired field the workflow acts on.",
-      "concepts": ["Escalation signals", "Boolean/event flags", "Human judgment as data"]
+      "concepts": [
+        "Escalation signals",
+        "Boolean/event flags",
+        "Human judgment as data"
+      ]
     },
     "labVersion": "Interpreted by you in the Trader Flag task; the signal rides inside the analyst note fixture.",
     "realWorldSources": [
@@ -67,7 +77,9 @@
       "Capture it manually at first",
       "Later wire it to a chat or tool signal"
     ],
-    "reusedBy": ["market-intake-record"],
+    "reusedBy": [
+      "market-intake-record"
+    ],
     "governanceNote": "Requires agreement on what counts as a flag, and ownership of the escalation channel.",
     "auditNote": "Distinct from the Intake build: this lesson interprets ONE judgment signal; Intake extracts all fields. The distinction is taught explicitly in both lessons.",
     "taskId": "lesson-trader-flag",
@@ -86,7 +98,12 @@
       "type": "build",
       "status": "now",
       "intent": "Extract hub, peakPrice, settledPrice, generationFlag, and approvalRequired from a messy note into valid JSON and pass field validation.",
-      "concepts": ["JSON", "Named fields / schema", "Field extraction", "Deterministic validation"]
+      "concepts": [
+        "JSON",
+        "Named fields / schema",
+        "Field extraction",
+        "Deterministic validation"
+      ]
     },
     "labVersion": "Built by you in the Intake task by extracting fields from the analyst note.",
     "realWorldSources": [
@@ -104,7 +121,11 @@
       "Store the result as market-intake.json",
       "Later automate extraction from email, Teams, or an API"
     ],
-    "reusedBy": ["risk-evaluation", "approval-decision", "morning-brief"],
+    "reusedBy": [
+      "risk-evaluation",
+      "approval-decision",
+      "morning-brief"
+    ],
     "governanceNote": "Requires agreement on the required intake fields; the schema is the contract every downstream step trusts.",
     "auditNote": "Validation rules in src/lib/validators.js are frozen; any field change ripples to three downstream nodes.",
     "taskId": "lesson-intake",
@@ -123,7 +144,11 @@
       "type": "inspection",
       "status": "now",
       "intent": "Inspect where numeric data enters, its column format, and the access a real feed or export would require.",
-      "concepts": ["Tabular/CSV ingestion", "Feed scheduling", "Column formats"]
+      "concepts": [
+        "Tabular/CSV ingestion",
+        "Feed scheduling",
+        "Column formats"
+      ]
     },
     "labVersion": "Inspected by you in the Price Feed task; the fixture is the same raw rows the Clean Price Data task normalizes.",
     "realWorldSources": [
@@ -140,7 +165,9 @@
       "Parse it with a small script",
       "Later subscribe to a real feed or API"
     ],
-    "reusedBy": ["clean-price-data"],
+    "reusedBy": [
+      "clean-price-data"
+    ],
     "governanceNote": "Needs access to the feed or export and knowledge of the column contract.",
     "auditNote": "Fixture added: the lesson inspects the same raw CSV rows the Clean Price Data task consumes, deliberately identical.",
     "taskId": "lesson-price-feed",
@@ -159,7 +186,11 @@
       "type": "inspection",
       "status": "now",
       "intent": "Inspect a second numeric input and judge why 'which forecast is authoritative' matters before it is compared.",
-      "concepts": ["Comparison inputs", "Joining datasets by key", "Authoritative source"]
+      "concepts": [
+        "Comparison inputs",
+        "Joining datasets by key",
+        "Authoritative source"
+      ]
     },
     "labVersion": "Inspected by you in the Forecast Data task; the fixture is the forecast values the Variance Check task consumes.",
     "realWorldSources": [
@@ -176,7 +207,9 @@
       "Join it to the actuals by key",
       "Later pull live forecasts on a schedule"
     ],
-    "reusedBy": ["variance-check"],
+    "reusedBy": [
+      "variance-check"
+    ],
     "governanceNote": "Requires agreement on which forecast is authoritative (ownership of source-of-truth).",
     "auditNote": "Fixture added: forecast values match the canon used by Variance Check (ERCOT 170, SPP 96, MISO 80).",
     "taskId": "lesson-forecast-data",
@@ -195,7 +228,11 @@
       "type": "inspection",
       "status": "now",
       "intent": "Inspect how a saved prior run is retained and reused as today's comparison baseline.",
-      "concepts": ["Baselines", "Historical retention", "Temporal reuse"]
+      "concepts": [
+        "Baselines",
+        "Historical retention",
+        "Temporal reuse"
+      ]
     },
     "labVersion": "Inspected by you in the Prior Day Reference task; the fixture is the prior-day values the Variance Check task consumes.",
     "realWorldSources": [
@@ -212,7 +249,9 @@
       "Load the previous file as a baseline",
       "Later move to a small historical store"
     ],
-    "reusedBy": ["variance-check"],
+    "reusedBy": [
+      "variance-check"
+    ],
     "governanceNote": "Needs read access to prior runs and a retention location; retention policy is a governance decision.",
     "auditNote": "Temporal cycle: the lesson teaches the backward edge explicitly as a day-crossing loop, not a same-run cycle.",
     "taskId": "lesson-prior-day-reference",
@@ -231,7 +270,12 @@
       "type": "transformation",
       "status": "now",
       "intent": "Coerce and validate raw price rows into a trusted, normalized clean-prices.json table.",
-      "concepts": ["Normalization", "Validation", "Data quality", "Type coercion"]
+      "concepts": [
+        "Normalization",
+        "Validation",
+        "Data quality",
+        "Type coercion"
+      ]
     },
     "labVersion": "Built by you in the Clean Price Data task by normalizing messy price rows into a numeric table.",
     "realWorldSources": [
@@ -247,7 +291,10 @@
       "Coerce and validate numeric fields",
       "Emit a clean price table"
     ],
-    "reusedBy": ["risk-evaluation", "morning-brief"],
+    "reusedBy": [
+      "risk-evaluation",
+      "morning-brief"
+    ],
     "governanceNote": "Read access to the feed plus a store for the cleaned table; data-quality rules are the trust boundary for everything downstream.",
     "auditNote": "Recommended next interactive build: smallest, most self-contained transformation lesson and reuses the Intake JSON/validation concepts.",
     "taskId": "lesson-clean-price-data",
@@ -266,7 +313,11 @@
       "type": "governance",
       "status": "now",
       "intent": "Set and version the threshold values reused by three downstream nodes, and decide their ownership and approval path.",
-      "concepts": ["Business rules as config", "Parameterization", "Policy vs logic"]
+      "concepts": [
+        "Business rules as config",
+        "Parameterization",
+        "Policy vs logic"
+      ]
     },
     "labVersion": "Built by you in the Threshold Policy task by setting and versioning the threshold values.",
     "realWorldSources": [
@@ -283,7 +334,11 @@
       "Version it alongside the workflow",
       "Later replace with a governed policy source"
     ],
-    "reusedBy": ["risk-evaluation", "approval-decision", "morning-brief"],
+    "reusedBy": [
+      "risk-evaluation",
+      "approval-decision",
+      "morning-brief"
+    ],
     "governanceNote": "Strongest governance node on the map: needs business-owner approval, risk-policy access, and versioning. Reused by three downstream steps.",
     "auditNote": "Best candidate to deliver the doctrine-required governance moment; author as a short 'set and version a threshold' lesson.",
     "taskId": "lesson-threshold-policy",
@@ -302,7 +357,11 @@
       "type": "transformation",
       "status": "now",
       "intent": "Compute actual-vs-forecast and actual-vs-prior deltas and flag material variance.",
-      "concepts": ["Comparison steps", "Materiality thresholds", "Flagging deltas"]
+      "concepts": [
+        "Comparison steps",
+        "Materiality thresholds",
+        "Flagging deltas"
+      ]
     },
     "labVersion": "Built by you in the Variance Check task by computing actual-vs-forecast and actual-vs-prior deltas and flagging material variance.",
     "realWorldSources": [
@@ -318,7 +377,9 @@
       "Flag values over a variance threshold",
       "Pass the result into evaluation"
     ],
-    "reusedBy": ["risk-evaluation"],
+    "reusedBy": [
+      "risk-evaluation"
+    ],
     "governanceNote": "Requires agreement on what variance is material (a business rule overlapping Threshold Policy).",
     "auditNote": "Stores an explicit variance-summary.json so Risk Evaluation consumes a derived, auditable signal instead of recomputing deltas.",
     "taskId": "lesson-variance-check",
@@ -337,7 +398,11 @@
       "type": "transformation",
       "status": "now",
       "intent": "Apply the threshold policy to the intake record, clean prices, and variance to emit the reusable risk-evaluation.json record.",
-      "concepts": ["Rules engine", "Applying policy to data", "Decision-ready record"]
+      "concepts": [
+        "Rules engine",
+        "Applying policy to data",
+        "Decision-ready record"
+      ]
     },
     "labVersion": "Built by you in the Risk Evaluation task by applying the governed thresholds to today's day-over-day moves.",
     "realWorldSources": [
@@ -353,7 +418,10 @@
       "Apply the threshold rules",
       "Emit a risk-evaluation record"
     ],
-    "reusedBy": ["approval-decision", "morning-brief"],
+    "reusedBy": [
+      "approval-decision",
+      "morning-brief"
+    ],
     "governanceNote": "Needs the agreed threshold values and read access to four upstream artifacts; the risk record should be auditable.",
     "auditNote": "Typed process but emits risk-evaluation.json; eventually split into Evaluate Risk (action) and Risk Evaluation Record (artifact). Highest fan-in (4 deps), so it sequences late.",
     "taskId": "lesson-risk-evaluation",
@@ -372,7 +440,11 @@
       "type": "governance",
       "status": "now",
       "intent": "Define the reusable approval format and the required fields a sign-off request must contain.",
-      "concepts": ["Output templating", "Reusable formats", "Required-field standards"]
+      "concepts": [
+        "Output templating",
+        "Reusable formats",
+        "Required-field standards"
+      ]
     },
     "labVersion": "Built by you in the Approval Template task by recording the desk's agreed request format as a versioned template.",
     "realWorldSources": [
@@ -388,7 +460,9 @@
       "Fill it from the risk evaluation",
       "Later wire it to a real approval channel"
     ],
-    "reusedBy": ["approval-route"],
+    "reusedBy": [
+      "approval-route"
+    ],
     "governanceNote": "Needs agreement on required approval fields; the template standardizes what every approver sees.",
     "auditNote": "Could become interpretation instead of governance if the authored lesson has the learner read/apply a template rather than define one.",
     "taskId": "lesson-approval-template",
@@ -407,7 +481,11 @@
       "type": "decision",
       "status": "now",
       "intent": "Encode the if/else branch from the risk evaluation and log each decision for audit.",
-      "concepts": ["Branching logic", "Thresholds", "Decision audit logging"]
+      "concepts": [
+        "Branching logic",
+        "Thresholds",
+        "Decision audit logging"
+      ]
     },
     "labVersion": "Built by you in the Approval Decision task by routing three mornings through the escalation fork and logging each decision.",
     "realWorldSources": [
@@ -424,7 +502,10 @@
       "Make the threshold configurable",
       "Log every decision for audit"
     ],
-    "reusedBy": ["approval-route", "routine-update-path"],
+    "reusedBy": [
+      "approval-route",
+      "routine-update-path"
+    ],
     "governanceNote": "Needs the escalation threshold and knowledge of who can approve; every decision should be logged for audit.",
     "auditNote": "The only true fork (two downstream branches); the decision log is now persisted as decision-log.json for audit.",
     "taskId": "lesson-approval-decision",
@@ -443,7 +524,11 @@
       "type": "handoff",
       "status": "now",
       "intent": "Route a sign-off request to an approver and capture the yes/no response as approval-route.json.",
-      "concepts": ["Handoff", "Human-in-the-loop approval", "Capturing a response"]
+      "concepts": [
+        "Handoff",
+        "Human-in-the-loop approval",
+        "Capturing a response"
+      ]
     },
     "labVersion": "Built by you in the Approval Route task by capturing the Desk Manager's chat response as a structured approval record.",
     "realWorldSources": [
@@ -460,7 +545,9 @@
       "Capture a manual yes/no response",
       "Later wire to email or a chat approval"
     ],
-    "reusedBy": ["morning-brief"],
+    "reusedBy": [
+      "morning-brief"
+    ],
     "governanceNote": "Needs the ability to message the approver and a place to record the response; the response is an audit record.",
     "auditNote": "Emits approval-route.json but typed handoff (action yielding an artifact); real-world messaging integrations are out of MVP scope.",
     "taskId": "lesson-approval-route",
@@ -479,7 +566,11 @@
       "type": "handoff",
       "status": "now",
       "intent": "Handle the no-approval branch: write a routine note when below threshold and keep it for the audit trail.",
-      "concepts": ["Alternate-branch handling", "No-action logging", "Path symmetry"]
+      "concepts": [
+        "Alternate-branch handling",
+        "No-action logging",
+        "Path symmetry"
+      ]
     },
     "labVersion": "Built by you in the Routine Update Path task by writing the system-authored log entry for a quiet morning.",
     "realWorldSources": [
@@ -494,7 +585,9 @@
       "Include it in the brief as context",
       "Keep it for the audit trail"
     ],
-    "reusedBy": ["morning-brief"],
+    "reusedBy": [
+      "morning-brief"
+    ],
     "governanceNote": "Needs a place to record routine outcomes; 'no action' must still be auditable.",
     "auditNote": "The quiet branch, easy to under-teach; its value is that the non-escalation path is still logged as routine-log.json.",
     "taskId": "lesson-routine-update-path",
@@ -513,7 +606,11 @@
       "type": "inspection",
       "status": "now",
       "intent": "Inspect the reusable brief structure and how it keeps the daily output consistent before assembly.",
-      "concepts": ["Output structure", "Consistency", "Templating across runs"]
+      "concepts": [
+        "Output structure",
+        "Consistency",
+        "Templating across runs"
+      ]
     },
     "labVersion": "Inspected by you in the Prior Day Brief Template task; the fixture is the section structure the Morning Brief renders into.",
     "realWorldSources": [
@@ -529,7 +626,9 @@
       "Fill it from upstream artifacts",
       "Version it alongside the workflow"
     ],
-    "reusedBy": ["morning-brief"],
+    "reusedBy": [
+      "morning-brief"
+    ],
     "governanceNote": "Needs agreement on the brief sections; template versioning keeps output consistent.",
     "auditNote": "Stays inspection; the structure-vs-baseline distinction with Prior Day Reference is taught explicitly in both lessons.",
     "taskId": "lesson-prior-day-brief-template",
@@ -542,13 +641,17 @@
     "thingOrAction": "thing",
     "phaseId": "brief-assembly-layer",
     "x": 1020,
-    "y": 380,
+    "y": 190,
     "description": "The approval-ready 7:00 AM summary that joins intake, clean prices, risk, and approval status into one business output.",
     "lesson": {
       "type": "assembly",
       "status": "now",
       "intent": "Assemble the intake record, clean prices, risk, approval status, and template into one approval-ready market-brief.md.",
-      "concepts": ["Aggregation / assembly", "Joining artifacts", "Rendering output"]
+      "concepts": [
+        "Aggregation / assembly",
+        "Joining artifacts",
+        "Rendering output"
+      ]
     },
     "labVersion": "Built by you in the Morning Brief task by filling the governed template with values looked up from your stored artifacts.",
     "realWorldSources": [
@@ -566,7 +669,9 @@
       "Render to Markdown",
       "Later automate delivery on a schedule"
     ],
-    "reusedBy": ["distribution-archive"],
+    "reusedBy": [
+      "distribution-archive"
+    ],
     "governanceNote": "Needs read access to all upstream artifacts plus the template; the assembled brief is the record of the day.",
     "auditNote": "Highest fan-in (7 deps); the assembly lesson reads stored artifacts from the shelf, so it should be played after the artifact-producing lessons.",
     "taskId": "lesson-morning-brief",
@@ -579,13 +684,18 @@
     "thingOrAction": "ambiguous",
     "phaseId": "brief-assembly-layer",
     "x": 1020,
-    "y": 500,
+    "y": 300,
     "description": "The finished brief is delivered to the desk and stored for the record, seeding tomorrow's prior-day reference.",
     "lesson": {
       "type": "handoff",
       "status": "now",
       "intent": "Deliver the brief to the desk, archive it for the record, and seed tomorrow's prior-day baseline.",
-      "concepts": ["Delivery", "Retention", "Audit trail", "Feedback loop"]
+      "concepts": [
+        "Delivery",
+        "Retention",
+        "Audit trail",
+        "Feedback loop"
+      ]
     },
     "labVersion": "Built by you in the Distribution / Archive task by recording the delivery, retention, and tomorrow-seeding run record.",
     "realWorldSources": [
@@ -602,10 +712,55 @@
       "Add a send step (email or chat)",
       "Feed it back as tomorrow's prior-day reference"
     ],
-    "reusedBy": ["prior-day-reference"],
+    "reusedBy": [
+      "prior-day-reference"
+    ],
     "governanceNote": "Needs send permission to the distribution list and write access to the archive; retention/audit policy applies.",
     "auditNote": "Action+thing ambiguity; recommend splitting into Distribution (handoff/action) and Archive (output/thing). Likely the first map shape change after the audit.",
     "taskId": "lesson-distribution-archive",
     "artifactName": "archive-record.json"
+  },
+  {
+    "id": "run-operations",
+    "label": "Brief Run Operations",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "brief-assembly-layer",
+    "x": 1020,
+    "y": 410,
+    "skeletonStage": "operate",
+    "description": "The brief workflow is itself a system: it needs a connection to the desk mailbox, a trigger, a failure plan, and a test before anyone can rely on it at 7:00 AM.",
+    "lesson": {
+      "type": "governance",
+      "status": "now",
+      "intent": "Connect the brief automation to its source, set what starts it, and decide what happens when a step fails.",
+      "concepts": [
+        "Connections & credentials",
+        "Triggers",
+        "Run history",
+        "Testing an automation"
+      ]
+    },
+    "labVersion": "Built by you in the Run Operations task by configuring the connection, trigger, and failure behavior of the brief automation.",
+    "realWorldSources": [
+      "A cloud flow's connections and run history",
+      "A scheduler or mailbox trigger",
+      "A secret store or vault"
+    ],
+    "accessNeeded": [
+      "Permission to create a connection as a service account",
+      "Read access to the secret reference",
+      "Access to the run history"
+    ],
+    "soloRebuildPath": [
+      "Open the flow's connections and note what identity it runs as",
+      "Set the trigger and its interval",
+      "Add retries and a failure path, then run it once and read the run"
+    ],
+    "reusedBy": [],
+    "governanceNote": "The automation runs as a service account, not a person. Secrets are referenced, never pasted. Every run is retained so a failure can be diagnosed after the fact.",
+    "auditNote": "Operations node added 2026-08-22 per MODULE_AUTHORING_PLAYBOOK Step 2b. Fed by the archive node because the retained run record IS what the operator inspects.",
+    "taskId": "lesson-brief-operations",
+    "artifactName": "connector-config.json"
   }
 ]

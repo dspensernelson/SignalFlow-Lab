@@ -82,12 +82,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "approval",
       "soloRebuildPath": "You'd send the readiness summary to the manager and wait for a 'got it, looks good' reply before considering onboarding closed.",
-      "tools": {
-        "powerAutomate": "'Start and wait for an approval' on the package to the manager",
-        "zapier": "send the package, capture the manager's confirmation reply",
-        "python": "record the manager's acknowledgement {by, confirmed, at}"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "'Start and wait for an approval' on the package, addressed to the hiring manager"
+        },
+        {
+          "tool": "powerAppsCopilot",
+          "how": "an approval card carrying the package summary; the reply is captured on the run"
+        }
+      ]
     },
     "heading": "Handoff acknowledged",
     "points": [

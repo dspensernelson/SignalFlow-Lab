@@ -62,12 +62,22 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "lookup",
       "soloRebuildPath": "You'd look at how long each task actually took, pad for the slow cases, and publish deadlines the teams can hit.",
-      "tools": {
-        "powerAutomate": "compute percentiles from history, set SLA config from them",
-        "zapier": "derive SLA values from a completion-time table",
-        "python": "set each sla from a high percentile of past durations"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "a config list of task SLAs, with due dates computed by addDays from the start date"
+        },
+        {
+          "tool": "python",
+          "how": "an SLA table with a version; due dates derive from the start date so a moved date recomputes"
+        },
+        {
+          "tool": "make",
+          "how": "a data store of SLA offsets read once and applied to every task in the plan"
+        }
+      ]
     },
     "heading": "SLA policy designed",
     "points": [

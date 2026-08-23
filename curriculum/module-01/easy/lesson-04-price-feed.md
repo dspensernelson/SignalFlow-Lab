@@ -1,5 +1,10 @@
 # Lesson 04 - Price Feed / CSV Rows (price-feed)
 
+> REVISED 2026-07-06 (opening-arc re-storyboard): converted choiceCheck ->
+> tagSource; the learner tags the contract line, the corroborating ERCOT peak,
+> the two quirks, and the schedule. Mission intro + diagram takeaway added.
+> See DECISION_LOG.md 2026-07-06. The script below is the original design record.
+
 - Lesson type: inspection | Interaction: choiceCheck (new)
 - Artifact: source-profile-price-feed.json | Difficulty: Beginner | Clock: 6:18 AM
 - Build wave: B (requires choiceCheck)

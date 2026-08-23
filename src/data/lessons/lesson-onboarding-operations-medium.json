@@ -1,0 +1,168 @@
+{
+  "id": "lesson-onboarding-operations-medium",
+  "nodeId": "run-operations",
+  "title": "Diagnose the Failed Harbor Run",
+  "subtitle": "Read the run history, find the failure, choose the fix",
+  "clock": "9:00 AM",
+  "difficulty": "Intermediate",
+  "skill": "Reading a run history",
+  "opsTopics": [
+    "failed-run",
+    "environments"
+  ],
+  "scenario": "The automation ran on its trigger and stopped. Nobody is watching a screen at 9:00 AM, so what you have is the run history: a list of steps, their statuses, and one error message. Work out which step failed, what kind of failure it is, and what to do about it. Guessing wrong here is expensive - the wrong fix wastes an hour and the run stays broken.",
+  "inputType": "text",
+  "input": "Run run-2026-07-08-0900 finished with status: failed.\nEnvironment: prod. Trigger: Webhook / ATS offer countersigned. Started 9:00 AM.\n\nRead the step list in the run history panel. A step marked skipped was never attempted -\nit is downstream of the failure, not a second problem.",
+  "instructions": [
+    "Find the step where the run actually stopped.",
+    "Classify what KIND of failure it is from the error message.",
+    "Choose the fix that addresses that kind of failure.",
+    "Choose the step to re-run from, given which steps already succeeded.",
+    "Validate the diagnosis."
+  ],
+  "interactionType": "runInspect",
+  "validation": {
+    "type": "runInspect",
+    "run": {
+      "id": "run-2026-07-08-0900",
+      "environment": "prod",
+      "trigger": "Webhook / ATS offer countersigned",
+      "startedAt": "9:00 AM",
+      "status": "failed",
+      "steps": [
+        {
+          "id": "s1",
+          "name": "Receive offer webhook",
+          "status": "succeeded",
+          "durationMs": 210
+        },
+        {
+          "id": "s2",
+          "name": "Create onboarding record",
+          "status": "succeeded",
+          "durationMs": 930
+        },
+        {
+          "id": "s3",
+          "name": "Get row: role profile catalog",
+          "status": "failed",
+          "durationMs": 1450,
+          "error": "Property \"entitlements\" not found on the returned row. Expected an array of group names."
+        },
+        {
+          "id": "s4",
+          "name": "Expand provisioning plan",
+          "status": "skipped"
+        },
+        {
+          "id": "s5",
+          "name": "Create provisioning tasks",
+          "status": "skipped"
+        },
+        {
+          "id": "s6",
+          "name": "Readiness gate",
+          "status": "skipped"
+        }
+      ]
+    },
+    "fields": [
+      {
+        "id": "failedStep",
+        "label": "Failed step",
+        "kind": "step",
+        "expected": "s3",
+        "explain": "Read the status column. s1 and s2 succeeded, so the trigger and the record are fine. s3 is where it stopped."
+      },
+      {
+        "id": "cause",
+        "label": "Cause",
+        "kind": "select",
+        "options": [
+          "auth-expired",
+          "rate-limit",
+          "schema-change",
+          "missing-field"
+        ],
+        "expected": "schema-change",
+        "explain": "The row came back, so the connection and the credential are fine. A field the automation depends on is no longer shaped the way it expects - someone changed the catalog."
+      },
+      {
+        "id": "action",
+        "label": "Fix",
+        "kind": "select",
+        "options": [
+          "rotate-credential",
+          "retry-with-backoff",
+          "fix-mapping",
+          "dead-letter-and-alert"
+        ],
+        "expected": "fix-mapping",
+        "explain": "Retrying returns the same wrongly-shaped row forever. The mapping has to be corrected to the catalog's new shape, and the catalog change should have carried a version bump."
+      },
+      {
+        "id": "rerunFrom",
+        "label": "Re-run from",
+        "kind": "step",
+        "expected": "s3",
+        "explain": "The onboarding record from s2 already exists and creating it again would duplicate the hire. Re-run from the step that failed."
+      }
+    ]
+  },
+  "copilotPrompt": "Given a workflow run history where one step failed with an error message, explain how to tell a credential problem from a rate limit from a schema change, and what each one calls for.",
+  "successMessage": "Run diagnosed. The failure has a cause and a fix on the record.",
+  "validateLabel": "Validate Diagnosis",
+  "intro": {
+    "heading": "Before you build: a run is evidence",
+    "artifactName": "run-diagnosis.json",
+    "sections": [
+      {
+        "title": "What this record does",
+        "body": "The run diagnosis turns 'it broke' into a cause, a fix, and a re-run point. Without it the next failure is diagnosed from scratch by whoever happens to be on call."
+      },
+      {
+        "title": "Failed is not the same as skipped",
+        "body": "A skipped step was never attempted; it is downstream of the real failure. Chasing a skipped step is the most common way to spend an hour fixing nothing."
+      },
+      {
+        "title": "The kind of failure decides the fix",
+        "body": "An expired credential needs rotating and will not survive a retry. A rate limit needs backing off and will fix itself. A changed schema needs a mapping change and will fail identically forever until someone makes it. Same red X, three different days of work."
+      },
+      {
+        "title": "Where you re-run from",
+        "body": "Steps that already succeeded may have minted records. Re-running from the top can duplicate them. Re-run from the failure unless an earlier step is safe to repeat."
+      }
+    ]
+  },
+  "takeaway": {
+    "realWorld": {
+      "actionKind": "operate",
+      "soloRebuildPath": "You would open the run history, find the first non-succeeded step, read its error, decide what class of failure it is, and re-run from that step once the cause is addressed.",
+      "bestFit": [
+        {
+          "tool": "langgraph",
+          "how": "a traced run so the failing node and its state are visible after the fact"
+        },
+        {
+          "tool": "n8n",
+          "how": "the Executions list with the failed node's input and output side by side"
+        },
+        {
+          "tool": "python",
+          "how": "structured logs carrying the hire id, so one hire's run can be pulled out"
+        }
+      ]
+    },
+    "heading": "Run diagnosed",
+    "artifactName": "run-diagnosis.json",
+    "before": "The run had failed and the reason lived only in a log nobody had read.",
+    "after": "The failure has a named cause, a chosen fix, and a re-run point on the record.",
+    "capability": "The workflow can now be diagnosed after a failure instead of restarted blindly.",
+    "auditNote": "The diagnosis is retained against the run id, so a recurring failure is visible as a pattern rather than rediscovered each time.",
+    "points": [
+      "You created run-diagnosis.json from evidence in the run history, not from a guess.",
+      "Classifying the failure is what makes the fix cheap: a retry, a rotation, and a mapping change are three different days of work.",
+      "The workflow can now be diagnosed after a failure instead of restarted blindly."
+    ]
+  }
+}

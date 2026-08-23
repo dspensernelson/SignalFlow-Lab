@@ -1,0 +1,88 @@
+{
+  "note": "Terms module-02 introduces, and the lesson responsible for teaching each. Enforced by scripts/lint-glossary.mjs: a lesson may not use a term before the lesson that teaches it. Written 2026-08-22 after the owner - the product owner - could not read this module's own vocabulary. Beacon carried the worst load in the curriculum: three-way match used 17 times, tolerance 23, PO 18, receipt 20, and not one of them defined anywhere. Keep ASCII-only.",
+  "module": "module-02",
+  "terms": [
+    {
+      "term": "PO",
+      "aliases": ["purchase order"],
+      "teachesIn": "lesson-po-register",
+      "gloss": "Purchase order: the promise the company made before anything arrived - what was ordered, how many, at what price."
+    },
+    {
+      "term": "goods receipt",
+      "aliases": ["receipt log", "goods received"],
+      "teachesIn": "lesson-receipt-log",
+      "gloss": "The proof the goods actually showed up, and how many. Separate from the bill on purpose: one says what was promised, one says what arrived."
+    },
+    {
+      "term": "three-way match",
+      "aliases": ["three way match", "3-way match"],
+      "teachesIn": "lesson-three-way-match",
+      "gloss": "Checking the invoice against the PO and the goods receipt before paying: right item, actually arrived, right price. You do this yourself when a couch is delivered - order confirmation, delivery slip, bill."
+    },
+    {
+      "term": "tolerance",
+      "aliases": ["tolerance band", "within tolerance"],
+      "teachesIn": "lesson-tolerance-policy",
+      "gloss": "How big a price or quantity gap is allowed to pass without a human looking. Small gaps are normal (freight, rounding); the tolerance is where someone drew the line, on purpose."
+    },
+    {
+      "term": "overcharge",
+      "teachesIn": "lesson-tolerance-policy",
+      "gloss": "A vendor billing more than was agreed. Some gaps are innocent; an overcharge is the kind you claw back."
+    },
+    {
+      "term": "clawed back",
+      "aliases": ["claw back", "clawback"],
+      "teachesIn": "lesson-tolerance-policy",
+      "gloss": "Money recovered after it was already paid - the expensive way to catch an overcharge, and the reason the tolerance exists."
+    },
+    {
+      "term": "AP",
+      "aliases": ["accounts payable", "payables"],
+      "teachesIn": "lesson-invoice-inbox",
+      "gloss": "Accounts payable: the desk that pays what the company owes suppliers."
+    },
+    {
+      "term": "vendor master",
+      "teachesIn": "lesson-vendor-master",
+      "gloss": "The governed list of who the company is allowed to pay, and where the money goes. Changing a bank detail here is the single highest-risk edit in the whole workflow."
+    },
+    {
+      "term": "duplicate",
+      "aliases": ["duplicate invoice", "dedupe"],
+      "teachesIn": "lesson-duplicate-check",
+      "gloss": "The same bill arriving twice - usually a resend, occasionally fraud. Paying it twice is real money out the door."
+    },
+    {
+      "term": "exception",
+      "aliases": ["exception queue"],
+      "teachesIn": "lesson-exception-queue",
+      "gloss": "An invoice the rules could not clear on their own, parked where a person will work it. An exception is a routing outcome, not a failure."
+    },
+    {
+      "term": "straight-through",
+      "aliases": ["straight through processing", "auto-approve"],
+      "teachesIn": "lesson-auto-approve-path",
+      "gloss": "An invoice that clears every check and moves toward payment with no human touching it. Straight-through means no manual work, not no controls."
+    },
+    {
+      "term": "payment run",
+      "aliases": ["payment batch"],
+      "teachesIn": "lesson-payment-batch",
+      "gloss": "One batch of approved invoices paid together at a cutoff, rather than one payment at a time. One approval covers the batch."
+    },
+    {
+      "term": "remittance advice",
+      "aliases": ["remittance"],
+      "teachesIn": "lesson-remittance-advice",
+      "gloss": "The note sent to a vendor saying which invoices a payment covers, so they can match the money to their own records."
+    },
+    {
+      "term": "BEC",
+      "aliases": ["business email compromise"],
+      "teachesIn": "lesson-vendor-master-hard",
+      "gloss": "Business email compromise: an attacker posing as a vendor to change the bank details on file. The reason a bank-detail change needs a second approver and an out-of-band callback."
+    }
+  ]
+}

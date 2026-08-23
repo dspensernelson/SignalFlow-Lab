@@ -103,12 +103,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "store",
       "soloRebuildPath": "You'd let fully-matched, within-tolerance invoices approve automatically so only real problems reach a person.",
-      "tools": {
-        "powerAutomate": "the 'yes' branch that sets Approved and skips the review step",
-        "zapier": "the default Path that marks the invoice approved",
-        "python": "if matched and within tolerance: status = 'approved'"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "the clean branch that sets Approved and writes who or what approved it, and when"
+        },
+        {
+          "tool": "python",
+          "how": "record the auto-approval with the rule version that granted it; straight-through still needs a trail"
+        }
+      ]
     },
     "heading": "Auto-approval logged",
     "points": [

@@ -1,0 +1,69 @@
+{
+  "note": "Terms module-03 introduces, and the lesson responsible for teaching each. Enforced by scripts/lint-glossary.mjs. Harbor was assumed to be the friendly module because everyone has started a job; a 2026-08-22 audit measured SLA used in 8 lessons, provisioning in 13, escalation in 9, and none of them defined. No module is glossary-free. Keep ASCII-only.",
+  "module": "module-03",
+  "terms": [
+    {
+      "term": "SLA",
+      "aliases": ["service level agreement"],
+      "teachesIn": "lesson-sla-policy",
+      "gloss": "Service level agreement: the promised deadline for a task - 'a laptop is ordered within one business day'. It turns 'soon' into a date a machine can check."
+    },
+    {
+      "term": "provisioning",
+      "aliases": ["provision"],
+      "teachesIn": "lesson-provisioning-plan",
+      "gloss": "Setting up everything a new hire needs before day one: account, email, badge, laptop, payroll. Provisioning is the work; the plan is the list of it."
+    },
+    {
+      "term": "role profile",
+      "aliases": ["entitlements"],
+      "teachesIn": "lesson-role-profile-catalog",
+      "gloss": "The governed list of what a given job title gets. Hiring a Warehouse Associate expands to the same set every time, which is what makes onboarding automatable."
+    },
+    {
+      "term": "access group",
+      "teachesIn": "lesson-access-task",
+      "gloss": "A named bundle of permissions. People are added to groups rather than granted permissions one by one, so access can be audited and removed cleanly."
+    },
+    {
+      "term": "least privilege",
+      "teachesIn": "lesson-access-task",
+      "gloss": "Grant exactly what the role profile lists and nothing more. A convenient extra grant is a policy exception, not a favor."
+    },
+    {
+      "term": "SD",
+      "aliases": ["SD-1", "SD-2", "SD+1", "start date"],
+      "teachesIn": "lesson-onboarding-record",
+      "gloss": "Start Date, used as an anchor: SD-1 is the day before the hire starts, SD+2 the second day after. Every deadline is written relative to SD so a moved start date recomputes the whole plan."
+    },
+    {
+      "term": "idempotent",
+      "aliases": ["idempotency", "idempotent re-run"],
+      "teachesIn": "lesson-accounts-task",
+      "gloss": "Safe to run twice. Running an idempotent step again converges on the same result instead of creating a second account. Check-then-create, never create-blindly."
+    },
+    {
+      "term": "gate",
+      "aliases": ["readiness gate", "fan-in"],
+      "teachesIn": "lesson-readiness-gate",
+      "gloss": "A point where parallel branches have to converge before anything continues - a fan-in. The readiness gate holds until every provisioning task is done, so one blocked laptop blocks the hire."
+    },
+    {
+      "term": "escalation",
+      "aliases": ["escalate", "escalation ladder"],
+      "teachesIn": "lesson-escalation-path",
+      "gloss": "Handing a stuck task upward on a schedule, to a named person, with a deadline. An escalation without an owner and a clock is just a complaint."
+    },
+    {
+      "term": "loaner",
+      "teachesIn": "lesson-hardware-task-medium",
+      "gloss": "A temporary substitute (here, a spare laptop) that unblocks day one while the real item is still coming. The workaround is recorded, not hidden."
+    },
+    {
+      "term": "degraded",
+      "aliases": ["degraded package"],
+      "teachesIn": "lesson-day-one-package-hard",
+      "gloss": "Shipping a deliberately incomplete package and stating what is missing and why, rather than delaying everything or pretending it is complete."
+    }
+  ]
+}

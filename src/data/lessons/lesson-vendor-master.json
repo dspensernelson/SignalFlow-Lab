@@ -103,12 +103,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "lookup",
       "soloRebuildPath": "You'd match the invoice's vendor to your official vendor list and add or correct the master record if it is new or stale.",
-      "tools": {
-        "powerAutomate": "'Get items' to find the vendor, then 'Update/Create item' to maintain the master",
-        "zapier": "'Find or Create Record' in your vendor table",
-        "python": "upsert into the vendor table keyed by tax id or vendor id"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAppsCopilot",
+          "how": "a Dataverse vendor table with a maintained-by-Finance form, not a spreadsheet on a share"
+        },
+        {
+          "tool": "n8n",
+          "how": "a database node reading the vendor row, keyed on the vendor id rather than the display name"
+        }
+      ]
     },
     "heading": "Vendor master governed",
     "points": [

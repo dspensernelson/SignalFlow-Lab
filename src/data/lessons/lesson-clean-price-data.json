@@ -79,12 +79,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "By hand you'd find-and-replace the '$' and '/MWh' out in Excel, then set the column type to number so formulas work.",
-      "tools": {
-        "powerAutomate": "'Apply to each' row with replace()/int() expressions to coerce values",
-        "zapier": "'Formatter > Numbers' to strip symbols and convert text to a real number",
-        "python": "float(re.sub(r'[^0-9.]', '', value)) per cell, or pandas.to_numeric"
-      }
+      "bestFit": [
+        {
+          "tool": "python",
+          "how": "pandas.to_numeric with errors='coerce', so bad rows become null instead of crashing the run"
+        },
+        {
+          "tool": "make",
+          "how": "an Iterator plus text-parser modules coercing each row before any comparison"
+        }
+      ]
     },
     "heading": "Clean price table built",
     "points": [

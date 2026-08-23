@@ -64,12 +64,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "You'd add the role's groups and strip anything a copy-paste left behind, so access matches the role exactly.",
-      "tools": {
-        "powerAutomate": "Add to profile groups; Remove member for anything off-profile",
-        "zapier": "grant the role groups, remove the stale one",
-        "python": "diff current access against the profile; grant missing, revoke extra"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "Apply to each group in the profile, then Add member - only the groups the profile lists"
+        },
+        {
+          "tool": "n8n",
+          "how": "loop the entitlement list adding memberships, and log any grant that was not on the profile"
+        }
+      ]
     },
     "heading": "Access reconciled",
     "points": [

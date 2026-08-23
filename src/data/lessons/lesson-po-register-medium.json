@@ -98,12 +98,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "lookup",
       "soloRebuildPath": "You'd pull the matching purchase order from the PO log so you can check the invoice against what was actually ordered.",
-      "tools": {
-        "powerAutomate": "'Get items' filtered by PO number from the PO list",
-        "zapier": "'Find Record' by PO number",
-        "python": "look up the PO by number in the register table"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "'Get items' filtered by PO number, with an explicit branch for no-PO-found"
+        },
+        {
+          "tool": "zapier",
+          "how": "a 'Find Record' step on the PO table that fails loudly when the PO does not exist"
+        }
+      ]
     },
     "heading": "PO register inspected",
     "points": [

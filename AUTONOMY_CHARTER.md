@@ -52,11 +52,25 @@ list, the deliverable, the signature concept cluster, the fork's meaning,
 or the temporal loop's meaning. No eleventh module: when module 10 ships,
 the build phase of this charter is complete and the builder STOPS.
 
+OPERATIONS NODE (owner-ratified 2026-08-22): every module's map ALSO
+carries exactly one Operations node (MODULE_AUTHORING_PLAYBOOK Step 2b),
+spending one of the 1-2 nodes a builder may add within a ratified
+charter. It is mandatory, not discretionary, and it is lint-enforced
+(`ops-node` in lint-map, `ops-coverage` in lint-lessons). It teaches the
+operating layer - connect, trigger, observe, test, promote - which the
+2026-08-22 coverage audit measured at 0-1 lessons out of 120.
+
 GATE 3 - Map shape: SELF-SERVE. A new module's map is approved when it
 (a) conforms to its charter's spine and shape class, (b) passes
 `npm run lint:map`, and (c) its derivation from the charter is logged in
 DECISION_LOG.md. Editing an already-shipped module's map remains
 prohibited except additive bug fixes, logged.
+
+ONE-TIME ADDITIVE EXCEPTION (owner-ratified 2026-08-22): modules 1-3,
+already shipped, each receive the Operations node and its single
+incoming archive edge. This is additive only - no existing node, edge,
+lesson, or artifact changes - and is logged in DECISION_LOG 2026-08-22.
+No other shipped-map edit is authorized by this exception.
 
 GATE 4 - New interaction types and validators: SELF-SERVE WITH SPEC AND
 BUDGET. Existing validators' matching rules stay frozen forever. A new
@@ -66,6 +80,15 @@ and lint coverage in the same PR; and a budget of AT MOST ONE new
 interaction type per module (the charters already flag the likely ones).
 If a concept seems to need more, express it with existing types instead -
 constraint is the design tool here.
+
+GATE 4 EXEMPTIONS (owner-granted, both one-time):
+(a) 2026-07-05, anti-slop: `tagSource` + `handoffForm`
+    (ENGINE_ADDITIONS_SPEC_INSPECTION_HANDOFF.md).
+(b) 2026-08-22, operations: `connectorConfig` + `runInspect`
+    (ENGINE_ADDITIONS_SPEC_OPERATIONS.md). Same reasoning as (a): two
+    different node behaviors (configure vs diagnose), whole-curriculum
+    benefit, closing a gap measured across all 120 lessons. The normal
+    one-new-type-per-module budget resumes after these two.
 
 GATE 5 - Tier curation: SELF-SERVE per each charter's tier-posture section,
 logged. Defaults inherited from Module 1: easy covers every node; medium

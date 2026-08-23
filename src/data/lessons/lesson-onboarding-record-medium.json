@@ -68,12 +68,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "You'd update the hire's row with the new start date and a note that it changed, so nobody works to the old day.",
-      "tools": {
-        "powerAutomate": "update the record's start date and set an 'amended' flag",
-        "zapier": "write the new start and a changed marker to the row",
-        "python": "store startDate and startDateAmended together"
-      }
+      "bestFit": [
+        {
+          "tool": "make",
+          "how": "a Set Variable module minting the hire record once, so every branch reads the same start date"
+        },
+        {
+          "tool": "python",
+          "how": "build the record with the start date as a real date object, not a string to re-parse later"
+        }
+      ]
     },
     "heading": "Record built",
     "points": [

@@ -103,12 +103,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "lookup",
       "soloRebuildPath": "You'd check the goods-receipt log to confirm what was actually delivered before paying for it.",
-      "tools": {
-        "powerAutomate": "'Get items' from the receipts list filtered by PO and line",
-        "zapier": "'Find Record' in the receipts table",
-        "python": "query the receipts store by PO line"
-      }
+      "bestFit": [
+        {
+          "tool": "n8n",
+          "how": "a database read filtered by PO and line, returning zero rows when nothing was received"
+        },
+        {
+          "tool": "python",
+          "how": "query receipts by PO line; treat an empty result as 'not received', never as zero quantity"
+        }
+      ]
     },
     "heading": "Receipt inspected",
     "points": [

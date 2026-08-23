@@ -87,12 +87,22 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "condition",
       "soloRebuildPath": "You'd apply the rule - auto-approve if within tolerance, otherwise send to a person - so obvious cases don't wait on a human.",
-      "tools": {
-        "powerAutomate": "'Condition' -> either auto-complete or 'Start and wait for an approval'",
-        "zapier": "'Filter'/'Paths' that auto-pass clean cases and route the rest",
-        "python": "if within_tolerance: approve() else: escalate()"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "'Condition' on the risk label - auto-complete on one branch, approval on the other"
+        },
+        {
+          "tool": "n8n",
+          "how": "an IF node whose expression reads the policy value, not a literal"
+        },
+        {
+          "tool": "make",
+          "how": "a Router with a filter per route, so both paths are visible on the canvas"
+        }
+      ]
     },
     "heading": "Decision log built",
     "points": [

@@ -84,12 +84,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "send",
       "soloRebuildPath": "You'd place the laptop order, note the tracking number and expected date, and only mark it done once you had a shipping confirmation in hand.",
-      "tools": {
-        "powerAutomate": "create a procurement item, then wait for a shipping-confirmation email/flag",
-        "zapier": "'Create Order' then capture the tracking number into the record",
-        "python": "call the asset-order API and store the returned tracking id"
-      }
+      "bestFit": [
+        {
+          "tool": "zapier",
+          "how": "create the procurement ticket and post the tracking number back to the tracker"
+        },
+        {
+          "tool": "make",
+          "how": "a ticket-creation module, then a Wait for the shipping confirmation the vendor sends"
+        }
+      ]
     },
     "heading": "Hardware handed off",
     "points": [

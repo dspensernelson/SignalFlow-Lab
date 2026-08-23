@@ -147,12 +147,22 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "You'd line up the invoice, the PO, and the receipt and confirm the three agree on item, quantity, and price.",
-      "tools": {
-        "powerAutomate": "join the three records and use a 'Condition' per field within tolerance",
-        "zapier": "a multi-step 'Lookup' + 'Filter' comparing the three sources",
-        "python": "compare invoice vs PO vs receipt field by field against tolerances"
-      }
+      "bestFit": [
+        {
+          "tool": "python",
+          "how": "join the three records on PO line and compute each variance once, storing it for the audit trail"
+        },
+        {
+          "tool": "n8n",
+          "how": "a Merge node joining invoice, PO, and receipt, then a Code node computing the variances"
+        },
+        {
+          "tool": "powerAutomate",
+          "how": "join the three records and use a 'Condition' per field against the policy value"
+        }
+      ]
     },
     "heading": "Three-way match complete",
     "points": [

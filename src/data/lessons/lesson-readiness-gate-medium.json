@@ -66,12 +66,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "condition",
       "soloRebuildPath": "You'd refuse to sign off while any item is open, and hand the open item to whoever can unblock it.",
-      "tools": {
-        "powerAutomate": "a Condition failing when any status is not done -> escalation branch",
-        "zapier": "a Filter that routes to escalation when a task is blocked",
-        "python": "if not all(done): route to escalation with the blocked task"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "a Condition that ALL task statuses equal done before the assemble branch runs"
+        },
+        {
+          "tool": "python",
+          "how": "all() over the tracker rows; one blocked task blocks the gate, by design"
+        }
+      ]
     },
     "heading": "Routed to escalation",
     "points": [

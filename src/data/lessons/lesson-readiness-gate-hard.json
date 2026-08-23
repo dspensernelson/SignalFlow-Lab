@@ -112,12 +112,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "condition",
       "soloRebuildPath": "You'd stand up the whole onboarding - intake the offer, plan the tasks, track their states, and gate on all-done - in whatever tools your team actually uses.",
-      "tools": {
-        "powerAutomate": "a flow: parse offer -> create tasks -> track statuses -> Condition gate",
-        "zapier": "a Zap chain building each artifact and a Filter as the gate",
-        "python": "functions for record, plan, tracker, and an all() gate"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "a Condition that ALL task statuses equal done before the assemble branch runs"
+        },
+        {
+          "tool": "python",
+          "how": "all() over the tracker rows; one blocked task blocks the gate, by design"
+        }
+      ]
     },
     "heading": "Onboarding rebuilt and proven",
     "points": [

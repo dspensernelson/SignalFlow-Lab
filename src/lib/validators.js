@@ -785,6 +785,165 @@ function handoffForm(answer, validation) {
   return { passed, results, artifact }
 }
 
+// Connector-configuration validator (additive). Operations interaction: the
+// learner configures how the automation CONNECTS, what TRIGGERS it, and what it
+// does when a step FAILS. See ENGINE_ADDITIONS_SPEC_OPERATIONS.md section 1.
+//
+// The answer is a flat JSON string of { fieldId: value } (the component
+// flattens its groups on serialize). Select/text/secretRef fields are delegated
+// to the frozen handoffForm matcher by COMPOSITION - the same technique
+// artifactImport uses - so no existing matching rule is duplicated or changed.
+// Only numeric fields are matched here, because handoffForm has no numeric kind.
+function connectorConfig(answer, validation) {
+  let parsed
+  try {
+    parsed = JSON.parse(answer)
+  } catch {
+    return {
+      passed: false,
+      results: [
+        {
+          id: 'json-parse',
+          label: 'Valid JSON',
+          passed: false,
+          message: 'Your answer is not valid JSON. Check for missing quotes, commas, or braces.',
+        },
+      ],
+      artifact: null,
+    }
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) parsed = {}
+
+  const { groups = [], artifactOnPass = null } = validation
+  const flat = groups.flatMap((g) => (g.fields || []).map((f) => ({ ...f, groupId: g.id })))
+  const delegated = flat.filter((f) => f.kind !== 'number')
+  const numeric = flat.filter((f) => f.kind === 'number')
+
+  // 1. Delegate every non-numeric field to handoffForm, then re-prefix its ids.
+  const byId = {}
+  if (delegated.length > 0) {
+    const sub = handoffForm(answer, { fields: delegated })
+    for (const row of sub.results) {
+      const fieldId = row.id.replace(/^field-/, '')
+      byId[fieldId] = { ...row, id: `cfg-${fieldId}` }
+    }
+  }
+
+  // 2. Numeric fields: must be real numbers, and match expected or sit in range.
+  for (const field of numeric) {
+    const raw = parsed[field.id]
+    const value = raw === undefined || raw === null ? '' : String(raw).trim()
+    let passed = false
+    let message
+    if (value === '') {
+      message = `Fill in: ${field.label}.`
+    } else {
+      const n = Number(value)
+      if (!Number.isFinite(n)) {
+        message = `${field.label} must be a number (no quotes, no units).`
+      } else if (field.expected !== undefined) {
+        passed = n === field.expected
+        message = passed ? 'Correct.' : field.explain
+      } else if (field.range) {
+        passed = n >= field.range.min && n <= field.range.max
+        message = passed ? 'Correct.' : field.explain
+      } else {
+        passed = true
+        message = 'Correct.'
+      }
+    }
+    byId[field.id] = { id: `cfg-${field.id}`, label: field.label, passed, message }
+  }
+
+  // 3. Report rows in the order the form shows them.
+  const results = flat.map((f) => byId[f.id]).filter(Boolean)
+  const passed = results.length > 0 && results.every((r) => r.passed)
+
+  let artifact = null
+  if (passed) {
+    if (artifactOnPass) {
+      artifact = artifactOnPass
+    } else {
+      artifact = {}
+      for (const g of groups) {
+        artifact[g.id] = {}
+        for (const f of g.fields || []) {
+          const raw = parsed[f.id]
+          artifact[g.id][f.id] = f.kind === 'number' ? Number(raw) : String(raw).trim()
+        }
+      }
+    }
+  }
+
+  return { passed, results, artifact }
+}
+
+// Run-inspection validator (additive). Operations interaction: the learner reads
+// a run history with a failed step, identifies the step, classifies the cause,
+// and chooses the remediation. See ENGINE_ADDITIONS_SPEC_OPERATIONS.md section 2.
+//
+// Deliberately the handoffForm algorithm over a different PRESENTATION: the
+// teaching lives in the run log the component renders, not in a new matching
+// rule. The answer is a JSON string of { fieldId: value }.
+function runInspect(answer, validation) {
+  let parsed
+  try {
+    parsed = JSON.parse(answer)
+  } catch {
+    return {
+      passed: false,
+      results: [
+        {
+          id: 'json-parse',
+          label: 'Valid JSON',
+          passed: false,
+          message: 'Your answer is not valid JSON. Check for missing quotes, commas, or braces.',
+        },
+      ],
+      artifact: null,
+    }
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) parsed = {}
+
+  const { fields = [], run = {}, artifactOnPass = null } = validation
+  const results = []
+
+  fields.forEach((field) => {
+    const raw = parsed[field.id]
+    const value = raw === undefined || raw === null ? '' : String(raw).trim()
+    let passed = false
+    let message
+    if (value === '') {
+      message =
+        field.kind === 'step'
+          ? 'Pick the step in the run history before validating.'
+          : `Fill in: ${field.label}.`
+    } else {
+      const accepted =
+        field.accepted || (field.expected !== undefined ? [field.expected] : [])
+      passed = accepted.map(normalize).includes(normalize(value))
+      message = passed ? 'Correct.' : field.explain
+    }
+    results.push({ id: `inspect-${field.id}`, label: field.label, passed, message })
+  })
+
+  const passed = results.length > 0 && results.every((r) => r.passed)
+
+  let artifact = null
+  if (passed) {
+    if (artifactOnPass) {
+      artifact = artifactOnPass
+    } else {
+      artifact = { runId: run.id, environment: run.environment }
+      fields.forEach((field) => {
+        artifact[field.id] = String(parsed[field.id]).trim()
+      })
+    }
+  }
+
+  return { passed, results, artifact }
+}
+
 const validators = {
   jsonFields,
   jsonPolicy,
@@ -795,6 +954,8 @@ const validators = {
   artifactImport,
   tagSource,
   handoffForm,
+  connectorConfig,
+  runInspect,
   // Stubs for future build passes.
   csvColumns: null,
   ruleBuilder: null,

@@ -65,12 +65,22 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "You'd mark the one stuck item blocked with a note on your checklist, so the reason is right next to the status.",
-      "tools": {
-        "powerAutomate": "set the hardware row status to blocked with a reason field",
-        "zapier": "update the status and reason columns for the blocked task",
-        "python": "record {taskId, state:'blocked', blockedReason} for the stuck branch"
-      }
+      "bestFit": [
+        {
+          "tool": "python",
+          "how": "one status row per task, updated by task id, so parallel branches cannot overwrite each other"
+        },
+        {
+          "tool": "make",
+          "how": "a data store updated per branch outcome, keyed on task id rather than on position"
+        },
+        {
+          "tool": "n8n",
+          "how": "a database upsert per branch, so re-running one branch does not disturb the others"
+        }
+      ]
     },
     "heading": "Block made visible",
     "points": [

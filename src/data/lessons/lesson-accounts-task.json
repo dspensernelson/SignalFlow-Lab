@@ -106,12 +106,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "You'd search the directory for the person before creating them, so running your script twice never makes two accounts.",
-      "tools": {
-        "powerAutomate": "Get user (filter) -> Condition -> Create user only if none returned",
-        "zapier": "'Find User' then a Filter so 'Create User' runs only when none exists",
-        "python": "look up by employee id; create only when the lookup is empty"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "Get user, then a Condition, then Create user ONLY if none was returned"
+        },
+        {
+          "tool": "python",
+          "how": "check-then-create keyed on the hire id, so a retry converges instead of duplicating"
+        }
+      ]
     },
     "heading": "Accounts created",
     "points": [

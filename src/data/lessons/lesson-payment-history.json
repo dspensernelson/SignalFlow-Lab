@@ -102,12 +102,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "lookup",
       "soloRebuildPath": "You'd search prior payments for this vendor and invoice number to make sure you have not already paid it.",
-      "tools": {
-        "powerAutomate": "'Get items' filtered by vendor + invoice number from the payments list",
-        "zapier": "'Find Record' by vendor and invoice number",
-        "python": "SELECT from payments WHERE vendor and invoice_no"
-      }
+      "bestFit": [
+        {
+          "tool": "zapier",
+          "how": "a 'Find Record' search by vendor and invoice number across the payments table"
+        },
+        {
+          "tool": "n8n",
+          "how": "a database node with an index on vendor plus invoice number, so the lookback stays fast"
+        }
+      ]
     },
     "heading": "Payment History inspected",
     "points": [

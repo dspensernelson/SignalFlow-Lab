@@ -99,12 +99,22 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "trigger",
       "soloRebuildPath": "You'd read the signed offer and copy the role, start date, and manager into your onboarding tracker - ignoring the salary and signatures the provisioning teams do not need.",
-      "tools": {
-        "powerAutomate": "an ATS/e-signature trigger that reads the offer fields into variables",
-        "zapier": "a 'New signed document' trigger mapping offer fields to the next step",
-        "python": "parse the offer record and pull role, startDate, and manager into a dict"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "an e-signature or ATS trigger that fires the moment the offer is countersigned"
+        },
+        {
+          "tool": "make",
+          "how": "a Watch module on the ATS, so onboarding starts without anyone remembering to start it"
+        },
+        {
+          "tool": "langgraph",
+          "how": "the graph entry, with the offer parsed into typed state before any provisioning runs"
+        }
+      ]
     },
     "heading": "Offer profiled",
     "points": [

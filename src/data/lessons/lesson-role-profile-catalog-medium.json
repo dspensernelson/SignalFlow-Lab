@@ -104,12 +104,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "lookup",
       "soloRebuildPath": "You'd update the role checklist once People Ops approved the addition, then use the new version for every hire in that role.",
-      "tools": {
-        "powerAutomate": "read the current published version of the role entitlements",
-        "zapier": "look up the versioned role row, including recent additions",
-        "python": "load the latest ratified role profile, version and all"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAppsCopilot",
+          "how": "a Dataverse entitlements table with an owner in People Ops, edited through a form"
+        },
+        {
+          "tool": "n8n",
+          "how": "a database read keyed on role, returning the entitlement list the plan expands"
+        }
+      ]
     },
     "heading": "Updated profile read",
     "points": [

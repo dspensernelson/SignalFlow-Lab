@@ -78,12 +78,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "You'd add the person to exactly the groups their role lists in your access sheet - resisting the urge to copy a busy colleague's extra access.",
-      "tools": {
-        "powerAutomate": "Apply to each role group -> Add member (only the profile's groups)",
-        "zapier": "loop the role's groups into 'Add to Group'",
-        "python": "iterate the role profile's access_groups and grant each"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "Apply to each group in the profile, then Add member - only the groups the profile lists"
+        },
+        {
+          "tool": "n8n",
+          "how": "loop the entitlement list adding memberships, and log any grant that was not on the profile"
+        }
+      ]
     },
     "heading": "Access granted",
     "points": [

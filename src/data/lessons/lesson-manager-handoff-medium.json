@@ -83,12 +83,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "approval",
       "soloRebuildPath": "You'd tell the manager 'ready, but on a loaner' and get a clear 'understood, proceed' before closing it out.",
-      "tools": {
-        "powerAutomate": "an approval that captures a conditional decision + the caveat",
-        "zapier": "record the manager's conditional confirmation and the note",
-        "python": "store {readyConfirmed:'conditional', caveatNoted:true}"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "'Start and wait for an approval' on the package, addressed to the hiring manager"
+        },
+        {
+          "tool": "powerAppsCopilot",
+          "how": "an approval card carrying the package summary; the reply is captured on the run"
+        }
+      ]
     },
     "heading": "Conditional handoff captured",
     "points": [

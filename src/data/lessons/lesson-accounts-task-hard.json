@@ -66,12 +66,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "You'd check which parts of the account already exist and create only the missing ones, rather than re-running blind.",
-      "tools": {
-        "powerAutomate": "Get each resource; Condition per sub-step; create only the missing",
-        "zapier": "Find each part; create only where the lookup is empty",
-        "python": "if identity and not mailbox: create_mailbox() only"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "Get user, then a Condition, then Create user ONLY if none was returned"
+        },
+        {
+          "tool": "python",
+          "how": "check-then-create keyed on the hire id, so a retry converges instead of duplicating"
+        }
+      ]
     },
     "heading": "Partial state reconciled",
     "points": [

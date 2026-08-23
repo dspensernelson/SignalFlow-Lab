@@ -68,12 +68,22 @@
   "fieldGuide": [],
   "takeaway": {
     "realWorld": {
+      "actionKind": "compose",
       "soloRebuildPath": "You'd note 'ready, on a loaner' with the backorder flagged, so the manager knows the real state.",
-      "tools": {
-        "powerAutomate": "compose the doc including an exception field from the escalation",
-        "zapier": "merge the tracker states and escalation note into the summary",
-        "python": "render the template with a degraded readiness and exception line"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "compose the document from the record, tracker, and gate fields, not from retyped values"
+        },
+        {
+          "tool": "python",
+          "how": "render the package from the three artifacts, so every line traces to the task that produced it"
+        },
+        {
+          "tool": "langgraph",
+          "how": "a synthesis node assembling the package from state, with the artifacts as grounding"
+        }
+      ]
     },
     "heading": "Degraded package assembled",
     "points": [

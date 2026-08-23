@@ -2,7 +2,157 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-08-22 (Operations node + connectorConfig/runInspect built)
+
+Ecosystem Literacy Plan 4b.2 and 4b.3. `npm run check` green: 129 lessons,
+154 canon assertions, 0 errors.
+
+- ENGINE: built `connectorConfig` and `runInspect` per
+  ENGINE_ADDITIONS_SPEC_OPERATIONS.md (spec committed first, Gate 4).
+  connectorConfig COMPOSES the frozen handoffForm matcher for its select/text/
+  secretRef fields - the artifactImport technique - and only matches numbers
+  itself. runInspect is deliberately the handoffForm algorithm over a different
+  PRESENTATION: the teaching is in the rendered run log, not in a new rule.
+  Both components are React.lazy, so the LessonWorkspace chunk grew only
+  76.7 -> 79.9 kB and the two surfaces ship as 5.65 kB / 6.49 kB chunks.
+- OPERATIONS NODE on modules 1-3 (Gate 3 one-time additive exception). Type
+  `process`, marked `skeletonStage: "operate"`, fed by ONE archive edge
+  labelled "run history". Archive-origin edges are exempt from the cycle check
+  and the temporal-loop check still finds archive -> reference, so no topology
+  rule was touched. Node counts 17/17/16 -> 18/18/17, all inside 15-18. Each
+  module's archive column was re-spaced to the 5-slot grid.
+- LESSON IDS ARE GLOBAL: the three modules' Operations lessons are
+  lesson-brief-operations, lesson-desk-operations, and
+  lesson-onboarding-operations (not one shared id). Caught during the build.
+- 9 LESSONS, three per module: connectorConfig (Easy - connection, identity,
+  secret REFERENCE, trigger, retries, failure path; module-03 adds PII
+  handling), runInspect (Medium - a 5-6 step run with one real failure:
+  auth-expired for Meridian, rate-limit for Beacon, schema-change for Harbor),
+  and a jsonRows test plan (Hard - four cases whose expectedOutcome the learner
+  DERIVES from the module's own rules, including one case the automation must
+  refuse). Every ops Easy intro re-glosses the base operating terms so the
+  glossary lint survives the Phase 4.3 reorder.
+- ROTATION LINT EARNED ITS KEEP: the first draft gave all three module-01 ops
+  lessons the same tool triple, pushing powerAutomate to 62.2% and turning the
+  check red. Fixed by giving each TIER the tools that actually suit it
+  (connections -> Power Automate/n8n/Python; run history -> Zapier/Make/Python;
+  testing -> Copilot Studio/Python/n8n). Better content, and the budget holds.
+- NEW LINTS, all hard errors, no grandfathering: `ops-node` (exactly one
+  operate node, non-decision, in LESSON_PREREQS, matching its skeleton row),
+  `skeleton-row` (every project carries every stage - previously unlinted,
+  which is how the recurrence card could have silently broken),
+  `column-capacity` (<= 5 nodes per canvas column), `ops-coverage` (all three
+  tiers, connectorConfig and runInspect both spent, opsTopicsRequired covered),
+  plus connectorConfig-shape and runInspect-shape. runInspect-shape includes a
+  GIVEAWAY RULE: a step's error text may not contain the expected cause
+  verbatim, so the learner infers the classification from the symptom.
+- COMPACTION PASS (the spec predicted it; every new surface has needed one):
+  connectorConfig first measured 732px against a 650px viewport in the
+  wrong-answer state. Fixed by laying the three groups side by side
+  (lg:grid-cols-3) instead of 2+1 wrapping, and tightening `short:` paddings.
+  Now scrollHeight === clientHeight at BOTH 1280x800 and 1366x650.
+- VERIFIED LIVE, both surfaces, both viewports, wrong-answer state: the
+  connectorConfig lesson flags a pasted raw secret with its teaching message
+  ("Fix this next: Secret"), passes on the vault reference, and mints
+  connector-config.json; the runInspect lesson rejects blaming a skipped step
+  and passes on s2/auth-expired/rotate-credential/s2, minting
+  run-diagnosis.json. Console clean; localStorage cleared after.
+- The validator audit now probes both new types with structurally-valid
+  garbage. Both reject it. jsonPolicy remains the single documented debt.
+
+## 2026-08-22 (Ecosystem literacy: taxonomy, Operations node, two interaction types)
+
+Owner ratified the Ecosystem Literacy Plan. Driver: the end-goal bar in
+GO_LIVE_REVIEW.md ("knowing everything possible about how to ACTUALLY build
+automations and workflows") is not met by the shipped curriculum. A coverage
+audit across all 120 lessons measured the gap.
+
+- FIELD-NOTES DECLINE REVERSED (supersedes 2026-07-06). That entry declined a
+  wrap lesson because its themes were "already owned by existing nodes -
+  credentials/secrets by accounts-task ... testing by the accounts-task
+  idempotent re-run". Verified 2026-08-22: `grep -i "credential\|secret"` over
+  lesson-accounts-task{,-medium,-hard}.json and lesson-access-task{,-medium}.json
+  returns 0 matches in all five files. The coverage claim was not supported.
+  Measured across 120 lessons (teaching prose, excluding realWorld one-liners):
+  runtime error handling 0, run history / failed runs 1, credentials/secrets/auth
+  1, testing an automation 0, triggers + poll-vs-webhook 1, environments/ALM 0,
+  rate limits/backoff 0, PII 0, when-NOT-to-automate 0 by phrase.
+- OPERATIONS NODE, mandatory per module (AUTONOMY_CHARTER Gate 2,
+  MODULE_AUTHORING_PLAYBOOK Step 2b/7c). One `process` node marked
+  `skeletonStage: "operate"`, fed by the archive node, non-decision, no outgoing
+  edges. Three lessons: connectorConfig (Easy), runInspect (Medium), jsonRows
+  test plan (Hard). Lint-enforced by `ops-node` and `ops-coverage` - it is a
+  script, not a wish, because the Step 7a capstone and the TOOL_MAP appendix
+  both silently lapsed when they were prose-only rules.
+- ONE-TIME ADDITIVE MAP CHANGE to shipped modules 1-3 (Gate 3 exception, owner
+  ratified): each gains the Operations node and its single incoming archive
+  edge. Additive only - no existing node, edge, lesson, or artifact changes.
+  Node counts 17 -> 18, 17 -> 18, 16 -> 17; all inside the 15-18 guardrail.
+- GATE 4 EXEMPTION for `connectorConfig` + `runInspect`
+  (ENGINE_ADDITIONS_SPEC_OPERATIONS.md), same reasoning as the 2026-07-05
+  anti-slop pair: two different node behaviors, whole-curriculum benefit. The
+  normal one-new-type-per-module budget resumes after these two. Spec committed
+  BEFORE implementation per Gate 4.
+- CANONICAL VOCABULARY: src/data/automationTaxonomy.json is the single source of
+  truth for nine action kinds, a seven-tool roster (Power Automate, Power Apps /
+  Copilot Studio, Make, n8n, Zapier, Python, LangGraph), opsTopics, and the run
+  vocabulary. Resolves three competing compressions that had drifted apart: the
+  master plan's eight moves (KEPT as pedagogy, now nine, with a crosswalk table),
+  moduleSkeleton.json's seven stages (KEPT as the shape axis, now eight with
+  `operate`), and the TOOL_MAP.md "five moves" (RETIRED with those files).
+- realWorld v2: `takeaway.realWorld` becomes
+  `{ actionKind, soloRebuildPath, bestFit: [{ tool, how }] }`, replacing the
+  fixed powerAutomate/zapier/python triple that was hardcoded in BOTH
+  LessonTakeaway.jsx and lint-lessons.mjs. Tools rotate by relevance, enforced by
+  a `realworld-rotation` lint (>= 5 of 7 tools per module, no tool above 60%).
+  All 120 lessons migrate; there is no dual shape.
+- TOOL_MAP.md RETIRED, superseding GO_LIVE_REVIEW W1 directive item 3. The
+  per-module markdown appendix lapsed after two modules (module-03 shipped
+  without one) and never rendered in the app. Replaced by an in-app Tool map
+  view generated from lesson realWorld data, which cannot lapse.
+- LESSON_DESIGN_FRAMEWORK "no real integrations" clarified to "no LIVE
+  integrations". Gate 8 unchanged: no network, no OAuth, no platform APIs.
+  Simulated platform surfaces built from authored mock data are in scope.
+- SEQUENCING: this work is REMEDIATION_PLAN Phases 4b and 5, after Phases 0-2
+  (lints, validator fixes), so the new types are born covered by the giveaway
+  and glossary lints. Module 4 does not merge before 4b.1 and 4b.2.
+
 ## 2026-07-06 (Module 3 Harbor - medium + hard tiers complete)
+## 2026-07-06 (Module 1 opening arc re-storyboard)
+
+- Owner review found the Module 1 easy openers (analyst-notes, trader-flag,
+  price-feed) un-storyboarded: three back-to-back choiceCheck quizzes, no
+  visible mission, and no felt answer to "where does the JSON come from".
+  Root cause confirmed in code: `lesson.scenario` rendered NOWHERE, and the
+  openers used the plain intro/takeaway layouts while the rich mission-path
+  intro and diagram takeaway (built for lesson-intake) sat unused.
+- ENGINE (render-only): LessonIntro now renders `lesson.scenario` as a
+  scene-setting line at the top of all three intro layouts (every lesson's
+  authored clock-time/why-now copy is finally visible), and the mission-path
+  layout renders `intro.sections` as background reading below the CTA (they
+  were lint-required but invisible on that layout). LessonTakeaway's diagram
+  layout: flag input card is now conditional (mirrors LessonIntro), and
+  tagSource lessons report `validation.fields.length` as the field count.
+- INTERACTION CONVERSIONS (Step 7b spend-or-justify): analyst-notes and
+  price-feed converted choiceCheck -> tagSource - the note/CSV literally
+  contain the spans that become the intake record's fields, so tagging IS the
+  where-the-JSON-comes-from moment (mirrors module-03's signed-offer opener
+  and the 2026-07-05 module-02 conversions). trader-flag STAYS choiceCheck:
+  genuinely interpretive - the answer (approvalRequired: true) appears in no
+  source span, so there is nothing to tag. Cap math: module-01 choiceCheck
+  12/42 = 28.6% -> 10/42 = 23.8%; module-01 REMOVED from
+  CHOICECHECK_GRANDFATHERED in lint-lessons.mjs (regressions are now errors).
+- STORY THREAD: the three openers (plus lesson-intake's nextNodeId, fixed
+  from clean-price-data to price-feed to keep the arc continuous) now follow
+  one named case - the 2 AM ERCOT spike ($187 peak / $142 settle, all canon)
+  - toward the 7:00 AM brief, with mission intros, whatCameIn/unlocks
+  context, capability + consumers takeaways, and Next Node chaining:
+  analyst-notes -> trader-flag -> market-intake-record -> price-feed ->
+  forecast-data. Artifacts minted on pass are unchanged in shape (additive
+  keys only), so no storage/consumer impact.
+- Guardrails: canon.json gained 5 assertions pinning the new segment texts
+  that carry canon numbers; fixtures added for both tagSource conversions;
+  npm run check green (120 lessons, 154 assertions, module-01 warning gone).
 
 - MEDIUM tier (16 lessons, full tier): a messier second hire (Sam Rivera,
   H-4022) carrying the charter's three messes - a moved/amended start date

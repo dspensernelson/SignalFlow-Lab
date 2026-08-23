@@ -1,5 +1,6 @@
 import LessonWorkflowStrip from './LessonWorkflowStrip'
 import { Button, SignalFlowDiagram } from './ui'
+import { ActionKindChip } from './LessonTakeaway'
 
 // Small inline icon set so the mission path reads like a work-order screen
 // without pulling in an icon dependency. Unknown names render nothing.
@@ -21,6 +22,13 @@ function Icon({ name, className = 'h-4 w-4' }) {
           <circle cx="12" cy="12" r="9" />
           <circle cx="12" cy="12" r="5" />
           <circle cx="12" cy="12" r="1.5" />
+        </svg>
+      )
+    case 'clock':
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3 2" />
         </svg>
       )
     case 'note':
@@ -97,6 +105,19 @@ function Icon({ name, className = 'h-4 w-4' }) {
   }
 }
 
+// Scene-setting line rendered from lesson.scenario on every intro layout.
+// Authoring rules require every scenario to state the clock time and why the
+// artifact is needed NOW; this is the one place the learner reads it.
+function SceneLine({ scenario }) {
+  if (!scenario) return null
+  return (
+    <p className="flex items-start gap-2 px-1 text-sm italic leading-relaxed text-sf-muted">
+      <Icon name="clock" className="mt-0.5 h-4 w-4 flex-none" />
+      <span>{scenario}</span>
+    </p>
+  )
+}
+
 // Step 1 of the reusable lesson template: prepare the user before the exercise.
 // Lessons that define intro.mission render the Hybrid B "mission path" layout;
 // lessons with intro.subtitle (but no mission) render the earlier artifact hero;
@@ -105,6 +126,10 @@ export default function LessonIntro({ lesson, onContinue }) {
   const intro = lesson.intro
   const missionPath = Boolean(intro.mission)
   const rich = Boolean(intro.subtitle)
+  // The kind-of-action chip is the one concept label every lesson carries
+  // (intro.concept is authored on only one lesson). It names what this step IS
+  // in any tool, and its tooltip carries the gloss - see automationTaxonomy.json.
+  const actionKind = lesson.takeaway?.realWorld?.actionKind
 
   if (missionPath) {
     const came = intro.whatCameIn || {}
@@ -112,6 +137,12 @@ export default function LessonIntro({ lesson, onContinue }) {
     const unlocks = intro.unlocks || {}
     return (
       <div className="flex flex-col gap-4">
+        <SceneLine scenario={lesson.scenario} />
+        {actionKind && (
+          <div className="flex flex-wrap items-center gap-2">
+            <ActionKindChip actionKind={actionKind} />
+          </div>
+        )}
         {/* Mission statement: blocked until the note becomes a record */}
         <div className="flex items-start gap-3 rounded-xl border border-sf-border bg-sf-surface p-4 shadow-sf-sm">
           <span className="mt-0.5 flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-sf-accent-weak text-sf-accent">
@@ -255,6 +286,23 @@ export default function LessonIntro({ lesson, onContinue }) {
             </span>
           </div>
         </div>
+
+        {/* Background reading: the intro sections every lesson authors (lint
+            requires them). The mission path keeps them below the CTA so the
+            diagram stays the hero; the Intro step is allowed to scroll. */}
+        {intro.sections && intro.sections.length > 0 && (
+          <div className="rounded-xl border border-sf-border bg-sf-surface p-4 shadow-sf-sm">
+            <h2 className="text-sm font-semibold text-sf-text">{intro.heading}</h2>
+            <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
+              {intro.sections.map((section) => (
+                <div key={section.title}>
+                  <h3 className="text-xs font-semibold text-sf-body">{section.title}</h3>
+                  <p className="mt-0.5 text-xs leading-relaxed text-sf-muted">{section.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     )
   }
@@ -262,8 +310,10 @@ export default function LessonIntro({ lesson, onContinue }) {
   if (!rich) {
     return (
       <div className="flex flex-col gap-4">
+        <SceneLine scenario={lesson.scenario} />
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <section className="lg:col-span-2 rounded-xl border border-sf-border bg-sf-surface p-5 shadow-sf-sm">
+            {actionKind && <ActionKindChip actionKind={actionKind} className="mb-3" />}
             <h2 className="text-lg font-semibold text-sf-text">{intro.heading}</h2>
             <div className="mt-4 flex flex-col gap-4">
               {intro.sections.map((section) => (
@@ -316,13 +366,17 @@ export default function LessonIntro({ lesson, onContinue }) {
 
   return (
     <div className="flex flex-col gap-4">
+      <SceneLine scenario={lesson.scenario} />
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <section className="lg:col-span-2 rounded-xl border border-sf-border bg-sf-surface p-5 shadow-sf-sm">
-          {intro.concept && (
-            <span className="inline-flex items-center rounded-full border border-sf-accent-border bg-sf-accent-weak px-2.5 py-0.5 text-xs font-medium text-sf-accent-text">
-              Concept: {intro.concept}
-            </span>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {intro.concept && (
+              <span className="inline-flex items-center rounded-full border border-sf-accent-border bg-sf-accent-weak px-2.5 py-0.5 text-xs font-medium text-sf-accent-text">
+                Concept: {intro.concept}
+              </span>
+            )}
+            {actionKind && <ActionKindChip actionKind={actionKind} />}
+          </div>
           <h2 className="mt-3 text-2xl font-semibold text-sf-text">
             {intro.recordName || intro.heading}
           </h2>

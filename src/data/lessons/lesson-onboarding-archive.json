@@ -96,12 +96,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "store",
       "soloRebuildPath": "You'd file the completed onboarding in a dated, retained folder and note what the role really needed for the next time you hire it.",
-      "tools": {
-        "powerAutomate": "write the run to a retained SharePoint/Dataverse store with a retention label",
-        "zapier": "archive the record to storage and append to a 'lessons learned' sheet",
-        "python": "write the run to a dated archive and export role-needs to the feedback step"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "write the run to a retained store with a retention label matching the HR policy"
+        },
+        {
+          "tool": "make",
+          "how": "a storage module writing the retained run that the catalog feedback later reads"
+        }
+      ]
     },
     "heading": "Onboarding archived",
     "points": [

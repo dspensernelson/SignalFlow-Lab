@@ -109,12 +109,22 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "compose",
       "soloRebuildPath": "You'd assemble the final brief by dropping the cleaned numbers and the risk verdicts into the template, ready to send at 7:00.",
-      "tools": {
-        "powerAutomate": "'Create HTML table' + 'Compose' to build the body, then 'Send an email'",
-        "zapier": "a 'Formatter' build step feeding 'Send Outbound Email' / Gmail",
-        "python": "render the template with the day data, output HTML or markdown"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "'Create HTML table' plus 'Compose' to build the body from the upstream artifacts"
+        },
+        {
+          "tool": "python",
+          "how": "render a Jinja template from the artifact dicts, so every figure traces to a source"
+        },
+        {
+          "tool": "langgraph",
+          "how": "a synthesis node composing the brief from state, with the artifacts as grounding"
+        }
+      ]
     },
     "heading": "Degraded brief shipped",
     "points": [

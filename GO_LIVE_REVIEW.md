@@ -54,6 +54,11 @@ OWNER DIRECTIVE (ratified by this review, per the owner's stated bar):
    Modules 1-2.
 3. Each module wrap gains a TOOL_MAP.md appendix (concept -> tool feature
    table, ~1 page) linked from the case study.
+   SUPERSEDED 2026-08-22: the markdown appendix lapsed after two modules
+   (module-03 shipped without one) and never rendered in the app. Replaced by
+   an in-app Tool map view generated from lesson takeaway.realWorld data, which
+   cannot lapse. The intent of this directive stands; the mechanism changed.
+   See DECISION_LOG 2026-08-22 and src/lib/toolMap.js.
 
 ### W2. The viewport lie: the no-scroll doctrine fails on real laptops
 

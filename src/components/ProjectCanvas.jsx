@@ -18,6 +18,9 @@ import { buildExport, downloadText } from '../lib/export'
 import { WelcomeModal, TierCompleteModal, RecurrenceModal } from './HumanMoments'
 import { Logo, ThemeToggle, StatItem, Button, Icon } from './ui'
 import moduleSkeleton from '../data/moduleSkeleton.json'
+import ToolMapModal from './ToolMap'
+import { buildToolMapRows } from '../lib/toolMap'
+import { tierLessonId } from '../lib/progress'
 
 const TIER_LABELS = { easy: 'Easy', medium: 'Medium', hard: 'Hard' }
 
@@ -147,6 +150,7 @@ function ProjectSwitch({ projects, value, onChange }) {
 }
 
 export default function ProjectCanvas({
+  lessons,
   nodes,
   phases,
   edges,
@@ -246,6 +250,11 @@ export default function ProjectCanvas({
     setCelebrateClosed(true)
   }
 
+  // Tool map rows are derived from lesson realWorld data, so the view exists
+  // for any project whose lessons have loaded and cannot go stale.
+  const [showToolMap, setShowToolMap] = useState(false)
+  const toolMapRows = buildToolMapRows({ nodes, lessons, tierLessonId, tier })
+
   function handleExport() {
     const payload = buildExport({
       projectName,
@@ -293,6 +302,15 @@ export default function ProjectCanvas({
             </span>
             {onTierChange && <TierSwitch value={tier} onChange={onTierChange} />}
             <ThemeToggle value={theme} onChange={onToggleTheme} />
+            <Button
+              variant="neutral"
+              size="sm"
+              onClick={() => setShowToolMap(true)}
+              disabled={toolMapRows.length === 0}
+              title="Every step of this workflow, the kind of action it is, and the tools that fit"
+            >
+              Tool map
+            </Button>
             <Button
               variant="neutral"
               size="sm"
@@ -357,6 +375,12 @@ export default function ProjectCanvas({
 
             <aside className="mt-6 lg:mt-0 lg:sticky lg:top-20">
               <NodeDetail
+                lesson={
+                  selectedNode?.taskId && lessons
+                    ? lessons[tierLessonId(selectedNode.taskId, tier)] ||
+                      lessons[selectedNode.taskId]
+                    : null
+                }
                 node={selectedNode}
                 status={selectedStatus}
                 phase={selectedPhase}
@@ -374,6 +398,12 @@ export default function ProjectCanvas({
         </section>
       </div>
 
+      <ToolMapModal
+        open={showToolMap}
+        onClose={() => setShowToolMap(false)}
+        projectName={projectName}
+        rows={toolMapRows}
+      />
       <WelcomeModal open={showWelcome} onDismiss={dismissWelcome} />
       <RecurrenceModal
         open={showRecurrence}

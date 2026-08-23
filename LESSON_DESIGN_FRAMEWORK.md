@@ -51,7 +51,13 @@ First scenario / business: **Meridian Morning Market Brief** - every morning the
 convert messy overnight energy-market inputs into a polished 7:00 AM briefing.
 
 Stack (intentionally small simulation, not enterprise platform): React + Vite + Tailwind v3,
-local JSON data, localStorage. No backend, no auth, no AI grading, no real integrations.
+local JSON data, localStorage. No backend, no auth, no AI grading, no LIVE integrations.
+
+Clarified 2026-08-22 (owner): "no LIVE integrations" means no network calls, no OAuth, no
+platform APIs, no third-party services - Gate 8 is unchanged. It does NOT forbid SIMULATED
+platform surfaces built from authored mock data: connector configuration, run histories with
+failed steps, environments, test plans. Those are how the operating layer is taught (see
+ENGINE_ADDITIONS_SPEC_OPERATIONS.md). Everything stays local, deterministic, and offline.
 
 Bigger vision (parked, not in scope now): the same engine - workflow map + artifact model +
 lesson structure - is largely domain agnostic. Meridian is just the first curriculum. Later
@@ -338,8 +344,10 @@ CURRICULUM_MASTER_PLAN.md.
   enforced in lint-lessons, backfilled across all 81 Module 1+2 lessons.
   [done 2026-07-04] Module 2 solo-rebuild capstone (lesson-match-decision-hard,
   artifactImport, 4 Beacon spine files, mirrors approval-decision-hard).
-  [done 2026-07-04] TOOL_MAP.md for modules 1+2 (per-step Power Automate/Zapier/
-  Python mapping). [done 2026-07-04] amended MODULE_AUTHORING_PLAYBOOK step 7
+  [done 2026-07-04, SUPERSEDED 2026-08-22] TOOL_MAP.md for modules 1+2
+  (per-step Power Automate/Zapier/Python mapping). Those two files are deleted;
+  the tool map is now generated in-app from lesson data over the full seven-tool
+  roster. See DECISION_LOG 2026-08-22. [done 2026-07-04] amended MODULE_AUTHORING_PLAYBOOK step 7
   (7a capstone MANDATORY, 7b interaction budget SPEND-OR-JUSTIFY) and
   charters/_INDEX. G2 phase complete; next is G3 ship (F7 code-split + owner park).
 - G3 SHIP. F7 per-project code-splitting; then PARK owner items in

@@ -16,25 +16,67 @@
     "routine-update-path",
     "prior-day-brief-template",
     "morning-brief",
-    "distribution-archive"
+    "distribution-archive",
+    "run-operations"
   ],
   "LESSON_PREREQS": {
     "analyst-notes": [],
-    "trader-flag": ["analyst-notes"],
-    "price-feed": ["analyst-notes"],
-    "market-intake-record": ["trader-flag"],
-    "clean-price-data": ["price-feed"],
-    "forecast-data": ["price-feed"],
-    "prior-day-reference": ["forecast-data"],
-    "threshold-policy": ["market-intake-record"],
-    "variance-check": ["clean-price-data", "forecast-data", "prior-day-reference"],
-    "risk-evaluation": ["variance-check", "threshold-policy"],
-    "approval-template": ["threshold-policy"],
-    "approval-decision": ["risk-evaluation"],
-    "approval-route": ["approval-decision", "approval-template"],
-    "routine-update-path": ["approval-decision"],
-    "prior-day-brief-template": ["risk-evaluation"],
-    "morning-brief": ["approval-route", "routine-update-path", "prior-day-brief-template"],
-    "distribution-archive": ["morning-brief"]
+    "trader-flag": [
+      "analyst-notes"
+    ],
+    "price-feed": [
+      "analyst-notes"
+    ],
+    "market-intake-record": [
+      "trader-flag"
+    ],
+    "clean-price-data": [
+      "price-feed"
+    ],
+    "forecast-data": [
+      "price-feed"
+    ],
+    "prior-day-reference": [
+      "forecast-data"
+    ],
+    "threshold-policy": [
+      "market-intake-record"
+    ],
+    "variance-check": [
+      "clean-price-data",
+      "forecast-data",
+      "prior-day-reference"
+    ],
+    "risk-evaluation": [
+      "variance-check",
+      "threshold-policy"
+    ],
+    "approval-template": [
+      "threshold-policy"
+    ],
+    "approval-decision": [
+      "risk-evaluation"
+    ],
+    "approval-route": [
+      "approval-decision",
+      "approval-template"
+    ],
+    "routine-update-path": [
+      "approval-decision"
+    ],
+    "prior-day-brief-template": [
+      "risk-evaluation"
+    ],
+    "morning-brief": [
+      "approval-route",
+      "routine-update-path",
+      "prior-day-brief-template"
+    ],
+    "distribution-archive": [
+      "morning-brief"
+    ],
+    "run-operations": [
+      "distribution-archive"
+    ]
   }
 }

@@ -99,12 +99,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "lookup",
       "soloRebuildPath": "You'd keep last issue's brief as a starting template so today's edition follows the same headings and order.",
-      "tools": {
-        "powerAutomate": "a stored Word/HTML template populated with dynamic content",
-        "zapier": "a template message step with merge fields for each section",
-        "python": "a Jinja2 or string template with named sections"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAppsCopilot",
+          "how": "the brief layout held as a reusable card definition rather than retyped each day"
+        },
+        {
+          "tool": "python",
+          "how": "a Jinja template file loaded at run time, versioned alongside the code"
+        }
+      ]
     },
     "heading": "Template change managed",
     "points": [

@@ -1,0 +1,149 @@
+{
+  "id": "lesson-desk-operations-hard",
+  "nodeId": "run-operations",
+  "title": "Write the Beacon Test Plan",
+  "subtitle": "Prove the automation behaves before it touches production",
+  "clock": "8:30 AM",
+  "difficulty": "Hard",
+  "skill": "Testing an automation",
+  "opsTopics": [
+    "test-plan",
+    "environments",
+    "when-not-to-automate"
+  ],
+  "scenario": "The automation works on the happy path, which is the least interesting thing about it. Before it is promoted from test to prod, write the test plan: four cases, each naming the outcome the workflow's OWN RULES produce. You are not told the outcomes. Apply the rules to each case and work them out - that is the whole exercise, and it is also how you find out whether the rules are actually complete.",
+  "inputType": "text",
+  "input": "THE RULES THIS WORKFLOW APPLIES\nA line matches when the price variance is within the LARGER of 2% of the PO amount or $25.00, and the received quantity equals the ordered quantity exactly. Anything outside routes to the exception queue. An invoice already paid is a duplicate and is blocked. A vendor not on the master cannot be paid and stays manual.\n\nCASES TO COVER (run each in the test environment)\n- TC-1: Invoice $2.40 vs PO $2.40, quantities equal\n- TC-2: Invoice $2.44 vs PO $2.40 on a $600 PO, quantities equal\n- TC-3: Same vendor, same invoice number, already paid last week\n- TC-4: Invoice from a vendor with no row on the master\n\nFor each case, give caseId, scenario, environment, and the expectedOutcome the rules above produce.\nReturn an array of four row objects.",
+  "instructions": [
+    "Read the rules, then work out what each case produces. The outcomes are not given to you.",
+    "Include the clean case, the boundary case, the broken-input case, and the case that should stay manual.",
+    "Run every case in the test environment, never in prod.",
+    "Return an array of four rows with caseId, scenario, environment, and expectedOutcome.",
+    "Validate the plan."
+  ],
+  "interactionType": "jsonEditor",
+  "validation": {
+    "type": "jsonRows",
+    "keyField": "caseId",
+    "rowFields": [
+      "caseId",
+      "scenario",
+      "environment",
+      "expectedOutcome"
+    ],
+    "numericFields": [],
+    "expectedRows": [
+      {
+        "caseId": "TC-1",
+        "scenario": "Invoice $2.40 vs PO $2.40, quantities equal",
+        "environment": "test",
+        "expectedOutcome": "auto-approve-path"
+      },
+      {
+        "caseId": "TC-2",
+        "scenario": "Invoice $2.44 vs PO $2.40 on a $600 PO, quantities equal",
+        "environment": "test",
+        "expectedOutcome": "auto-approve-path"
+      },
+      {
+        "caseId": "TC-3",
+        "scenario": "Same vendor, same invoice number, already paid last week",
+        "environment": "test",
+        "expectedOutcome": "duplicate-blocked"
+      },
+      {
+        "caseId": "TC-4",
+        "scenario": "Invoice from a vendor with no row on the master",
+        "environment": "test",
+        "expectedOutcome": "stays-manual"
+      }
+    ]
+  },
+  "starterAnswer": "[\n  {\n    \"caseId\": \"TC-1\",\n    \"scenario\": \"Invoice $2.40 vs PO $2.40, quantities equal\",\n    \"environment\": \"\",\n    \"expectedOutcome\": \"\"\n  },\n  {\n    \"caseId\": \"TC-2\",\n    \"scenario\": \"Invoice $2.44 vs PO $2.40 on a $600 PO, quantities equal\",\n    \"environment\": \"\",\n    \"expectedOutcome\": \"\"\n  },\n  {\n    \"caseId\": \"TC-3\",\n    \"scenario\": \"Same vendor, same invoice number, already paid last week\",\n    \"environment\": \"\",\n    \"expectedOutcome\": \"\"\n  },\n  {\n    \"caseId\": \"TC-4\",\n    \"scenario\": \"Invoice from a vendor with no row on the master\",\n    \"environment\": \"\",\n    \"expectedOutcome\": \"\"\n  }\n]",
+  "fieldGuide": [
+    {
+      "field": "caseId",
+      "meaning": "The identifier for this test case.",
+      "type": "string",
+      "example": "\"TC-1\"",
+      "hint": "Use the ids given in the case list."
+    },
+    {
+      "field": "scenario",
+      "meaning": "What this case exercises, in one line.",
+      "type": "string",
+      "example": "\"Clean run\"",
+      "hint": "Copy the scenario from the case list."
+    },
+    {
+      "field": "environment",
+      "meaning": "Where the case runs.",
+      "type": "string",
+      "example": "\"test\"",
+      "hint": "Never prod. A test that runs in prod is not a test."
+    },
+    {
+      "field": "expectedOutcome",
+      "meaning": "What the workflow's rules produce for this case.",
+      "type": "string",
+      "example": "\"routine-update-path\"",
+      "hint": "Derive it by applying the stated rules. It is not written down for you."
+    }
+  ],
+  "copilotPrompt": "Explain why a test plan for an automation needs a boundary case and a malformed-input case, not just a happy path, and why tests belong in a test environment rather than production.",
+  "successMessage": "Test plan written. The automation can be promoted on evidence.",
+  "validateLabel": "Validate Test Plan",
+  "intro": {
+    "heading": "Before you build: promotion needs evidence",
+    "artifactName": "test-plan.json",
+    "sections": [
+      {
+        "title": "What this record does",
+        "body": "The test plan is what lets someone promote this automation from test to prod and say why. Without it, promotion is a feeling."
+      },
+      {
+        "title": "Dev, test, prod",
+        "body": "An automation is built in dev, proven in test against realistic data, and only then promoted to prod where it touches real money, real hires, or real decisions. Testing in prod means your first real run is also your first test."
+      },
+      {
+        "title": "The cases that matter are the awkward ones",
+        "body": "The happy path proves almost nothing. The boundary case proves you know where your own line is. The malformed input proves you fail safely. The case that should stay manual proves you know the limit of the automation."
+      },
+      {
+        "title": "When NOT to automate",
+        "body": "The fourth case in every plan here is a case the automation should REFUSE. Knowing where automation stops is a design skill, not an admission of failure - an automation that guesses at the edge is worse than one that hands over cleanly."
+      }
+    ]
+  },
+  "takeaway": {
+    "realWorld": {
+      "actionKind": "operate",
+      "soloRebuildPath": "You would write the cases in a sheet, run each one in a test environment, record the actual outcome next to the expected one, and only promote when they match.",
+      "bestFit": [
+        {
+          "tool": "python",
+          "how": "a test suite with the tolerance boundary as an explicit case"
+        },
+        {
+          "tool": "zapier",
+          "how": "the Zap test step run against each sample invoice before turning it on"
+        },
+        {
+          "tool": "powerAppsCopilot",
+          "how": "a managed solution promoted dev to test to prod rather than edited in place"
+        }
+      ]
+    },
+    "heading": "Test plan written",
+    "artifactName": "test-plan.json",
+    "before": "The automation worked on the happy path and nobody could say what it did at the edges.",
+    "after": "Four cases name what the rules produce, including the case the automation must refuse.",
+    "capability": "The workflow can now be promoted to production on evidence rather than on optimism.",
+    "auditNote": "The plan records the environment each case ran in, so 'we tested it' has a date, a case list, and a place attached to it.",
+    "points": [
+      "You created test-plan.json by applying the workflow's own rules to four cases, including the boundary.",
+      "One case is a deliberate refusal: knowing where the automation stops is part of designing it.",
+      "The workflow can now be promoted to production on evidence rather than on optimism."
+    ]
+  }
+}

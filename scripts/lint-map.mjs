@@ -30,6 +30,9 @@ import { fileURLToPath } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const registry = JSON.parse(readFileSync(path.join(root, 'src', 'data', 'projects.json'), 'utf8'))
+const skeleton = JSON.parse(
+  readFileSync(path.join(root, 'src', 'data', 'moduleSkeleton.json'), 'utf8')
+)
 
 const VALID_TYPES = ['source', 'reference', 'artifact', 'process', 'decision', 'handoff', 'output', 'archive']
 
@@ -148,6 +151,46 @@ function lintProject(projectId) {
       }
       seen.add(id)
     }
+  }
+
+  // 7. ops-node: every module ships exactly one Operations node (playbook Step
+  // 2b). This is a LINT and not a prose rule on purpose: the Step 7a capstone
+  // and the TOOL_MAP appendix were both prose-only mandates and both silently
+  // lapsed after two modules.
+  const opsNodes = nodes.filter((n) => n.skeletonStage === 'operate')
+  if (opsNodes.length !== 1) {
+    err(`needs exactly ONE node with skeletonStage "operate" (found ${opsNodes.length}) - see MODULE_AUTHORING_PLAYBOOK Step 2b`)
+  } else {
+    const ops = opsNodes[0]
+    if (ops.type === 'decision') err(`ops node "${ops.id}" must not be the decision node (the one-fork rule)`)
+    if (!ops.taskId) err(`ops node "${ops.id}" needs a taskId - it carries lessons in all three tiers`)
+    if (!prereqs[ops.id]) err(`ops node "${ops.id}" is missing from LESSON_PREREQS`)
+    else if ((prereqs[ops.id] || []).length === 0) err(`ops node "${ops.id}" needs at least one prerequisite`)
+    const row = skeleton.modules?.[projectId]?.map
+    if (!row) err(`no moduleSkeleton row for ${projectId}`)
+    else if (row.operate !== ops.label) {
+      err(`moduleSkeleton operate row is "${row.operate}" but the ops node is labelled "${ops.label}"`)
+    }
+  }
+
+  // 8. skeleton-row: the recurrence card lines every module up against the
+  // anchor stage for stage, so a module missing a stage silently breaks it.
+  const row = skeleton.modules?.[projectId]?.map
+  if (row) {
+    for (const stage of skeleton.skeleton) {
+      if (!row[stage.id]) err(`moduleSkeleton row for ${projectId} is missing stage "${stage.id}"`)
+    }
+  }
+
+  // 9. column-capacity: the canvas is a fixed 5-column grid; more than 5 nodes
+  // in a column overflows the design space.
+  const byColumn = {}
+  for (const n of nodes) {
+    if (typeof n.x !== 'number') continue
+    byColumn[n.x] = (byColumn[n.x] || 0) + 1
+  }
+  for (const [x, count] of Object.entries(byColumn)) {
+    if (count > 5) err(`column x=${x} holds ${count} nodes (max 5 - the canvas grid has 5 slots)`)
   }
 
   return { nodes: nodes.length, edges: edges.length }

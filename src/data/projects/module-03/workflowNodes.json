@@ -12,7 +12,11 @@
       "type": "inspection",
       "status": "intent",
       "intent": "Inspect the signed offer and tag the fields the workflow depends on - role, start date, and manager - before anything is provisioned.",
-      "concepts": ["Triggering document", "Effective dates", "Source of the hire"]
+      "concepts": [
+        "Triggering document",
+        "Effective dates",
+        "Source of the hire"
+      ]
     },
     "labVersion": "Inspected by you in the Signed Offer task; the offer is a local document fixture the onboarding record is keyed from.",
     "realWorldSources": [
@@ -30,7 +34,9 @@
       "Tag the fields onboarding needs: role, start date, manager",
       "Later trigger from the ATS or e-signature webhook"
     ],
-    "reusedBy": ["onboarding-record"],
+    "reusedBy": [
+      "onboarding-record"
+    ],
     "governanceNote": "The start date on the signed offer is the authoritative clock; every SLA in the plan is measured backward from it.",
     "auditNote": "Inspection by tagging (tagSource): the learner tags each field in the offer, minting a source profile the onboarding record trusts.",
     "taskId": "lesson-signed-offer",
@@ -49,7 +55,11 @@
       "type": "governance",
       "status": "intent",
       "intent": "Read the role profile catalog as governed reference data: who owns it, why it is the single source for what a role gets, and how least-privilege is baked in.",
-      "concepts": ["Provisioning matrix", "Governed reference", "Least-privilege by role"]
+      "concepts": [
+        "Provisioning matrix",
+        "Governed reference",
+        "Least-privilege by role"
+      ]
     },
     "labVersion": "Provided as a local role-profile catalog fixture the provisioning plan and access task expand from.",
     "realWorldSources": [
@@ -67,7 +77,10 @@
       "Record who owns each entitlement change",
       "Later integrate with the access-management system"
     ],
-    "reusedBy": ["provisioning-plan", "access-task"],
+    "reusedBy": [
+      "provisioning-plan",
+      "access-task"
+    ],
     "governanceNote": "The People Ops Lead owns the catalog; access is granted by role, not by request, so least-privilege is the default and every grant is traceable to a profile.",
     "auditNote": "Governance lesson; the temporal loop (onboarding-archive -> role-profile-catalog) refines this catalog from what past hires actually needed.",
     "taskId": "lesson-role-profile-catalog",
@@ -86,7 +99,11 @@
       "type": "build",
       "status": "intent",
       "intent": "Build the master onboarding record from the signed offer - the trusted structured record the whole workflow acts on instead of the letter.",
-      "concepts": ["Master record", "Structured capture", "One record, many readers"]
+      "concepts": [
+        "Master record",
+        "Structured capture",
+        "One record, many readers"
+      ]
     },
     "labVersion": "Built by you in the Onboarding Record task from the signed offer fixture.",
     "realWorldSources": [
@@ -104,7 +121,9 @@
       "Validate role, start date, and manager are present",
       "Later create it automatically from the ATS trigger"
     ],
-    "reusedBy": ["provisioning-plan"],
+    "reusedBy": [
+      "provisioning-plan"
+    ],
     "governanceNote": "The onboarding record is what the workflow trusts instead of the offer letter; its start date drives every downstream SLA.",
     "auditNote": "Build lesson; every provisioning branch and the readiness gate reads this record, so its fields must be owned and stable.",
     "taskId": "lesson-onboarding-record",
@@ -123,7 +142,11 @@
       "type": "governance",
       "status": "intent",
       "intent": "Read the SLA policy as owned, versioned config: per-task deadlines measured backward from the start date, not numbers buried in someone's head.",
-      "concepts": ["SLAs as fields", "Deadlines relative to start date", "Policy versioning"]
+      "concepts": [
+        "SLAs as fields",
+        "Deadlines relative to start date",
+        "Policy versioning"
+      ]
     },
     "labVersion": "Provided as a local SLA-policy fixture the provisioning plan and readiness gate apply.",
     "realWorldSources": [
@@ -141,7 +164,10 @@
       "Version it and record who approved each deadline",
       "Later wire it into the workflow tool's due dates"
     ],
-    "reusedBy": ["provisioning-plan", "readiness-gate"],
+    "reusedBy": [
+      "provisioning-plan",
+      "readiness-gate"
+    ],
     "governanceNote": "SLA deadlines are People Ops-approved and versioned; a shorter SLA buys margin before day one but strains the provisioning teams.",
     "auditNote": "Governance lesson; the hard tier deepens this into designing the SLA policy from past onboarding completion times.",
     "taskId": "lesson-sla-policy",
@@ -160,7 +186,11 @@
       "type": "transformation",
       "status": "intent",
       "intent": "Expand the role profile into a concrete task list, attaching each task's owner and its SLA date computed from the start date.",
-      "concepts": ["Expansion", "Task list with owners", "Applying SLAs"]
+      "concepts": [
+        "Expansion",
+        "Task list with owners",
+        "Applying SLAs"
+      ]
     },
     "labVersion": "Built by you in the Provisioning Plan task from the onboarding record, role profile, and SLA policy fixtures.",
     "realWorldSources": [
@@ -178,7 +208,12 @@
       "Attach an owner and an SLA date to every task",
       "Later generate tasks in the workflow tool automatically"
     ],
-    "reusedBy": ["accounts-task", "hardware-task", "access-task", "payroll-task"],
+    "reusedBy": [
+      "accounts-task",
+      "hardware-task",
+      "access-task",
+      "payroll-task"
+    ],
     "governanceNote": "The plan turns a role into accountable work: every task has one owner and one SLA date, so nothing is 'someone will handle it'.",
     "auditNote": "Central transformation; it fans out to the four parallel task branches - the map's widest simultaneous opening.",
     "taskId": "lesson-provisioning-plan",
@@ -197,7 +232,11 @@
       "type": "transformation",
       "status": "intent",
       "intent": "Create accounts idempotently: check for an existing identity first so a re-run after a partial failure never creates a duplicate account.",
-      "concepts": ["Account creation", "Idempotent re-runs", "Check-then-create"]
+      "concepts": [
+        "Account creation",
+        "Idempotent re-runs",
+        "Check-then-create"
+      ]
     },
     "labVersion": "Run by you in the Accounts Task using the provisioning plan; the identity store is a local fixture you check before creating.",
     "realWorldSources": [
@@ -215,7 +254,9 @@
       "Create only if none exists; otherwise reuse it",
       "Later wire the identity provider's provisioning API"
     ],
-    "reusedBy": ["task-tracker"],
+    "reusedBy": [
+      "task-tracker"
+    ],
     "governanceNote": "Idempotency is the safety rule of automated provisioning: a re-run must converge to one account, never two, or offboarding and audit break.",
     "auditNote": "Transformation; the medium tier re-runs this after a partial failure to prove the check-then-create rule holds.",
     "taskId": "lesson-accounts-task",
@@ -234,7 +275,11 @@
       "type": "handoff",
       "status": "intent",
       "intent": "Hand off the physical laptop provisioning: place the order, name the owner, and capture the tracking confirmation the tracker needs.",
-      "concepts": ["Physical-world tasks", "Handoff with confirmation", "Automation boundaries"]
+      "concepts": [
+        "Physical-world tasks",
+        "Handoff with confirmation",
+        "Automation boundaries"
+      ]
     },
     "labVersion": "Worked by you in the Hardware Task; the order and its confirmation are captured as a handoff record.",
     "realWorldSources": [
@@ -252,7 +297,9 @@
       "Capture owner, order id, and expected date",
       "Later wire the asset-management ordering API"
     ],
-    "reusedBy": ["task-tracker"],
+    "reusedBy": [
+      "task-tracker"
+    ],
     "governanceNote": "Some tasks end in the physical world; the automation's job is to trigger, track, and capture confirmation, not to pretend it shipped the box.",
     "auditNote": "Handoff (handoffForm): captures who ordered, the tracking id, and whether it lands before the start date; medium tier backorders it.",
     "taskId": "lesson-hardware-task",
@@ -271,7 +318,11 @@
       "type": "transformation",
       "status": "intent",
       "intent": "Grant access by expanding the role profile's access groups, enforcing least-privilege so no hire gets more than their role defines.",
-      "concepts": ["Least-privilege", "Access by role", "Entitlement from profile"]
+      "concepts": [
+        "Least-privilege",
+        "Access by role",
+        "Entitlement from profile"
+      ]
     },
     "labVersion": "Run by you in the Access Task from the role profile's access groups; the grant is validated against the profile.",
     "realWorldSources": [
@@ -289,7 +340,9 @@
       "Grant exactly those, nothing extra",
       "Later wire the identity-governance system"
     ],
-    "reusedBy": ["task-tracker"],
+    "reusedBy": [
+      "task-tracker"
+    ],
     "governanceNote": "Least-privilege is enforced by sourcing access from the role profile: a grant the profile does not list is a policy violation, not a convenience.",
     "auditNote": "Transformation; reuses role-profile-catalog, reinforcing that access is governed by role, not by request.",
     "taskId": "lesson-access-task",
@@ -308,7 +361,11 @@
       "type": "handoff",
       "status": "intent",
       "intent": "Hand off payroll enrollment: send the pay class and start date to Payroll and capture the enrollment confirmation the tracker needs.",
-      "concepts": ["Enrollment handoff", "Captured confirmation", "Cross-team dependency"]
+      "concepts": [
+        "Enrollment handoff",
+        "Captured confirmation",
+        "Cross-team dependency"
+      ]
     },
     "labVersion": "Worked by you in the Payroll Task; the enrollment request and its confirmation are captured as a handoff record.",
     "realWorldSources": [
@@ -326,7 +383,9 @@
       "Capture the enrollment id and confirmation",
       "Later wire the HRIS-to-payroll integration"
     ],
-    "reusedBy": ["task-tracker"],
+    "reusedBy": [
+      "task-tracker"
+    ],
     "governanceNote": "A payroll handoff without a captured confirmation is a dropped ball; the new hire must be enrolled before their first cycle.",
     "auditNote": "Handoff (handoffForm): captures the pay class, receiver, and confirmation; parallels the hardware handoff on the human side.",
     "taskId": "lesson-payroll-task",
@@ -345,7 +404,11 @@
       "type": "transformation",
       "status": "intent",
       "intent": "Record the state of all four provisioning tasks on one tracker, setting each task's state from its branch's event and a reason when blocked.",
-      "concepts": ["Task states", "One record, four branches", "State plus reason"]
+      "concepts": [
+        "Task states",
+        "One record, four branches",
+        "State plus reason"
+      ]
     },
     "labVersion": "Built by you in the Task Tracker task by setting each task's state row from the four branch outcomes.",
     "realWorldSources": [
@@ -363,7 +426,9 @@
       "Set state from the branch outcome; add a reason if blocked",
       "Later sync states from the workflow tool automatically"
     ],
-    "reusedBy": ["readiness-gate"],
+    "reusedBy": [
+      "readiness-gate"
+    ],
     "governanceNote": "The allowed states are fixed (pending, in-progress, done, blocked); a blocked state without a reason hides the problem the gate needs to see.",
     "auditNote": "Transformation via jsonDeltas rows (taskId/state/blockedReason); the fan-in the readiness gate evaluates on ALL.",
     "taskId": "lesson-task-tracker",
@@ -382,7 +447,11 @@
       "type": "decision",
       "status": "intent",
       "intent": "Encode the readiness rule: assemble the package only when ALL four tasks are done inside SLA; any blocked or late task routes to escalation.",
-      "concepts": ["Fan-in on all", "Completion gate", "Orchestration invariant"]
+      "concepts": [
+        "Fan-in on all",
+        "Completion gate",
+        "Orchestration invariant"
+      ]
     },
     "labVersion": "Encoded by you in the Readiness Gate task from the task tracker's four states.",
     "realWorldSources": [
@@ -401,7 +470,10 @@
       "Ready only if every one is done within SLA",
       "Otherwise route the whole hire to escalation"
     ],
-    "reusedBy": ["day-one-package", "escalation-path"],
+    "reusedBy": [
+      "day-one-package",
+      "escalation-path"
+    ],
     "governanceNote": "The gate is ALL, not most: one blocked task blocks the hire no matter how many others are done - the orchestration invariant the module exists to teach.",
     "auditNote": "The single decision node (the fork); boundary case done-at-deadline passes. Hard tier is the solo-rebuild capstone (artifactImport).",
     "taskId": "lesson-readiness-gate",
@@ -420,7 +492,11 @@
       "type": "handoff",
       "status": "intent",
       "intent": "Escalate a blocked task: capture which task is blocked, the accountable owner, and the resolution deadline before day one.",
-      "concepts": ["Escalation ladder", "Owner and deadline", "No silent lateness"]
+      "concepts": [
+        "Escalation ladder",
+        "Owner and deadline",
+        "No silent lateness"
+      ]
     },
     "labVersion": "Worked by you in the Escalation Path task; the escalation is captured as a handoff record from a blocked tracker.",
     "realWorldSources": [
@@ -438,7 +514,9 @@
       "Assign an owner and a resolution deadline",
       "Later wire the escalation into the ticketing system"
     ],
-    "reusedBy": ["day-one-package"],
+    "reusedBy": [
+      "day-one-package"
+    ],
     "governanceNote": "Every escalation captures an owner and a deadline; a blocked task with no named owner is how a start date quietly slips.",
     "auditNote": "Handoff (handoffForm) with captured owner and deadline; deepens Module 1's escalation ladder under orchestration.",
     "taskId": "lesson-escalation-path",
@@ -457,7 +535,11 @@
       "type": "assembly",
       "status": "intent",
       "intent": "Assemble the Day-One Ready certificate from the plan and tracker, listing every task's outcome so the hiring manager can trust the hire is ready.",
-      "concepts": ["Assembly", "Traceable certificate", "Business deliverable"]
+      "concepts": [
+        "Assembly",
+        "Traceable certificate",
+        "Business deliverable"
+      ]
     },
     "labVersion": "Assembled by you in the Day-One Package task from the provisioning plan and the completed task tracker.",
     "realWorldSources": [
@@ -475,7 +557,10 @@
       "Note any escalation and its status",
       "Assemble the certificate the evening before start"
     ],
-    "reusedBy": ["manager-handoff", "onboarding-archive"],
+    "reusedBy": [
+      "manager-handoff",
+      "onboarding-archive"
+    ],
     "governanceNote": "The package is only trustworthy if it is traceable: every 'done' must point to the task record that proves it, and every exception must be named, not hidden.",
     "auditNote": "The assembly node and the module deliverable (day-one-package.md); templateSlots renders it from canon values.",
     "taskId": "lesson-day-one-package",
@@ -488,13 +573,17 @@
     "thingOrAction": "action",
     "phaseId": "day-one-package",
     "x": 1020,
-    "y": 230,
+    "y": 190,
     "description": "The hiring manager receives the Day-One Package and acknowledges the hire is ready. The captured acknowledgement closes the loop with the person who owns the new hire's first day.",
     "lesson": {
       "type": "handoff",
       "status": "intent",
       "intent": "Hand the package to the hiring manager and capture their acknowledgement - who confirmed readiness and when.",
-      "concepts": ["Delivery handoff", "Captured acknowledgement", "Accountable receipt"]
+      "concepts": [
+        "Delivery handoff",
+        "Captured acknowledgement",
+        "Accountable receipt"
+      ]
     },
     "labVersion": "Captured by you in the Manager Handoff task from the delivered Day-One Package.",
     "realWorldSources": [
@@ -512,7 +601,9 @@
       "Capture who acknowledged and when",
       "Later wire the acknowledgement into the onboarding tool"
     ],
-    "reusedBy": ["onboarding-archive"],
+    "reusedBy": [
+      "onboarding-archive"
+    ],
     "governanceNote": "A delivery without a captured acknowledgement is not a handoff; the hiring manager's confirmation is the proof the hire is truly owned on day one.",
     "auditNote": "Handoff (handoffForm) capturing the acknowledger and timestamp; mirrors Module 2's run-approval sign-off on the delivery side.",
     "taskId": "lesson-manager-handoff",
@@ -525,13 +616,17 @@
     "thingOrAction": "thing",
     "phaseId": "day-one-package",
     "x": 1020,
-    "y": 380,
+    "y": 300,
     "description": "The retained record of the completed onboarding: the package, the tracker, and any escalations. It preserves the run for audit and feeds improvements back to the role catalog.",
     "lesson": {
       "type": "handoff",
       "status": "intent",
       "intent": "Archive the completed onboarding for retention and export what it teaches, so the role catalog can learn what this role actually needed.",
-      "concepts": ["Retention", "Archive-seeded loop", "Auditability"]
+      "concepts": [
+        "Retention",
+        "Archive-seeded loop",
+        "Auditability"
+      ]
     },
     "labVersion": "Archived by you in the Onboarding Archive task from the acknowledged Day-One Package.",
     "realWorldSources": [
@@ -549,7 +644,10 @@
       "Export what this role needed to the feedback loop",
       "Later integrate with the records system"
     ],
-    "reusedBy": ["role-profile-catalog", "profile-feedback"],
+    "reusedBy": [
+      "role-profile-catalog",
+      "profile-feedback"
+    ],
     "governanceNote": "Retention length is a compliance decision; the archive is also what makes the catalog improve, so it is a loop input, not a dead end.",
     "auditNote": "The archive origin of the temporal loop (onboarding-archive -> role-profile-catalog), refined by profile-feedback.",
     "taskId": "lesson-onboarding-archive",
@@ -562,13 +660,17 @@
     "thingOrAction": "action",
     "phaseId": "day-one-package",
     "x": 1020,
-    "y": 520,
+    "y": 410,
     "description": "What the archive teaches the catalog: a hire needed a tool the role profile missed, or never used one it listed. The improvement note that closes the onboarding loop.",
     "lesson": {
       "type": "transformation",
       "status": "intent",
       "intent": "Turn the archived onboarding into a catalog improvement: identify what the role actually needed versus what the profile listed, and propose the change.",
-      "concepts": ["Loop close", "Reference improvement", "Learning from the run"]
+      "concepts": [
+        "Loop close",
+        "Reference improvement",
+        "Learning from the run"
+      ]
     },
     "labVersion": "Run by you in the Profile Feedback task from the onboarding archive fixture.",
     "realWorldSources": [
@@ -586,10 +688,55 @@
       "Write the proposed catalog change",
       "Later feed usage analytics into the review"
     ],
-    "reusedBy": ["role-profile-catalog"],
+    "reusedBy": [
+      "role-profile-catalog"
+    ],
     "governanceNote": "Catalog changes still go through People Ops governance; feedback proposes, it does not silently rewrite the provisioning matrix.",
     "auditNote": "Closes the temporal loop into role-profile-catalog; the improvement is a proposal the catalog owner ratifies.",
     "taskId": "lesson-profile-feedback",
     "artifactName": "profile-feedback.json"
+  },
+  {
+    "id": "run-operations",
+    "label": "Onboarding Run Operations",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "day-one-package",
+    "x": 1020,
+    "y": 520,
+    "skeletonStage": "operate",
+    "description": "The onboarding automation is itself a system: it needs a connection to the ATS, a trigger, a failure plan, and a test - and it handles personal data, so how it stores secrets and records matters.",
+    "lesson": {
+      "type": "governance",
+      "status": "now",
+      "intent": "Connect the onboarding automation to its source, set what starts it, decide what happens on failure, and say how personal data is handled.",
+      "concepts": [
+        "Connections & credentials",
+        "Triggers",
+        "Run history",
+        "Testing an automation"
+      ]
+    },
+    "labVersion": "Built by you in the Run Operations task by configuring the connection, trigger, failure behavior, and PII handling of the onboarding automation.",
+    "realWorldSources": [
+      "A cloud flow's connections and run history",
+      "An ATS or e-signature webhook",
+      "A secret store or vault"
+    ],
+    "accessNeeded": [
+      "Permission to create a connection as a service account",
+      "Read access to the secret reference",
+      "Access to the run history"
+    ],
+    "soloRebuildPath": [
+      "Open the flow's connections and note what identity it runs as",
+      "Set the trigger and confirm the source can push",
+      "Add retries and a failure path, then run it once and read the run"
+    ],
+    "reusedBy": [],
+    "governanceNote": "Onboarding runs carry salary and personal data. The automation runs as a service account, secrets are referenced not pasted, and run records holding personal data follow the HR retention policy.",
+    "auditNote": "Operations node added 2026-08-22 per MODULE_AUTHORING_PLAYBOOK Step 2b. Fed by the archive node because the retained run record IS what the operator inspects.",
+    "taskId": "lesson-onboarding-operations",
+    "artifactName": "connector-config.json"
   }
 ]

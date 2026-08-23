@@ -102,12 +102,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "lookup",
       "soloRebuildPath": "You'd look up yesterday's closing values (from your archive or a prior report) and stage them as the baseline this run compares against.",
-      "tools": {
-        "powerAutomate": "'Get items' filtered to yesterday's date from your SharePoint archive",
-        "zapier": "'Find Record' in Airtable filtered to the prior day",
-        "python": "query the store (SQL WHERE date = yesterday) or read the prior archive file"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "'Get items' from the archive library filtered to yesterday's date"
+        },
+        {
+          "tool": "zapier",
+          "how": "a 'Find Record' search step against the archive table, with a fallback if none is found"
+        }
+      ]
     },
     "heading": "Baseline traced",
     "points": [

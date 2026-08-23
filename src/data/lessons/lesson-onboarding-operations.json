@@ -1,0 +1,180 @@
+{
+  "id": "lesson-onboarding-operations",
+  "nodeId": "run-operations",
+  "title": "Connect and Schedule the Harbor Automation",
+  "subtitle": "Configure how it connects, what starts it, and what happens when it breaks",
+  "clock": "SD-5, 9:00 AM",
+  "difficulty": "Beginner",
+  "skill": "Connections, credentials, and triggers",
+  "opsTopics": [
+    "connectors-credentials",
+    "triggers",
+    "pii"
+  ],
+  "scenario": "You have built the whole Day-One package workflow. None of it runs by itself yet. Before anyone can rely on it, the automation needs a connection to applicant tracking system, an identity to run as, something to start it, and a decision about what happens when a step fails. That configuration is the difference between a design and a system.",
+  "inputType": "text",
+  "input": "IT setup sheet - Harbor automation account\n\nSource system: Applicant tracking system (team-owned). Also available: The recruiter's inbox, A shared spreadsheet.\nIdentity: service account, provisioned for this automation.\nSecret: the raw token is whsec_2ZmQ9xTb51KdVr8Ns - it is ALSO registered in the vault as vault://harbor/ats-webhook-secret.\nRetry guidance: three attempts, then stop.\nFailure guidance: park the run where it can be found and notify the on-call owner.\nData note: this workflow carries salary and personal details.\n",
+  "instructions": [
+    "Choose the system the automation connects to, and the identity it runs as.",
+    "Point the secret at its vault reference - do not paste the token itself.",
+    "Set what starts a run.",
+    "Set the retry count and what happens after the retries are used up.",
+    "Validate the configuration."
+  ],
+  "interactionType": "connectorConfig",
+  "validation": {
+    "type": "connectorConfig",
+    "groups": [
+      {
+        "id": "connection",
+        "label": "Connection",
+        "fields": [
+          {
+            "id": "system",
+            "label": "System",
+            "kind": "select",
+            "options": [
+              "Applicant tracking system",
+              "The recruiter's inbox",
+              "A shared spreadsheet"
+            ],
+            "expected": "Applicant tracking system",
+            "explain": "The automation must not depend on one person's account. It connects to the applicant tracking system the team owns, so it keeps working when someone leaves."
+          },
+          {
+            "id": "authMethod",
+            "label": "Auth method",
+            "kind": "select",
+            "options": [
+              "Service account",
+              "Your own login",
+              "A shared password in the flow"
+            ],
+            "expected": "Service account",
+            "explain": "A flow authenticated as a person breaks the day that person changes their password or leaves. It runs as a service account with its own identity."
+          },
+          {
+            "id": "secret",
+            "label": "Secret",
+            "kind": "secretRef",
+            "accepted": [
+              "vault://harbor/ats-webhook-secret"
+            ],
+            "explain": "Store a REFERENCE to the secret, never the value. A pasted token lives in the flow definition, in every export, and in the run history - forever, and for everyone who can read them."
+          }
+        ]
+      },
+      {
+        "id": "trigger",
+        "label": "Trigger",
+        "fields": [
+          {
+            "id": "mode",
+            "label": "Trigger mode",
+            "kind": "select",
+            "options": [
+              "Webhook",
+              "Poll",
+              "Schedule"
+            ],
+            "expected": "Webhook",
+            "explain": "The ATS can post the moment an offer is countersigned, and onboarding should start then rather than up to an hour later. When the source CAN push, take the push."
+          }
+        ]
+      },
+      {
+        "id": "behavior",
+        "label": "On failure",
+        "fields": [
+          {
+            "id": "retries",
+            "label": "Retries",
+            "kind": "number",
+            "expected": 3,
+            "explain": "Three retries clears a transient blip without hammering a system that is genuinely down. Zero gives up on a hiccup; ten turns an outage into an attack."
+          },
+          {
+            "id": "onFailure",
+            "label": "Then",
+            "kind": "select",
+            "options": [
+              "Dead-letter and alert",
+              "Skip silently",
+              "Retry forever"
+            ],
+            "expected": "Dead-letter and alert",
+            "explain": "A failure nobody sees is the worst outcome available. Park the run where it can be found and tell a person."
+          },
+          {
+            "id": "piiHandling",
+            "label": "Run records with personal data",
+            "kind": "select",
+            "options": [
+              "Retain per the HR policy",
+              "Keep forever",
+              "Delete immediately"
+            ],
+            "expected": "Retain per the HR policy",
+            "explain": "Onboarding runs carry salary and personal details. Keeping them forever is a liability and deleting them immediately destroys the audit trail. The HR retention policy is the answer to both."
+          }
+        ]
+      }
+    ]
+  },
+  "copilotPrompt": "Explain the difference between polling and a webhook trigger, and why an automation should reference a secret from a vault instead of storing the value. Keep it to a few sentences.",
+  "successMessage": "Connector configured. The automation can now run on its own.",
+  "validateLabel": "Validate Configuration",
+  "intro": {
+    "heading": "Before you build: the automation is a system too",
+    "artifactName": "connector-config.json",
+    "sections": [
+      {
+        "title": "What this record does",
+        "body": "The connector config is how the Day-One package workflow stops being a design and starts being something that runs at SD-5, 9:00 AM whether or not anyone is watching. (Domain note: a CONNECTOR is the piece that lets the automation talk to another system. A CREDENTIAL is what proves it is allowed to. A TRIGGER is what starts a run - either the automation POLLS (checks on a timer) or the source sends a WEBHOOK (pushes the moment something happens). A RUN is one execution. A RETRY is running a failed step again.)"
+      },
+      {
+        "title": "Why the identity matters",
+        "body": "An automation authenticated as a person inherits that person's access and dies with their password. A service account has its own identity, its own least-privilege permissions, and an owner who is not a single human being."
+      },
+      {
+        "title": "Why a reference, not a value",
+        "body": "A pasted secret is in the flow definition, in every export of it, in source control if the flow is versioned, and often in the run history. A reference resolves at run time and can be rotated without touching the automation."
+      },
+      {
+        "title": "Why failure behavior is a design decision",
+        "body": "Every automation fails eventually. The question the config answers is what happens next: retried, parked where someone will see it, or silently dropped. Only one of those is acceptable."
+      }
+    ]
+  },
+  "takeaway": {
+    "realWorld": {
+      "actionKind": "operate",
+      "soloRebuildPath": "You would open the flow's connections, note what identity it runs as, set the trigger and its interval, add a retry policy and a failure path, then run it once and read the run.",
+      "bestFit": [
+        {
+          "tool": "powerAppsCopilot",
+          "how": "a connection reference inside the solution, promoted rather than rebuilt per environment"
+        },
+        {
+          "tool": "zapier",
+          "how": "an app connection owned by a service account, with the webhook secret stored in the Zap"
+        },
+        {
+          "tool": "n8n",
+          "how": "a Webhook trigger whose credential validates the ATS signature"
+        }
+      ]
+    },
+    "heading": "Automation connected",
+    "artifactName": "connector-config.json",
+    "before": "The Day-One package workflow was a design that only ran when a person ran it.",
+    "after": "The automation has a governed connection, a trigger, and a defined failure path.",
+    "capability": "The workflow can now run on a trigger, as a governed identity, with a defined failure path.",
+    "auditNote": "The config names the identity, the secret reference, and the failure path, so an auditor can answer 'what runs this, as whom, and what happens when it breaks' without reading the flow.",
+    "points": [
+      "You created connector-config.json, the record of how this automation connects and runs.",
+      "The secret is referenced, not stored, so it can be rotated without touching the automation.",
+      "The workflow can now run on a trigger, as a governed identity, with a defined failure path."
+    ]
+  }
+}

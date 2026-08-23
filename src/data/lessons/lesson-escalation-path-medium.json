@@ -84,12 +84,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "send",
       "soloRebuildPath": "You'd grab a spare laptop for day one and keep the backorder moving, rather than delaying the start.",
-      "tools": {
-        "powerAutomate": "create an escalation task to IT with a loaner action and due date",
-        "zapier": "route the block to IT with the resolution captured",
-        "python": "open an escalation {task:'hardware', owner:'IT', action:'issue loaner'}"
-      }
+      "bestFit": [
+        {
+          "tool": "zapier",
+          "how": "create the escalation task with an assignee and a deadline, then notify the owner's manager"
+        },
+        {
+          "tool": "n8n",
+          "how": "a Wait node on the SLA, then a Send node up the ladder when no response arrived"
+        }
+      ]
     },
     "heading": "Escalation resolved",
     "points": [

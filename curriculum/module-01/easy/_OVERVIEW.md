@@ -8,6 +8,12 @@
 > CANON DATA (section 2) - medium/hard lessons and future edits must not
 > contradict it. The per-lesson script files remain the design record for the
 > built lesson JSONs.
+>
+> **2026-07-06: opening arc re-storyboarded.** Lessons 01 (analyst-notes) and
+> 04 (price-feed) converted choiceCheck -> tagSource; all three openers (01,
+> 02, 04) rewritten around the named case (the 2 AM ERCOT spike) with mission
+> intros, capability/consumers takeaways, and Next Node chaining. Canon data
+> in section 2 is UNCHANGED. See DECISION_LOG.md 2026-07-06.
 
 This directory contains the complete lesson scripts for Module 1 Easy: 17 lessons,
 one per workflow node, in the pedagogical order from NODE_AUDIT.md. Four lessons
@@ -101,10 +107,10 @@ note), Desk Trader (raises the flag), Risk Desk Lead (owns policies), Desk Manag
 
 | # | Node | Lesson type | Interaction | Status | The invariant it teaches |
 | - | --- | --- | --- | --- | --- |
-| 01 | analyst-notes | inspection | choiceCheck | script | Every pipeline starts by understanding where work ENTERS and what access that requires |
-| 02 | trader-flag | interpretation | choiceCheck | script | Human judgment becomes automatable only when captured as a structured signal |
+| 01 | analyst-notes | inspection | tagSource | BUILT | Every pipeline starts by understanding where work ENTERS and what access that requires |
+| 02 | trader-flag | interpretation | choiceCheck | BUILT | Human judgment becomes automatable only when captured as a structured signal |
 | 03 | market-intake-record | build | jsonEditor | BUILT | Automation cannot act on a paragraph; mint the first trusted record |
-| 04 | price-feed | inspection | choiceCheck | script | Know a feed's format and contract before you consume it |
+| 04 | price-feed | inspection | tagSource | BUILT | Know a feed's format and contract before you consume it |
 | 05 | forecast-data | inspection | choiceCheck | script | Comparison inputs need an agreed source of truth and a join key |
 | 06 | prior-day-reference | inspection | choiceCheck | script | Yesterday's output is today's input: baselines and temporal reuse |
 | 07 | clean-price-data | transformation | jsonEditor | BUILT | Normalize once at the boundary; everything downstream inherits the quality |
@@ -132,8 +138,8 @@ ENGINE_ADDITIONS_SPEC.md section 3 for registration steps common to all lessons.
 
 ## 5. Shared copy rules
 
-- Difficulty labels: use "Beginner" for choiceCheck lessons, "Intermediate" for the
-  rest (matches the built lessons' usage).
+- Difficulty labels: use "Beginner" for inspection lessons (choiceCheck/tagSource),
+  "Intermediate" for the rest (matches the built lessons' usage).
 - Every takeaway's LAST point is the Capability Statement ("The workflow can now
   ..."). Use the exact statements from LESSON_AUTHORING_TEMPLATE.md's starter table
   unless the lesson script overrides.

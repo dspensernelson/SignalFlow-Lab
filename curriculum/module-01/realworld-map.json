@@ -1,0 +1,131 @@
+{
+  "note": "realWorld v2 source data for module-01, keyed by taskId (tier variants inherit). actionKind ids and tool ids come from src/data/automationTaxonomy.json. Consumed by scripts/migrate-realworld.mjs. Keep ASCII-only.",
+  "module": "module-01",
+  "tasks": {
+    "lesson-analyst-notes": {
+      "actionKind": "trigger",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "'When a new email arrives (V3)' on the desk mailbox, filtered to the overnight sender" },
+        { "tool": "make", "how": "a Watch Emails module polling the shared mailbox on a schedule" },
+        { "tool": "langgraph", "how": "the graph entry node, with the note text as the first state value to be parsed" }
+      ]
+    },
+    "lesson-trader-flag": {
+      "actionKind": "trigger",
+      "bestFit": [
+        { "tool": "zapier", "how": "a Slack or Teams 'New Message Posted to Channel' trigger on the desk channel" },
+        { "tool": "n8n", "how": "a Webhook trigger the chat tool posts to when the flag is raised" }
+      ]
+    },
+    "lesson-intake": {
+      "actionKind": "transform",
+      "bestFit": [
+        { "tool": "langgraph", "how": "a structured-output call that returns the intake fields as a typed object, not prose" },
+        { "tool": "python", "how": "build one dict from both sources, {**note, **flag}, resolving conflicts explicitly" }
+      ]
+    },
+    "lesson-price-feed": {
+      "actionKind": "trigger",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "'When a file is created' on the feed folder, then Excel 'List rows in a table'" },
+        { "tool": "n8n", "how": "a Cron trigger plus a Read Binary File node when the vendor drops on a schedule" }
+      ]
+    },
+    "lesson-forecast-data": {
+      "actionKind": "lookup",
+      "bestFit": [
+        { "tool": "python", "how": "requests.get on the vendor endpoint, then validate the payload before trusting it" },
+        { "tool": "n8n", "how": "an HTTP Request node with the vendor key stored as a credential, not inline" },
+        { "tool": "make", "how": "an HTTP module plus a JSON parser feeding the rest of the scenario" }
+      ]
+    },
+    "lesson-prior-day-reference": {
+      "actionKind": "lookup",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "'Get items' from the archive library filtered to yesterday's date" },
+        { "tool": "zapier", "how": "a 'Find Record' search step against the archive table, with a fallback if none is found" }
+      ]
+    },
+    "lesson-clean-price-data": {
+      "actionKind": "transform",
+      "bestFit": [
+        { "tool": "python", "how": "pandas.to_numeric with errors='coerce', so bad rows become null instead of crashing the run" },
+        { "tool": "make", "how": "an Iterator plus text-parser modules coercing each row before any comparison" }
+      ]
+    },
+    "lesson-threshold-policy": {
+      "actionKind": "lookup",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "an Environment Variable or a SharePoint config list read at run time, never a hardcoded number" },
+        { "tool": "n8n", "how": "Workflow Static Data or an environment variable holding the limits" },
+        { "tool": "python", "how": "load thresholds from a config file so changing them needs no code deploy" }
+      ]
+    },
+    "lesson-variance-check": {
+      "actionKind": "transform",
+      "bestFit": [
+        { "tool": "make", "how": "a Set Variable module computing the delta once, so downstream routes reuse it" },
+        { "tool": "zapier", "how": "Formatter by Zapier (Numbers) to compute the move, stored as a field" }
+      ]
+    },
+    "lesson-risk-evaluation": {
+      "actionKind": "transform",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "a 'Switch' on the computed score to assign a risk label" },
+        { "tool": "langgraph", "how": "a scoring node that writes the label into state, with the rubric passed in as config" },
+        { "tool": "python", "how": "a scoring function returning both the score and the reason it fired" }
+      ]
+    },
+    "lesson-approval-template": {
+      "actionKind": "lookup",
+      "bestFit": [
+        { "tool": "powerAppsCopilot", "how": "an adaptive card template stored once and filled from the record" },
+        { "tool": "zapier", "how": "a stored text template in Storage by Zapier, populated per run" }
+      ]
+    },
+    "lesson-approval-decision": {
+      "actionKind": "condition",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "'Condition' on the risk label - auto-complete on one branch, approval on the other" },
+        { "tool": "n8n", "how": "an IF node whose expression reads the policy value, not a literal" },
+        { "tool": "make", "how": "a Router with a filter per route, so both paths are visible on the canvas" }
+      ]
+    },
+    "lesson-approval-route": {
+      "actionKind": "approval",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "a routing lookup, then 'Start and wait for an approval' addressed to the resolved approver" },
+        { "tool": "powerAppsCopilot", "how": "an approval card in a topic; the reply writes back to the record" }
+      ]
+    },
+    "lesson-routine-update-path": {
+      "actionKind": "store",
+      "bestFit": [
+        { "tool": "zapier", "how": "the quiet Path that writes an audit row and ends, so 'nothing happened' is still recorded" },
+        { "tool": "python", "how": "log the no-action decision with its reason; a silent branch is an unauditable branch" }
+      ]
+    },
+    "lesson-prior-day-brief-template": {
+      "actionKind": "lookup",
+      "bestFit": [
+        { "tool": "powerAppsCopilot", "how": "the brief layout held as a reusable card definition rather than retyped each day" },
+        { "tool": "python", "how": "a Jinja template file loaded at run time, versioned alongside the code" }
+      ]
+    },
+    "lesson-morning-brief": {
+      "actionKind": "compose",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "'Create HTML table' plus 'Compose' to build the body from the upstream artifacts" },
+        { "tool": "python", "how": "render a Jinja template from the artifact dicts, so every figure traces to a source" },
+        { "tool": "langgraph", "how": "a synthesis node composing the brief from state, with the artifacts as grounding" }
+      ]
+    },
+    "lesson-distribution-archive": {
+      "actionKind": "store",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "'Send an email' to the group plus 'Create file' in a dated library with a retention label" },
+        { "tool": "make", "how": "a Google Drive or storage module writing the dated copy that seeds tomorrow's lookup" }
+      ]
+    }
+  }
+}

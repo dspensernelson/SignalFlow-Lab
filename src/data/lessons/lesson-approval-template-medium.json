@@ -66,12 +66,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "lookup",
       "soloRebuildPath": "You'd write a reusable message template with blanks (merge fields) so every approval request reads the same and just swaps the numbers.",
-      "tools": {
-        "powerAutomate": "a 'Compose' with dynamic content, or an approval email template with placeholders",
-        "zapier": "a step with {{merge fields}} in the message body",
-        "python": "an f-string or Jinja2 template filled from the record"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAppsCopilot",
+          "how": "an adaptive card template stored once and filled from the record"
+        },
+        {
+          "tool": "zapier",
+          "how": "a stored text template in Storage by Zapier, populated per run"
+        }
+      ]
     },
     "heading": "Template amended",
     "points": [

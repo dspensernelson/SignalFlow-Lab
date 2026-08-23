@@ -2,10 +2,11 @@
   "id": "lesson-trader-flag",
   "nodeId": "trader-flag",
   "title": "Interpret the Trader's Flag",
+  "subtitle": "One sentence in the note is a decision, not data",
   "difficulty": "Beginner",
   "skill": "Signals from human judgment",
   "clock": "6:08 AM",
-  "scenario": "It is 6:08 AM. Inside the overnight note there is one sentence that is not commentary - it is a judgment call by the Desk Trader, and it changes what the workflow must do this morning. Your job is to interpret that signal precisely before the intake step encodes it.",
+  "scenario": "It is 6:08 AM. Three minutes ago you mapped the overnight note; the intake build is minutes away. But one span you tagged is not a market fact - it is a decision the Desk Trader made about the 2 AM ERCOT spike, and it changes what this morning's workflow must do. Interpret it precisely before the intake step encodes it.",
   "inputType": "text",
   "inputLabel": "The Signal, In Context",
   "input": "From the overnight note:\n\"... Trader flagged the hub spike for review. No action taken yet. Need approval if we move on this.\"\n\nContext: the flag was raised by the Desk Trader about the ERCOT spike. Raising a flag is a deliberate act - it is how a human tells the workflow that this morning is not routine.",
@@ -15,7 +16,7 @@
     "Validate to record the signal interpretation."
   ],
   "interactionType": "choiceCheck",
-  "starterAnswer": "{}",
+  "starterAnswer": "{\n  \"signal\": \"trader-flag\",\n  \"becomesField\": \"?\",\n  \"valueToday\": \"?\"\n}",
   "validation": {
     "type": "choiceCheck",
     "questions": [
@@ -75,8 +76,53 @@
   },
   "fieldGuide": [],
   "copilotPrompt": "Interpret this human escalation cue: what kind of signal is it, which structured field should it become, what value does it carry today, and what breaks if it is not captured?",
-  "successMessage": "Signal interpreted. When you build the intake record, you will know exactly why approvalRequired exists and what it must say.",
+  "successMessage": "Signal interpreted. When you build the intake record next, you will know exactly why approvalRequired exists and what it must say.",
   "intro": {
+    "recordName": "Signal Interpretation",
+    "mission": "The brief cannot ship unapproved if a human asked for review - but automation cannot read a hint.",
+    "missionSubtext": "The Desk Trader's flag on the 2 AM ERCOT spike must become a field the workflow can route on, or it will be silently lost.",
+    "whatCameIn": {
+      "label": "Incoming signals",
+      "noteTitle": "From the Overnight Note",
+      "noteSubtitle": "Source mapped at 6:05 - one span left to interpret",
+      "flagTitle": "Trader Flag",
+      "flagSubtitle": "A judgment call riding inside the note",
+      "flagCue": "Review requested",
+      "flagNote": "Raised deliberately - this morning is not routine.",
+      "flagType": "Price spike",
+      "flagRequestedBy": "Desk Trader"
+    },
+    "yourJob": {
+      "label": "Interpret the signal",
+      "artifact": "Pin the flag to approvalRequired: true",
+      "description": "Four questions pin down what the flag is, which field carries it, what it must say today, and what breaks if it is lost.",
+      "signals": [
+        { "group": "Signal kind", "icon": "flag", "detail": "Escalation cue or market measurement?" },
+        { "group": "Field mapping", "icon": "control", "detail": "Which intake field encodes it?" },
+        { "group": "Value today", "icon": "target", "detail": "What must that field say this morning?" },
+        { "group": "Failure mode", "icon": "risk", "detail": "What breaks downstream if it is never captured?" }
+      ]
+    },
+    "unlocks": {
+      "label": "Waiting consumers",
+      "consumers": [
+        {
+          "name": "Market Intake Record",
+          "icon": "note",
+          "status": "Waiting",
+          "needs": "Needs approvalRequired as a field, not a sentence.",
+          "can": "Encodes your interpretation when you build it at 6:15."
+        },
+        {
+          "name": "Approval Decision",
+          "icon": "approval",
+          "status": "Downstream",
+          "needs": "Routes the morning by reading that boolean - it never re-reads the note.",
+          "can": "Can route review once the field exists."
+        }
+      ]
+    },
+    "artifactPreviewNote": "The interpretation you are about to record: the judgment, the field it becomes, and its value today.",
     "heading": "Before you interpret: judgment as data",
     "sections": [
       {
@@ -102,19 +148,41 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "trigger",
       "soloRebuildPath": "You'd take the trader's one-line flag (a chat ping or email) and log it as a row with ticker, severity, and reason so it can be merged with the desk note later.",
-      "tools": {
-        "powerAutomate": "Teams 'When a new message is posted' trigger into a Dataverse 'Create item'",
-        "zapier": "Slack 'New Message Posted' trigger into an Airtable 'Create Record'",
-        "python": "slack_sdk to read the channel, parse the flag text, append to a list or DataFrame"
-      }
+      "bestFit": [
+        {
+          "tool": "zapier",
+          "how": "a Slack or Teams 'New Message Posted to Channel' trigger on the desk channel"
+        },
+        {
+          "tool": "n8n",
+          "how": "a Webhook trigger the chat tool posts to when the flag is raised"
+        }
+      ]
     },
     "heading": "Signal interpreted",
+    "recordBanner": "Judgment captured as a signal",
+    "recordSummary": "One human escalation, encoded as approvalRequired: true",
+    "capability": "The workflow can now convert a human escalation cue into a structured decision signal.",
+    "auditNote": "The nuance stays in the note for humans; the boolean is what automation routes on. Uncaptured signals fail silently - a brief that skips review throws no error anywhere.",
+    "nextNodeId": "market-intake-record",
+    "consumers": [
+      {
+        "name": "Market Intake Record",
+        "nodeId": "market-intake-record",
+        "note": "encodes approvalRequired: true when you build it at 6:15 - that build is next"
+      },
+      {
+        "name": "Approval Decision",
+        "nodeId": "approval-decision",
+        "note": "routes the morning by reading that boolean, never by re-reading prose"
+      }
+    ],
     "points": [
       "You separated one act of human judgment from the commentary around it.",
       "The flag maps to approvalRequired: true - a boolean the Approval Decision can route on.",
       "You named the failure mode: uncaptured signals fail silently, producing a brief that skips review with no error anywhere.",
-      "In the intake build next, watch this interpretation become a field in the record.",
       "The workflow can now convert a human escalation cue into a structured decision signal."
     ],
     "artifactName": "signal-interpretation-trader-flag.json"

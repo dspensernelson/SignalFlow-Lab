@@ -2,66 +2,67 @@
   "id": "lesson-price-feed",
   "nodeId": "price-feed",
   "title": "Read the Feed Like a Contract",
+  "subtitle": "The numbers the brief will cite arrive with quirks",
   "difficulty": "Beginner",
   "skill": "Feed contracts",
   "clock": "6:18 AM",
-  "scenario": "It is 6:18 AM. The overnight price rows landed on schedule. Before anyone cleans or computes, inspect the feed the way a pipeline engineer would: what does each column promise, what quirks does today's file reveal, and who depends on it next?",
+  "scenario": "It is 6:18 AM. The intake record exists - the 2 AM ERCOT spike is on the books as structured fields. Now the numbers the brief will actually cite arrive from a second, independent source: the nightly price file. It corroborates the note ($187 peak, $142 settle), but it promises columns, not cleanliness. Read it like a contract before anyone computes on it.",
   "inputType": "text",
   "inputLabel": "Raw Price Rows (as delivered)",
   "input": "hub, peak, settled\nercot, $187/MWh, $142/MWh\nSPP, $96/MWh, $88/MWh\nmiso, $74 /MWh, $70/MWh\n\nDelivery: dropped nightly by the market data export, expected before 6:15 AM.",
   "instructions": [
     "Read the header row, then read each data row slowly - the quirks are the lesson.",
-    "Answer the four feed questions.",
+    "Tag the contract, the case's number, the two quirks, and the schedule to their exact spans.",
     "Validate to record the feed profile."
   ],
-  "interactionType": "choiceCheck",
-  "starterAnswer": "{}",
+  "interactionType": "tagSource",
+  "starterAnswer": "{\n  \"contract\": \"\",\n  \"spikePeak\": \"\",\n  \"casingQuirk\": \"\",\n  \"spacingQuirk\": \"\",\n  \"schedule\": \"\"\n}",
   "validation": {
-    "type": "choiceCheck",
-    "questions": [
+    "type": "tagSource",
+    "source": {
+      "label": "Raw Price Rows - delivered overnight",
+      "segments": [
+        { "id": "header", "text": "hub, peak, settled" },
+        { "id": "ercotHub", "text": "ercot" },
+        { "id": "ercotPeak", "text": "$187/MWh" },
+        { "id": "ercotSettled", "text": "$142/MWh" },
+        { "id": "sppHub", "text": "SPP" },
+        { "id": "sppPeak", "text": "$96/MWh" },
+        { "id": "misoPeak", "text": "$74 /MWh" },
+        { "id": "delivery", "text": "dropped nightly by the market data export" },
+        { "id": "schedule", "text": "expected before 6:15 AM" }
+      ]
+    },
+    "fields": [
       {
-        "id": "q1",
-        "prompt": "What structure does this input have?",
-        "options": [
-          { "id": "a", "text": "CSV rows under a header that names the columns" },
-          { "id": "b", "text": "Free-form prose like the analyst note" },
-          { "id": "c", "text": "A JSON array of objects" }
-        ],
-        "correctOptionId": "a",
-        "explain": "The first line (hub, peak, settled) is a header naming the columns; every following line is one row honoring that order. That header is the feed's contract."
+        "id": "contract",
+        "label": "The contract (column promise)",
+        "correctSegmentId": "header",
+        "explain": "The contract is the header row: hub, peak, settled - the producer's promise about every future file. Data cells are instances of the promise, not the promise itself."
       },
       {
-        "id": "q2",
-        "prompt": "Which quirks in today's file show the feed does NOT promise clean values?",
-        "options": [
-          { "id": "a", "text": "The rows arrive in alphabetical order" },
-          { "id": "b", "text": "Inconsistent hub casing (ercot, SPP, miso) and a stray space in \"$74 /MWh\"" },
-          { "id": "c", "text": "There are only three rows" }
-        ],
-        "correctOptionId": "b",
-        "explain": "Compare the hub values and the MISO peak cell character by character. Casing drifts and spacing drifts - the contract covers columns, not cleanliness."
+        "id": "spikePeak",
+        "label": "Today's ERCOT peak",
+        "correctSegmentId": "ercotPeak",
+        "explain": "The feed corroborates the note: the flagged hub's peak is $187/MWh. Same number, second source - that agreement is what lets the brief cite it."
       },
       {
-        "id": "q3",
-        "prompt": "In a real company, what would consuming this feed require?",
-        "options": [
-          { "id": "a", "text": "A market data subscription or permission to the nightly export location" },
-          { "id": "b", "text": "Nothing - price data is always free" },
-          { "id": "c", "text": "Manager approval each morning" }
-        ],
-        "correctOptionId": "a",
-        "explain": "The input names its delivery: a nightly market data export. Reading it programmatically means access to that feed or drop location - a subscription and a permission, not a person."
+        "id": "casingQuirk",
+        "label": "Casing quirk",
+        "correctSegmentId": "ercotHub",
+        "explain": "Compare the hub cells: SPP arrived uppercase the way a hub code should; 'ercot' arrived lowercase. The quirk is the cell that drifted, not the one that behaved."
       },
       {
-        "id": "q4",
-        "prompt": "Which workflow step consumes these rows first?",
-        "options": [
-          { "id": "a", "text": "Variance Check" },
-          { "id": "b", "text": "Morning Brief" },
-          { "id": "c", "text": "Clean Price Data" }
-        ],
-        "correctOptionId": "c",
-        "explain": "Follow the map: raw rows cannot be computed on ($ signs, units, drift), so their first stop is the cleaning step that normalizes them."
+        "id": "spacingQuirk",
+        "label": "Spacing quirk",
+        "correctSegmentId": "misoPeak",
+        "explain": "Look character by character: '$74 /MWh' carries a stray space before the unit. A parser written for '$96/MWh' chokes on exactly this kind of drift."
+      },
+      {
+        "id": "schedule",
+        "label": "Delivery schedule",
+        "correctSegmentId": "schedule",
+        "explain": "Who drops the file is provenance; WHEN it is due is the schedule. Everything downstream inherits 'before 6:15 AM' - a late feed is a late brief."
       }
     ],
     "artifactOnPass": {
@@ -70,15 +71,60 @@
       "columns": ["hub", "peak", "settled"],
       "schedule": "nightly, before 6:15 AM",
       "knownQuirks": "inconsistent hub casing; stray spaces; values carry $ and /MWh",
+      "corroborates": "the 2 AM ERCOT spike reported in the analyst note ($187 peak, $142 settle)",
       "accessNeeded": "market data subscription or export-location permission",
       "firstConsumer": "clean-price-data"
     }
   },
   "fieldGuide": [],
-  "copilotPrompt": "Profile this CSV feed as a contract: structure, columns, schedule, the quirks today's file reveals, the access consuming it requires, and its first consumer.",
+  "copilotPrompt": "Profile this CSV feed as a contract: which line is the column promise, which cell corroborates the analyst note's ERCOT peak, which cells reveal a casing quirk and a spacing quirk, and which span states when the file is due. Tag each to its exact span.",
   "successMessage": "Feed profiled. You already know exactly what the cleaning step will have to fix - because you found the quirks yourself.",
   "intro": {
-    "heading": "Before you inspect: feeds are promises",
+    "recordName": "Feed Contract Profile",
+    "mission": "The brief's numbers must come from a source that promises columns - not from a paragraph.",
+    "missionSubtext": "The nightly price file corroborates the 2 AM ERCOT spike. Profile what it promises, what today's file reveals it does not, and when it is due.",
+    "whatCameIn": {
+      "label": "Incoming signals",
+      "noteTitle": "Raw Price Rows (as delivered)",
+      "noteSubtitle": "Nightly market data export, due before 6:15 AM",
+      "flagTitle": "Case Context",
+      "flagSubtitle": "The morning this feed lands into",
+      "flagCue": "ERCOT under review",
+      "flagNote": "Flagged at 6:08; the intake record carries approvalRequired: true.",
+      "flagType": "Price spike",
+      "flagRequestedBy": "Desk Trader"
+    },
+    "yourJob": {
+      "label": "Profile the feed",
+      "artifact": "Tag the contract, the quirks, the schedule",
+      "description": "Five facts make a feed profile: the column promise, the case's number, the two quirks today's file reveals, and the delivery deadline.",
+      "signals": [
+        { "group": "Contract", "icon": "note", "detail": "Which line is the producer's promise?" },
+        { "group": "Corroboration", "icon": "price", "detail": "Find the flagged hub's peak - it should match the note." },
+        { "group": "Quirks", "icon": "operating", "detail": "Casing drift and a stray space - cleanliness is not promised." },
+        { "group": "Schedule", "icon": "control", "detail": "When the file is due - everything downstream inherits it." }
+      ]
+    },
+    "unlocks": {
+      "label": "Waiting consumers",
+      "consumers": [
+        {
+          "name": "Clean Price Data",
+          "icon": "operating",
+          "status": "Waiting",
+          "needs": "Normalizes exactly the quirks you find here.",
+          "can": "Can fix what has been named."
+        },
+        {
+          "name": "Variance Check",
+          "icon": "risk",
+          "status": "Downstream",
+          "needs": "Computes on cleaned numbers - never on raw cells with $ signs and stray spaces."
+        }
+      ]
+    },
+    "artifactPreviewNote": "The feed profile you are building: the promise, the evidence, the quirks, the deadline.",
+    "heading": "Before you tag: feeds are promises",
     "sections": [
       {
         "title": "A header row is a contract",
@@ -93,8 +139,8 @@
         "body": "This feed drops nightly before 6:15 AM. Schedules matter because everything downstream inherits them: a late feed is a late brief."
       },
       {
-        "title": "Same rows, the Clean Price Data step",
-        "body": "These are the exact rows the Clean Price Data step normalizes. Inspection and transformation are two different skills applied to one input - first understand it, then fix it."
+        "title": "Two sources, one case",
+        "body": "The note said ERCOT hit $187 and settled at $142; this file says the same. The brief cites numbers only when an independent source corroborates the prose - that is why this feed exists in the workflow at all."
       }
     ],
     "jsonExample": "{\n  \"structure\": \"csv-rows-with-header\",\n  \"columns\": [\"hub\", \"peak\", \"settled\"],\n  \"firstConsumer\": \"clean-price-data\"\n}",
@@ -103,19 +149,41 @@
   },
   "takeaway": {
     "realWorld": {
-      "soloRebuildPath": "You'd download the overnight price file (a CSV or an emailed attachment) and load its rows into a table the workflow can read.",
-      "tools": {
-        "powerAutomate": "'When a file is created' (SharePoint/OneDrive) + Excel 'List rows in a table'",
-        "zapier": "'New File in Folder' (Dropbox/Drive) into a 'Create Spreadsheet Row(s)' step",
-        "python": "pandas.read_csv (or requests to the feed API) to load rows into a DataFrame"
-      }
+      "actionKind": "trigger",
+      "soloRebuildPath": "You'd download the overnight price file (a CSV or an emailed attachment), eyeball it for drift the way you just did, and load its rows into a table the workflow can read.",
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "'When a file is created' on the feed folder, then Excel 'List rows in a table'"
+        },
+        {
+          "tool": "n8n",
+          "how": "a Cron trigger plus a Read Binary File node when the vendor drops on a schedule"
+        }
+      ]
     },
     "heading": "Feed profiled",
+    "recordBanner": "Contract read, quirks named",
+    "recordSummary": "The column promise, today's evidence, and the deadline downstream inherits",
+    "capability": "The workflow can now identify the raw numeric feed that must be cleaned before evaluation.",
+    "auditNote": "Schedule is part of the source: this feed is due before 6:15 AM, and everything downstream inherits that deadline. A late feed is a late brief.",
+    "nextNodeId": "forecast-data",
+    "consumers": [
+      {
+        "name": "Clean Price Data",
+        "nodeId": "clean-price-data",
+        "note": "will normalize exactly the quirks you found - lowercase 'ercot', the stray space, units on every value"
+      },
+      {
+        "name": "Forecast Data",
+        "nodeId": "forecast-data",
+        "note": "the next comparison input to profile - inspected the same way, next"
+      }
+    ],
     "points": [
       "You read the header as a contract and today's rows as evidence of what the contract leaves out.",
+      "The feed corroborates the note: $187 peak and $142 settle for ERCOT, now confirmed by a second source.",
       "You found the quirks by eye - casing drift, a stray space, units on every value - before any code had to.",
-      "You recorded the schedule and the access requirement, the two facts integration work always starts from.",
-      "Clean Price Data consumes exactly these rows; you now know why that step exists.",
       "The workflow can now identify the raw numeric feed that must be cleaned before evaluation."
     ],
     "artifactName": "source-profile-price-feed.json"

@@ -36,7 +36,11 @@ are frozen for the module.
 
 Design the node graph. Guardrails, learned from Module 1:
 
-- 15-18 nodes across 5 phases (fewer reads thin; more will not fit the canvas).
+- 15-18 nodes across 5 phases INCLUDING the mandatory Operations node
+  (Step 2b). Fewer reads thin; more will not fit the canvas.
+- Column capacity: the canvas has 5 fixed columns; keep at most 5 nodes in
+  any one column (y = 80/190/300/410/520) and RESERVE a slot in the last
+  column for the Operations node.
 - Node taxonomy: source / reference / artifact / process / decision / handoff
   / output / archive. Every node is a THING or an ACTION, never both
   (PRODUCT_DOCTRINE taxonomy rule).
@@ -59,14 +63,42 @@ GATE: owner approves the map shape and unlock tree.
 ### Step 2a - Recurrence map (one row per module)
 
 Add this module's entry to src/data/moduleSkeleton.json: `org`, `deliverable`,
-and a `map` naming the ONE representative node label for each of the seven
+and a `map` naming the ONE representative node label for each of the eight
 shared skeleton stages (intake, reference, transform, decision, handoff,
-assembly, archive). This is what powers the once-per-module "you have seen this
+assembly, archive, operate). The `operate` row is the module's Operations
+node (Step 2b). This is what powers the once-per-module "you have seen this
 shape before" card (module-02+), which lines the new module up against the
 Meridian anchor stage for stage. Use the map to sanity-check the design: if a
 stage has no clean representative node, the map is probably missing an invariant
 (fix the map, not the card). module-01 (Meridian) is the anchor and shows no
 card.
+
+### Step 2b - Operations node (MANDATORY)
+
+Every module MUST ship exactly one Operations node. It teaches the operating
+layer the 2026-08-22 coverage audit found missing across all 120 lessons:
+connect it, trigger it, watch it fail, test it, promote it.
+
+- Node: `type: "process"`, `thingOrAction: "action"`, `lesson.type:
+  "governance"`, and the marker `"skeletonStage": "operate"`. Id
+  `run-operations`, label "<Org> Run Operations", taskId
+  `lesson-run-operations`, artifactName `connector-config.json`.
+- It is NEVER a decision node (the one-fork rule is untouched) and it has no
+  outgoing edges.
+- Exactly ONE incoming edge: the module's archive node -> run-operations,
+  labeled "run history". Archive-origin edges are exempt from the lint-map
+  cycle check, and the temporal-loop check still finds archive -> reference,
+  so the topology rules are unaffected.
+- Unlock tree: `LESSON_PREREQS["run-operations"] = ["<archive node id>"]`;
+  appended last to LESSON_PATH.
+- Fill the full Selected Node Panel contract (labVersion, realWorldSources,
+  accessNeeded, soloRebuildPath, reusedBy, governanceNote, auditNote).
+- Add the `operate` row to this module's src/data/moduleSkeleton.json entry.
+
+LINT: `ops-node` (lint-map) requires exactly one `skeletonStage: "operate"`
+node, non-decision, with a taskId, present in LESSON_PREREQS, and matching the
+moduleSkeleton row. `skeleton-row` requires every project to carry a full
+skeleton row. These are hard errors; there is no grandfathering.
 
 ## Step 3 - Node audit
 
@@ -179,12 +211,48 @@ like a worksheet. The artifactImport budget is always spent by the mandatory
 Step 7a capstone.
 
 Available exercise types (all engine-supported): `choiceCheck`, `jsonEditor`,
-`templateSlots`, `artifactImport`, plus the two anti-slop additions `tagSource`
+`templateSlots`, `artifactImport`, the two anti-slop additions `tagSource`
 (inspection-by-tagging) and `handoffForm` (capture the handoff record) - see
-ENGINE_ADDITIONS_SPEC_INSPECTION_HANDOFF.md. Prefer `tagSource` on
+ENGINE_ADDITIONS_SPEC_INSPECTION_HANDOFF.md - and the two operations additions
+`connectorConfig` (configure the connection, trigger, and failure behavior) and
+`runInspect` (diagnose a failed run) - see ENGINE_ADDITIONS_SPEC_OPERATIONS.md. Prefer `tagSource` on
 inspection/provenance nodes and `handoffForm` on handoff/notify nodes instead of
 `choiceCheck`; that is how a module meets the <=25% choiceCheck cap
 (scripts/lint-lessons.mjs, a HARD ERROR for module-03+).
+
+### Step 7c - Operations lessons (MANDATORY, all three tiers)
+
+The Operations node (Step 2b) ships a lesson in EVERY tier. Unlike Hard-tier
+curation elsewhere, this node is never skipped at any tier.
+
+- EASY - `connectorConfig`. Connect the module's source system: Connection
+  (system, auth method, secret REFERENCE not value), Trigger (poll vs webhook
+  vs schedule, and the interval), On failure (retries, dead-letter and alert).
+  The lesson `input` must show BOTH the raw secret and its vault reference so
+  pasting the raw value is a real wrong answer. Mints `connector-config.json`.
+  opsTopics: connectors-credentials, triggers (+ pii where the module handles
+  personal data).
+- MEDIUM - `runInspect`. A 5-7 step run history with one failed step; the
+  learner tags the failed step, classifies the cause, chooses the remediation,
+  and picks the re-run point. Use only roles the charter names. Mints
+  `run-diagnosis.json`. opsTopics: failed-run, environments.
+- HARD - `jsonRows`. A 4-row test plan {caseId, scenario, environment,
+  expectedOutcome} where each expectedOutcome is DERIVED by applying the
+  module's own rules to the given fixtures: a clean case, a boundary case at
+  the threshold, a malformed input that quarantines, and a case that should
+  stay manual. Carries dev/test/prod promotion and when-NOT-to-automate in the
+  intro and takeaway. Mints `test-plan.json`. opsTopics: test-plan,
+  environments, when-not-to-automate.
+
+Every Operations Easy intro RE-GLOSSES the base operating terms (connector,
+credential, trigger, poll/webhook, run, retry) so the glossary lint holds no
+matter what order the modules are played in.
+
+LINT: `ops-coverage` (lint-lessons) requires all three tiers registered, valid
+`opsTopics` present only on Operations lessons, the module's union covering
+`opsTopicsRequired` from src/data/automationTaxonomy.json, and at least one
+`connectorConfig` and one `runInspect` per module. Exceptions are expressed as
+an explicit allow-list constant in the lint, never as a silent absence.
 
 ## Step 8 - Module wrap (OWNER GATE)
 
@@ -192,7 +260,11 @@ inspection/provenance nodes and `handoffForm` on handoff/notify nodes instead of
   recipe).
 - Docs sync: README status, LESSON_DESIGN_FRAMEWORK sections 6-7 (the
   living handoff), DECISION_LOG entries, tier overviews marked complete.
-- Write the module case study (portfolio artifact).
+- Write the module case study (portfolio artifact). The tool map is NO LONGER
+  a hand-written TOOL_MAP.md appendix: it is generated in-app from lesson
+  `takeaway.realWorld` data (the Tool map button on the canvas), so it cannot
+  silently lapse the way module-03's did. Link the case study to that view, or
+  run the optional `scripts/gen-tool-map.mjs` to emit a GENERATED markdown copy.
 - Tag a release. The app must be demoable before the next module starts.
 
 ---

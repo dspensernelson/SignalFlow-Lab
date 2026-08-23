@@ -73,12 +73,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "You'd compare the new invoice's key fields against recent ones and stop it if the vendor, number, and amount already appear.",
-      "tools": {
-        "powerAutomate": "'Get items' + 'Condition' on matching vendor/number/amount to flag duplicates",
-        "zapier": "'Find Record'; a 'Filter' halts the Zap on a match",
-        "python": "check membership on a (vendor, number, amount) key set"
-      }
+      "bestFit": [
+        {
+          "tool": "python",
+          "how": "build a match key from vendor, number, and amount, then check membership against the lookback window"
+        },
+        {
+          "tool": "make",
+          "how": "a Search module on the composite key, routing any hit to the duplicate branch"
+        }
+      ]
     },
     "heading": "You designed what 'duplicate' means",
     "points": [

@@ -83,12 +83,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "approval",
       "soloRebuildPath": "You'd send the pay class and start date to payroll early, then only tick it off once they confirmed the person was enrolled.",
-      "tools": {
-        "powerAutomate": "start an approval/enrollment to Payroll and wait for the confirmation",
-        "zapier": "send the enrollment request, capture the reply into the record",
-        "python": "post the enrollment to the payroll API and store the returned status"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAppsCopilot",
+          "how": "an enrollment card to Payroll; the confirmation writes back to the task tracker"
+        },
+        {
+          "tool": "zapier",
+          "how": "a delayed step that resumes when Payroll submits the confirmation form"
+        }
+      ]
     },
     "heading": "Payroll handed off",
     "points": [

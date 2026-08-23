@@ -1,0 +1,162 @@
+{
+  "id": "lesson-brief-operations-medium",
+  "nodeId": "run-operations",
+  "title": "Diagnose the Failed Meridian Run",
+  "subtitle": "Read the run history, find the failure, choose the fix",
+  "clock": "6:15 AM",
+  "difficulty": "Intermediate",
+  "skill": "Reading a run history",
+  "opsTopics": [
+    "failed-run",
+    "environments"
+  ],
+  "scenario": "The automation ran on its trigger and stopped. Nobody is watching a screen at 6:15 AM, so what you have is the run history: a list of steps, their statuses, and one error message. Work out which step failed, what kind of failure it is, and what to do about it. Guessing wrong here is expensive - the wrong fix wastes an hour and the run stays broken.",
+  "inputType": "text",
+  "input": "Run run-2026-07-08-0615 finished with status: failed.\nEnvironment: prod. Trigger: Poll / desk shared mailbox. Started 6:15 AM.\n\nRead the step list in the run history panel. A step marked skipped was never attempted -\nit is downstream of the failure, not a second problem.",
+  "instructions": [
+    "Find the step where the run actually stopped.",
+    "Classify what KIND of failure it is from the error message.",
+    "Choose the fix that addresses that kind of failure.",
+    "Choose the step to re-run from, given which steps already succeeded.",
+    "Validate the diagnosis."
+  ],
+  "interactionType": "runInspect",
+  "validation": {
+    "type": "runInspect",
+    "run": {
+      "id": "run-2026-07-08-0615",
+      "environment": "prod",
+      "trigger": "Poll / desk shared mailbox",
+      "startedAt": "6:15 AM",
+      "status": "failed",
+      "steps": [
+        {
+          "id": "s1",
+          "name": "Get new emails",
+          "status": "succeeded",
+          "durationMs": 840
+        },
+        {
+          "id": "s2",
+          "name": "Get items: threshold policy",
+          "status": "failed",
+          "durationMs": 12030,
+          "error": "401 Unauthorized. The service account desk-bot was rejected by the config list."
+        },
+        {
+          "id": "s3",
+          "name": "Apply thresholds",
+          "status": "skipped"
+        },
+        {
+          "id": "s4",
+          "name": "Evaluate risk",
+          "status": "skipped"
+        },
+        {
+          "id": "s5",
+          "name": "Send approval",
+          "status": "skipped"
+        }
+      ]
+    },
+    "fields": [
+      {
+        "id": "failedStep",
+        "label": "Failed step",
+        "kind": "step",
+        "expected": "s2",
+        "explain": "Read the status column. s2 is the first step that did not succeed; everything after it is skipped, which means never attempted, not broken."
+      },
+      {
+        "id": "cause",
+        "label": "Cause",
+        "kind": "select",
+        "options": [
+          "auth-expired",
+          "rate-limit",
+          "schema-change",
+          "missing-field"
+        ],
+        "expected": "auth-expired",
+        "explain": "A 401 rejection on a service account that worked yesterday is a credential problem, not a data problem. The config list did not change; the token did."
+      },
+      {
+        "id": "action",
+        "label": "Fix",
+        "kind": "select",
+        "options": [
+          "rotate-credential",
+          "retry-with-backoff",
+          "fix-mapping",
+          "dead-letter-and-alert"
+        ],
+        "expected": "rotate-credential",
+        "explain": "Retrying an expired credential just fails four more times. The token has to be renewed before any re-run is worth attempting."
+      },
+      {
+        "id": "rerunFrom",
+        "label": "Re-run from",
+        "kind": "step",
+        "expected": "s2",
+        "explain": "s1 already succeeded and re-reading the mailbox is safe but pointless. Re-run from the step that actually failed."
+      }
+    ]
+  },
+  "copilotPrompt": "Given a workflow run history where one step failed with an error message, explain how to tell a credential problem from a rate limit from a schema change, and what each one calls for.",
+  "successMessage": "Run diagnosed. The failure has a cause and a fix on the record.",
+  "validateLabel": "Validate Diagnosis",
+  "intro": {
+    "heading": "Before you build: a run is evidence",
+    "artifactName": "run-diagnosis.json",
+    "sections": [
+      {
+        "title": "What this record does",
+        "body": "The run diagnosis turns 'it broke' into a cause, a fix, and a re-run point. Without it the next failure is diagnosed from scratch by whoever happens to be on call."
+      },
+      {
+        "title": "Failed is not the same as skipped",
+        "body": "A skipped step was never attempted; it is downstream of the real failure. Chasing a skipped step is the most common way to spend an hour fixing nothing."
+      },
+      {
+        "title": "The kind of failure decides the fix",
+        "body": "An expired credential needs rotating and will not survive a retry. A rate limit needs backing off and will fix itself. A changed schema needs a mapping change and will fail identically forever until someone makes it. Same red X, three different days of work."
+      },
+      {
+        "title": "Where you re-run from",
+        "body": "Steps that already succeeded may have minted records. Re-running from the top can duplicate them. Re-run from the failure unless an earlier step is safe to repeat."
+      }
+    ]
+  },
+  "takeaway": {
+    "realWorld": {
+      "actionKind": "operate",
+      "soloRebuildPath": "You would open the run history, find the first non-succeeded step, read its error, decide what class of failure it is, and re-run from that step once the cause is addressed.",
+      "bestFit": [
+        {
+          "tool": "zapier",
+          "how": "Zap History: the run list, the step that errored, and its payload"
+        },
+        {
+          "tool": "make",
+          "how": "the scenario execution history, with the failed module expanded"
+        },
+        {
+          "tool": "python",
+          "how": "structured logs keyed by run id so a failure is greppable after the fact"
+        }
+      ]
+    },
+    "heading": "Run diagnosed",
+    "artifactName": "run-diagnosis.json",
+    "before": "The run had failed and the reason lived only in a log nobody had read.",
+    "after": "The failure has a named cause, a chosen fix, and a re-run point on the record.",
+    "capability": "The workflow can now be diagnosed after a failure instead of restarted blindly.",
+    "auditNote": "The diagnosis is retained against the run id, so a recurring failure is visible as a pattern rather than rediscovered each time.",
+    "points": [
+      "You created run-diagnosis.json from evidence in the run history, not from a guess.",
+      "Classifying the failure is what makes the fix cheap: a retry, a rotation, and a mapping change are three different days of work.",
+      "The workflow can now be diagnosed after a failure instead of restarted blindly."
+    ]
+  }
+}

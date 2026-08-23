@@ -1,0 +1,122 @@
+{
+  "note": "realWorld v2 source data for module-03, keyed by taskId (tier variants inherit). actionKind ids and tool ids come from src/data/automationTaxonomy.json. Consumed by scripts/migrate-realworld.mjs. Keep ASCII-only.",
+  "module": "module-03",
+  "tasks": {
+    "lesson-signed-offer": {
+      "actionKind": "trigger",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "an e-signature or ATS trigger that fires the moment the offer is countersigned" },
+        { "tool": "make", "how": "a Watch module on the ATS, so onboarding starts without anyone remembering to start it" },
+        { "tool": "langgraph", "how": "the graph entry, with the offer parsed into typed state before any provisioning runs" }
+      ]
+    },
+    "lesson-role-profile-catalog": {
+      "actionKind": "lookup",
+      "bestFit": [
+        { "tool": "powerAppsCopilot", "how": "a Dataverse entitlements table with an owner in People Ops, edited through a form" },
+        { "tool": "n8n", "how": "a database read keyed on role, returning the entitlement list the plan expands" }
+      ]
+    },
+    "lesson-onboarding-record": {
+      "actionKind": "transform",
+      "bestFit": [
+        { "tool": "make", "how": "a Set Variable module minting the hire record once, so every branch reads the same start date" },
+        { "tool": "python", "how": "build the record with the start date as a real date object, not a string to re-parse later" }
+      ]
+    },
+    "lesson-sla-policy": {
+      "actionKind": "lookup",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "a config list of task SLAs, with due dates computed by addDays from the start date" },
+        { "tool": "python", "how": "an SLA table with a version; due dates derive from the start date so a moved date recomputes" },
+        { "tool": "make", "how": "a data store of SLA offsets read once and applied to every task in the plan" }
+      ]
+    },
+    "lesson-provisioning-plan": {
+      "actionKind": "transform",
+      "bestFit": [
+        { "tool": "python", "how": "expand the role profile into dated tasks; the plan is data, so a changed role re-expands cleanly" },
+        { "tool": "n8n", "how": "an Item Lists node fanning the entitlements into one task item per branch" }
+      ]
+    },
+    "lesson-accounts-task": {
+      "actionKind": "transform",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "Get user, then a Condition, then Create user ONLY if none was returned" },
+        { "tool": "python", "how": "check-then-create keyed on the hire id, so a retry converges instead of duplicating" }
+      ]
+    },
+    "lesson-hardware-task": {
+      "actionKind": "send",
+      "bestFit": [
+        { "tool": "zapier", "how": "create the procurement ticket and post the tracking number back to the tracker" },
+        { "tool": "make", "how": "a ticket-creation module, then a Wait for the shipping confirmation the vendor sends" }
+      ]
+    },
+    "lesson-access-task": {
+      "actionKind": "transform",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "Apply to each group in the profile, then Add member - only the groups the profile lists" },
+        { "tool": "n8n", "how": "loop the entitlement list adding memberships, and log any grant that was not on the profile" }
+      ]
+    },
+    "lesson-payroll-task": {
+      "actionKind": "approval",
+      "bestFit": [
+        { "tool": "powerAppsCopilot", "how": "an enrollment card to Payroll; the confirmation writes back to the task tracker" },
+        { "tool": "zapier", "how": "a delayed step that resumes when Payroll submits the confirmation form" }
+      ]
+    },
+    "lesson-task-tracker": {
+      "actionKind": "transform",
+      "bestFit": [
+        { "tool": "python", "how": "one status row per task, updated by task id, so parallel branches cannot overwrite each other" },
+        { "tool": "make", "how": "a data store updated per branch outcome, keyed on task id rather than on position" },
+        { "tool": "n8n", "how": "a database upsert per branch, so re-running one branch does not disturb the others" }
+      ]
+    },
+    "lesson-readiness-gate": {
+      "actionKind": "condition",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "a Condition that ALL task statuses equal done before the assemble branch runs" },
+        { "tool": "python", "how": "all() over the tracker rows; one blocked task blocks the gate, by design" }
+      ]
+    },
+    "lesson-escalation-path": {
+      "actionKind": "send",
+      "bestFit": [
+        { "tool": "zapier", "how": "create the escalation task with an assignee and a deadline, then notify the owner's manager" },
+        { "tool": "n8n", "how": "a Wait node on the SLA, then a Send node up the ladder when no response arrived" }
+      ]
+    },
+    "lesson-day-one-package": {
+      "actionKind": "compose",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "compose the document from the record, tracker, and gate fields, not from retyped values" },
+        { "tool": "python", "how": "render the package from the three artifacts, so every line traces to the task that produced it" },
+        { "tool": "langgraph", "how": "a synthesis node assembling the package from state, with the artifacts as grounding" }
+      ]
+    },
+    "lesson-manager-handoff": {
+      "actionKind": "approval",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "'Start and wait for an approval' on the package, addressed to the hiring manager" },
+        { "tool": "powerAppsCopilot", "how": "an approval card carrying the package summary; the reply is captured on the run" }
+      ]
+    },
+    "lesson-onboarding-archive": {
+      "actionKind": "store",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "write the run to a retained store with a retention label matching the HR policy" },
+        { "tool": "make", "how": "a storage module writing the retained run that the catalog feedback later reads" }
+      ]
+    },
+    "lesson-profile-feedback": {
+      "actionKind": "send",
+      "bestFit": [
+        { "tool": "zapier", "how": "create a catalog change-request record assigned to People Ops when a run needed something off-profile" },
+        { "tool": "python", "how": "diff what was actually granted against the profile and file the delta as a change request" }
+      ]
+    }
+  }
+}

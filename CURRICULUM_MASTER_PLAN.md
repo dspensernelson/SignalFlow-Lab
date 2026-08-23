@@ -40,6 +40,30 @@ because every platform is a skin over the same eight moves:
     as records (handoffs).
 8.  Outputs are assembled from upstream artifacts, delivered, retained, and fed back
     as tomorrow's inputs (assembly + the loop).
+9.  The automation is itself a system: it must be connected, triggered, observed,
+    tested, and promoted (operations). Added 2026-08-22 after a coverage audit found
+    this move taught in 0-1 of 120 lessons. See MODULE_AUTHORING_PLAYBOOK Step 2b.
+
+These nine MOVES are the pedagogy. Two machine-readable axes carry them:
+
+| Move | Skeleton stage (src/data/moduleSkeleton.json) | Action kinds (src/data/automationTaxonomy.json) |
+|---|---|---|
+| 1 Signals enter | intake | trigger |
+| 2 Trusted objects | intake | transform |
+| 3 Rules live outside | reference | lookup |
+| 4 Normalize first | transform | transform |
+| 5 Derive once, store | transform | transform |
+| 6 Explicit branches | decision | condition |
+| 7 Humans in the loop | handoff | approval, send |
+| 8 Assemble, deliver, retain, loop | assembly, archive | compose, store |
+| 9 Operate the automation | operate | operate |
+
+The SKELETON STAGE axis answers "what shape does every workflow repeat?" (the
+recurrence card). The ACTION KIND axis answers "what is this step called in a real
+tool?" (the kind-of-action chip and the tool map). automationTaxonomy.json is the
+single source of truth for action kinds, the tool roster, and the operations
+vocabulary. The earlier "five moves" compression in the per-module TOOL_MAP.md files
+is RETIRED along with those files.
 
 The pedagogy is constructionist: the learner does not read about these moves, they
 PERFORM each move once, on a realistic business workflow, producing a named artifact

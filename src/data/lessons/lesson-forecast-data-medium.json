@@ -98,12 +98,22 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "lookup",
       "soloRebuildPath": "You'd pull the forecast numbers from the provider's portal or emailed report and drop them into a structured table keyed by hub and date.",
-      "tools": {
-        "powerAutomate": "HTTP 'GET' the forecast API + 'Parse JSON' into a table",
-        "zapier": "Webhooks by Zapier 'GET' the forecast endpoint, then 'Create Row'",
-        "python": "requests.get the forecast API, then json() the response into records"
-      }
+      "bestFit": [
+        {
+          "tool": "python",
+          "how": "requests.get on the vendor endpoint, then validate the payload before trusting it"
+        },
+        {
+          "tool": "n8n",
+          "how": "an HTTP Request node with the vendor key stored as a credential, not inline"
+        },
+        {
+          "tool": "make",
+          "how": "an HTTP module plus a JSON parser feeding the rest of the scenario"
+        }
+      ]
     },
     "heading": "Reference gap assessed",
     "points": [

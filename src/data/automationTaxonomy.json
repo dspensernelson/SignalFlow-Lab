@@ -1,0 +1,203 @@
+{
+  "note": "Canonical automation vocabulary. Two axes: actionKinds (what a step IS in any tool) and the moduleSkeleton stages (the SHAPE a workflow repeats). Every actionKind maps to exactly one skeleton stage. Lesson takeaway.realWorld.actionKind must be an id from actionKinds; takeaway.realWorld.bestFit[].tool must be an id from tools. Keep ASCII-only.",
+  "version": "1.0.0",
+  "actionKinds": [
+    {
+      "id": "trigger",
+      "label": "Trigger",
+      "skeletonStage": "intake",
+      "gloss": "something arrives, or a clock fires, and a run starts",
+      "cue": "whenever work begins on its own - an email lands, a file drops, a timer hits - look for the trigger; if there is not one, the automation has not started yet",
+      "dialect": {
+        "powerAutomate": "'When a new email arrives' / 'Recurrence' / 'When an item is created'",
+        "powerAppsCopilot": "a form submit, or a Copilot Studio topic trigger phrase",
+        "make": "a Watch module, or a custom webhook",
+        "n8n": "a Trigger node (Cron, Webhook, IMAP Email)",
+        "zapier": "the Trigger step that starts the Zap",
+        "python": "a scheduled entry point (cron, Task Scheduler) or a webhook route",
+        "langgraph": "the graph entry point / START edge"
+      }
+    },
+    {
+      "id": "lookup",
+      "label": "Lookup",
+      "skeletonStage": "reference",
+      "gloss": "read the governed rule, reference table, or history the run needs",
+      "cue": "when a number or rule is about to be hardcoded in a step, that is a lookup waiting to happen - move it out where it can be owned and changed",
+      "dialect": {
+        "powerAutomate": "'Get items' from a SharePoint config list, or an Environment Variable",
+        "powerAppsCopilot": "a Dataverse table read, or a Copilot Studio variable from a knowledge source",
+        "make": "a Search / Get module against a data store",
+        "n8n": "a database or Read node, or Workflow Static Data",
+        "zapier": "a 'Find Record' search step, or Storage by Zapier",
+        "python": "load a config file or query a table into a dict",
+        "langgraph": "a retrieval tool call, or config read from graph state"
+      }
+    },
+    {
+      "id": "transform",
+      "label": "Transform",
+      "skeletonStage": "transform",
+      "gloss": "parse, normalize, or compute so the data is safe to compare",
+      "cue": "any time two values must be compared, ask what shape they are in first; comparison before normalization is where silent bugs live",
+      "dialect": {
+        "powerAutomate": "'Compose', 'Select', 'Parse JSON', or an expression like float()",
+        "powerAppsCopilot": "a Power Fx formula, or a Copilot Studio variable expression",
+        "make": "an Iterator plus a Set variable / text parser module",
+        "n8n": "a Set, Code, or Item Lists node",
+        "zapier": "Formatter by Zapier (numbers, text, dates)",
+        "python": "a parsing function; pandas.to_numeric or re.sub for cleaning",
+        "langgraph": "a node function that rewrites state, or a structured-output extraction call"
+      }
+    },
+    {
+      "id": "condition",
+      "label": "Condition",
+      "skeletonStage": "decision",
+      "gloss": "branch the run on a rule that someone owns",
+      "cue": "when a person says 'it depends', that is a condition; write down what it depends on and who owns the threshold",
+      "dialect": {
+        "powerAutomate": "'Condition' or 'Switch' on the computed value",
+        "powerAppsCopilot": "a Copilot Studio condition node, or an If() in Power Fx",
+        "make": "a Router with filters on each route",
+        "n8n": "an IF or Switch node",
+        "zapier": "Paths by Zapier, or a Filter step",
+        "python": "an if/elif branch against the policy value",
+        "langgraph": "a conditional edge routing on graph state"
+      }
+    },
+    {
+      "id": "approval",
+      "label": "Approval",
+      "skeletonStage": "handoff",
+      "gloss": "a person decides, and the reply is captured as a record",
+      "cue": "if a human has to say yes, the automation is not done at 'sent' - it is done when the answer is stored",
+      "dialect": {
+        "powerAutomate": "'Start and wait for an approval', then write the outcome",
+        "powerAppsCopilot": "an approval card in a Copilot Studio topic, or a Power Apps review screen",
+        "make": "a webhook-response pattern, or an approval-app module",
+        "n8n": "a Wait node paired with a Form or Webhook resume",
+        "zapier": "a delayed step plus a form submission that resumes the Zap",
+        "python": "write a pending record and poll for the reply; never block on input",
+        "langgraph": "a human-in-the-loop interrupt on the graph"
+      }
+    },
+    {
+      "id": "send",
+      "label": "Send",
+      "skeletonStage": "handoff",
+      "gloss": "notify, route, or deliver to a person, queue, or channel",
+      "cue": "a send with no recipient rule is a guess; the routing rule belongs in a lookup, not in the message",
+      "dialect": {
+        "powerAutomate": "'Send an email (V2)', 'Post message in a chat', or 'Create item' in a queue list",
+        "powerAppsCopilot": "a Copilot Studio message node, or a notification from the app",
+        "make": "an Email / Slack / HTTP module on the route",
+        "n8n": "a Send Email, Slack, or HTTP Request node",
+        "zapier": "an action step to Gmail, Slack, or a webhook",
+        "python": "smtplib or requests.post to the channel's API",
+        "langgraph": "a tool node that emits the notification"
+      }
+    },
+    {
+      "id": "compose",
+      "label": "Compose",
+      "skeletonStage": "assembly",
+      "gloss": "assemble the deliverable from upstream artifacts",
+      "cue": "a deliverable that restates facts instead of citing the artifacts that hold them cannot be traced back; assemble, do not retype",
+      "dialect": {
+        "powerAutomate": "'Compose' plus 'Create HTML table', or a Word template action",
+        "powerAppsCopilot": "a Copilot Studio adaptive card, or a Power Apps display screen",
+        "make": "a Text Aggregator, or a Create Document module",
+        "n8n": "a Merge node into an HTML or Markdown Set node",
+        "zapier": "Formatter, or a document-generation action",
+        "python": "a Jinja template rendered from the artifact dicts",
+        "langgraph": "a synthesis node that composes the final answer from state"
+      }
+    },
+    {
+      "id": "store",
+      "label": "Store",
+      "skeletonStage": "archive",
+      "gloss": "write it, retain it, and let it seed the next run",
+      "cue": "if nobody can answer 'what did we do last time', the loop was never closed; retention is what makes tomorrow's run cheaper",
+      "dialect": {
+        "powerAutomate": "'Create file' in SharePoint, or 'Add a new row' in Dataverse",
+        "powerAppsCopilot": "a Dataverse write from the app or topic",
+        "make": "a Google Drive / Data store module on the tail of the scenario",
+        "n8n": "a database Insert node, or Write Binary File",
+        "zapier": "a 'Create Record' action into Airtable, Sheets, or Storage",
+        "python": "write the artifact to disk or a table with a run id",
+        "langgraph": "a checkpointer write, or persisted thread state"
+      }
+    },
+    {
+      "id": "operate",
+      "label": "Operate",
+      "skeletonStage": "operate",
+      "gloss": "connect it, trigger it, watch it fail, test it, promote it",
+      "cue": "the workflow is one system and the automation running it is another; the second one also needs credentials, a schedule, a failure plan, and a test",
+      "dialect": {
+        "powerAutomate": "connections and connection references, run history, the flow checker, and solution export dev to test to prod",
+        "powerAppsCopilot": "connectors and connection references, Test copilot, and managed-solution promotion",
+        "make": "connections, the scenario execution history, and the Run once button",
+        "n8n": "credentials, Executions list, pinned test data, and environment variables",
+        "zapier": "app connections, Zap History, and the Zap test step",
+        "python": "environment variables or a vault, structured logs, retries with backoff, and a test suite",
+        "langgraph": "API keys per tool, LangSmith traces, and an evaluation run"
+      }
+    }
+  ],
+  "tools": [
+    { "id": "powerAutomate", "label": "Power Automate", "family": "low-code" },
+    { "id": "powerAppsCopilot", "label": "Power Apps / Copilot Studio", "family": "app-builder" },
+    { "id": "make", "label": "Make", "family": "low-code" },
+    { "id": "n8n", "label": "n8n", "family": "low-code" },
+    { "id": "zapier", "label": "Zapier", "family": "low-code" },
+    { "id": "python", "label": "Python", "family": "pro-code" },
+    { "id": "langgraph", "label": "LangGraph", "family": "agentic" }
+  ],
+  "opsTopics": [
+    "connectors-credentials",
+    "triggers",
+    "failed-run",
+    "test-plan",
+    "environments",
+    "when-not-to-automate",
+    "pii"
+  ],
+  "opsTopicsRequired": [
+    "connectors-credentials",
+    "triggers",
+    "failed-run",
+    "test-plan",
+    "environments",
+    "when-not-to-automate"
+  ],
+  "runVocabulary": {
+    "stepStatuses": ["succeeded", "failed", "skipped", "timedOut", "throttled"],
+    "failureCauses": [
+      "auth-expired",
+      "rate-limit",
+      "schema-change",
+      "missing-field",
+      "timeout",
+      "downstream-outage",
+      "bad-config"
+    ],
+    "remediations": [
+      "retry-with-backoff",
+      "rotate-credential",
+      "fix-mapping",
+      "dead-letter-and-alert",
+      "rerun-from-step",
+      "no-action"
+    ],
+    "environments": ["dev", "test", "prod"]
+  },
+  "rotation": {
+    "minToolsPerModule": 5,
+    "maxToolSharePerModule": 0.6,
+    "bestFitMin": 2,
+    "bestFitMax": 3
+  }
+}

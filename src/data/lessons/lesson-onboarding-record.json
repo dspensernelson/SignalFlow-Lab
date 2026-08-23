@@ -116,12 +116,18 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "transform",
       "soloRebuildPath": "You'd type the hire's core fields into your onboarding sheet once, then have every checklist item read from that row instead of the offer email.",
-      "tools": {
-        "powerAutomate": "a Dataverse 'Create row' for the new-hire record from the offer trigger",
-        "zapier": "'Create Record' mapping the offer fields into one row",
-        "python": "assemble the fields into a dict / row keyed by hireId"
-      }
+      "bestFit": [
+        {
+          "tool": "make",
+          "how": "a Set Variable module minting the hire record once, so every branch reads the same start date"
+        },
+        {
+          "tool": "python",
+          "how": "build the record with the start date as a real date object, not a string to re-parse later"
+        }
+      ]
     },
     "heading": "Onboarding Record built",
     "points": [

@@ -99,12 +99,18 @@
   },
   "takeaway": {
     "realWorld": {
+      "actionKind": "approval",
       "soloRebuildPath": "You'd get a manager to sign off on the whole batch total before any money moves.",
-      "tools": {
-        "powerAutomate": "'Start and wait for an approval' on the batch summary",
-        "zapier": "an approval step (e.g. Slack approval) gating the run",
-        "python": "require an approver flag before the payment call runs"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "'Start and wait for an approval' on the batch summary, with the total and count in the card"
+        },
+        {
+          "tool": "powerAppsCopilot",
+          "how": "an approval card showing the batch totals; the reply is stored against the run"
+        }
+      ]
     },
     "heading": "Run approved with holds acknowledged",
     "points": [

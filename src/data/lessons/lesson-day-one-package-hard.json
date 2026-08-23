@@ -62,12 +62,22 @@
   ],
   "takeaway": {
     "realWorld": {
+      "actionKind": "compose",
       "soloRebuildPath": "You'd have a written rule for what counts as a blocker worth delaying a start, so the call is consistent no matter who makes it.",
-      "tools": {
-        "powerAutomate": "a decision table: critical + no workaround -> delay; else start",
-        "zapier": "Paths keyed on criticalBlocked and workaroundAvailable",
-        "python": "decision = 'delay' if critical and not workaround else 'start-anyway'"
-      }
+      "bestFit": [
+        {
+          "tool": "powerAutomate",
+          "how": "compose the document from the record, tracker, and gate fields, not from retyped values"
+        },
+        {
+          "tool": "python",
+          "how": "render the package from the three artifacts, so every line traces to the task that produced it"
+        },
+        {
+          "tool": "langgraph",
+          "how": "a synthesis node assembling the package from state, with the artifacts as grounding"
+        }
+      ]
     },
     "heading": "Decision governed",
     "points": [

@@ -1,0 +1,130 @@
+{
+  "note": "realWorld v2 source data for module-02, keyed by taskId (tier variants inherit). actionKind ids and tool ids come from src/data/automationTaxonomy.json. Consumed by scripts/migrate-realworld.mjs. Keep ASCII-only.",
+  "module": "module-02",
+  "tasks": {
+    "lesson-invoice-inbox": {
+      "actionKind": "trigger",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "an Outlook trigger on the AP mailbox, with a condition separating invoices from everything else" },
+        { "tool": "make", "how": "a Watch Emails module with a filter on attachments, so only real invoices enter the scenario" },
+        { "tool": "langgraph", "how": "the entry node, classifying each arrival before the pipeline commits to processing it" }
+      ]
+    },
+    "lesson-invoice-record": {
+      "actionKind": "transform",
+      "bestFit": [
+        { "tool": "langgraph", "how": "a structured-output extraction returning typed invoice fields, with a confidence check before use" },
+        { "tool": "python", "how": "parse the PDF into a dict and coerce quantity, unit price, and total to numbers immediately" }
+      ]
+    },
+    "lesson-vendor-master": {
+      "actionKind": "lookup",
+      "bestFit": [
+        { "tool": "powerAppsCopilot", "how": "a Dataverse vendor table with a maintained-by-Finance form, not a spreadsheet on a share" },
+        { "tool": "n8n", "how": "a database node reading the vendor row, keyed on the vendor id rather than the display name" }
+      ]
+    },
+    "lesson-po-register": {
+      "actionKind": "lookup",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "'Get items' filtered by PO number, with an explicit branch for no-PO-found" },
+        { "tool": "zapier", "how": "a 'Find Record' step on the PO table that fails loudly when the PO does not exist" }
+      ]
+    },
+    "lesson-receipt-log": {
+      "actionKind": "lookup",
+      "bestFit": [
+        { "tool": "n8n", "how": "a database read filtered by PO and line, returning zero rows when nothing was received" },
+        { "tool": "python", "how": "query receipts by PO line; treat an empty result as 'not received', never as zero quantity" }
+      ]
+    },
+    "lesson-tolerance-policy": {
+      "actionKind": "lookup",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "Environment Variables or a config list holding the tolerance limits, owned by the Controller" },
+        { "tool": "python", "how": "a config dict with a version and an effective date, so an old run can be re-explained" },
+        { "tool": "make", "how": "a data store record read at the top of the scenario rather than a number typed into a filter" }
+      ]
+    },
+    "lesson-payment-history": {
+      "actionKind": "lookup",
+      "bestFit": [
+        { "tool": "zapier", "how": "a 'Find Record' search by vendor and invoice number across the payments table" },
+        { "tool": "n8n", "how": "a database node with an index on vendor plus invoice number, so the lookback stays fast" }
+      ]
+    },
+    "lesson-duplicate-check": {
+      "actionKind": "transform",
+      "bestFit": [
+        { "tool": "python", "how": "build a match key from vendor, number, and amount, then check membership against the lookback window" },
+        { "tool": "make", "how": "a Search module on the composite key, routing any hit to the duplicate branch" }
+      ]
+    },
+    "lesson-three-way-match": {
+      "actionKind": "transform",
+      "bestFit": [
+        { "tool": "python", "how": "join the three records on PO line and compute each variance once, storing it for the audit trail" },
+        { "tool": "n8n", "how": "a Merge node joining invoice, PO, and receipt, then a Code node computing the variances" },
+        { "tool": "powerAutomate", "how": "join the three records and use a 'Condition' per field against the policy value" }
+      ]
+    },
+    "lesson-match-decision": {
+      "actionKind": "condition",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "a 'Switch' setting the match status, so every invoice leaves with an explicit outcome" },
+        { "tool": "make", "how": "a Router with one filtered route per outcome, including the fall-through" },
+        { "tool": "zapier", "how": "Paths by Zapier, with a final catch-all path so nothing silently stops" }
+      ]
+    },
+    "lesson-exception-queue": {
+      "actionKind": "send",
+      "bestFit": [
+        { "tool": "powerAppsCopilot", "how": "a review app over the exceptions table, so the queue is worked where it lives" },
+        { "tool": "zapier", "how": "a 'Create Record' into the exceptions table plus a channel message naming the assignee" }
+      ]
+    },
+    "lesson-auto-approve-path": {
+      "actionKind": "store",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "the clean branch that sets Approved and writes who or what approved it, and when" },
+        { "tool": "python", "how": "record the auto-approval with the rule version that granted it; straight-through still needs a trail" }
+      ]
+    },
+    "lesson-payment-batch": {
+      "actionKind": "transform",
+      "bestFit": [
+        { "tool": "python", "how": "select approved invoices as of the cutoff and build the batch once, with a deterministic batch id" },
+        { "tool": "make", "how": "an Aggregator collecting approved items into a single batch payload" }
+      ]
+    },
+    "lesson-run-approval": {
+      "actionKind": "approval",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "'Start and wait for an approval' on the batch summary, with the total and count in the card" },
+        { "tool": "powerAppsCopilot", "how": "an approval card showing the batch totals; the reply is stored against the run" }
+      ]
+    },
+    "lesson-payment-run": {
+      "actionKind": "compose",
+      "bestFit": [
+        { "tool": "python", "how": "assemble the payment file from the approved batch and log the response with the run id" },
+        { "tool": "n8n", "how": "an HTTP Request to the bank or ERP endpoint, with the credential stored, and the response persisted" }
+      ]
+    },
+    "lesson-remittance-advice": {
+      "actionKind": "compose",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "'Create HTML table' of the paid invoices per vendor, then 'Send an email (V2)'" },
+        { "tool": "zapier", "how": "Formatter to build the per-vendor summary, then an email action" },
+        { "tool": "python", "how": "render one remittance per vendor from the batch, citing invoice numbers rather than restating amounts" }
+      ]
+    },
+    "lesson-payment-archive": {
+      "actionKind": "store",
+      "bestFit": [
+        { "tool": "powerAutomate", "how": "'Create file' in a dated library plus 'Update item' to mark the batch archived" },
+        { "tool": "make", "how": "a storage module writing the retained batch that tomorrow's duplicate check reads" }
+      ]
+    }
+  }
+}
