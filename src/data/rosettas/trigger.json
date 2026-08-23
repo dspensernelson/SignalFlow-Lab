@@ -1,0 +1,92 @@
+{
+  "id": "trigger",
+  "kind": "rosetta",
+  "exercise": "add-step",
+  "label": "Trigger",
+  "introducedBy": "module-02",
+  "gloss": "something arrives, or a clock fires, and a run starts",
+  "why": "Nothing in an automation happens until something starts it. A trigger names the event the flow waits for, and every record it emits becomes one run. At Beacon, the invoice desk flow starts when an invoice lands in the Invoice Inbox - no trigger, no run, and INV-1 just sits there.",
+  "cue": "whenever work begins on its own - an email lands, a file drops, a timer hits - look for the trigger; if there is not one, the automation has not started yet",
+  "sample": {
+    "sources": [
+      {
+        "id": "inbox",
+        "label": "Invoice Inbox",
+        "labelField": "invoiceNumber",
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "poNumber",
+          "invoiceTotal"
+        ]
+      }
+    ],
+    "stores": [],
+    "owners": [
+      "AP Clerk",
+      "Procurement Lead"
+    ],
+    "day": {
+      "sources": {
+        "inbox": [
+          {
+            "invoiceNumber": "INV-1",
+            "vendorId": "V-1",
+            "poNumber": "PO-1",
+            "invoiceTotal": 1220
+          }
+        ]
+      },
+      "seeds": {},
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [],
+  "task": "Make the flow start when an invoice lands in the Invoice Inbox, so INV-1 enters a run.",
+  "add": {
+    "kind": "trigger"
+  },
+  "solution": {
+    "kind": "trigger",
+    "config": {
+      "source": "inbox",
+      "mode": "event",
+      "at": ""
+    }
+  },
+  "notes": [
+    "A flow always begins with a Trigger - it is the only step allowed first.",
+    "Event mode: one run per record that arrives in the source.",
+    "Schedule mode: one run at a set time, with no record from a source."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "runStatus",
+      "flowId": "concept",
+      "equals": "succeeded",
+      "label": "The flow runs"
+    },
+    {
+      "id": "c2",
+      "kind": "recordField",
+      "where": {
+        "invoiceNumber": "INV-1"
+      },
+      "field": "invoiceNumber",
+      "exists": true,
+      "label": "INV-1 entered a run",
+      "why": "a trigger on the Invoice Inbox emits one record per invoice"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "'When a new email arrives' / 'Recurrence' / 'When an item is created'",
+    "powerAppsCopilot": "a form submit, or a Copilot Studio topic trigger phrase",
+    "make": "a Watch module, or a custom webhook",
+    "n8n": "a Trigger node (Cron, Webhook, IMAP Email)",
+    "zapier": "the Trigger step that starts the Zap",
+    "python": "a scheduled entry point (cron, Task Scheduler) or a webhook route",
+    "langgraph": "the graph entry point / START edge"
+  }
+}

@@ -1,0 +1,183 @@
+{
+  "id": "data-types",
+  "kind": "waypoint",
+  "exercise": "json-edit",
+  "label": "Data types",
+  "introducedBy": "module-02",
+  "gloss": "a number and the text of a number are different things; arithmetic on text glues characters together instead of adding",
+  "why": "Capture and copy-paste hand flows text that looks like numbers: \"500\", \"$1,220.00\". In JSON the quotes make it text, and text plus a number is string concatenation: \"500\" + 25 is \"50025\", and \"$1,220.00\" + 30 is not 1250. At Beacon, that turns a clean invoice into a quantity mismatch and a wrong variance. Fixing the types at the edge is cheaper than debugging every step after.",
+  "cue": "when a total looks like digits mashed together, or a comparison that should be true is false, look at the quotes",
+  "sample": {
+    "sources": [
+      {
+        "id": "inbox",
+        "label": "Invoice Inbox",
+        "labelField": "invoiceNumber",
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "poNumber",
+          "quantity",
+          "freeGoods",
+          "invoiceTotal",
+          "freight"
+        ]
+      }
+    ],
+    "stores": [
+      {
+        "id": "po-register",
+        "label": "PO Register",
+        "keyField": "poNumber",
+        "owner": "Procurement Lead",
+        "fields": [
+          "poNumber",
+          "vendorId",
+          "quantityOrdered",
+          "poTotal"
+        ]
+      }
+    ],
+    "owners": [
+      "AP Clerk",
+      "Procurement Lead"
+    ],
+    "day": {
+      "sources": {
+        "inbox": [
+          {
+            "invoiceNumber": "INV-1",
+            "vendorId": "V-1",
+            "poNumber": "PO-1",
+            "quantity": 500,
+            "freeGoods": 25,
+            "invoiceTotal": 1220,
+            "freight": 30
+          }
+        ]
+      },
+      "seeds": {
+        "po-register": [
+          {
+            "poNumber": "PO-1",
+            "vendorId": "V-1",
+            "quantityOrdered": 525,
+            "poTotal": 1230
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "inbox",
+        "mode": "event",
+        "at": ""
+      }
+    },
+    {
+      "kind": "lookup",
+      "config": {
+        "store": "po-register",
+        "matchOn": [
+          {
+            "recordField": "poNumber",
+            "storeField": "poNumber"
+          }
+        ],
+        "as": "po",
+        "mode": "one"
+      }
+    },
+    {
+      "kind": "transform",
+      "config": {
+        "set": [
+          {
+            "field": "unitsBilled",
+            "expr": "quantity + freeGoods"
+          },
+          {
+            "field": "qtyMatch",
+            "expr": "unitsBilled == po.quantityOrdered"
+          },
+          {
+            "field": "amountDue",
+            "expr": "invoiceTotal + freight"
+          },
+          {
+            "field": "variance",
+            "expr": "amountDue - po.poTotal"
+          }
+        ]
+      }
+    }
+  ],
+  "task": "The transform adds quantity + freeGoods and invoiceTotal + freight, and both come out wrong. Fix the record so the numbers are numbers: unitsBilled should be 525 (matching the PO) and variance should be 20.",
+  "add": {
+    "kind": "json"
+  },
+  "solution": {
+    "record": {
+      "invoiceNumber": "INV-1",
+      "vendorId": "V-1",
+      "poNumber": "PO-1",
+      "quantity": 500,
+      "freeGoods": 25,
+      "invoiceTotal": 1220,
+      "freight": 30
+    }
+  },
+  "brokenRecord": {
+    "invoiceNumber": "INV-1",
+    "vendorId": "V-1",
+    "poNumber": "PO-1",
+    "quantity": "500",
+    "freeGoods": 25,
+    "invoiceTotal": "$1,220.00",
+    "freight": 30
+  },
+  "notes": [
+    "Numbers are bare: 500 not \"500\"; 1220 not \"$1,220.00\" (no quotes, no currency sign, no thousands comma).",
+    "Text + number glues characters: \"500\" + 25 is \"50025\".",
+    "Text stays quoted: \"INV-1\", \"PO-1\". true and false are bare words.",
+    "Run it after each fix and read the transform note in the trace."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "recordField",
+      "where": {
+        "invoiceNumber": "INV-1"
+      },
+      "field": "variance",
+      "equals": 20,
+      "label": "INV-1 variance is 20 (1220 + 30 freight - 1230 PO)",
+      "why": "only works once invoiceTotal is a number"
+    },
+    {
+      "id": "c2",
+      "kind": "recordField",
+      "where": {
+        "invoiceNumber": "INV-1"
+      },
+      "field": "qtyMatch",
+      "equals": true,
+      "label": "INV-1 qtyMatch is true (500 + 25 = 525 ordered)",
+      "why": "only works once quantity is a number"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "float(), int(), string() expressions; the 'Parse JSON' schema declares each field's type",
+    "powerAppsCopilot": "Value() and Text() in Power Fx; Dataverse column types (Whole number, Currency, Text)",
+    "make": "parseNumber() and the type badge on each mapping pill (text vs number)",
+    "n8n": "Number() in an expression, or the Set node's type column; Convert to Number",
+    "zapier": "Formatter > Numbers (Format Number, Perform Math); text fields vs number fields",
+    "python": "int(), float(); \"500\" is a str and 500 is an int - \"500\" + 25 raises, \"500\" + \"25\" is \"50025\"",
+    "langgraph": "the state schema (TypedDict / pydantic) that types each field and rejects the wrong one"
+  }
+}

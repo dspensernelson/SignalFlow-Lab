@@ -1,0 +1,129 @@
+{
+  "id": "lists",
+  "kind": "waypoint",
+  "exercise": "add-step",
+  "label": "Lists",
+  "introducedBy": "module-02",
+  "gloss": "a list is many rows under one name; you count it, total it, or walk it one row at a time",
+  "why": "A one-row lookup gives you an object; a whole-table lookup gives you a list (an array). You cannot read batch.invoiceTotal off a list - which row would it mean - but you can count it with len(batch), total a column with sum(batch, 'invoiceTotal'), or walk it with {{#each batch}} in a compose. At Beacon, the 2:30 PM run needs exactly those: how many invoices, how much, and one line each.",
+  "cue": "if a field holds [3 rows], reach for len, sum, or each - not a dotted path",
+  "sample": {
+    "sources": [],
+    "stores": [
+      {
+        "id": "payment-batch",
+        "label": "Payment Batch",
+        "daily": true,
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "invoiceTotal"
+        ]
+      }
+    ],
+    "owners": [
+      "AP Clerk",
+      "AP Manager",
+      "Payables DL"
+    ],
+    "day": {
+      "sources": {},
+      "seeds": {
+        "payment-batch": [
+          {
+            "invoiceNumber": "INV-1",
+            "vendorId": "V-1",
+            "invoiceTotal": 1220
+          },
+          {
+            "invoiceNumber": "INV-2",
+            "vendorId": "V-2",
+            "invoiceTotal": 980
+          },
+          {
+            "invoiceNumber": "INV-3",
+            "vendorId": "V-1",
+            "invoiceTotal": 640
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "",
+        "mode": "schedule",
+        "at": "2:30 PM"
+      }
+    },
+    {
+      "kind": "lookup",
+      "config": {
+        "store": "payment-batch",
+        "matchOn": [],
+        "as": "batch",
+        "mode": "all"
+      }
+    }
+  ],
+  "task": "Summarize the batch: set count to the number of rows in batch and total to the sum of their invoiceTotal.",
+  "add": {
+    "kind": "transform"
+  },
+  "solution": {
+    "kind": "transform",
+    "config": {
+      "set": [
+        {
+          "field": "count",
+          "expr": "len(batch)"
+        },
+        {
+          "field": "total",
+          "expr": "sum(batch, 'invoiceTotal')"
+        }
+      ]
+    }
+  },
+  "notes": [
+    "len(batch) - how many rows the list has.",
+    "sum(batch, 'invoiceTotal') - add up one column across the rows (column name in quotes).",
+    "In a compose, {{#each batch}} ... {{/each}} repeats once per row.",
+    "A list shows as [3 rows] in the trace; an object shows as {...}."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "recordField",
+      "where": {
+        "runId": "day-1-run"
+      },
+      "field": "count",
+      "equals": 3,
+      "label": "count is 3 (three invoices in the batch)"
+    },
+    {
+      "id": "c2",
+      "kind": "recordField",
+      "where": {
+        "runId": "day-1-run"
+      },
+      "field": "total",
+      "equals": 2840,
+      "label": "total is 2840 (1220 + 980 + 640)"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "an array: 'Apply to each' to walk it, length() to count, 'Create HTML table' to render it",
+    "powerAppsCopilot": "a table in Power Fx: CountRows(), Sum(table, column), ForAll()",
+    "make": "an array (or a set of bundles): Iterator to walk it, Array aggregator / Numeric aggregator to count and sum",
+    "n8n": "items - each row is one item; Aggregate or Summarize nodes to count and sum, Loop Over Items to walk",
+    "zapier": "line items; Formatter > Utilities (Line Itemizer), Looping by Zapier to walk them",
+    "python": "a list of dicts: len(rows), sum(r['invoiceTotal'] for r in rows), for r in rows",
+    "langgraph": "a list in state; loop over it in a node, or Send() to fan out one task per row"
+  }
+}

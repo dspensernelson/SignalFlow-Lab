@@ -51,6 +51,19 @@ function nodeClasses(status, type) {
   return 'border-sf-border bg-sf-surface-subtle text-sf-muted'
 }
 
+// World-view phase status: complete if every covered node is complete, ready
+// if any is ready, else locked/context.
+function phaseStatusFrom(phase, statusById) {
+  const ids = phase.nodeIds || []
+  const sts = ids.map((id) => statusById[id]).filter(Boolean)
+  if (sts.length === 0) return STATUS.CONTEXT
+  const covered = sts.filter((st) => st !== STATUS.CONTEXT)
+  if (covered.length === 0) return STATUS.CONTEXT
+  if (covered.every((st) => st === STATUS.COMPLETE)) return STATUS.COMPLETE
+  if (covered.some((st) => st === STATUS.READY || st === STATUS.IN_PROGRESS)) return STATUS.READY
+  return STATUS.LOCKED
+}
+
 const PHASE_DOT_VAR = {
   [STATUS.READY]: 'var(--sf-ready)',
   [STATUS.IN_PROGRESS]: 'var(--sf-progress)',
@@ -102,6 +115,10 @@ export default function WorkflowGraph({
   onStart,
   onContinue,
   onViewArtifact,
+  // World-view mode: status and actions come from the builder's progress
+  // instead of the worksheet progress model.
+  statusById: statusOverride = null,
+  actionFor = null,
 }) {
   const containerRef = useRef(null)
   const [scale, setScale] = useState(1)
@@ -117,7 +134,8 @@ export default function WorkflowGraph({
   }, [])
 
   const byId = Object.fromEntries(nodes.map((n) => [n.id, n]))
-  const statusById = Object.fromEntries(nodes.map((n) => [n.id, deriveNodeStatus(n, progress)]))
+  const statusById = statusOverride || Object.fromEntries(nodes.map((n) => [n.id, deriveNodeStatus(n, progress)]))
+  const worldMode = Boolean(statusOverride)
   // Node positions in stage space (offset below the phase header band).
   const pos = Object.fromEntries(nodes.map((n) => [n.id, { x: n.x, y: n.y + HEADER_H }]))
 
@@ -140,7 +158,7 @@ export default function WorkflowGraph({
             if (!colNode) return null
             const left = colNode.x - REGION_PAD
             const related = phase.id === relatedPhaseId
-            const phaseStatus = derivePhaseStatus(phase, progress)
+            const phaseStatus = worldMode ? phaseStatusFrom(phase, statusById) : derivePhaseStatus(phase, progress)
             const bg = related
               ? 'var(--sf-phase-band-sel)'
               : i % 2 === 0
@@ -253,12 +271,17 @@ export default function WorkflowGraph({
             if (selected) ring = 'ring-2 ring-offset-2 ring-offset-sf-surface ring-sf-ring'
             else if (isDown) ring = 'ring-2 ring-offset-1 ring-offset-sf-surface ring-sf-type-artifact'
             else if (isUp) ring = 'ring-2 ring-offset-1 ring-offset-sf-surface ring-sf-type-source'
-            const buildable = isBuildable(node)
+            const worldAction = worldMode && actionFor ? actionFor(node) : null
+            const buildable = worldMode ? Boolean(worldAction) : isBuildable(node)
             // Playable nodes always stay legible: relationship-dimming only applies
             // to non-playable context nodes, so a buildable lesson never looks disabled.
             const dimmed = !related && !buildable
             let action = null
-            if (buildable && status === STATUS.READY) {
+            if (worldMode) {
+              if (worldAction && !worldAction.disabled) {
+                action = { label: worldAction.label, run: worldAction.onClick, cls: status === STATUS.COMPLETE ? 'bg-sf-complete text-white hover:opacity-90' : 'bg-sf-accent text-white hover:bg-sf-accent-hover' }
+              }
+            } else if (buildable && status === STATUS.READY) {
               action = { label: 'Start lesson', run: () => onStart(node.id), cls: 'bg-sf-accent text-white hover:bg-sf-accent-hover' }
             } else if (buildable && status === STATUS.IN_PROGRESS) {
               action = { label: 'Continue', run: () => onContinue(node.id), cls: 'bg-sf-progress text-white hover:opacity-90' }

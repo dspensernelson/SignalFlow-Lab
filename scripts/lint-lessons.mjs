@@ -97,6 +97,9 @@ for (const p of registry) {
     medium: extractTierIds(block, 'medium'),
     hard: extractTierIds(block, 'hard'),
   }
+  // A project with no BUILT_LESSONS block has been ported to runnable flows
+  // (src/data/flows/<id>.json); its lessons and canon are no longer linted here.
+  if (!tierIds.easy.length && !tierIds.medium.length && !tierIds.hard.length) continue
   PROJECTS.push({ id: p.id, nodes, canon, tierIds })
   for (const tier of ['easy', 'medium', 'hard']) {
     tierIds[tier].forEach((lid) => { lessonToProject[lid] = p.id })

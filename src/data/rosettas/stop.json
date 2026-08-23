@@ -1,0 +1,214 @@
+{
+  "id": "stop",
+  "kind": "rosetta",
+  "exercise": "add-step",
+  "label": "Stop",
+  "introducedBy": "module-02",
+  "gloss": "end this record here; nothing after this step runs for it",
+  "why": "Lanes rejoin. A record that goes down the YES lane of a condition comes back out and keeps running the steps after the condition, unless something ends it. A stop ends the record where it stands. At Beacon, a duplicate invoice is parked in the Exception Queue in the YES lane - but without a stop it rejoins and is also written to the Payment Batch, so the duplicate gets paid anyway.",
+  "cue": "if a hold lane does not end with a stop, the held record still flows into whatever comes after the condition",
+  "sample": {
+    "sources": [
+      {
+        "id": "inbox",
+        "label": "Invoice Inbox",
+        "labelField": "invoiceNumber",
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "poNumber",
+          "invoiceTotal"
+        ]
+      }
+    ],
+    "stores": [
+      {
+        "id": "payment-history",
+        "label": "Payment History",
+        "keyField": "invoiceNumber",
+        "owner": "AP Clerk",
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "invoiceTotal",
+          "paidOn"
+        ]
+      },
+      {
+        "id": "payment-batch",
+        "label": "Payment Batch",
+        "daily": true,
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "invoiceTotal"
+        ]
+      },
+      {
+        "id": "exception-queue",
+        "label": "Exception Queue",
+        "daily": true,
+        "fields": [
+          "invoiceNumber",
+          "reason"
+        ]
+      }
+    ],
+    "owners": [
+      "AP Clerk",
+      "Procurement Lead"
+    ],
+    "day": {
+      "sources": {
+        "inbox": [
+          {
+            "invoiceNumber": "INV-1",
+            "vendorId": "V-1",
+            "poNumber": "PO-1",
+            "invoiceTotal": 1220
+          },
+          {
+            "invoiceNumber": "INV-9",
+            "vendorId": "V-1",
+            "poNumber": "PO-9",
+            "invoiceTotal": 640
+          }
+        ]
+      },
+      "seeds": {
+        "payment-history": [
+          {
+            "invoiceNumber": "INV-9",
+            "vendorId": "V-1",
+            "invoiceTotal": 640,
+            "paidOn": "day-0"
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "inbox",
+        "mode": "event",
+        "at": ""
+      }
+    },
+    {
+      "kind": "lookup",
+      "config": {
+        "store": "payment-history",
+        "matchOn": [
+          {
+            "recordField": "invoiceNumber",
+            "storeField": "invoiceNumber"
+          }
+        ],
+        "as": "priorPayment",
+        "mode": "one"
+      }
+    },
+    {
+      "kind": "condition",
+      "config": {
+        "rules": [
+          {
+            "left": "priorPayment",
+            "op": "exists",
+            "right": "",
+            "rightKind": "value"
+          }
+        ],
+        "combine": "all"
+      },
+      "branches": {
+        "yes": [
+          {
+            "kind": "store",
+            "config": {
+              "store": "exception-queue",
+              "from": "",
+              "mode": "append",
+              "key": ""
+            }
+          }
+        ],
+        "no": []
+      }
+    },
+    {
+      "kind": "store",
+      "config": {
+        "store": "payment-batch",
+        "from": "",
+        "mode": "append",
+        "key": ""
+      }
+    }
+  ],
+  "task": "INV-9 was already paid. It is held in the Exception Queue, but it still reaches the Payment Batch. End the duplicate in the YES lane so only INV-1 is paid.",
+  "add": {
+    "kind": "stop"
+  },
+  "solution": {
+    "kind": "stop",
+    "config": {},
+    "placement": {
+      "lane": "yes",
+      "conditionIndex": 2,
+      "index": 1,
+      "path": [
+        "2",
+        "yes"
+      ]
+    }
+  },
+  "notes": [
+    "Stop goes at the end of the YES lane, after the Exception Queue write.",
+    "After a stop, nothing else runs for that record - the steps after the condition are skipped.",
+    "Other records (INV-1, NO lane) are not affected; they rejoin and are paid."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "storeMissing",
+      "store": "payment-batch",
+      "where": {
+        "invoiceNumber": "INV-9"
+      },
+      "why": "it was already paid on day-0",
+      "label": "INV-9 (duplicate) is NOT in the Payment Batch"
+    },
+    {
+      "id": "c2",
+      "kind": "storeContains",
+      "store": "exception-queue",
+      "where": {
+        "invoiceNumber": "INV-9"
+      },
+      "label": "INV-9 is held in the Exception Queue"
+    },
+    {
+      "id": "c3",
+      "kind": "storeContains",
+      "store": "payment-batch",
+      "where": {
+        "invoiceNumber": "INV-1"
+      },
+      "label": "INV-1 (clean) is still paid"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "'Terminate' (Status: Succeeded) at the end of the branch",
+    "powerAppsCopilot": "End the topic / Exit() in Power Fx after the hold is recorded",
+    "make": "the route simply ends; use a Router so the hold route has no downstream modules",
+    "n8n": "leave the branch with no further connection, or a No Operation node that ends it",
+    "zapier": "the Path ends; no action follows the hold step on that path",
+    "python": "return (or continue to the next record) after writing the hold",
+    "langgraph": "an edge to END from the hold node"
+  }
+}

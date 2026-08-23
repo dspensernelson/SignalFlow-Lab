@@ -1,0 +1,156 @@
+{
+  "id": "json-record",
+  "kind": "waypoint",
+  "exercise": "json-edit",
+  "label": "A record is JSON",
+  "introducedBy": "module-02",
+  "gloss": "every record a flow carries is a set of named fields - and underneath, every tool stores it as JSON",
+  "why": "Whatever the tool calls it - dynamic content in Power Automate, a bundle in Make, an item in n8n, the data-out fields in Zapier, a dict in Python - the record a step receives is a JSON object: field names in quotes, values after colons. When a step misbehaves, reading that object as the step sees it is how you find out why. Here the PO lookup finds nothing for INV-1; the record will tell you why.",
+  "cue": "when a lookup or expression comes back empty, open the record and read the field names it actually has",
+  "sample": {
+    "sources": [
+      {
+        "id": "inbox",
+        "label": "Invoice Inbox",
+        "labelField": "invoiceNumber",
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "poNumber",
+          "invoiceTotal"
+        ]
+      }
+    ],
+    "stores": [
+      {
+        "id": "po-register",
+        "label": "PO Register",
+        "keyField": "poNumber",
+        "owner": "Procurement Lead",
+        "fields": [
+          "poNumber",
+          "vendorId",
+          "poTotal"
+        ]
+      }
+    ],
+    "owners": [
+      "AP Clerk",
+      "Procurement Lead"
+    ],
+    "day": {
+      "sources": {
+        "inbox": [
+          {
+            "invoiceNumber": "INV-1",
+            "vendorId": "V-1",
+            "poNumber": "PO-1",
+            "invoiceTotal": 1220
+          }
+        ]
+      },
+      "seeds": {
+        "po-register": [
+          {
+            "poNumber": "PO-1",
+            "vendorId": "V-1",
+            "poTotal": 1200
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "inbox",
+        "mode": "event",
+        "at": ""
+      }
+    },
+    {
+      "kind": "lookup",
+      "config": {
+        "store": "po-register",
+        "matchOn": [
+          {
+            "recordField": "poNumber",
+            "storeField": "poNumber"
+          }
+        ],
+        "as": "po",
+        "mode": "one"
+      }
+    },
+    {
+      "kind": "transform",
+      "config": {
+        "set": [
+          {
+            "field": "variance",
+            "expr": "invoiceTotal - po.poTotal"
+          }
+        ]
+      }
+    }
+  ],
+  "task": "The PO lookup matches on poNumber but comes back empty for INV-1. Read the record as it arrived, find the field the lookup needs, and fix the record so PO-1 is found and variance computes.",
+  "add": {
+    "kind": "json"
+  },
+  "solution": {
+    "record": {
+      "invoiceNumber": "INV-1",
+      "vendorId": "V-1",
+      "poNumber": "PO-1",
+      "invoiceTotal": 1220
+    }
+  },
+  "brokenRecord": {
+    "invoiceNumber": "INV-1",
+    "vendorId": "V-1",
+    "purchaseOrder": "PO-1",
+    "invoiceTotal": 1220
+  },
+  "notes": [
+    "Keys are always in double quotes: \"poNumber\", not poNumber.",
+    "Numbers are bare: 1220, not \"1220\" and not \"$1,220.00\".",
+    "Text is in double quotes; true, false and null are bare words.",
+    "Commas between fields, none after the last one; braces { } wrap an object, brackets [ ] wrap a list."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "recordField",
+      "where": {
+        "invoiceNumber": "INV-1"
+      },
+      "field": "po.poTotal",
+      "equals": 1200,
+      "label": "INV-1 carries its PO (poTotal 1200)",
+      "why": "the lookup reads record.poNumber - the field must have that exact name"
+    },
+    {
+      "id": "c2",
+      "kind": "recordField",
+      "where": {
+        "invoiceNumber": "INV-1"
+      },
+      "field": "variance",
+      "equals": 20,
+      "label": "INV-1 variance is 20"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "dynamic content / 'Parse JSON' - the trigger output body is this object",
+    "powerAppsCopilot": "a record in Power Fx ({ poNumber: \"PO-1\", ... }) or a Dataverse row",
+    "make": "a bundle - the output panel of each module shows the fields",
+    "n8n": "an item ({ \"json\": { ... } }) - the output panel shows it as table or JSON",
+    "zapier": "the 'Data out' fields shown when you test a step",
+    "python": "a dict (json.loads of the payload)",
+    "langgraph": "the state object (a TypedDict) passed from node to node"
+  }
+}

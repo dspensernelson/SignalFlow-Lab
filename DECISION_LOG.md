@@ -2,6 +2,70 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-08-23 (P0 of the runnable-flows plan: Beacon opens the product)
+
+- OWNER (2026-08-22/23): "this is insane, I love it, needs some cleaning up."
+  Approved plan (docs: ~/.claude/plans, summarized in README "Runnable flows"):
+  every module as runnable flows; Beacon first; a "rosetta" micro-build gates
+  each concept just in time; builder is home; map = world view; worksheets
+  retire module by module; order Beacon, Harbor, Meridian, then 04-10; all ten
+  in scope. Also: keep genuine JSON/literacy learning as WAYPOINTS (must-learn
+  gates), not as the whole thing.
+- BUILT (P0): concept runner (src/runtime/concepts.js) - a rosetta or
+  waypoint is data the SAME engine runs as a one-build module; 12 Beacon
+  rosettas + 4 waypoints (json-record, fields-and-paths, data-types, lists);
+  ConceptScreen (sample, one step to add / settings / JSON editor, checks,
+  the same step in every tool); build.requires gates builds; concept progress
+  is global (signalflow_concepts). ModuleIntro (who / what arrives / tables /
+  what you owe / days). Build briefs: outcome + constraints + narrative goal,
+  no step lists. Graduated hints: question -> nudge -> steps; hintsUsed and
+  assisted recorded on the pass. World view: the canvas map lit from
+  builds[].mapNodes (nodeStatusFromBuilds), node panel links to builds.
+  Builder is the default view; ModuleSwitch in the shell; Beacon's 43
+  worksheet lessons, registry, lessonMeta, and fixtures deleted; lint-map
+  and lint-glossary accept flow modules; scripts/lint-flows.mjs added to
+  `npm run check`; JSON views in the run panel; field/function pickers;
+  flow export (flow.json, Python, build sheet).
+- NOT YET: module-02 canon.json assertions are no longer linted (lint-lessons
+  skips ported modules); port them to lint-flows with the next module. The
+  map's "Build it"/welcome modal remain on the worksheet canvas for modules
+  01/03 until they port.
+- CHECKPOINT QUESTION for the owner: open the app cold. Do you know what you
+  are using and where you are before you click a hint? Does "Ask me a
+  question" feel like thinking, not instructions?
+
+## 2026-08-22 (reimagine: runnable-flows slice on feat/runnable-flows)
+
+- CONTEXT: REIMAGINE_BRIEF.md (owner, same day) said the product's one verb
+  (validateAnswer == author's value) makes every lesson a worksheet and that
+  the learner never runs anything. It named four capabilities - assemble, run,
+  break and fix, flip the tool skin - and told the next session to treat the
+  governance docs as evidence, not law.
+- DECIDED (builder, on a branch, for the owner to react to): replace the
+  validation seam with a deterministic in-browser flow runtime. A learner
+  assembles typed steps into a flow, runs it on a day of scenario data, and a
+  build passes when the desk's acceptance checks hold on the run. Modules are
+  days (clean -> messy -> failure), not tiers. Spec: docs/superpowers/specs/
+  2026-08-22-runnable-flows-design.md.
+- BUILT: src/runtime (expression evaluator, engine with per-record trace and
+  failure injection, checks with trace-citing explanations, five tool skins,
+  Python codegen), src/builder (rail/line/code views, step editor, run replay,
+  checks/data/settings panels), Beacon module data (3 days, 6 builds, 37
+  checks) and a reference solution. `npm run test:runtime` (31 tests) joins
+  `npm run check`; golden tests prove the reference passes every build and
+  that the Day 1 flow fails Day 2 (pays INV-58962 and INV-59004).
+- SEMANTICS CHOSEN: condition branches rejoin (Power Automate / n8n style) and
+  a Stop step ends a record; working queues (payment batch, exception queue)
+  reset daily while history carries forward; lookup in all-rows mode with no
+  match fields means the whole table.
+- KEPT (owner decisions, defaulted to "keep"): local-first, no backend,
+  deterministic, no AI. NOT TOUCHED: the 129 worksheet lessons, the tier
+  system, the map, the lints. The no-scroll rule does not apply to the builder.
+- OPEN FOR THE OWNER: does the slice feel like building an automation; module
+  order; whether tiers become days everywhere; whether the worksheet path is
+  retired once modules 1 and 3 are ported.
+- NOT SELF-MERGED: PR opened as the review artifact per AUTONOMY_CHARTER.
+
 ## 2026-08-22 (PR #8 merged; production deploy verified; local main realigned)
 
 - MERGED PR #8 to main (a1d52d0): the ecosystem literacy work, the Operations

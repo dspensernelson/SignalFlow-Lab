@@ -1,0 +1,108 @@
+{
+  "id": "approval",
+  "kind": "rosetta",
+  "exercise": "add-step",
+  "label": "Approval",
+  "introducedBy": "module-02",
+  "gloss": "a person decides, and the reply is captured as a record",
+  "why": "Some decisions belong to a person, and the automation is not done when it asks - it is done when the answer is on the record. An approval names the approver and what they are deciding, and writes their reply back as approval.outcome. At Beacon, the AP Manager approves the payment run at 2:30 PM, and the next step gates on that outcome.",
+  "cue": "if a human has to say yes, the automation is not done at 'sent' - it is done when the answer is stored",
+  "sample": {
+    "sources": [],
+    "stores": [
+      {
+        "id": "payment-batch",
+        "label": "Payment Batch",
+        "daily": true,
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "invoiceTotal"
+        ]
+      }
+    ],
+    "owners": [
+      "AP Clerk",
+      "AP Manager",
+      "Payables DL"
+    ],
+    "day": {
+      "sources": {},
+      "seeds": {
+        "payment-batch": [
+          {
+            "invoiceNumber": "INV-1",
+            "vendorId": "V-1",
+            "invoiceTotal": 1220
+          },
+          {
+            "invoiceNumber": "INV-2",
+            "vendorId": "V-2",
+            "invoiceTotal": 980
+          }
+        ]
+      },
+      "approvals": {
+        "AP Manager": {
+          "outcome": "approved",
+          "at": "2:30 PM"
+        }
+      },
+      "failures": []
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "",
+        "mode": "schedule",
+        "at": "2:30 PM"
+      }
+    }
+  ],
+  "task": "Ask the AP Manager to approve the payment run, and capture the reply on the run record.",
+  "add": {
+    "kind": "approval"
+  },
+  "solution": {
+    "kind": "approval",
+    "config": {
+      "approver": "AP Manager",
+      "about": "payment run"
+    }
+  },
+  "notes": [
+    "Approver: the named person; About: what they are deciding.",
+    "The reply lands on the record as approval = { by, outcome, at, about }.",
+    "No reply is captured as outcome \"no-reply\" - a later condition should treat that as not approved."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "runStatus",
+      "flowId": "concept",
+      "equals": "succeeded",
+      "label": "The run succeeds"
+    },
+    {
+      "id": "c2",
+      "kind": "recordField",
+      "where": {
+        "runId": "day-1-run"
+      },
+      "field": "approval.outcome",
+      "equals": "approved",
+      "label": "The AP Manager approved (approval.outcome = approved)"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "'Start and wait for an approval', then write the outcome",
+    "powerAppsCopilot": "an approval card in a Copilot Studio topic, or a Power Apps review screen",
+    "make": "a webhook-response pattern, or an approval-app module",
+    "n8n": "a Wait node paired with a Form or Webhook resume",
+    "zapier": "a delayed step plus a form submission that resumes the Zap",
+    "python": "write a pending record and poll for the reply; never block on input",
+    "langgraph": "a human-in-the-loop interrupt on the graph"
+  }
+}

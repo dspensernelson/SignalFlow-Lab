@@ -1,0 +1,184 @@
+{
+  "id": "operate-retry",
+  "kind": "rosetta",
+  "exercise": "settings",
+  "label": "Retry and failure policy",
+  "introducedBy": "module-02",
+  "gloss": "when a step fails, try again a few times; if it still fails, park the record where someone will see it",
+  "why": "A flow that works on a clean day still meets a rotated token or a slow server. Retries give a transient failure a second chance; the failure policy says what happens if it never recovers. Skip drops the record silently. Dead-letter parks it and alerts an owner. At Beacon, the PO Register rejects the connection once on Day 3; with retries the lookup recovers, and with dead-letter nothing can vanish unnoticed.",
+  "cue": "a failure nobody sees is the worst outcome; a retry count and a dead-letter are the two settings that stop it",
+  "sample": {
+    "sources": [
+      {
+        "id": "inbox",
+        "label": "Invoice Inbox",
+        "labelField": "invoiceNumber",
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "poNumber",
+          "invoiceTotal"
+        ]
+      }
+    ],
+    "stores": [
+      {
+        "id": "po-register",
+        "label": "PO Register",
+        "keyField": "poNumber",
+        "owner": "Procurement Lead",
+        "fields": [
+          "poNumber",
+          "vendorId",
+          "poTotal"
+        ]
+      },
+      {
+        "id": "payment-batch",
+        "label": "Payment Batch",
+        "daily": true,
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "invoiceTotal"
+        ]
+      },
+      {
+        "id": "dead-letter",
+        "label": "Dead Letter",
+        "daily": true,
+        "fields": [
+          "recordLabel",
+          "cause"
+        ]
+      }
+    ],
+    "owners": [
+      "AP Clerk",
+      "Procurement Lead"
+    ],
+    "day": {
+      "sources": {
+        "inbox": [
+          {
+            "invoiceNumber": "INV-1",
+            "vendorId": "V-1",
+            "poNumber": "PO-1",
+            "invoiceTotal": 1220
+          }
+        ]
+      },
+      "seeds": {
+        "po-register": [
+          {
+            "poNumber": "PO-1",
+            "vendorId": "V-1",
+            "poTotal": 1200
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": [
+        {
+          "stepKind": "lookup",
+          "store": "po-register",
+          "cause": "auth-expired",
+          "failAttempts": 1,
+          "message": "the PO register rejected the connection token (it was rotated overnight)"
+        }
+      ]
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "inbox",
+        "mode": "event",
+        "at": ""
+      }
+    },
+    {
+      "kind": "lookup",
+      "config": {
+        "store": "po-register",
+        "matchOn": [
+          {
+            "recordField": "poNumber",
+            "storeField": "poNumber"
+          }
+        ],
+        "as": "po",
+        "mode": "one"
+      }
+    },
+    {
+      "kind": "store",
+      "config": {
+        "store": "payment-batch",
+        "from": "",
+        "mode": "append",
+        "key": ""
+      }
+    }
+  ],
+  "task": "The PO Register rejects the first call today. Set the flow so the lookup recovers on a retry, and so a record that never recovers is parked in dead-letter with an alert instead of being dropped.",
+  "add": {
+    "kind": "settings"
+  },
+  "solution": {
+    "settings": {
+      "retries": 3,
+      "onFailure": "dead-letter"
+    }
+  },
+  "notes": [
+    "Retries: how many extra attempts a failing step gets before the flow gives up (1 to 5 is sane).",
+    "On failure - skip: the record is dropped and nobody is told.",
+    "On failure - dead-letter: the record is parked in dead-letter and the on-call owner is alerted.",
+    "On failure - retry-forever: the run hangs until someone notices."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "runStatus",
+      "flowId": "concept",
+      "equals": "succeeded",
+      "label": "The flow succeeds despite the failed first call"
+    },
+    {
+      "id": "c2",
+      "kind": "stepRetried",
+      "flowId": "concept",
+      "stepKind": "lookup",
+      "store": "po-register",
+      "label": "The PO lookup recovered on a retry"
+    },
+    {
+      "id": "c3",
+      "kind": "settingEquals",
+      "flowId": "concept",
+      "path": "onFailure",
+      "equals": "dead-letter",
+      "label": "On failure: dead-letter and alert"
+    },
+    {
+      "id": "c4",
+      "kind": "settingInRange",
+      "flowId": "concept",
+      "path": "retries",
+      "min": 1,
+      "max": 5,
+      "label": "Retries are set between 1 and 5"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "action Settings > Retry Policy (count, interval); 'Configure run after' on a failure branch that writes a list row and sends an alert; run history",
+    "powerAppsCopilot": "retry policy on the connector actions behind the app; the failure branch writes a Dataverse row and notifies; flow run history",
+    "make": "a module Error handler (Break / Resume / Ignore) plus the scenario's consecutive-errors setting; Incomplete executions act as the dead-letter",
+    "n8n": "node Settings > Retry On Fail (Max Tries, Wait Between Tries) and an Error Workflow; the Executions list",
+    "zapier": "Autoreplay on errors; Zap History shows Held and Errored tasks for someone to replay",
+    "python": "retry with backoff (tenacity), then write the record to a dead-letter table and page on-call",
+    "langgraph": "a RetryPolicy on the node plus a checkpointer; interrupt or alert when retries are exhausted"
+  }
+}

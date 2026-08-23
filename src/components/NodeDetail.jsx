@@ -140,6 +140,9 @@ export default function NodeDetail({
   onContinue,
   onViewArtifact,
   onRestart,
+  // World-view mode: { builds: [...], passed: {}, onOpenBuild } replaces the
+  // lesson action zone with links to the builds that make this node.
+  world = null,
 }) {
   if (!node) {
     return (
@@ -149,14 +152,16 @@ export default function NodeDetail({
     )
   }
 
-  const buildable = isBuildable(node)
-  const lesson = node.lesson
+  const buildable = world ? world.builds.length > 0 : isBuildable(node)
+  const lesson = world ? null : node.lesson
   const isComplete = status === STATUS.COMPLETE
   const accent = isComplete && node.type === 'artifact' ? 'var(--sf-artifact-trusted)' : TYPE_COLOR[node.type] || '#9ca3af'
   // Right-side badge: progress status when buildable, otherwise lesson maturity.
-  const rightBadge = buildable
-    ? STATUS_BADGE[status] || STATUS_BADGE[STATUS.LOCKED]
-    : LESSON_STATUS[lesson?.status] || LESSON_STATUS.later
+  const rightBadge = world
+    ? STATUS_BADGE[status] || STATUS_BADGE[STATUS.CONTEXT]
+    : buildable
+      ? STATUS_BADGE[status] || STATUS_BADGE[STATUS.LOCKED]
+      : LESSON_STATUS[lesson?.status] || LESSON_STATUS.later
 
   const feedsInto = edges
     .filter((e) => e.from === node.id)
@@ -193,13 +198,30 @@ export default function NodeDetail({
 
       {/* Action zone — kept at the top so the primary action is always visible */}
       <div className="border-b border-sf-border-subtle pb-2">
-        {buildable && status === STATUS.READY && (
+        {world && world.builds.length > 0 && (
+          <div className="flex flex-col gap-1">
+            <SectionLabel size="xs">Built in</SectionLabel>
+            {world.builds.map((b) => {
+              const rec = world.passed[b.id]
+              return (
+                <button key={b.id} type="button" onClick={() => world.onOpenBuild(b.id)} className="flex items-center justify-between gap-2 rounded-lg border border-sf-border bg-sf-surface-subtle px-2 py-1 text-left hover:border-sf-accent-border">
+                  <span className="truncate text-[11px] font-medium text-sf-text">{b.title}</span>
+                  <span className={`flex-none rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase ${rec ? (rec.assisted ? 'bg-sf-warning-weak text-sf-progress-text' : 'bg-sf-complete-weak text-sf-complete-text') : 'bg-sf-surface-inset text-sf-muted'}`}>{rec ? (rec.assisted ? 'assisted' : 'passed') : 'open'}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
+        {world && world.builds.length === 0 && (
+          <p className="rounded-lg bg-sf-surface-subtle px-2.5 py-1.5 text-[11px] leading-snug text-sf-body">Context: the flow reads or feeds this; no build makes it directly.</p>
+        )}
+        {!world && buildable && status === STATUS.READY && (
           <Button variant="primary" size="sm" fullWidth iconRight="arrow-right" onClick={() => onStart(node.id)}>
             Start lesson
           </Button>
         )}
 
-        {buildable && status === STATUS.IN_PROGRESS && (
+        {!world && buildable && status === STATUS.IN_PROGRESS && (
           <div className="flex gap-2">
             <Button variant="warning" size="sm" className="flex-1" onClick={() => onContinue(node.id)}>
               Continue lesson
@@ -210,7 +232,7 @@ export default function NodeDetail({
           </div>
         )}
 
-        {buildable && status === STATUS.COMPLETE && (
+        {!world && buildable && status === STATUS.COMPLETE && (
           <div className="flex gap-2">
             <Button variant="success" size="sm" className="flex-1" onClick={() => onViewArtifact(node.id)}>
               View artifact
@@ -221,7 +243,7 @@ export default function NodeDetail({
           </div>
         )}
 
-        {buildable && status === STATUS.LOCKED && (
+        {!world && buildable && status === STATUS.LOCKED && (
           <p className="rounded-lg bg-sf-surface-subtle px-2.5 py-1.5 text-[11px] leading-snug text-sf-body">
             Locked — the board opens up as you build.
             {unlockAfterLabels.length > 0
@@ -230,7 +252,7 @@ export default function NodeDetail({
           </p>
         )}
 
-        {!buildable && lesson && (
+        {!world && !buildable && lesson && (
           <p className="rounded-lg bg-sf-surface-subtle px-2.5 py-1.5 text-[11px] leading-snug text-sf-body">
             {lesson.status === 'intent'
               ? `${capitalize(lesson.type)} lesson — intent is defined; the interaction is coming in a later pass.`

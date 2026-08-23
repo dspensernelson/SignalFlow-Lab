@@ -1,0 +1,110 @@
+{
+  "id": "lookup-all",
+  "kind": "rosetta",
+  "exercise": "add-step",
+  "label": "Lookup (all rows)",
+  "introducedBy": "module-02",
+  "gloss": "read every matching row from a store as a list, not just the first one",
+  "why": "A one-row lookup answers \"which PO does this invoice bill against\". A daily run needs the other question: \"everything in the batch\". Lookup in mode all returns a list of rows and attaches it to the record under one name. At Beacon, the 2:30 PM run reads the whole Payment Batch as batch, then counts it, totals it, and lists it in the run document.",
+  "cue": "if the next step needs a count, a total, or a line per row, you need all the rows, not the first match",
+  "sample": {
+    "sources": [],
+    "stores": [
+      {
+        "id": "payment-batch",
+        "label": "Payment Batch",
+        "daily": true,
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "invoiceTotal"
+        ]
+      }
+    ],
+    "owners": [
+      "AP Clerk",
+      "AP Manager",
+      "Payables DL"
+    ],
+    "day": {
+      "sources": {},
+      "seeds": {
+        "payment-batch": [
+          {
+            "invoiceNumber": "INV-1",
+            "vendorId": "V-1",
+            "invoiceTotal": 1220
+          },
+          {
+            "invoiceNumber": "INV-2",
+            "vendorId": "V-2",
+            "invoiceTotal": 980
+          },
+          {
+            "invoiceNumber": "INV-3",
+            "vendorId": "V-1",
+            "invoiceTotal": 640
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "",
+        "mode": "schedule",
+        "at": "2:30 PM"
+      }
+    }
+  ],
+  "task": "Collect the day: read every row of the Payment Batch and attach the list to the run as batch.",
+  "add": {
+    "kind": "lookup"
+  },
+  "solution": {
+    "kind": "lookup",
+    "config": {
+      "store": "payment-batch",
+      "matchOn": [],
+      "as": "batch",
+      "mode": "all"
+    }
+  },
+  "notes": [
+    "Mode: all. With no match fields, every row in the store is returned.",
+    "The result is a list (3 rows here), not a single row - batch.invoiceNumber means nothing; batch is the whole list.",
+    "Mode one with no match fields is an error; mode all is how you read a whole table."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "runStatus",
+      "flowId": "concept",
+      "equals": "succeeded",
+      "label": "The run succeeds"
+    },
+    {
+      "id": "c2",
+      "kind": "recordField",
+      "where": {
+        "runId": "day-1-run"
+      },
+      "field": "batch",
+      "exists": true,
+      "label": "The run carries batch (the list of Payment Batch rows)"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "'Get items' with no Top Count (optionally a Filter Query) - the output value is an array",
+    "powerAppsCopilot": "Filter() or a whole table reference in Power Fx; a table variable in Copilot Studio",
+    "make": "Data store > Search Records with Limit: all (output is a set of bundles; Array aggregator to make one list)",
+    "n8n": "Get row(s) with Return All on - every row becomes an item",
+    "zapier": "Find Records (plural) returning line items",
+    "python": "a SELECT or a list comprehension that returns a list of dicts",
+    "langgraph": "a retrieval tool that returns a list into graph state"
+  }
+}

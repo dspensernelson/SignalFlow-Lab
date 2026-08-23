@@ -1,0 +1,127 @@
+{
+  "id": "lookup",
+  "kind": "rosetta",
+  "exercise": "add-step",
+  "label": "Lookup",
+  "introducedBy": "module-02",
+  "gloss": "read the governed rule, reference table, or history the run needs",
+  "why": "A record rarely carries everything the run needs to decide. A lookup reads a table the run does not own - the PO Register, the Vendor Master, a tolerance policy - and attaches the matching row to the record. At Beacon, INV-1 says it bills against PO-1; the lookup fetches PO-1 so the flow can see what was actually agreed.",
+  "cue": "when a number or rule is about to be hardcoded in a step, that is a lookup waiting to happen - move it out where it can be owned and changed",
+  "sample": {
+    "sources": [
+      {
+        "id": "inbox",
+        "label": "Invoice Inbox",
+        "labelField": "invoiceNumber",
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "poNumber",
+          "invoiceTotal"
+        ]
+      }
+    ],
+    "stores": [
+      {
+        "id": "po-register",
+        "label": "PO Register",
+        "keyField": "poNumber",
+        "owner": "Procurement Lead",
+        "fields": [
+          "poNumber",
+          "vendorId",
+          "poTotal"
+        ]
+      }
+    ],
+    "owners": [
+      "AP Clerk",
+      "Procurement Lead"
+    ],
+    "day": {
+      "sources": {
+        "inbox": [
+          {
+            "invoiceNumber": "INV-1",
+            "vendorId": "V-1",
+            "poNumber": "PO-1",
+            "invoiceTotal": 1220
+          }
+        ]
+      },
+      "seeds": {
+        "po-register": [
+          {
+            "poNumber": "PO-1",
+            "vendorId": "V-1",
+            "poTotal": 1200
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "inbox",
+        "mode": "event",
+        "at": ""
+      }
+    }
+  ],
+  "task": "Attach the purchase order INV-1 bills against: read the PO Register where the PO number matches, and name the result po.",
+  "add": {
+    "kind": "lookup"
+  },
+  "solution": {
+    "kind": "lookup",
+    "config": {
+      "store": "po-register",
+      "matchOn": [
+        {
+          "recordField": "poNumber",
+          "storeField": "poNumber"
+        }
+      ],
+      "as": "po",
+      "mode": "one"
+    }
+  },
+  "notes": [
+    "Match on: which field of the record equals which column of the store.",
+    "The result is attached to the record under the name you give it (as).",
+    "No match is not an error - the field is set to null, and a later step can test for that."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "runStatus",
+      "flowId": "concept",
+      "equals": "succeeded",
+      "label": "The flow runs"
+    },
+    {
+      "id": "c2",
+      "kind": "recordField",
+      "where": {
+        "invoiceNumber": "INV-1"
+      },
+      "field": "po.poTotal",
+      "equals": 1200,
+      "label": "INV-1 carries its PO (poTotal 1200)",
+      "why": "the lookup matched PO-1 in the PO Register and attached it as po"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "'Get items' from a SharePoint config list, or an Environment Variable",
+    "powerAppsCopilot": "a Dataverse table read, or a Copilot Studio variable from a knowledge source",
+    "make": "a Search / Get module against a data store",
+    "n8n": "a database or Read node, or Workflow Static Data",
+    "zapier": "a 'Find Record' search step, or Storage by Zapier",
+    "python": "load a config file or query a table into a dict",
+    "langgraph": "a retrieval tool call, or config read from graph state"
+  }
+}

@@ -37,7 +37,7 @@ function projectNodes(project) {
   return getProjectData(hasProjectData(project) ? project : loadProject()).nodes
 }
 function projectLessonMeta(project) {
-  return getProjectData(hasProjectData(project) ? project : loadProject()).lessonMeta
+  return getProjectData(hasProjectData(project) ? project : loadProject()).lessonMeta || { LESSON_PATH: [], LESSON_PREREQS: {} }
 }
 
 // Tier is persisted per project. Module 1 keeps the legacy unsuffixed key.

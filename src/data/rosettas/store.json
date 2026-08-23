@@ -1,0 +1,158 @@
+{
+  "id": "store",
+  "kind": "rosetta",
+  "exercise": "add-step",
+  "label": "Store",
+  "introducedBy": "module-02",
+  "gloss": "write it, retain it, and let it seed the next run",
+  "why": "A run that only computes and forgets leaves nothing behind. A store writes the record (or a list on it) into a table another step, another flow, or tomorrow can read. At Beacon, the invoice flow writes each clean invoice to the Payment Batch; the 2:30 PM run then reads that batch, and the history it writes is what catches duplicates the next day.",
+  "cue": "if nobody can answer 'what did we do last time', the loop was never closed; retention is what makes tomorrow's run cheaper",
+  "sample": {
+    "sources": [
+      {
+        "id": "inbox",
+        "label": "Invoice Inbox",
+        "labelField": "invoiceNumber",
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "poNumber",
+          "invoiceTotal"
+        ]
+      }
+    ],
+    "stores": [
+      {
+        "id": "po-register",
+        "label": "PO Register",
+        "keyField": "poNumber",
+        "owner": "Procurement Lead",
+        "fields": [
+          "poNumber",
+          "vendorId",
+          "poTotal"
+        ]
+      },
+      {
+        "id": "payment-batch",
+        "label": "Payment Batch",
+        "daily": true,
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "invoiceTotal"
+        ]
+      }
+    ],
+    "owners": [
+      "AP Clerk",
+      "Procurement Lead"
+    ],
+    "day": {
+      "sources": {
+        "inbox": [
+          {
+            "invoiceNumber": "INV-1",
+            "vendorId": "V-1",
+            "poNumber": "PO-1",
+            "invoiceTotal": 1220
+          }
+        ]
+      },
+      "seeds": {
+        "po-register": [
+          {
+            "poNumber": "PO-1",
+            "vendorId": "V-1",
+            "poTotal": 1200
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "inbox",
+        "mode": "event",
+        "at": ""
+      }
+    },
+    {
+      "kind": "lookup",
+      "config": {
+        "store": "po-register",
+        "matchOn": [
+          {
+            "recordField": "poNumber",
+            "storeField": "poNumber"
+          }
+        ],
+        "as": "po",
+        "mode": "one"
+      }
+    },
+    {
+      "kind": "transform",
+      "config": {
+        "set": [
+          {
+            "field": "variance",
+            "expr": "invoiceTotal - po.poTotal"
+          }
+        ]
+      }
+    }
+  ],
+  "task": "Keep the result: write INV-1, with its variance, into the Payment Batch.",
+  "add": {
+    "kind": "store"
+  },
+  "solution": {
+    "kind": "store",
+    "config": {
+      "store": "payment-batch",
+      "from": "",
+      "mode": "append",
+      "key": ""
+    }
+  },
+  "notes": [
+    "Append writes the whole record as one row; everything attached so far (po, variance) goes with it.",
+    "Upsert with a key replaces a row that already has that key.",
+    "From: write a list field (for example batch) as many rows instead of the record as one."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "storeContains",
+      "store": "payment-batch",
+      "where": {
+        "invoiceNumber": "INV-1"
+      },
+      "fields": {
+        "variance": 20
+      },
+      "label": "INV-1 is in the Payment Batch with variance 20"
+    },
+    {
+      "id": "c2",
+      "kind": "storeCount",
+      "store": "payment-batch",
+      "equals": 1,
+      "label": "The Payment Batch has exactly one row"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "'Create file' in SharePoint, or 'Add a new row' in Dataverse",
+    "powerAppsCopilot": "a Dataverse write from the app or topic",
+    "make": "a Google Drive / Data store module on the tail of the scenario",
+    "n8n": "a database Insert node, or Write Binary File",
+    "zapier": "a 'Create Record' action into Airtable, Sheets, or Storage",
+    "python": "write the artifact to disk or a table with a run id",
+    "langgraph": "a checkpointer write, or persisted thread state"
+  }
+}

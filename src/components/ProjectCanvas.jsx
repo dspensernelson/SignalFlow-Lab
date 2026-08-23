@@ -170,6 +170,8 @@ export default function ProjectCanvas({
   onViewArtifact,
   onReset,
   onRestartNode,
+  flowModuleIds = [],
+  onBuild,
 }) {
   const activeProject = projects?.find((p) => p.id === project)
   const projectName = activeProject?.name || 'Meridian Morning Market Brief'
@@ -301,6 +303,11 @@ export default function ProjectCanvas({
               {projectClock}
             </span>
             {onTierChange && <TierSwitch value={tier} onChange={onTierChange} />}
+            {onBuild && flowModuleIds.includes(project) && (
+              <Button variant="primary" size="sm" icon="circle-play" onClick={() => onBuild(project)} title="Build this workflow as a runnable flow">
+                Build it
+              </Button>
+            )}
             <ThemeToggle value={theme} onChange={onToggleTheme} />
             <Button
               variant="neutral"
