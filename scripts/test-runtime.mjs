@@ -196,7 +196,7 @@ await test('engine: happy path trace, branch, stores, outbox', () => {
   eq(rec.final.variance, 20)
   eq(rec.final.band, 25)
   eq(rec.final.prior, null)
-  eq(rec.terminal, { type: 'store', target: 'history' })
+  eq(rec.terminal, { type: 'store', target: 'history', stopped: false })
   eq(res.stores.batch.length, 1)
   eq(res.stores.history.length, 2)
   eq(res.outbox.length, 0)
@@ -215,7 +215,7 @@ await test('engine: no-branch records send and the note is legible', () => {
   eq(res.outbox[0].to, 'Procurement Lead')
   eq(res.outbox[0].subject, 'Held INV-1')
   eq(res.outbox[0].body, 'variance 20')
-  eq(rec.terminal, { type: 'store', target: 'held' })
+  eq(rec.terminal, { type: 'store', target: 'held', stopped: false })
 })
 
 await test('engine: transform shows null with missing path; bad expr fails the step', () => {
@@ -306,6 +306,167 @@ await test('engine: renderTemplate', () => {
   eq(eng.renderTemplate('Hi {{name}} {{missing}}!', { name: 'A' }), 'Hi A !')
   eq(eng.renderTemplate('{{ total * 2 }}', { total: 3 }), '6')
   eq(eng.renderTemplate('{{#each rows}}[{{n}}]{{/each}}', { rows: [{ n: 1 }, { n: 2 }] }), '[1][2]')
+})
+
+// ============================================================ checks
+const chk = await imp('src/runtime/checks.js')
+
+await test('checks: store/record/outbox/status kinds with legible detail', () => {
+  const s1 = eng.createDayState(MOD, 'd1')
+  const rr = eng.runDay([refFlow()], s1)
+  const results = chk.evaluateChecks(
+    [
+      { id: 'a', kind: 'storeContains', store: 'batch', where: { invoiceNumber: 'INV-1' }, label: 'paid' },
+      { id: 'b', kind: 'storeMissing', store: 'held', where: { invoiceNumber: 'INV-1' }, label: 'not held' },
+      { id: 'c', kind: 'storeCount', store: 'batch', equals: 1, label: 'one' },
+      { id: 'd', kind: 'storeSum', store: 'batch', field: 'total', equals: 1220, label: 'sum' },
+      { id: 'e', kind: 'recordField', where: { invoiceNumber: 'INV-1' }, field: ['nope.x', 'po.poTotal'], equals: 1200, label: 'po' },
+      { id: 'f', kind: 'outboxContains', to: 'Procurement Lead', label: 'sent', count: 0 },
+      { id: 'g', kind: 'runStatus', flowId: 'main', equals: 'succeeded', label: 'ok' },
+      { id: 'h', kind: 'storeMissing', store: 'batch', where: { invoiceNumber: 'INV-1' }, why: 'it is a test', label: 'should fail' },
+      { id: 'i', kind: 'storeContains', store: 'held', where: { invoiceNumber: 'INV-1' }, label: 'should fail too' },
+      { id: 'j', kind: 'settingEquals', flowId: 'main', path: 'onFailure', equals: 'dead-letter', label: 'policy' },
+      { id: 'k', kind: 'settingInRange', flowId: 'main', path: 'retries', min: 1, max: 5, label: 'retries' },
+    ],
+    rr,
+    s1,
+    [refFlow()]
+  )
+  const byId = Object.fromEntries(results.map((r) => [r.id, r]))
+  for (const id of ['a', 'b', 'c', 'd', 'e', 'f', 'g']) ok(byId[id].passed, `${id}: ${byId[id].detail}`)
+  ok(!byId.h.passed)
+  ok(byId.h.detail.includes('INV-1 IS in batch - it is a test') && byId.h.detail.includes('Path: trigger -> lookup(po-register)'))
+  ok(!byId.i.passed)
+  ok(byId.i.detail.includes('it was written to history'))
+  ok(!byId.j.passed && byId.j.detail.includes('expected "dead-letter"'))
+  ok(!byId.k.passed && byId.k.detail.includes('between 1 and 5'))
+})
+
+await test('checks: fieldsContain, stepRetried, alertSent', () => {
+  const s1 = eng.createDayState(MOD, 'd1')
+  const d1 = eng.runFlow(refFlow(), s1)
+  const s2 = eng.createDayState(MOD, 'd2', d1.stores)
+  const rr = eng.runDay([refFlow({ ...fm.defaultSettings(), retries: 1 })], s2)
+  const results = chk.evaluateChecks(
+    [
+      { id: 'a', kind: 'stepRetried', stepKind: 'lookup', store: 'po-register', label: 'retried' },
+      { id: 'b', kind: 'alertSent', label: 'alert' },
+    ],
+    rr,
+    s2,
+    []
+  )
+  ok(results[0].passed && results[0].detail.includes('recovered on attempt 2'))
+  ok(!results[1].passed)
+  const rr0 = eng.runDay([refFlow({ ...fm.defaultSettings(), onFailure: 'dead-letter' })], s2)
+  const r2 = chk.evaluateChecks([{ id: 'b', kind: 'alertSent', label: 'alert' }], rr0, s2, [])
+  ok(r2[0].passed)
+})
+
+// ============================================================ skins + codegen
+const { SKINS, getSkin } = await imp('src/runtime/skins/index.js')
+const { renderPython } = await imp('src/runtime/codegen/python.js')
+
+await test('skins: every skin describes every kind; palettes differ by tool', () => {
+  eq(SKINS.map((s) => s.id), ['lab', 'powerAutomate', 'make', 'n8n', 'zapier', 'python'])
+  for (const skin of SKINS) {
+    for (const kind of fm.STEP_KINDS) {
+      const d = skin.describe(fm.createStep(kind), { moduleData: MOD })
+      ok(d && typeof d.title === 'string' && d.title.length > 0, `${skin.id}/${kind} title`)
+      ok(typeof skin.paletteLabel(kind) === 'string' && skin.paletteLabel(kind).length > 0, `${skin.id}/${kind} palette`)
+    }
+  }
+  ok(getSkin('powerAutomate').paletteLabel('transform') !== getSkin('lab').paletteLabel('transform'))
+  ok(getSkin('make').describe(fm.createStep('condition'), {}).title.includes('Router'))
+  eq(getSkin('nope').id, 'lab')
+})
+
+// ============================================================ Beacon golden
+const MOD2 = JSON.parse(readFileSync(path.join(root, 'src/data/flows/module-02.json'), 'utf8'))
+const { referenceFlowsFor, REFERENCE_BUILD_IDS } = await imp('src/data/flows/module-02.reference.js')
+
+function runBuild(flowsMap, build) {
+  const flows = Object.values(flowsMap)
+  const all = eng.runModule(flows, MOD2, build.dayId)
+  const dayRes = all.byDay[build.dayId]
+  return chk.evaluateChecks(build.checks, dayRes, dayRes.dayState, flows)
+}
+const failing = (results) => results.filter((r) => !r.passed).map((r) => `${r.id}: ${r.detail}`).join('\n    ')
+
+await test('golden: module-02 data is well-formed', () => {
+  eq(MOD2.builds.map((b) => b.id), REFERENCE_BUILD_IDS)
+  for (const b of MOD2.builds) {
+    ok(MOD2.days.some((d) => d.id === b.dayId), `${b.id} day`)
+    ok(MOD2.flows.some((f) => f.id === b.flowId), `${b.id} flow`)
+    ok(b.checks.length > 0 && b.hints.length > 0 && b.goal, `${b.id} content`)
+    for (const c of b.checks) ok(chk.CHECK_KINDS.includes(c.kind), `${b.id}/${c.id} kind ${c.kind}`)
+  }
+})
+
+for (const build of MOD2.builds) {
+  await test(`golden: reference passes ${build.id} (${build.title})`, () => {
+    const results = runBuild(referenceFlowsFor(build.id), build)
+    ok(chk.allPassed(results), `\n    ${failing(results)}`)
+  })
+}
+
+await test('golden: the Day 1 flow (b3) FAILS Day 2 - it pays the duplicate and the unknown vendor', () => {
+  const b4 = MOD2.builds.find((b) => b.id === 'b4')
+  const results = runBuild(referenceFlowsFor('b3'), b4)
+  ok(!chk.allPassed(results))
+  const byId = Object.fromEntries(results.map((r) => [r.id, r]))
+  ok(!byId['b4-dup-not-paid'].passed && byId['b4-dup-not-paid'].detail.includes('INV-58962 IS in payment-batch'))
+  ok(!byId['b4-vendor-not-paid'].passed)
+  ok(byId['b4-paid'].passed)
+  ok(byId['b4-price-not-paid'].passed)
+})
+
+await test('golden: the b5 flow with zero retries FAILS Day 3; b6 settings recover it', () => {
+  const b6 = MOD2.builds.find((b) => b.id === 'b6')
+  const results = runBuild(referenceFlowsFor('b5'), b6)
+  const byId = Object.fromEntries(results.map((r) => [r.id, r]))
+  ok(!byId['b6-run'].passed && !byId['b6-paid'].passed && !byId['b6-retry'].passed)
+  ok(byId['b6-paid'].detail.includes('dropped silently'))
+  ok(chk.allPassed(runBuild(referenceFlowsFor('b6'), b6)))
+})
+
+await test('golden: each reference level still passes the earlier builds of its day', () => {
+  const b1 = MOD2.builds.find((b) => b.id === 'b1')
+  const b4 = MOD2.builds.find((b) => b.id === 'b4')
+  ok(chk.allPassed(runBuild(referenceFlowsFor('b3'), b1)))
+  ok(chk.allPassed(runBuild(referenceFlowsFor('b6'), b4)))
+})
+
+await test('codegen: python renders the reference flow and compiles', async () => {
+  const flow = referenceFlowsFor('b6')['invoice-flow']
+  const code = renderPython(flow, MOD2)
+  ok(code.includes('def process_invoice_intake_and_match(rec, stores, outbox, approvals):'))
+  ok(code.includes('rec["variance"] = rec["invoiceTotal"] - g(rec, "po.poTotal")'))
+  ok(code.includes('if (rec["priorPayment"] is not None):'))
+  ok(code.includes('return  # Stop'))
+  ok(code.includes('for rec in sources["invoice-inbox"]:'))
+  const run = renderPython(referenceFlowsFor('b6')['run-flow'], MOD2)
+  ok(run.includes('for row in rec["batch"] or []:'))
+  const { execFileSync } = await import('node:child_process')
+  const { writeFileSync, mkdtempSync } = await import('node:fs')
+  const os = await import('node:os')
+  let python = null
+  for (const cand of ['python3', 'python']) {
+    try {
+      execFileSync(cand, ['--version'], { stdio: 'ignore' })
+      python = cand
+      break
+    } catch {
+      // try next
+    }
+  }
+  if (!python) return
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'sf-py-'))
+  for (const [name, src] of [['invoice.py', code], ['run.py', run]]) {
+    const f = path.join(dir, name)
+    writeFileSync(f, src)
+    execFileSync(python, ['-c', `import ast,sys; ast.parse(open(sys.argv[1]).read())`, f], { stdio: 'pipe' })
+  }
 })
 
 // ============================================================ summary

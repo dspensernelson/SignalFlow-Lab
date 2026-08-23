@@ -7,7 +7,7 @@
 // [stepId, 'yes'] is the yes-branch of the condition with that id. Lists can
 // nest (a condition inside a branch), so paths can be longer: [id1,'no',id2,'yes'].
 
-export const STEP_KINDS = ['trigger', 'lookup', 'transform', 'condition', 'approval', 'send', 'compose', 'store']
+export const STEP_KINDS = ['trigger', 'lookup', 'transform', 'condition', 'approval', 'send', 'compose', 'store', 'stop']
 
 export const CONDITION_OPS = ['==', '!=', '<', '<=', '>', '>=', 'exists', 'missing', 'contains']
 
@@ -35,6 +35,8 @@ export function defaultConfig(kind) {
       return { template: '', as: 'body' }
     case 'store':
       return { store: '', from: '', mode: 'append', key: '' }
+    case 'stop':
+      return {}
     default:
       return {}
   }
@@ -199,6 +201,7 @@ export const KIND_LABEL = {
   send: 'Send',
   compose: 'Compose',
   store: 'Store',
+  stop: 'Stop',
 }
 
 export const KIND_GLOSS = {
@@ -210,4 +213,5 @@ export const KIND_GLOSS = {
   send: 'notify, route, or deliver to a person or queue',
   compose: 'assemble the deliverable from the record',
   store: 'write it, retain it, let it seed the next run',
+  stop: 'end this record here; nothing after this step runs for it',
 }

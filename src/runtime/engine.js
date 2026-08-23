@@ -142,8 +142,17 @@ export function createDayState(moduleData, dayId, carriedStores = {}) {
 
 // ------------------------------------------------------------- engine core
 
-function makeNote(parts) {
-  return parts.filter(Boolean).join('; ')
+// Where a record ended up: the last successful store/send, unless it failed.
+function finishTerminal(rt) {
+  if (rt.terminal) return
+  for (let i = rt.steps.length - 1; i >= 0; i -= 1) {
+    const s = rt.steps[i]
+    if (s.status === 'succeeded' && (s.kind === 'store' || s.kind === 'send')) {
+      rt.terminal = { type: s.kind, target: s.target, stopped: !!rt.stopped }
+      return
+    }
+  }
+  rt.terminal = { type: 'end', stopped: !!rt.stopped }
 }
 
 export function runFlow(flow, dayState) {
@@ -161,7 +170,7 @@ export function runFlow(flow, dayState) {
   }
 
   // Records the trigger emits.
-  let seeds = []
+  let seeds
   if (trigger.config.mode === 'schedule') {
     seeds = [{ record: { runId: `${dayState.dayId}-run`, scheduledAt: trigger.config.at || '', day: dayState.dayId }, label: `Scheduled run ${trigger.config.at || ''}`.trim() }]
   } else {
@@ -181,12 +190,7 @@ export function runFlow(flow, dayState) {
     rt.steps.push({ stepId: trigger.id, kind: 'trigger', status: 'succeeded', note: trigger.config.mode === 'schedule' ? `fired at ${trigger.config.at || 'schedule'}` : `arrived in ${dayState.sources[trigger.config.source].label}` })
     const record = seed.record
     runList(flow.steps.slice(1), record, rt, ctx)
-    if (!rt.terminal) {
-      const last = rt.steps[rt.steps.length - 1]
-      if (last && last.kind === 'store' && last.status === 'succeeded') rt.terminal = { type: 'store', target: last.target }
-      else if (last && last.kind === 'send' && last.status === 'succeeded') rt.terminal = { type: 'send', target: last.target }
-      else rt.terminal = { type: 'end' }
-    }
+    finishTerminal(rt)
     rt.final = clone(record)
     trace.records.push(rt)
   }
@@ -197,7 +201,9 @@ export function runFlow(flow, dayState) {
   return { trace, stores, outbox, alerts }
 }
 
-// Execute a list of steps against a record; returns true if the record reached a terminal state.
+// Execute a list of steps against a record. Returns true if the record is done
+// (it failed, or hit a Stop); false if it reached the end of the list and the
+// caller should continue with whatever follows (branches rejoin).
 function runList(steps, record, rt, ctx) {
   for (const step of steps) {
     const entry = { stepId: step.id, kind: step.kind, status: 'succeeded', note: '' }
@@ -229,17 +235,15 @@ function runList(steps, record, rt, ctx) {
       rt.terminal = { type: 'failed', target: step.id }
       return true
     }
+    if (result.stop) {
+      rt.stopped = true
+      return true
+    }
     if (step.kind === 'condition') {
       const list = step.branches ? step.branches[result.branch] || [] : []
       const done = runList(list, record, rt, ctx)
-      // Branches are terminal: whatever the branch did, the record stops here.
-      if (!done && !rt.terminal) {
-        const last = rt.steps[rt.steps.length - 1]
-        if (last && last.kind === 'store' && last.status === 'succeeded') rt.terminal = { type: 'store', target: last.target }
-        else if (last && last.kind === 'send' && last.status === 'succeeded') rt.terminal = { type: 'send', target: last.target }
-        else rt.terminal = { type: 'end', branch: result.branch, conditionId: step.id }
-      }
-      return true
+      if (done) return true
+      // Branches rejoin: the record continues with the steps after the condition.
     }
   }
   return false
@@ -284,13 +288,14 @@ function execStep(step, record, rt, ctx) {
       const rows = ctx.stores[c.store]
       if (!rows) return { status: 'failed', note: `store "${c.store}" does not exist` }
       const pairs = (c.matchOn || []).filter((p) => p.recordField && p.storeField)
-      if (pairs.length === 0) return { status: 'failed', note: 'no match fields set - which field of the record matches which column?' }
       const as = c.as || c.store
-      const matches = rows.filter((row) => pairs.every((p) => looseEq(getPath(record, p.recordField), getPath(row, p.storeField))))
-      const keyDesc = pairs.map((p) => `${p.recordField}=${fmt(getPath(record, p.recordField))}`).join(', ')
+      if (pairs.length === 0 && c.mode !== 'all') return { status: 'failed', note: 'no match fields set - which field of the record matches which column?' }
+      const leftVals = pairs.map((p) => recordValue(record, p.recordField))
+      const matches = rows.filter((row) => pairs.every((p, i) => looseEq(leftVals[i], getPath(row, p.storeField))))
+      const keyDesc = pairs.map((p, i) => `${p.recordField}=${fmt(leftVals[i])}`).join(', ')
       if (c.mode === 'all') {
         record[as] = clone(matches)
-        return { status: 'succeeded', note: `${matches.length} row${matches.length === 1 ? '' : 's'} from ${c.store} -> ${as}`, target: c.store }
+        return { status: 'succeeded', note: `${matches.length} row${matches.length === 1 ? '' : 's'} from ${c.store}${pairs.length ? ` where ${keyDesc}` : ''} -> ${as}`, target: c.store }
       }
       if (matches.length === 0) {
         record[as] = null
@@ -369,6 +374,9 @@ function execStep(step, record, rt, ctx) {
       return { status: 'succeeded', note: `${as} = ${record[as].length} chars` }
     }
 
+    case 'stop':
+      return { status: 'succeeded', note: 'stopped here - nothing after this runs for this record', stop: true }
+
     case 'store': {
       if (!c.store) return { status: 'failed', note: 'no store chosen' }
       if (!ctx.stores[c.store]) ctx.stores[c.store] = []
@@ -394,6 +402,17 @@ function execStep(step, record, rt, ctx) {
 
     default:
       return { status: 'failed', note: `unknown step kind "${step.kind}"` }
+  }
+}
+
+// A lookup's record-side value: a field path, or a literal/expression like '1.0.0'.
+function recordValue(record, src) {
+  const direct = getPath(record, src)
+  if (direct !== undefined) return direct
+  try {
+    return evalExpr(src, record)
+  } catch {
+    return undefined
   }
 }
 
