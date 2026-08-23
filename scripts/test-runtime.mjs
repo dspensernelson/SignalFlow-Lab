@@ -98,9 +98,219 @@ await test('expr: paths + python', () => {
   eq(exprToPython('(a + b) * c'), '(rec["a"] + rec["b"]) * rec["c"]')
 })
 
+// ============================================================ flowModel
+const fm = await imp('src/runtime/flowModel.js')
+const eng = await imp('src/runtime/engine.js')
+
+await test('flowModel: create/insert/update/remove/move are immutable', () => {
+  const t = fm.createStep('trigger', { source: 'inbox' }, 't1')
+  const l = fm.createStep('lookup', { store: 'po', matchOn: [{ recordField: 'po', storeField: 'po' }] }, 'l1')
+  const c = fm.createStep('condition', {}, 'c1')
+  let flow = fm.createFlow({ id: 'f', moduleId: 'm', name: 'F', steps: [t] })
+  const f2 = fm.insertStep(flow, [], 1, l)
+  ok(flow.steps.length === 1 && f2.steps.length === 2)
+  const f3 = fm.insertStep(f2, [], 2, c)
+  const s = fm.createStep('store', { store: 'batch' }, 's1')
+  const f4 = fm.insertStep(f3, ['c1', 'yes'], 0, s)
+  eq(fm.getList(f4, ['c1', 'yes']).map((x) => x.id), ['s1'])
+  eq(fm.findStep(f4, 's1').path, ['c1', 'yes'])
+  eq(fm.stepCount(f4), 4)
+  const f5 = fm.updateStep(f4, 's1', { config: { store: 'held' } })
+  eq(fm.findStep(f5, 's1').step.config.store, 'held')
+  eq(fm.findStep(f4, 's1').step.config.store, 'batch')
+  const f6 = fm.removeStep(f5, 'l1')
+  eq(f6.steps.map((x) => x.id), ['t1', 'c1'])
+  const f7 = fm.moveStep(f3, 'c1', -1)
+  eq(f7.steps.map((x) => x.id), ['t1', 'c1', 'l1'])
+  eq(fm.moveStep(f3, 't1', -1).steps.map((x) => x.id), ['t1', 'l1', 'c1'])
+})
+
+// ---- a tiny module for engine tests
+const MOD = {
+  moduleId: 'test',
+  sources: [{ id: 'inbox', label: 'Inbox', labelField: 'invoiceNumber' }],
+  stores: [
+    { id: 'po-register', label: 'PO Register', keyField: 'poNumber' },
+    { id: 'history', label: 'History', keyField: 'invoiceNumber' },
+    { id: 'batch', label: 'Batch', daily: true },
+    { id: 'held', label: 'Held' },
+  ],
+  days: [
+    {
+      id: 'd1',
+      label: 'Day 1',
+      sources: { inbox: [{ invoiceNumber: 'INV-1', poNumber: 'PO-1', total: 1220 }] },
+      seeds: { 'po-register': [{ poNumber: 'PO-1', poTotal: 1200 }], history: [{ invoiceNumber: 'INV-0', total: 5 }] },
+      approvals: { 'AP Manager': { outcome: 'approved', at: '2:30 PM' } },
+      failures: [],
+    },
+    {
+      id: 'd2',
+      label: 'Day 2',
+      sources: { inbox: [{ invoiceNumber: 'INV-2', poNumber: 'PO-2', total: 100 }, { invoiceNumber: 'INV-1', poNumber: 'PO-1', total: 1220 }] },
+      seeds: { 'po-register': [{ poNumber: 'PO-2', poTotal: 100 }] },
+      failures: [{ stepKind: 'lookup', store: 'po-register', cause: 'auth-expired', failAttempts: 1, message: 'token rejected' }],
+    },
+  ],
+}
+
+function refFlow(settings) {
+  return fm.createFlow({
+    id: 'main',
+    moduleId: 'test',
+    name: 'main',
+    settings: settings || fm.defaultSettings(),
+    steps: [
+      fm.createStep('trigger', { source: 'inbox' }, 't'),
+      fm.createStep('lookup', { store: 'po-register', matchOn: [{ recordField: 'poNumber', storeField: 'poNumber' }], as: 'po' }, 'l'),
+      fm.createStep('lookup', { store: 'history', matchOn: [{ recordField: 'invoiceNumber', storeField: 'invoiceNumber' }], as: 'prior' }, 'lh'),
+      fm.createStep('transform', { set: [{ field: 'variance', expr: 'total - po.poTotal' }, { field: 'band', expr: 'max(po.poTotal * 0.02, 25)' }] }, 'x'),
+      {
+        ...fm.createStep('condition', { rules: [{ left: 'variance', op: '<=', right: 'band', rightKind: 'field' }, { left: 'prior', op: 'missing' }], combine: 'all' }, 'c'),
+        branches: {
+          yes: [fm.createStep('store', { store: 'batch' }, 'sb'), fm.createStep('store', { store: 'history' }, 'sh')],
+          no: [fm.createStep('send', { to: 'Procurement Lead', subject: 'Held {{invoiceNumber}}', body: 'variance {{variance}}' }, 'sn'), fm.createStep('store', { store: 'held' }, 'sx')],
+        },
+      },
+    ],
+  })
+}
+
+await test('engine: day state merges seeds by keyField', () => {
+  const s1 = eng.createDayState(MOD, 'd1')
+  eq(s1.stores['po-register'].length, 1)
+  const s2 = eng.createDayState(MOD, 'd2', { ...s1.stores, history: [...s1.stores.history, { invoiceNumber: 'INV-1' }] })
+  eq(s2.stores['po-register'].map((r) => r.poNumber), ['PO-1', 'PO-2'])
+  eq(s2.stores.history.length, 2)
+  eq(s2.sources.inbox.rows.length, 2)
+})
+
+await test('engine: happy path trace, branch, stores, outbox', () => {
+  const state = eng.createDayState(MOD, 'd1')
+  const res = eng.runFlow(refFlow(), state)
+  const rec = res.trace.records[0]
+  eq(res.trace.status, 'succeeded')
+  eq(rec.label, 'INV-1')
+  eq(rec.steps.map((s) => s.kind), ['trigger', 'lookup', 'lookup', 'transform', 'condition', 'store', 'store'])
+  eq(rec.steps[4].branch, 'yes')
+  eq(rec.final.variance, 20)
+  eq(rec.final.band, 25)
+  eq(rec.final.prior, null)
+  eq(rec.terminal, { type: 'store', target: 'history' })
+  eq(res.stores.batch.length, 1)
+  eq(res.stores.history.length, 2)
+  eq(res.outbox.length, 0)
+  ok(rec.steps[1].note.includes('matched "PO-1"'))
+  ok(rec.steps[2].note.includes('no match'))
+  ok(rec.steps[4].note.includes('=> YES'))
+})
+
+await test('engine: no-branch records send and the note is legible', () => {
+  const state = eng.createDayState(MOD, 'd1')
+  const flow = refFlow()
+  flow.steps[3].config.set[1].expr = '1'
+  const res = eng.runFlow(flow, state)
+  const rec = res.trace.records[0]
+  eq(rec.steps[4].branch, 'no')
+  eq(res.outbox[0].to, 'Procurement Lead')
+  eq(res.outbox[0].subject, 'Held INV-1')
+  eq(res.outbox[0].body, 'variance 20')
+  eq(rec.terminal, { type: 'store', target: 'held' })
+})
+
+await test('engine: transform shows null with missing path; bad expr fails the step', () => {
+  const state = eng.createDayState(MOD, 'd1')
+  const flow = refFlow()
+  flow.steps[3].config.set[0].expr = 'total - po.nope'
+  let res = eng.runFlow(flow, state)
+  ok(res.trace.records[0].steps[3].note.includes('variance = null (po.nope missing)'))
+  flow.steps[3].config.set[0].expr = 'total -'
+  res = eng.runFlow(flow, state)
+  eq(res.trace.records[0].steps[3].status, 'failed')
+  eq(res.trace.records[0].terminal.type, 'failed')
+  eq(res.trace.status, 'failed')
+})
+
+await test('engine: missing trigger / missing source', () => {
+  const state = eng.createDayState(MOD, 'd1')
+  let res = eng.runFlow(fm.createFlow({ id: 'x', steps: [] }), state)
+  eq(res.trace.status, 'empty')
+  ok(res.trace.log[0].includes('No trigger'))
+  res = eng.runFlow(fm.createFlow({ id: 'x', steps: [fm.createStep('trigger', { source: 'nope' })] }), state)
+  ok(res.trace.log[0].includes('not connected'))
+})
+
+await test('engine: approval + compose + schedule trigger + store from array', () => {
+  const state = eng.createDayState(MOD, 'd1')
+  const day1 = eng.runFlow(refFlow(), state)
+  const runFlow = fm.createFlow({
+    id: 'run',
+    steps: [
+      fm.createStep('trigger', { mode: 'schedule', at: '2:30 PM' }),
+      fm.createStep('lookup', { store: 'batch', mode: 'all', as: 'batch', matchOn: [{ recordField: 'day', storeField: 'day' }] }),
+      fm.createStep('transform', { set: [{ field: 'count', expr: 'len(batch)' }, { field: 'total', expr: "sum(batch, 'total')" }] }),
+      fm.createStep('approval', { approver: 'AP Manager', about: 'payment run' }),
+      fm.createStep('compose', { template: 'Run {{day}}: {{count}} invoices, {{total}}\n{{#each batch}}- {{invoiceNumber}} {{total}}\n{{/each}}Approved: {{approval.outcome}}', as: 'doc' }),
+      fm.createStep('store', { store: 'history', from: 'batch' }),
+    ],
+  })
+  // lookup all with a non-matching pair would return nothing; use a matching trick: match on nothing -> we allow mode all to ignore pairs? No: require pairs. Use 'always' by matching day to day after tagging.
+  runFlow.steps[1].config.matchOn = [{ recordField: 'nothing', storeField: 'nothing' }]
+  const res = eng.runFlow(runFlow, { ...state, stores: day1.stores })
+  const rec = res.trace.records[0]
+  eq(rec.label, 'Scheduled run 2:30 PM')
+  eq(rec.final.count, 1)
+  eq(rec.final.total, 1220)
+  eq(rec.final.approval.outcome, 'approved')
+  ok(rec.final.doc.startsWith('Run d1: 1 invoices, 1220\n- INV-1 1220\nApproved: approved'))
+  eq(res.stores.history.length, 3)
+})
+
+await test('engine: failure injection - retries recover, zero retries fails, policy matters', () => {
+  const s1 = eng.createDayState(MOD, 'd1')
+  const d1 = eng.runFlow(refFlow(), s1)
+  const s2 = eng.createDayState(MOD, 'd2', d1.stores)
+  // zero retries, skip -> dropped silently
+  let res = eng.runFlow(refFlow(), s2)
+  eq(res.trace.status, 'failed')
+  eq(res.trace.records[0].terminal.type, 'dropped')
+  ok(res.trace.records[0].steps[1].note.includes('auth-expired'))
+  // zero retries, dead-letter -> failed but visible
+  res = eng.runFlow(refFlow({ ...fm.defaultSettings(), onFailure: 'dead-letter' }), s2)
+  eq(res.trace.records[0].terminal.handled, 'dead-letter')
+  eq(res.alerts.length, 2)
+  eq(res.stores['dead-letter'].length, 2)
+  // retries 2 -> recovers, attempt recorded, INV-1 is now a duplicate (in history) -> held
+  res = eng.runFlow(refFlow({ ...fm.defaultSettings(), retries: 2, onFailure: 'dead-letter' }), s2)
+  eq(res.trace.status, 'succeeded')
+  eq(res.trace.records[0].steps[1].attempt, 2)
+  ok(res.trace.records[0].steps[1].note.includes('recovered on attempt 2'))
+  const dup = res.trace.records.find((r) => r.label === 'INV-1')
+  eq(dup.terminal.target, 'held')
+  eq(res.stores.batch.map((r) => r.invoiceNumber), ['INV-2'])
+})
+
+await test('engine: runDay chains stores across flows; runModule carries days', () => {
+  const second = fm.createFlow({ id: 'second', steps: [fm.createStep('trigger', { mode: 'schedule', at: '3 PM' }), fm.createStep('lookup', { store: 'batch', mode: 'all', as: 'b', matchOn: [{ recordField: 'x', storeField: 'x' }] }), fm.createStep('store', { store: 'history', from: 'b' })] })
+  const s1 = eng.createDayState(MOD, 'd1')
+  const res = eng.runDay([refFlow(), second], s1)
+  eq(Object.keys(res.traces), ['main', 'second'])
+  eq(res.stores.history.length, 3)
+  const all = eng.runModule([refFlow({ ...fm.defaultSettings(), retries: 1 })], MOD, 'd2')
+  eq(Object.keys(all.byDay), ['d1', 'd2'])
+  eq(all.byDay.d2.status, 'succeeded')
+  eq(all.stores.held.length, 1)
+})
+
+await test('engine: renderTemplate', () => {
+  eq(eng.renderTemplate('Hi {{name}} {{missing}}!', { name: 'A' }), 'Hi A !')
+  eq(eng.renderTemplate('{{ total * 2 }}', { total: 3 }), '6')
+  eq(eng.renderTemplate('{{#each rows}}[{{n}}]{{/each}}', { rows: [{ n: 1 }, { n: 2 }] }), '[1][2]')
+})
+
 // ============================================================ summary
 console.log(`test:runtime - ${passed} passed, ${failed} failed`)
 for (const f of failures) {
-  console.log(`\nFAIL ${f.name}\n  ${f.error && f.error.stack ? f.error.stack.split('\n').slice(0, 4).join('\n  ') : f.error}`)
+  console.log(`\nFAIL ${f.name}\n  ${f.error && f.error.stack ? f.error.stack.split("\n").slice(0, 12).join('\n  ') : f.error}`)
 }
 if (failed > 0) process.exit(1)
