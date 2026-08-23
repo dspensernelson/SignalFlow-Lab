@@ -33,7 +33,7 @@ function InsertPoint({ open, onOpen, onPick, onCancel, skin, compact, kinds, all
 const pathKey = (path) => path.join('/')
 
 export default function FlowRail(props) {
-  const { flow, skin, ctx, selectedStepId, onSelectStep, insertAt, onOpenInsert, onPick, onCancelInsert, onChangeStep, onRemoveStep, onMoveStep, stepStatus, hasRun, replayStepId, fieldsFor, lockedIds, paletteKinds, allowTrigger, readOnly = false } = props
+  const { flow, skin, ctx, selectedStepId, onSelectStep, insertAt, onOpenInsert, onPick, onCancelInsert, onChangeStep, onRemoveStep, onMoveStep, stepStatus, hasRun, replayStepId, fieldsFor, lockedIds, paletteKinds, allowTrigger, readOnly = false, replayActive = false } = props
   let counter = 0
 
   function renderList(list, path, depth) {
@@ -71,6 +71,7 @@ export default function FlowRail(props) {
           visited={!!status}
           hasRun={hasRun}
           replaying={replayStepId === step.id}
+          replayActive={replayActive}
           onSelect={() => onSelectStep(selectedStepId === step.id ? null : step.id)}
           onChange={(patch) => onChangeStep(step.id, patch)}
           onRemove={locked ? null : () => onRemoveStep(step.id)}

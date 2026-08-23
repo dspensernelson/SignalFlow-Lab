@@ -13,7 +13,7 @@ export default function ModuleSwitch({ projects, value, flowModuleIds = [], hasD
       <button type="button" onClick={() => setOpen((o) => !o)} className="flex items-center gap-2 rounded-lg border border-sf-border bg-sf-surface-subtle px-2.5 py-1 text-left hover:border-sf-border-strong">
         <div className="leading-tight">
           <div className="text-[9px] font-semibold uppercase tracking-sf-wide text-sf-subtle">Module</div>
-          <div className="max-w-[200px] truncate text-sm font-semibold text-sf-text">{active ? active.name : value}</div>
+          <div className="max-w-[160px] truncate text-sm font-semibold text-sf-text">{active ? active.name : value}</div>
         </div>
         <Icon name="chevron-down" size={14} className="text-sf-muted" />
       </button>

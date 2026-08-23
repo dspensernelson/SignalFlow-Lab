@@ -7,6 +7,8 @@ import { getSkin } from '../runtime/skins/index.js'
 import { loadFlowState, saveFlowState, clearFlowState, initialFlowState, loadConceptState, saveConceptState, markConceptPassed, pendingConcepts } from '../lib/flowProgress.js'
 import { getConcept, conceptLabel } from '../data/concepts/index.js'
 import { availableFields } from './fieldHints.js'
+import { buildFlowExport } from '../lib/flowExport.js'
+import { downloadText } from '../lib/export.js'
 import ConceptScreen from './ConceptScreen.jsx'
 import ModuleIntro from './ModuleIntro.jsx'
 import SkinSwitch from './SkinSwitch.jsx'
@@ -234,13 +236,32 @@ export default function BuilderWorkspace({ moduleData, loadReference, theme, onT
   const day = moduleData.days.find((d) => d.id === build.dayId)
   const allDone = builds.every((b) => state.passed[b.id])
   const openConcept = openConceptId ? getConcept(openConceptId) : null
-  const viewProps = { flow, skin, ctx, selectedStepId, onSelectStep: setSelectedStepId, insertAt, onOpenInsert: openInsert, onPick: pick, onCancelInsert: () => setInsertAt(null), onChangeStep: changeStep, onRemoveStep: remove, onMoveStep: move, stepStatus, hasRun: !!trace, replayStepId, fieldsFor }
+  const viewProps = { flow, skin, ctx, selectedStepId, onSelectStep: setSelectedStepId, insertAt, onOpenInsert: openInsert, onPick: pick, onCancelInsert: () => setInsertAt(null), onChangeStep: changeStep, onRemoveStep: remove, onMoveStep: move, stepStatus, hasRun: !!trace, replayStepId, replayActive: !!replayView, fieldsFor }
+
+  // Escape closes whatever is open: palette, step editor, build menu.
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key !== 'Escape') return
+      setInsertAt(null)
+      setSelectedStepId(null)
+      setBuildMenu(false)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [])
+
+  function handleExport() {
+    const payload = buildFlowExport({ moduleData, state, skinId: state.skin })
+    downloadText(`${payload.base}-flows.json`, payload.json, 'application/json')
+    downloadText(`${payload.base}-build-sheet.md`, payload.markdown, 'text/markdown')
+    for (const py of payload.python) downloadText(py.name, py.text, 'text/x-python')
+  }
 
   return (
     <div className="flex h-screen flex-col bg-sf-bg text-left text-sf-text">
       <header className="flex-none border-b border-sf-border bg-sf-surface">
-        <div className="mx-auto flex w-full max-w-[1680px] items-center justify-between gap-3 px-4 py-2">
-          <div className="flex min-w-0 items-center gap-3">
+        <div className="mx-auto flex w-full max-w-[1680px] items-center justify-between gap-3 overflow-x-auto px-4 py-2">
+          <div className="flex min-w-0 flex-none items-center gap-3">
             {headerLeft || (
               <span className="hidden whitespace-nowrap xl:inline-flex">
                 <Logo size={20} uppercase wordmark="SignalFlow Lab" />
@@ -248,7 +269,7 @@ export default function BuilderWorkspace({ moduleData, loadReference, theme, onT
             )}
             <span className="hidden h-6 w-px bg-sf-border xl:inline-block" />
             <div className="relative">
-              <button type="button" onClick={() => setBuildMenu((o) => !o)} className="flex min-w-[260px] items-center gap-2 rounded-lg border border-sf-border bg-sf-surface-subtle px-2.5 py-1 text-left hover:border-sf-border-strong">
+              <button type="button" onClick={() => setBuildMenu((o) => !o)} className="flex min-w-[200px] max-w-[260px] items-center gap-2 rounded-lg border border-sf-border bg-sf-surface-subtle px-2.5 py-1 text-left hover:border-sf-border-strong">
                 <div className="min-w-0 flex-1 leading-tight">
                   <div className="truncate text-[9px] font-semibold uppercase tracking-sf-wide text-sf-subtle">
                     {moduleData.title} - build {buildIndex + 1} of {builds.length}
@@ -276,6 +297,9 @@ export default function BuilderWorkspace({ moduleData, loadReference, theme, onT
                       )
                     })}
                     <div className="mt-1 border-t border-sf-border-subtle pt-1">
+                      <button type="button" onClick={() => { setBuildMenu(false); handleExport() }} className="w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-sf-body hover:bg-sf-surface-subtle">
+                        Export what you built (flow.json, Python, build sheet)
+                      </button>
                       <button type="button" onClick={handleResetModule} className="w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-sf-muted hover:bg-sf-surface-subtle">
                         Start this module over
                       </button>
@@ -289,15 +313,17 @@ export default function BuilderWorkspace({ moduleData, loadReference, theme, onT
               {day ? day.label : build.dayId}
             </span>
           </div>
-          <div className="flex items-center gap-2.5">
-            <Button variant="neutral" size="sm" icon="circle-help" onClick={() => setIntroOpen(true)} title="The world: who, what arrives, what tables exist, what you owe">
-              World
-            </Button>
-            {onWorld && (
-              <Button variant="neutral" size="sm" icon="workflow" onClick={onWorld} title="The workflow map, lit up by what you have built">
-                Map
+          <div className="flex flex-none items-center gap-2">
+            <div className="flex items-center gap-1">
+              <Button variant="neutral" size="sm" icon="circle-help" onClick={() => setIntroOpen(true)} title="The world: who, what arrives, what tables exist, what you owe" className="whitespace-nowrap">
+                <span className="hidden 2xl:inline">World</span>
               </Button>
-            )}
+              {onWorld && (
+                <Button variant="neutral" size="sm" icon="workflow" onClick={onWorld} title="The workflow map, lit up by what you have built" className="whitespace-nowrap">
+                  <span className="hidden 2xl:inline">Map</span>
+                </Button>
+              )}
+            </div>
             <SkinSwitch value={state.skin} onChange={(id) => setState((s) => ({ ...s, skin: id }))} />
             {onToggleTheme && <ThemeToggle value={theme} onChange={onToggleTheme} />}
             <Button variant="primary" size="md" icon="circle-play" onClick={handleRun} disabled={!!replayView || gated} title={gated ? 'Finish the concepts for this build first' : `Run every flow for ${day ? day.label : 'today'}`}>

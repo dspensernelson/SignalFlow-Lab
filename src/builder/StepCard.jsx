@@ -14,6 +14,7 @@ export default function StepCard({
   visited, // whether the selected record touched this step
   hasRun,
   replaying,
+  replayActive = false,
   onSelect,
   onChange,
   onRemove,
@@ -24,11 +25,11 @@ export default function StepCard({
 }) {
   const st = kindStyle(step.kind)
   const d = skin.describe(step, ctx)
-  const dimmed = hasRun && !visited && !replaying
+  const dimmed = hasRun && !visited && !replaying && !replayActive
   const statusStyle = runStatus ? STATUS_STYLE[runStatus.status] : null
   return (
     <div
-      className={`group rounded-xl border bg-sf-surface transition-all ${selected ? 'border-sf-accent-border shadow-sf-md' : 'border-sf-border shadow-sf-sm hover:border-sf-border-strong'} ${dimmed ? 'opacity-45' : ''} ${replaying ? 'ring-2 ring-sf-accent' : ''}`}
+      className={`group rounded-xl border bg-sf-surface transition-all ${selected ? 'border-sf-accent-border shadow-sf-md' : 'border-sf-border shadow-sf-sm hover:border-sf-border-strong'} ${dimmed ? 'opacity-45' : ''} ${replaying ? 'ring-2 ring-sf-accent animate-pulse' : ''}`}
       style={{ borderLeftWidth: 4, borderLeftColor: st.color }}
     >
       <div className="flex cursor-pointer items-start gap-2.5 px-3 py-2" onClick={onSelect} role="button" tabIndex={0} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect()}>

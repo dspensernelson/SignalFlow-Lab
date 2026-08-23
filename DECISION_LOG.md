@@ -2,6 +2,38 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-08-23 (P0 of the runnable-flows plan: Beacon opens the product)
+
+- OWNER (2026-08-22/23): "this is insane, I love it, needs some cleaning up."
+  Approved plan (docs: ~/.claude/plans, summarized in README "Runnable flows"):
+  every module as runnable flows; Beacon first; a "rosetta" micro-build gates
+  each concept just in time; builder is home; map = world view; worksheets
+  retire module by module; order Beacon, Harbor, Meridian, then 04-10; all ten
+  in scope. Also: keep genuine JSON/literacy learning as WAYPOINTS (must-learn
+  gates), not as the whole thing.
+- BUILT (P0): concept runner (src/runtime/concepts.js) - a rosetta or
+  waypoint is data the SAME engine runs as a one-build module; 12 Beacon
+  rosettas + 4 waypoints (json-record, fields-and-paths, data-types, lists);
+  ConceptScreen (sample, one step to add / settings / JSON editor, checks,
+  the same step in every tool); build.requires gates builds; concept progress
+  is global (signalflow_concepts). ModuleIntro (who / what arrives / tables /
+  what you owe / days). Build briefs: outcome + constraints + narrative goal,
+  no step lists. Graduated hints: question -> nudge -> steps; hintsUsed and
+  assisted recorded on the pass. World view: the canvas map lit from
+  builds[].mapNodes (nodeStatusFromBuilds), node panel links to builds.
+  Builder is the default view; ModuleSwitch in the shell; Beacon's 43
+  worksheet lessons, registry, lessonMeta, and fixtures deleted; lint-map
+  and lint-glossary accept flow modules; scripts/lint-flows.mjs added to
+  `npm run check`; JSON views in the run panel; field/function pickers;
+  flow export (flow.json, Python, build sheet).
+- NOT YET: module-02 canon.json assertions are no longer linted (lint-lessons
+  skips ported modules); port them to lint-flows with the next module. The
+  map's "Build it"/welcome modal remain on the worksheet canvas for modules
+  01/03 until they port.
+- CHECKPOINT QUESTION for the owner: open the app cold. Do you know what you
+  are using and where you are before you click a hint? Does "Ask me a
+  question" feel like thinking, not instructions?
+
 ## 2026-08-22 (reimagine: runnable-flows slice on feat/runnable-flows)
 
 - CONTEXT: REIMAGINE_BRIEF.md (owner, same day) said the product's one verb

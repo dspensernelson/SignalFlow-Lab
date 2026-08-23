@@ -28,12 +28,17 @@ hold on the run. Day 2 brings the messy batch and the Day 1 flow pays a
 duplicate, visibly; Day 3 injects an auth-expired failure. The same flow
 renders as Lab, Power Automate, Make, n8n, Zapier, or Python.
 
-- Entry: the canvas banner / "Build it" on Beacon Invoice Desk (module 2).
+- Entry: the app opens on the Beacon builder. "World" = the module intro;
+  "Map" = the workflow map lit by what you have built. Concepts (rosettas
+  and waypoints, `src/data/rosettas`, `src/data/waypoints`) gate builds just
+  in time; hints are graduated (question, nudge, steps).
 - Code: `src/runtime/` (expr, engine, checks, skins, python codegen),
   `src/builder/` (UI), `src/data/flows/module-02.json` (days, builds, checks),
   `src/data/flows/module-02.reference.js` (example solution).
-- Proof: `npm run test:runtime` - unit tests plus golden tests that the
-  reference passes all six builds and that the Day 1 flow FAILS Day 2.
+- Proof: `npm run test:runtime` - unit tests, golden tests that the
+  reference passes all six builds and that the Day 1 flow FAILS Day 2, and
+  one test per concept (solution passes, starting point does not);
+  `npm run lint:flows` holds the authoring invariants.
 - Design: `docs/superpowers/specs/2026-08-22-runnable-flows-design.md`.
 - The worksheet lesson path is untouched; nothing live regresses.
 
