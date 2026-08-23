@@ -5,6 +5,7 @@ import ProjectCanvas from './components/ProjectCanvas'
 // leaves the canvas, so they load on demand rather than in the initial bundle.
 const LessonWorkspace = lazy(() => import('./components/LessonWorkspace'))
 const ArtifactViewer = lazy(() => import('./components/ArtifactViewer'))
+const BuilderWorkspace = lazy(() => import('./builder/BuilderWorkspace'))
 import {
   loadProgress,
   saveProgress,
@@ -31,6 +32,16 @@ const LESSON_MODULE_LOADERS = {
   'module-03': () => import('./data/lessons/module03Lessons.js'),
 }
 
+// Runnable-flow modules (the builder). A project with an entry here gets a
+// "Build it" entry point on the canvas. Loaded on demand.
+const FLOW_MODULE_LOADERS = {
+  'module-02': async () => {
+    const [data, ref] = await Promise.all([import('./data/flows/module-02.json'), import('./data/flows/module-02.reference.js')])
+    return { moduleData: data.default, loadReference: ref.referenceFlowsFor }
+  },
+}
+const FLOW_MODULE_IDS = Object.keys(FLOW_MODULE_LOADERS)
+
 export default function App() {
   const [project, setProject] = useState(() => loadProject())
   const [tier, setTier] = useState(() => loadTier())
@@ -46,6 +57,8 @@ export default function App() {
   // Loaded lesson registry, stamped with the project it belongs to so a
   // stale set from the previous project is ignored during a project swap.
   const [lessonSet, setLessonSet] = useState(null)
+  // The loaded runnable-flow module for the builder view.
+  const [flowModule, setFlowModule] = useState(null)
 
   // The active project's workflow map (nodes/phases/edges) drives the canvas.
   const { nodes, phases, edges } = getProjectData(project)
@@ -179,6 +192,18 @@ export default function App() {
     }
   }
 
+  // Open the builder for a project that has a runnable-flow module. Switches
+  // project first if needed so the canvas behind the builder matches.
+  function openBuilder(targetProject = project) {
+    const loader = FLOW_MODULE_LOADERS[targetProject]
+    if (!loader) return
+    if (targetProject !== project) handleProjectChange(targetProject)
+    loader().then((mod) => {
+      setFlowModule({ project: targetProject, ...mod })
+      setView('builder')
+    })
+  }
+
   function handleReset() {
     const confirmed = window.confirm(
       'Start over? This clears your progress and saved artifacts for this project.'
@@ -193,6 +218,20 @@ export default function App() {
     setNotice(null)
     setSelectedNodeId(getDefaultSelectedNodeId(fresh, project))
     setView('canvas')
+  }
+
+  if (view === 'builder' && flowModule) {
+    return (
+      <Suspense fallback={null}>
+        <BuilderWorkspace
+          moduleData={flowModule.moduleData}
+          loadReference={flowModule.loadReference}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+          onBack={() => returnToCanvas()}
+        />
+      </Suspense>
+    )
   }
 
   if (view === 'lesson' && activeLessonId) {
@@ -253,6 +292,8 @@ export default function App() {
         onViewArtifact={handleViewArtifact}
         onReset={handleReset}
         onRestartNode={handleRestartNode}
+        flowModuleIds={FLOW_MODULE_IDS}
+        onBuild={openBuilder}
       />
     </div>
   )
