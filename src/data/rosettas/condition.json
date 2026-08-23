@@ -1,0 +1,220 @@
+{
+  "id": "condition",
+  "kind": "rosetta",
+  "exercise": "add-step",
+  "label": "Condition",
+  "introducedBy": "module-02",
+  "gloss": "branch the run on a rule that someone owns",
+  "why": "Most work splits on a rule: in tolerance or not, known vendor or not, approved or not. A condition tests the rule and sends the record down a YES lane or a NO lane; the lanes rejoin afterwards unless a lane stops the record. At Beacon, an invoice within the price band goes to the Payment Batch and one outside it goes to the Exception Queue.",
+  "cue": "when a person says 'it depends', that is a condition; write down what it depends on and who owns the threshold",
+  "sample": {
+    "sources": [
+      {
+        "id": "inbox",
+        "label": "Invoice Inbox",
+        "labelField": "invoiceNumber",
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "poNumber",
+          "invoiceTotal"
+        ]
+      }
+    ],
+    "stores": [
+      {
+        "id": "po-register",
+        "label": "PO Register",
+        "keyField": "poNumber",
+        "owner": "Procurement Lead",
+        "fields": [
+          "poNumber",
+          "vendorId",
+          "poTotal"
+        ]
+      },
+      {
+        "id": "payment-batch",
+        "label": "Payment Batch",
+        "daily": true,
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "invoiceTotal"
+        ]
+      },
+      {
+        "id": "exception-queue",
+        "label": "Exception Queue",
+        "daily": true,
+        "fields": [
+          "invoiceNumber",
+          "reason"
+        ]
+      }
+    ],
+    "owners": [
+      "AP Clerk",
+      "Procurement Lead"
+    ],
+    "day": {
+      "sources": {
+        "inbox": [
+          {
+            "invoiceNumber": "INV-1",
+            "vendorId": "V-1",
+            "poNumber": "PO-1",
+            "invoiceTotal": 1220
+          },
+          {
+            "invoiceNumber": "INV-2",
+            "vendorId": "V-2",
+            "poNumber": "PO-2",
+            "invoiceTotal": 1290
+          }
+        ]
+      },
+      "seeds": {
+        "po-register": [
+          {
+            "poNumber": "PO-1",
+            "vendorId": "V-1",
+            "poTotal": 1200
+          },
+          {
+            "poNumber": "PO-2",
+            "vendorId": "V-2",
+            "poTotal": 1200
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "inbox",
+        "mode": "event",
+        "at": ""
+      }
+    },
+    {
+      "kind": "lookup",
+      "config": {
+        "store": "po-register",
+        "matchOn": [
+          {
+            "recordField": "poNumber",
+            "storeField": "poNumber"
+          }
+        ],
+        "as": "po",
+        "mode": "one"
+      }
+    },
+    {
+      "kind": "transform",
+      "config": {
+        "set": [
+          {
+            "field": "variance",
+            "expr": "invoiceTotal - po.poTotal"
+          },
+          {
+            "field": "band",
+            "expr": "max(po.poTotal * 0.02, 25)"
+          }
+        ]
+      }
+    }
+  ],
+  "task": "Route on the price rule: if variance is within band, write the invoice to the Payment Batch; otherwise write it to the Exception Queue.",
+  "add": {
+    "kind": "condition"
+  },
+  "solution": {
+    "kind": "condition",
+    "config": {
+      "rules": [
+        {
+          "left": "variance",
+          "op": "<=",
+          "right": "band",
+          "rightKind": "field"
+        }
+      ],
+      "combine": "all"
+    },
+    "branches": {
+      "yes": [
+        {
+          "kind": "store",
+          "config": {
+            "store": "payment-batch",
+            "from": "",
+            "mode": "append",
+            "key": ""
+          }
+        }
+      ],
+      "no": [
+        {
+          "kind": "store",
+          "config": {
+            "store": "exception-queue",
+            "from": "",
+            "mode": "append",
+            "key": ""
+          }
+        }
+      ]
+    }
+  },
+  "notes": [
+    "Left side: a field on the record. Right side: a fixed value, or another field (rightKind field).",
+    "YES lane runs when the rule holds, NO lane when it does not; both rejoin after the condition.",
+    "INV-1 is 20 over a 1200 PO (band 25); INV-2 is 90 over."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "storeContains",
+      "store": "payment-batch",
+      "where": {
+        "invoiceNumber": "INV-1"
+      },
+      "label": "INV-1 (20 over, band 25) is in the Payment Batch"
+    },
+    {
+      "id": "c2",
+      "kind": "storeContains",
+      "store": "exception-queue",
+      "where": {
+        "invoiceNumber": "INV-2"
+      },
+      "label": "INV-2 (90 over, band 25) is in the Exception Queue"
+    },
+    {
+      "id": "c3",
+      "kind": "storeMissing",
+      "store": "payment-batch",
+      "where": {
+        "invoiceNumber": "INV-2"
+      },
+      "why": "it is 90 over a 25 band",
+      "label": "INV-2 is NOT paid"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "'Condition' or 'Switch' on the computed value",
+    "powerAppsCopilot": "a Copilot Studio condition node, or an If() in Power Fx",
+    "make": "a Router with filters on each route",
+    "n8n": "an IF or Switch node",
+    "zapier": "Paths by Zapier, or a Filter step",
+    "python": "an if/elif branch against the policy value",
+    "langgraph": "a conditional edge routing on graph state"
+  }
+}

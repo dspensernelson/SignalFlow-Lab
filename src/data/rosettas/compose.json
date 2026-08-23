@@ -1,0 +1,112 @@
+{
+  "id": "compose",
+  "kind": "rosetta",
+  "exercise": "add-step",
+  "label": "Compose",
+  "introducedBy": "module-02",
+  "gloss": "assemble the deliverable from upstream artifacts",
+  "why": "A deliverable is built from the record, not retyped. A compose renders a template against the record - plain fields with {{field}}, and one line per row of a list with {{#each list}}...{{/each}} - and stores the text on the record for a send or a store to use. At Beacon, the run document lists every invoice in the batch and is what the Payables DL receives.",
+  "cue": "a deliverable that restates facts instead of citing the artifacts that hold them cannot be traced back; assemble, do not retype",
+  "sample": {
+    "sources": [],
+    "stores": [
+      {
+        "id": "payment-batch",
+        "label": "Payment Batch",
+        "daily": true,
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "invoiceTotal"
+        ]
+      }
+    ],
+    "owners": [
+      "AP Clerk",
+      "AP Manager",
+      "Payables DL"
+    ],
+    "day": {
+      "sources": {},
+      "seeds": {
+        "payment-batch": [
+          {
+            "invoiceNumber": "INV-1",
+            "vendorId": "V-1",
+            "invoiceTotal": 1220
+          },
+          {
+            "invoiceNumber": "INV-2",
+            "vendorId": "V-2",
+            "invoiceTotal": 980
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "",
+        "mode": "schedule",
+        "at": "2:30 PM"
+      }
+    },
+    {
+      "kind": "lookup",
+      "config": {
+        "store": "payment-batch",
+        "matchOn": [],
+        "as": "batch",
+        "mode": "all"
+      }
+    }
+  ],
+  "task": "Write the run document: render a template that names the day and lists each invoice in batch, and store it on the run as runDoc.",
+  "add": {
+    "kind": "compose"
+  },
+  "solution": {
+    "kind": "compose",
+    "config": {
+      "template": "Beacon Payment Run - {{day}}\n\n{{#each batch}}- {{invoiceNumber}} ({{vendorId}}) {{invoiceTotal}}\n{{/each}}",
+      "as": "runDoc"
+    }
+  },
+  "notes": [
+    "{{day}} fills in a field from the record.",
+    "{{#each batch}} ... {{/each}} repeats its body once per row; inside it, {{invoiceNumber}} is that row's field.",
+    "As: the field name the rendered text is stored under (runDoc), for a send or store to use."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "runStatus",
+      "flowId": "concept",
+      "equals": "succeeded",
+      "label": "The run succeeds"
+    },
+    {
+      "id": "c2",
+      "kind": "recordField",
+      "where": {
+        "runId": "day-1-run"
+      },
+      "field": "runDoc",
+      "exists": true,
+      "label": "The run carries runDoc (the rendered document)"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "'Compose' plus 'Create HTML table', or a Word template action",
+    "powerAppsCopilot": "a Copilot Studio adaptive card, or a Power Apps display screen",
+    "make": "a Text Aggregator, or a Create Document module",
+    "n8n": "a Merge node into an HTML or Markdown Set node",
+    "zapier": "Formatter, or a document-generation action",
+    "python": "a Jinja template rendered from the artifact dicts",
+    "langgraph": "a synthesis node that composes the final answer from state"
+  }
+}

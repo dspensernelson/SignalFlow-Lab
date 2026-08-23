@@ -336,22 +336,6 @@ export default function ProjectCanvas({
       </header>
 
       <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-6 px-4 py-6">
-        {onBuild && flowModuleIds.length > 0 && (
-          <div className="flex flex-col gap-2 rounded-xl border border-sf-accent-border bg-sf-accent-weak px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-3">
-              <span className="mt-0.5 flex h-8 w-8 flex-none items-center justify-center rounded-lg bg-sf-accent text-white">
-                <Icon name="circle-play" size={16} />
-              </span>
-              <div className="leading-snug">
-                <div className="text-sm font-semibold text-sf-text">New: build the Beacon invoice desk as a flow that actually runs.</div>
-                <div className="text-xs text-sf-body">Assemble the steps, run them on a real day of invoices, watch Day 2 break it, fix it, and flip the same flow into Power Automate, Make, n8n, Zapier, or Python.</div>
-              </div>
-            </div>
-            <Button variant="primary" size="sm" iconRight="arrow-right" onClick={() => onBuild(flowModuleIds.includes(project) ? project : flowModuleIds[0])} className="w-fit flex-none">
-              {flowModuleIds.includes(project) ? 'Build it' : 'Open the Beacon builder'}
-            </Button>
-          </div>
-        )}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-semibold text-sf-text">{projectName}</h1>

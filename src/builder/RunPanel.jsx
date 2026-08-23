@@ -14,14 +14,33 @@ function terminalBadge(rt, moduleData) {
     return d ? d.label : id
   }
   if (t.type === 'store') {
-    const daily = (moduleData.stores || []).find((s) => s.id === t.target)
-    const tone = t.target === 'payment-batch' ? 'bg-sf-complete-weak text-sf-complete-text' : t.target === 'exception-queue' || t.target === 'dead-letter' ? 'bg-sf-warning-weak text-sf-progress-text' : 'bg-sf-info-weak text-sf-info'
-    return { text: `-> ${storeLabel(t.target)}${daily ? '' : ''}`, tone }
+    const def = (moduleData.stores || []).find((s) => s.id === t.target)
+    const toneId = def && def.tone ? def.tone : 'neutral'
+    const tone = toneId === 'good' ? 'bg-sf-complete-weak text-sf-complete-text' : toneId === 'hold' ? 'bg-sf-warning-weak text-sf-progress-text' : toneId === 'bad' ? 'bg-sf-danger-weak text-sf-danger' : 'bg-sf-info-weak text-sf-info'
+    return { text: `-> ${storeLabel(t.target)}`, tone }
   }
   if (t.type === 'send') return { text: `-> sent to ${t.target}`, tone: 'bg-sf-info-weak text-sf-info' }
   if (t.type === 'failed') return { text: t.handled === 'dead-letter' ? 'FAILED - dead-lettered' : 'FAILED', tone: 'bg-sf-danger-weak text-sf-danger' }
   if (t.type === 'dropped') return { text: 'DROPPED silently', tone: 'bg-sf-danger-weak text-sf-danger' }
   return { text: 'nothing happened to it', tone: 'bg-sf-locked-weak text-sf-muted' }
+}
+
+export function JsonView({ value, maxHeight = 'max-h-64' }) {
+  const text = JSON.stringify(value, null, 2)
+  // Light syntax coloring: keys, strings, numbers, booleans/null.
+  const parts = []
+  const re = /("(?:\\.|[^"\\])*")(\s*:)?|(-?\d+(?:\.\d+)?)|\b(true|false|null)\b/g
+  let last = 0
+  let m
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index))
+    if (m[1] !== undefined) parts.push(<span key={parts.length} className={m[2] ? 'text-sf-accent-text' : 'text-sf-complete-text'}>{m[1]}</span>, m[2] || '')
+    else if (m[3] !== undefined) parts.push(<span key={parts.length} className="text-sf-info">{m[3]}</span>)
+    else parts.push(<span key={parts.length} className="text-sf-progress-text">{m[4]}</span>)
+    last = re.lastIndex
+  }
+  if (last < text.length) parts.push(text.slice(last))
+  return <pre className={`overflow-auto rounded-md bg-sf-surface-inset p-2 font-mono text-[11px] leading-relaxed text-sf-body ${maxHeight}`}>{parts}</pre>
 }
 
 function Table({ rows, fields, max = 6 }) {
@@ -57,22 +76,35 @@ function Table({ rows, fields, max = 6 }) {
   )
 }
 
-function Section({ title, count, children, defaultOpen = true }) {
+function Section({ title, count, children, defaultOpen = true, json }) {
   const [open, setOpen] = useState(defaultOpen)
+  const [asJson, setAsJson] = useState(false)
   return (
     <div className="rounded-lg border border-sf-border bg-sf-surface">
-      <button type="button" onClick={() => setOpen((o) => !o)} className="flex w-full items-center justify-between px-2.5 py-1.5 text-left">
-        <span className="text-[11px] font-semibold text-sf-text">
-          {title} {count !== undefined && <span className="ml-1 rounded-full bg-sf-surface-inset px-1.5 text-[10px] text-sf-muted">{count}</span>}
-        </span>
-        <Icon name="chevron-down" size={12} className={`text-sf-muted transition-transform ${open ? '' : '-rotate-90'}`} />
-      </button>
-      {open && <div className="border-t border-sf-border-subtle">{children}</div>}
+      <div className="flex w-full items-center justify-between px-2.5 py-1.5">
+        <button type="button" onClick={() => setOpen((o) => !o)} className="flex flex-1 items-center gap-1 text-left">
+          <span className="text-[11px] font-semibold text-sf-text">
+            {title} {count !== undefined && <span className="ml-1 rounded-full bg-sf-surface-inset px-1.5 text-[10px] text-sf-muted">{count}</span>}
+          </span>
+        </button>
+        <div className="flex items-center gap-1">
+          {json !== undefined && open && (
+            <button type="button" onClick={() => setAsJson((j) => !j)} className={`rounded px-1.5 py-0.5 font-mono text-[10px] ${asJson ? 'bg-sf-accent text-white' : 'bg-sf-surface-inset text-sf-muted hover:text-sf-text'}`} title="Show as JSON">
+              {'{ }'}
+            </button>
+          )}
+          <button type="button" onClick={() => setOpen((o) => !o)} aria-label="Toggle">
+            <Icon name="chevron-down" size={12} className={`text-sf-muted transition-transform ${open ? '' : '-rotate-90'}`} />
+          </button>
+        </div>
+      </div>
+      {open && <div className="border-t border-sf-border-subtle">{asJson && json !== undefined ? <div className="p-2"><JsonView value={json} /></div> : children}</div>}
     </div>
   )
 }
 
 export default function RunPanel({ run, flow, moduleData, skin, selectedRecordId, onSelectRecord, replay }) {
+  const [recordAsJson, setRecordAsJson] = useState(false)
   if (!run) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-sf-border-strong px-4 py-10 text-center">
@@ -126,8 +158,16 @@ export default function RunPanel({ run, flow, moduleData, skin, selectedRecordId
             })}
           </div>
           <div className="col-span-3 flex flex-col gap-1">
-            <span className="text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">Path of {selected ? selected.label : ''}</span>
-            {selected && (
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">{recordAsJson ? 'Record as JSON' : `Path of ${selected ? selected.label : ''}`}</span>
+              {selected && (!replay || !replay.active) && (
+                <button type="button" onClick={() => setRecordAsJson((j) => !j)} className={`rounded px-1.5 py-0.5 font-mono text-[10px] ${recordAsJson ? 'bg-sf-accent text-white' : 'bg-sf-surface-inset text-sf-muted hover:text-sf-text'}`} title="The record after the run, as JSON">
+                  {'{ }'}
+                </button>
+              )}
+            </div>
+            {selected && recordAsJson && (!replay || !replay.active) && <JsonView value={selected.final} maxHeight="max-h-80" />}
+            {selected && !(recordAsJson && (!replay || !replay.active)) && (
               <ol className="flex flex-col gap-1">
                 {selected.steps.map((s, i) => {
                   const found = findStep(flow, s.stepId)
@@ -171,7 +211,7 @@ export default function RunPanel({ run, flow, moduleData, skin, selectedRecordId
             <div className="flex flex-col gap-1.5">
               <span className="text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">After the run</span>
               {writtenStores.map((s) => (
-                <Section key={s.id} title={s.label} count={(stores[s.id] || []).length} defaultOpen={s.daily}>
+                <Section key={s.id} title={s.label} count={(stores[s.id] || []).length} defaultOpen={s.daily} json={stores[s.id] || []}>
                   <Table rows={stores[s.id] || []} fields={s.fields} />
                 </Section>
               ))}

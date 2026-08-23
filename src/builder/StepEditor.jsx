@@ -1,7 +1,47 @@
+import { useState } from 'react'
 import { CONDITION_OPS } from '../runtime/flowModel.js'
 import { safeParse } from '../runtime/expr.js'
 import { Icon } from '../components/ui'
 import { storeFields } from './fieldHints.js'
+
+// Functions the expression language offers, for the palette beside each
+// expression input. Kept in sync with FUNCS in src/runtime/expr.js.
+const FUNCTIONS = [
+  { name: 'max', sig: 'max(a, b, ...)', ex: 'max(po.poTotal * 0.02, 25)' },
+  { name: 'min', sig: 'min(a, b, ...)', ex: 'min(qty, 100)' },
+  { name: 'abs', sig: 'abs(x)', ex: 'abs(variance)' },
+  { name: 'round', sig: 'round(x, decimals)', ex: 'round(variance / po.poTotal * 100, 2)' },
+  { name: 'len', sig: 'len(list)', ex: 'len(batch)' },
+  { name: 'sum', sig: "sum(list, 'field')", ex: "sum(batch, 'invoiceTotal')" },
+  { name: 'num', sig: 'num(text)', ex: "num('$1,220.00')" },
+  { name: 'upper', sig: 'upper(text)', ex: 'upper(hub)' },
+  { name: 'lower', sig: 'lower(text)', ex: 'lower(email)' },
+  { name: 'trim', sig: 'trim(text)', ex: 'trim(vendorName)' },
+  { name: 'concat', sig: 'concat(a, b, ...)', ex: "concat('SD-', days)" },
+  { name: 'exists', sig: 'exists(x)', ex: 'exists(receipt)' },
+  { name: 'coalesce', sig: 'coalesce(a, b, ...)', ex: 'coalesce(po.total, 0)' },
+  { name: 'if', sig: 'if(test, a, b)', ex: "if(variance <= band, 'ok', 'over')" },
+]
+
+function PickerButton({ label, icon, children, title }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="relative flex-none">
+      <button type="button" onClick={() => setOpen((o) => !o)} title={title} aria-label={title} className={`flex h-6 items-center gap-0.5 rounded-md border px-1 text-[10px] ${open ? 'border-sf-accent-border text-sf-accent' : 'border-sf-border text-sf-muted hover:text-sf-text'}`}>
+        {icon && <Icon name={icon} size={11} />}
+        {label}
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} aria-hidden="true" />
+          <div className="absolute right-0 top-full z-40 mt-1 max-h-64 w-72 overflow-y-auto rounded-lg border border-sf-border bg-sf-surface p-1 shadow-sf-lg" onClick={() => setOpen(false)}>
+            {children}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
 
 // Per-kind configuration forms. Every input edits plain config; the learner
 // never types JSON. Expressions get an inline parse check so a typo is caught
@@ -29,11 +69,33 @@ function RowButton({ onClick, icon, label }) {
   )
 }
 
-function ExprInput({ value, onChange, list, placeholder }) {
+function ExprInput({ value, onChange, list, placeholder, fields = [], functions = false }) {
   const { error } = value && value.trim() ? safeParse(value) : { error: null }
+  const insert = (text) => onChange(value && value.trim() && !/[\s(+\-*/,=<>]$/.test(value) ? `${value} ${text}` : `${value || ''}${text}`)
   return (
     <div className="flex min-w-0 flex-col gap-0.5">
-      <input className={`${inputCls} font-mono ${error ? 'border-sf-danger' : ''}`} value={value} onChange={(e) => onChange(e.target.value)} list={list} placeholder={placeholder} spellCheck={false} />
+      <div className="flex items-start gap-1">
+        <input className={`${inputCls} font-mono ${error ? 'border-sf-danger' : ''}`} value={value} onChange={(e) => onChange(e.target.value)} list={list} placeholder={placeholder} spellCheck={false} />
+        {fields.length > 0 && (
+          <PickerButton label="field" icon="braces" title="Insert a field that exists at this point">
+            {fields.map((f) => (
+              <button key={f} type="button" onClick={() => insert(f)} className="block w-full rounded px-2 py-1 text-left font-mono text-[11px] text-sf-body hover:bg-sf-surface-subtle">
+                {f}
+              </button>
+            ))}
+          </PickerButton>
+        )}
+        {functions && (
+          <PickerButton label="fn" title="Insert a function">
+            {FUNCTIONS.map((f) => (
+              <button key={f.name} type="button" onClick={() => insert(f.sig.replace(/\(.*$/, '('))} className="block w-full rounded px-2 py-1 text-left hover:bg-sf-surface-subtle">
+                <span className="font-mono text-[11px] text-sf-text">{f.sig}</span>
+                <span className="block font-mono text-[10px] text-sf-subtle">{f.ex}</span>
+              </button>
+            ))}
+          </PickerButton>
+        )}
+      </div>
       {error && <span className="text-[10px] text-sf-danger">{error}</span>}
     </div>
   )
@@ -124,7 +186,7 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
                 </select>
                 <span className="text-xs text-sf-muted">=</span>
                 <div className="flex-1">
-                  <ExprInput value={p.recordField} onChange={(v) => setPair(i, { recordField: v })} list={listId} placeholder="record field, or 'literal'" />
+                  <ExprInput value={p.recordField} onChange={(v) => setPair(i, { recordField: v })} list={listId} placeholder="record field, or 'literal'" fields={fields} />
                 </div>
                 <RowButton icon="x" label="Remove match" onClick={() => set({ matchOn: pairs.filter((_, j) => j !== i) })} />
               </div>
@@ -148,7 +210,7 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
               <input className={`${inputCls} w-36 flex-none font-mono`} value={s.field} onChange={(e) => setRow(i, { field: e.target.value })} placeholder="field name" spellCheck={false} />
               <span className="pt-1 text-xs text-sf-muted">=</span>
               <div className="flex-1">
-                <ExprInput value={s.expr} onChange={(v) => setRow(i, { expr: v })} list={listId} placeholder="invoiceTotal - po.poTotal" />
+                <ExprInput value={s.expr} onChange={(v) => setRow(i, { expr: v })} list={listId} placeholder="invoiceTotal - po.poTotal" fields={fields} functions />
               </div>
               <RowButton icon="x" label="Remove" onClick={() => set({ set: sets.filter((_, j) => j !== i) })} />
             </div>
@@ -157,7 +219,7 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
             <button type="button" onClick={() => set({ set: [...sets, { field: '', expr: '' }] })} className="text-[11px] font-medium text-sf-accent hover:underline">
               + set another field
             </button>
-            <span className="text-[10px] text-sf-subtle">max min abs round len sum num upper lower trim concat exists coalesce if - and or not - 'text' in quotes</span>
+            <span className="text-[10px] text-sf-subtle">text in 'quotes'; and / or / not; the fn button lists the functions</span>
           </div>
         </div>
       )
@@ -176,7 +238,7 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
                 {i > 0 && <span className="w-9 flex-none pt-1 text-[10px] font-semibold uppercase text-sf-subtle">{c.combine === 'any' ? 'or' : 'and'}</span>}
                 {i === 0 && <span className="w-9 flex-none pt-1 text-[10px] font-semibold uppercase text-sf-subtle">if</span>}
                 <div className="flex-1">
-                  <ExprInput value={r.left} onChange={(v) => setRule(i, { left: v })} list={listId} placeholder="field" />
+                  <ExprInput value={r.left} onChange={(v) => setRule(i, { left: v })} list={listId} placeholder="field" fields={fields} />
                 </div>
                 <select className={`${selectCls} w-24 flex-none font-mono`} value={r.op} onChange={(e) => setRule(i, { op: e.target.value })}>
                   {CONDITION_OPS.map((op) => (
@@ -189,19 +251,18 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
                   <>
                     <div className="flex-1">
                       {r.rightKind === 'field' ? (
-                        <ExprInput value={r.right} onChange={(v) => setRule(i, { right: v })} list={listId} placeholder="field" />
+                        <ExprInput value={r.right} onChange={(v) => setRule(i, { right: v })} list={listId} placeholder="field" fields={fields} />
                       ) : (
                         <input className={inputCls} value={r.right} onChange={(e) => setRule(i, { right: e.target.value })} placeholder="value" />
                       )}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setRule(i, { rightKind: r.rightKind === 'field' ? 'value' : 'field' })}
-                      title={r.rightKind === 'field' ? 'Comparing to another field. Click to compare to a typed value.' : 'Comparing to a typed value. Click to compare to another field.'}
-                      className="h-6 flex-none rounded-md border border-sf-border px-1.5 text-[10px] font-semibold uppercase text-sf-muted hover:bg-sf-surface-subtle"
-                    >
-                      {r.rightKind === 'field' ? 'field' : 'value'}
-                    </button>
+                    <div className="flex h-6 flex-none overflow-hidden rounded-md border border-sf-border text-[10px] font-semibold uppercase" role="group" aria-label="Compare to">
+                      {['value', 'field'].map((k) => (
+                        <button key={k} type="button" onClick={() => setRule(i, { rightKind: k })} title={k === 'field' ? 'Compare to another field of the record' : 'Compare to a typed value'} className={`px-1.5 ${r.rightKind === k ? 'bg-sf-accent text-white' : 'text-sf-muted hover:bg-sf-surface-subtle'}`}>
+                          {k}
+                        </button>
+                      ))}
+                    </div>
                   </>
                 )}
                 <RowButton icon="x" label="Remove rule" onClick={() => set({ rules: rules.filter((_, j) => j !== i) })} />

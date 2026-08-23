@@ -1,0 +1,138 @@
+{
+  "id": "transform",
+  "kind": "rosetta",
+  "exercise": "add-step",
+  "label": "Transform",
+  "introducedBy": "module-02",
+  "gloss": "parse, normalize, or compute so the data is safe to compare",
+  "why": "Raw fields are rarely in the shape a decision needs. A transform computes or normalizes a value and writes it onto the record, so the step after it compares clean numbers instead of guessing. At Beacon, the invoice bills 1220 and the PO says 1200; the transform writes variance = 20, and that one number is what the desk decides on.",
+  "cue": "any time two values must be compared, ask what shape they are in first; comparison before normalization is where silent bugs live",
+  "sample": {
+    "sources": [
+      {
+        "id": "inbox",
+        "label": "Invoice Inbox",
+        "labelField": "invoiceNumber",
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "poNumber",
+          "invoiceTotal"
+        ]
+      }
+    ],
+    "stores": [
+      {
+        "id": "po-register",
+        "label": "PO Register",
+        "keyField": "poNumber",
+        "owner": "Procurement Lead",
+        "fields": [
+          "poNumber",
+          "vendorId",
+          "poTotal"
+        ]
+      }
+    ],
+    "owners": [
+      "AP Clerk",
+      "Procurement Lead"
+    ],
+    "day": {
+      "sources": {
+        "inbox": [
+          {
+            "invoiceNumber": "INV-1",
+            "vendorId": "V-1",
+            "poNumber": "PO-1",
+            "invoiceTotal": 1220
+          }
+        ]
+      },
+      "seeds": {
+        "po-register": [
+          {
+            "poNumber": "PO-1",
+            "vendorId": "V-1",
+            "poTotal": 1200
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "inbox",
+        "mode": "event",
+        "at": ""
+      }
+    },
+    {
+      "kind": "lookup",
+      "config": {
+        "store": "po-register",
+        "matchOn": [
+          {
+            "recordField": "poNumber",
+            "storeField": "poNumber"
+          }
+        ],
+        "as": "po",
+        "mode": "one"
+      }
+    }
+  ],
+  "task": "Compute how far the invoice is from its PO: set variance to invoiceTotal minus po.poTotal.",
+  "add": {
+    "kind": "transform"
+  },
+  "solution": {
+    "kind": "transform",
+    "config": {
+      "set": [
+        {
+          "field": "variance",
+          "expr": "invoiceTotal - po.poTotal"
+        }
+      ]
+    }
+  },
+  "notes": [
+    "Set: a field name and an expression; the result is written onto the record.",
+    "Expressions read record fields by name and nested ones by dotted path (po.poTotal).",
+    "Arithmetic on a missing field gives null, not a crash - look for null in the trace."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "runStatus",
+      "flowId": "concept",
+      "equals": "succeeded",
+      "label": "The flow runs"
+    },
+    {
+      "id": "c2",
+      "kind": "recordField",
+      "where": {
+        "invoiceNumber": "INV-1"
+      },
+      "field": "variance",
+      "equals": 20,
+      "label": "INV-1 variance is 20",
+      "why": "1220 billed minus 1200 on the PO"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "'Compose', 'Select', 'Parse JSON', or an expression like float()",
+    "powerAppsCopilot": "a Power Fx formula, or a Copilot Studio variable expression",
+    "make": "an Iterator plus a Set variable / text parser module",
+    "n8n": "a Set, Code, or Item Lists node",
+    "zapier": "Formatter by Zapier (numbers, text, dates)",
+    "python": "a parsing function; pandas.to_numeric or re.sub for cleaning",
+    "langgraph": "a node function that rewrites state, or a structured-output extraction call"
+  }
+}

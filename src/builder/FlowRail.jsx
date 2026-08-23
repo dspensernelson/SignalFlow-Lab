@@ -6,11 +6,11 @@ import Palette from './Palette.jsx'
 // to bottom; a Condition opens two lanes beneath it (yes / no) that rejoin.
 // "+" insertion points sit between steps and at the end of every lane.
 
-function InsertPoint({ open, onOpen, onPick, onCancel, skin, compact }) {
+function InsertPoint({ open, onOpen, onPick, onCancel, skin, compact, kinds, allowTrigger }) {
   if (open) {
     return (
       <div className="py-1.5">
-        <Palette skin={skin} onPick={onPick} onCancel={onCancel} />
+        <Palette skin={skin} onPick={onPick} onCancel={onCancel} kinds={kinds} allowTrigger={allowTrigger} />
       </div>
     )
   }
@@ -33,7 +33,7 @@ function InsertPoint({ open, onOpen, onPick, onCancel, skin, compact }) {
 const pathKey = (path) => path.join('/')
 
 export default function FlowRail(props) {
-  const { flow, skin, ctx, selectedStepId, onSelectStep, insertAt, onOpenInsert, onPick, onCancelInsert, onChangeStep, onRemoveStep, onMoveStep, stepStatus, hasRun, replayStepId, fieldsFor } = props
+  const { flow, skin, ctx, selectedStepId, onSelectStep, insertAt, onOpenInsert, onPick, onCancelInsert, onChangeStep, onRemoveStep, onMoveStep, stepStatus, hasRun, replayStepId, fieldsFor, lockedIds, paletteKinds, allowTrigger, readOnly = false } = props
   let counter = 0
 
   function renderList(list, path, depth) {
@@ -41,7 +41,8 @@ export default function FlowRail(props) {
     const items = []
     list.forEach((step, index) => {
       const isTrigger = step.kind === 'trigger' && depth === 0 && index === 0
-      if (!isTrigger) {
+      const locked = isTrigger || (lockedIds && lockedIds.has(step.id))
+      if (!isTrigger && !readOnly) {
         items.push(
           <InsertPoint
             key={`ins-${key}-${index}`}
@@ -51,6 +52,8 @@ export default function FlowRail(props) {
             onOpen={() => onOpenInsert(path, index)}
             onPick={onPick}
             onCancel={onCancelInsert}
+            kinds={paletteKinds}
+            allowTrigger={allowTrigger && depth === 0 && index === 0}
           />
         )
       }
@@ -70,8 +73,8 @@ export default function FlowRail(props) {
           replaying={replayStepId === step.id}
           onSelect={() => onSelectStep(selectedStepId === step.id ? null : step.id)}
           onChange={(patch) => onChangeStep(step.id, patch)}
-          onRemove={isTrigger ? null : () => onRemoveStep(step.id)}
-          onMove={isTrigger ? null : (delta) => onMoveStep(step.id, delta)}
+          onRemove={locked ? null : () => onRemoveStep(step.id)}
+          onMove={locked ? null : (delta) => onMoveStep(step.id, delta)}
           canMoveUp={index > (depth === 0 ? 1 : 0)}
           canMoveDown={index < list.length - 1}
           fields={fieldsFor(step.id)}
@@ -96,7 +99,7 @@ export default function FlowRail(props) {
         )
       }
     })
-    items.push(
+    if (!readOnly) items.push(
       <InsertPoint
         key={`ins-${key}-end`}
         skin={skin}
@@ -105,6 +108,8 @@ export default function FlowRail(props) {
         onOpen={() => onOpenInsert(path, list.length)}
         onPick={onPick}
         onCancel={onCancelInsert}
+        kinds={paletteKinds}
+        allowTrigger={allowTrigger && depth === 0 && list.length === 0}
       />
     )
     return items

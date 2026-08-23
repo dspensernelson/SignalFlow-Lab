@@ -398,7 +398,7 @@ await test('golden: module-02 data is well-formed', () => {
   for (const b of MOD2.builds) {
     ok(MOD2.days.some((d) => d.id === b.dayId), `${b.id} day`)
     ok(MOD2.flows.some((f) => f.id === b.flowId), `${b.id} flow`)
-    ok(b.checks.length > 0 && b.hints.length > 0 && b.goal, `${b.id} content`)
+    ok(b.checks.length > 0 && b.hints.steps.length > 0 && b.hints.question && b.hints.nudge && b.goal && b.outcome && Array.isArray(b.constraints) && Array.isArray(b.requires), `${b.id} content`)
     for (const c of b.checks) ok(chk.CHECK_KINDS.includes(c.kind), `${b.id}/${c.id} kind ${c.kind}`)
   }
 })
@@ -467,6 +467,86 @@ await test('codegen: python renders the reference flow and compiles', async () =
     writeFileSync(f, src)
     execFileSync(python, ['-c', `import ast,sys; ast.parse(open(sys.argv[1]).read())`, f], { stdio: 'pipe' })
   }
+})
+
+// ============================================================ flowProgress (pure parts)
+const fp = await imp('src/lib/flowProgress.js')
+
+await test('flowProgress: v1 -> v2 migration keeps flows and converts passed booleans', () => {
+  const fresh = fp.initialFlowState(MOD2)
+  const migrated = fp.migrateFlowState({ version: 1, flows: { 'invoice-flow': { id: 'invoice-flow', steps: [] } }, passed: { b1: true, b2: true }, activeBuildId: 'b3', skin: 'make' }, fresh)
+  eq(migrated.version, 2)
+  eq(migrated.passed.b1, { at: null, hintsUsed: 0, runs: 0, assisted: false })
+  ok(migrated.flows['run-flow'], 'missing flow restored')
+  eq(migrated.flows['invoice-flow'].steps.length, 0)
+  eq(migrated.skin, 'make')
+  eq(migrated.introSeen, false)
+  eq(fp.migrateFlowState(null, fresh), fresh)
+})
+
+await test('flowProgress: build unlock needs the previous pass AND the required concepts', () => {
+  const builds = [{ id: 'b1', requires: ['trigger'] }, { id: 'b2', requires: [] }, { id: 'b3', requires: ['condition'] }]
+  ok(!fp.isBuildUnlocked(builds, 0, {}, {}))
+  ok(fp.isBuildUnlocked(builds, 0, {}, { trigger: { at: 1 } }))
+  ok(!fp.isBuildUnlocked(builds, 1, {}, { trigger: 1 }))
+  ok(fp.isBuildUnlocked(builds, 1, { b1: { at: 1 } }, {}))
+  ok(!fp.isBuildUnlocked(builds, 2, { b1: 1, b2: 1 }, {}))
+  ok(fp.isBuildUnlocked(builds, 2, { b1: 1, b2: 1 }, { condition: 1 }))
+  eq(fp.pendingConcepts(builds[2], {}), ['condition'])
+  ok(!fp.isBuildUnlocked(builds, 3, {}, {}))
+})
+
+await test('flowProgress: node status from builds', () => {
+  const mod = { builds: [{ id: 'b1', mapNodes: ['a', 'b'] }, { id: 'b2', mapNodes: ['b', 'c'] }, { id: 'b3', mapNodes: ['d'] }] }
+  let st = fp.nodeStatusFromBuilds(mod, {}, 'b1')
+  eq(st, { a: 'active', b: 'active', c: 'locked', d: 'locked' })
+  st = fp.nodeStatusFromBuilds(mod, { b1: { assisted: false } }, 'b2')
+  eq(st, { a: 'complete', b: 'active', c: 'active', d: 'locked' })
+  st = fp.nodeStatusFromBuilds(mod, { b1: { assisted: false }, b2: { assisted: true } }, 'b3')
+  eq(st, { a: 'complete', b: 'assisted', c: 'assisted', d: 'active' })
+  eq(fp.nodeBuilds(mod, 'b').map((b) => b.id), ['b1', 'b2'])
+  eq(fp.markConceptPassed({ version: 1, passed: {} }, 'lookup', 'module-02', 5).passed.lookup, { at: 5, moduleId: 'module-02' })
+})
+
+// ============================================================ concepts (rosettas + waypoints)
+const { readdirSync } = await import('node:fs')
+const cpt = await imp('src/runtime/concepts.js')
+const CONCEPT_FILES = []
+for (const [dir, kind] of [['src/data/rosettas', 'rosetta'], ['src/data/waypoints', 'waypoint']]) {
+  for (const f of readdirSync(path.join(root, dir)).filter((x) => x.endsWith('.json')).sort()) {
+    CONCEPT_FILES.push({ kind, file: `${dir}/${f}`, concept: { kind, ...JSON.parse(readFileSync(path.join(root, dir, f), 'utf8')) } })
+  }
+}
+const CONCEPT_IDS = new Set(CONCEPT_FILES.map((c) => c.concept.id))
+
+await test('concepts: files are well-formed and ids match filenames', () => {
+  ok(CONCEPT_FILES.length >= 16, `found ${CONCEPT_FILES.length}`)
+  for (const { file, concept } of CONCEPT_FILES) {
+    ok(file.endsWith(`/${concept.id}.json`), `${file} id mismatch`)
+    for (const k of ['label', 'gloss', 'why', 'task', 'sample', 'checks', 'exercise', 'introducedBy']) ok(concept[k] !== undefined, `${file} missing ${k}`)
+    ok(Array.isArray(concept.checks) && concept.checks.length >= 1, `${file} checks`)
+    ok(/^[\x00-\x7F]*$/.test(JSON.stringify(concept)), `${file} is not ASCII`)
+    for (const c of concept.checks) ok(chk.CHECK_KINDS.includes(c.kind), `${file} check kind ${c.kind}`)
+  }
+})
+
+for (const { file, concept } of CONCEPT_FILES) {
+  await test(`concept: ${concept.id} - solution passes, starting point does not`, () => {
+    const sol = cpt.applySolution(concept)
+    const withSolution = cpt.runConcept(concept, { flow: sol.flow, record: sol.record })
+    ok(withSolution.passed, `${file} solution fails:\n    ${withSolution.results.filter((r) => !r.passed).map((r) => `${r.id}: ${r.detail}`).join('\n    ')}`)
+    const baselineRecord = concept.exercise === 'json-edit' ? concept.brokenRecord : null
+    const baseline = cpt.runConcept(concept, { flow: cpt.conceptFlow(concept), record: baselineRecord })
+    ok(!baseline.passed, `${file} passes without doing anything`)
+  })
+}
+
+await test('concepts: every build.requires in module-02 names an existing concept', () => {
+  for (const b of MOD2.builds) for (const id of b.requires || []) ok(CONCEPT_IDS.has(id), `${b.id} requires unknown concept ${id}`)
+  // Every step kind used by the Beacon reference has a rosetta.
+  const kinds = new Set()
+  for (const f of Object.values(referenceFlowsFor('b6'))) fm.walkSteps(f.steps, (st) => kinds.add(st.kind))
+  for (const k of kinds) ok(CONCEPT_IDS.has(k) || k === 'trigger', `no rosetta for step kind ${k}`)
 })
 
 // ============================================================ summary

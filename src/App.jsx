@@ -1,11 +1,14 @@
 import { Suspense, lazy, useEffect, useState } from 'react'
-import ProjectCanvas from './components/ProjectCanvas'
+import BuilderWorkspace from './builder/BuilderWorkspace'
+import ModuleSwitch from './builder/ModuleSwitch'
+import { Logo } from './components/ui'
 
-// F7: the lesson workspace and artifact viewer only render once a learner
-// leaves the canvas, so they load on demand rather than in the initial bundle.
+// The builder is home. The worksheet canvas, lesson workspace, artifact
+// viewer, and the world-view overlay load on demand.
+const ProjectCanvas = lazy(() => import('./components/ProjectCanvas'))
 const LessonWorkspace = lazy(() => import('./components/LessonWorkspace'))
 const ArtifactViewer = lazy(() => import('./components/ArtifactViewer'))
-const BuilderWorkspace = lazy(() => import('./builder/BuilderWorkspace'))
+const WorldView = lazy(() => import('./builder/WorldView'))
 import {
   loadProgress,
   saveProgress,
@@ -20,7 +23,7 @@ import {
   saveTier,
   tierLessonId,
 } from './lib/progress'
-import { PROJECTS, getProjectData, loadProject, saveProject } from './lib/projects'
+import { PROJECTS, getProjectData, loadProject, saveProject, hasProjectData } from './lib/projects'
 import { loadTheme, saveTheme, applyTheme } from './lib/theme'
 
 // F7: each project's lesson registry is its own dynamic-import chunk, so a
@@ -28,7 +31,6 @@ import { loadTheme, saveTheme, applyTheme } from './lib/theme'
 // no built lessons yet resolve to an empty map.
 const LESSON_MODULE_LOADERS = {
   'module-01': () => import('./data/lessons/module01Lessons.js'),
-  'module-02': () => import('./data/lessons/module02Lessons.js'),
   'module-03': () => import('./data/lessons/module03Lessons.js'),
 }
 
@@ -43,11 +45,15 @@ const FLOW_MODULE_LOADERS = {
 const FLOW_MODULE_IDS = Object.keys(FLOW_MODULE_LOADERS)
 
 export default function App() {
-  const [project, setProject] = useState(() => loadProject())
+  // Home is the first runnable-flow module unless the saved project is one.
+  const [project, setProject] = useState(() => {
+    const saved = loadProject()
+    return FLOW_MODULE_IDS.includes(saved) ? saved : FLOW_MODULE_IDS[0] || saved
+  })
   const [tier, setTier] = useState(() => loadTier())
   const [progress, setProgress] = useState(() => loadProgress())
   const [artifacts, setArtifacts] = useState(() => loadArtifacts())
-  const [view, setView] = useState('canvas') // 'canvas' | 'lesson' | 'artifact'
+  const [view, setView] = useState(() => (FLOW_MODULE_IDS.includes(loadProject()) || FLOW_MODULE_IDS.length ? 'builder' : 'canvas')) // 'builder' | 'world' | 'canvas' | 'lesson' | 'artifact'
   const [selectedNodeId, setSelectedNodeId] = useState(() =>
     getDefaultSelectedNodeId(loadProgress())
   )
@@ -59,6 +65,18 @@ export default function App() {
   const [lessonSet, setLessonSet] = useState(null)
   // The loaded runnable-flow module for the builder view.
   const [flowModule, setFlowModule] = useState(null)
+  // Load the flow module whenever the project has one.
+  useEffect(() => {
+    let cancelled = false
+    const loader = FLOW_MODULE_LOADERS[project]
+    if (!loader) return undefined
+    loader().then((mod) => {
+      if (!cancelled) setFlowModule({ project, ...mod })
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [project])
 
   // The active project's workflow map (nodes/phases/edges) drives the canvas.
   const { nodes, phases, edges } = getProjectData(project)
@@ -136,7 +154,7 @@ export default function App() {
     setActiveLessonId(null)
     setNotice(null)
     setSelectedNodeId(getDefaultSelectedNodeId(freshProgress, nextProject))
-    setView('canvas')
+    setView(FLOW_MODULE_LOADERS[nextProject] ? 'builder' : 'canvas')
   }
 
   function openLesson(nodeId) {
@@ -192,16 +210,11 @@ export default function App() {
     }
   }
 
-  // Open the builder for a project that has a runnable-flow module. Switches
-  // project first if needed so the canvas behind the builder matches.
+  // Open the builder for a project that has a runnable-flow module.
   function openBuilder(targetProject = project) {
-    const loader = FLOW_MODULE_LOADERS[targetProject]
-    if (!loader) return
+    if (!FLOW_MODULE_LOADERS[targetProject]) return
     if (targetProject !== project) handleProjectChange(targetProject)
-    loader().then((mod) => {
-      setFlowModule({ project: targetProject, ...mod })
-      setView('builder')
-    })
+    else setView('builder')
   }
 
   function handleReset() {
@@ -220,17 +233,56 @@ export default function App() {
     setView('canvas')
   }
 
-  if (view === 'builder' && flowModule) {
+  const shellHeaderLeft = (
+    <div className="flex items-center gap-3">
+      <span className="hidden whitespace-nowrap xl:inline-flex">
+        <Logo size={20} uppercase wordmark="SignalFlow Lab" />
+      </span>
+      <ModuleSwitch projects={PROJECTS} value={project} flowModuleIds={FLOW_MODULE_IDS} hasData={hasProjectData} onChange={handleProjectChange} />
+    </div>
+  )
+
+  if ((view === 'builder' || view === 'world') && FLOW_MODULE_LOADERS[project]) {
+    if (!flowModule || flowModule.project !== project) {
+      return <div className="flex h-screen items-center justify-center text-sm text-sf-muted">Loading the builder...</div>
+    }
     return (
-      <Suspense fallback={null}>
+      <>
         <BuilderWorkspace
+          key={project}
           moduleData={flowModule.moduleData}
           loadReference={flowModule.loadReference}
           theme={theme}
           onToggleTheme={toggleTheme}
-          onBack={() => returnToCanvas()}
+          onWorld={() => setView('world')}
+          headerLeft={shellHeaderLeft}
         />
-      </Suspense>
+        {view === 'world' && (
+          <Suspense fallback={null}>
+            <WorldView
+              moduleData={flowModule.moduleData}
+              project={PROJECTS.find((p) => p.id === project)}
+              nodes={nodes}
+              phases={phases}
+              edges={edges}
+              passed={JSON.parse(localStorage.getItem(`signalflow_flows__${project}`) || '{}').passed || {}}
+              activeBuildId={(JSON.parse(localStorage.getItem(`signalflow_flows__${project}`) || '{}') || {}).activeBuildId}
+              onOpenBuild={(buildId) => {
+                try {
+                  const key = `signalflow_flows__${project}`
+                  const st = JSON.parse(localStorage.getItem(key) || 'null')
+                  if (st) localStorage.setItem(key, JSON.stringify({ ...st, activeBuildId: buildId }))
+                } catch {
+                  // ignore
+                }
+                setFlowModule((m) => ({ ...m, nonce: (m.nonce || 0) + 1 }))
+                setView('builder')
+              }}
+              onClose={() => setView('builder')}
+            />
+          </Suspense>
+        )}
+      </>
     )
   }
 
@@ -271,6 +323,7 @@ export default function App() {
           </div>
         </div>
       )}
+      <Suspense fallback={null}>
       <ProjectCanvas
         lessons={lessons}
         nodes={nodes}
@@ -295,6 +348,7 @@ export default function App() {
         flowModuleIds={FLOW_MODULE_IDS}
         onBuild={openBuilder}
       />
+      </Suspense>
     </div>
   )
 }

@@ -63,9 +63,14 @@ function lintProject(projectId) {
   const nodes = JSON.parse(readFileSync(path.join(dir, 'workflowNodes.json'), 'utf8'))
   const edges = JSON.parse(readFileSync(path.join(dir, 'workflowEdges.json'), 'utf8'))
   const phases = JSON.parse(readFileSync(path.join(dir, 'phases.json'), 'utf8'))
-  const lessonMeta = JSON.parse(readFileSync(path.join(dir, 'lessonMeta.json'), 'utf8'))
-  const prereqs = lessonMeta.LESSON_PREREQS
-  const lessonPath = lessonMeta.LESSON_PATH
+  // Worksheet modules carry lessonMeta.json (unlock tree + path). Runnable-flow
+  // modules (src/data/flows/<id>.json) do not; their coverage is builds[].mapNodes.
+  const metaPath = path.join(dir, 'lessonMeta.json')
+  const flowsPath = path.join(root, 'src', 'data', 'flows', `${projectId}.json`)
+  const lessonMeta = existsSync(metaPath) ? JSON.parse(readFileSync(metaPath, 'utf8')) : null
+  const flows = existsSync(flowsPath) ? JSON.parse(readFileSync(flowsPath, 'utf8')) : null
+  const prereqs = lessonMeta ? lessonMeta.LESSON_PREREQS : null
+  const lessonPath = lessonMeta ? lessonMeta.LESSON_PATH : null
 
   const err = (msg) => { errors++; console.log(`ERROR [${projectId}] ${msg}`) }
   const warn = (msg) => { warnings++; console.log(`warn  [${projectId}] ${msg}`) }
@@ -108,10 +113,11 @@ function lintProject(projectId) {
   const cyc = findCycle(forwardEdges, Array.from(ids))
   if (cyc) err(`cycle in non-temporal edges (near ${cyc}); only archive-origin edges may point backward`)
 
-  // 5. Unlock tree
+  // 5. Unlock tree (worksheet modules only)
   const taskNodeIds = new Set(nodes.filter((n) => n.taskId).map((n) => n.id))
-  if (!prereqs) err('lessonMeta.json missing LESSON_PREREQS')
-  else {
+  if (!lessonMeta && !flows) err('needs either lessonMeta.json (worksheets) or src/data/flows/<id>.json (runnable flows)')
+  if (lessonMeta && !prereqs) err('lessonMeta.json missing LESSON_PREREQS')
+  else if (prereqs) {
     const keys = new Set(Object.keys(prereqs))
     taskNodeIds.forEach((id) => { if (!keys.has(id)) err(`task node "${id}" missing from LESSON_PREREQS`) })
     keys.forEach((id) => { if (!taskNodeIds.has(id)) err(`LESSON_PREREQS key "${id}" is not a task-bearing node`) })
@@ -137,9 +143,9 @@ function lintProject(projectId) {
     }
   }
 
-  // 6. LESSON_PATH
-  if (!lessonPath) err('lessonMeta.json missing LESSON_PATH')
-  else if (prereqs) {
+  // 6. LESSON_PATH (worksheet modules only)
+  if (lessonMeta && !lessonPath) err('lessonMeta.json missing LESSON_PATH')
+  else if (lessonPath && prereqs) {
     const pathSet = new Set(lessonPath)
     if (pathSet.size !== lessonPath.length) err('LESSON_PATH contains duplicates')
     Object.keys(prereqs).forEach((k) => { if (!pathSet.has(k)) err(`"${k}" in LESSON_PREREQS but not LESSON_PATH`) })
@@ -163,9 +169,10 @@ function lintProject(projectId) {
   } else {
     const ops = opsNodes[0]
     if (ops.type === 'decision') err(`ops node "${ops.id}" must not be the decision node (the one-fork rule)`)
-    if (!ops.taskId) err(`ops node "${ops.id}" needs a taskId - it carries lessons in all three tiers`)
-    if (!prereqs[ops.id]) err(`ops node "${ops.id}" is missing from LESSON_PREREQS`)
-    else if ((prereqs[ops.id] || []).length === 0) err(`ops node "${ops.id}" needs at least one prerequisite`)
+    if (lessonMeta && !ops.taskId) err(`ops node "${ops.id}" needs a taskId - it carries lessons in all three tiers`)
+    if (prereqs && !prereqs[ops.id]) err(`ops node "${ops.id}" is missing from LESSON_PREREQS`)
+    else if (prereqs && (prereqs[ops.id] || []).length === 0) err(`ops node "${ops.id}" needs at least one prerequisite`)
+    if (flows && !(flows.builds || []).some((b) => (b.mapNodes || []).includes(ops.id))) err(`ops node "${ops.id}" is not covered by any build's mapNodes`)
     const row = skeleton.modules?.[projectId]?.map
     if (!row) err(`no moduleSkeleton row for ${projectId}`)
     else if (row.operate !== ops.label) {
@@ -180,6 +187,19 @@ function lintProject(projectId) {
     for (const stage of skeleton.skeleton) {
       if (!row[stage.id]) err(`moduleSkeleton row for ${projectId} is missing stage "${stage.id}"`)
     }
+  }
+
+  // 10. flow coverage: every mapNodes id exists and every task node is made by
+  // some build (runnable-flow modules).
+  if (flows) {
+    const covered = new Set()
+    for (const b of flows.builds || []) {
+      for (const id of b.mapNodes || []) {
+        if (!ids.has(id)) err(`build ${b.id} mapNodes names unknown node "${id}"`)
+        covered.add(id)
+      }
+    }
+    taskNodeIds.forEach((id) => { if (!covered.has(id)) err(`task node "${id}" is not covered by any build's mapNodes`) })
   }
 
   // 9. column-capacity: the canvas is a fixed 5-column grid; more than 5 nodes

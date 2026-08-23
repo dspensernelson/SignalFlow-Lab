@@ -5,8 +5,8 @@ import { kindStyle, tint } from './kindStyles.js'
 // The step palette, shown inline at an insertion point. Labels follow the
 // active skin, so in the Power Automate view a Transform is offered as
 // "Compose" - the invariant wears the tool's costume even while you build.
-export default function Palette({ skin, onPick, onCancel, allowTrigger = false }) {
-  const kinds = STEP_KINDS.filter((k) => allowTrigger || k !== 'trigger')
+export default function Palette({ skin, onPick, onCancel, allowTrigger = false, kinds: onlyKinds = null }) {
+  const kinds = STEP_KINDS.filter((k) => (allowTrigger || k !== 'trigger') && (!onlyKinds || onlyKinds.includes(k)))
   return (
     <div className="rounded-xl border border-sf-accent-border bg-sf-surface p-2 shadow-sf-md">
       <div className="mb-1.5 flex items-center justify-between px-1">

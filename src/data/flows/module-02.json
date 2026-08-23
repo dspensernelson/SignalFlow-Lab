@@ -3,6 +3,21 @@
   "title": "Beacon Invoice Desk",
   "org": "Beacon Manufacturing",
   "intro": "Beacon's accounts-payable desk owes an approved payment run by 3:00 PM every day. You are going to build the automation that runs it: an invoice lands, the flow looks up what it bills against, checks it three ways, holds anything suspicious, and pays what is clean. Then it meets a real day.",
+  "world": {
+    "oneLiner": "Beacon's accounts-payable desk pays vendor invoices for goods Beacon ordered and received, and it owes the Controller an approved payment run by 3:00 PM every day.",
+    "roles": [
+      { "name": "AP Clerk", "does": "Works the invoices as they land. Owns the Payment Batch and Payment History, and is the person to tell when an invoice looks like one already paid." },
+      { "name": "AP Manager", "does": "Approves the daily run at 2:30 PM. Owns the Exception Queue and the Payment Run Archive." },
+      { "name": "Procurement Lead", "does": "Owns the PO Register. Answers for any price that does not match what was agreed on the purchase order." },
+      { "name": "Receiving Desk", "does": "Owns the Receipt Log. Answers for goods that were billed but never posted as received." },
+      { "name": "Vendor Relations Desk", "does": "Owns the Vendor Master. Onboards a payee before the desk is allowed to pay it." },
+      { "name": "Controller", "does": "Owns the Tolerance Policy, the governed rule for how far a price may drift before a person has to look." },
+      { "name": "Payables DL", "does": "The distribution list that receives the approved payment run and releases the money." }
+    ],
+    "deliverable": "an approved payment run by 3:00 PM, every day",
+    "clock": "8:00 AM invoices land and the invoice flow works each one as it arrives; 2:30 PM the run flow collects today's batch and asks the AP Manager; 3:00 PM the approved run reaches the Payables DL.",
+    "stakes": "Get it wrong and the desk pays the same invoice twice, or pays a payee nobody has vetted - money that does not come back."
+  },
   "owners": ["AP Clerk", "AP Manager", "Procurement Lead", "Receiving Desk", "Vendor Relations Desk", "Controller", "Payables DL"],
   "sources": [
     {
@@ -14,15 +29,15 @@
     }
   ],
   "stores": [
-    { "id": "vendor-master", "label": "Vendor Master", "keyField": "vendorId", "owner": "Vendor Relations Desk", "description": "Every vendor Beacon may pay: legal name, remit-to, bank on file, status. Unknown payee = hard stop.", "fields": ["vendorId", "legalName", "status", "bankOnFile", "remitTo"] },
-    { "id": "po-register", "label": "PO Register", "keyField": "poNumber", "owner": "Procurement Lead", "description": "Purchase orders: what was agreed, at what price, for which vendor.", "fields": ["poNumber", "vendorId", "quantityOrdered", "unitPricePO", "poTotal"] },
-    { "id": "receipt-log", "label": "Receipt Log", "keyField": "poNumber", "owner": "Receiving Desk", "description": "Goods receipts posted against POs: what actually arrived.", "fields": ["poNumber", "quantityReceived", "receiptDate", "status"] },
-    { "id": "tolerance-policy", "label": "Tolerance Policy", "keyField": "version", "owner": "Controller", "description": "The governed rule: a price matches if the variance is within the LARGER of pricePct% of the PO or priceAbs dollars. Quantity must match exactly.", "fields": ["version", "pricePct", "priceAbs", "qtyTolerance", "approvedBy"] },
-    { "id": "payment-history", "label": "Payment History", "keyField": "invoiceNumber", "owner": "AP Clerk", "description": "Everything already paid. Identity key = vendorId + invoiceNumber + invoiceTotal. Yesterday's run seeds today's duplicate check.", "fields": ["invoiceNumber", "vendorId", "invoiceTotal", "paidOn"] },
-    { "id": "payment-batch", "label": "Payment Batch", "daily": true, "owner": "AP Clerk", "description": "Today's invoices cleared to pay. Empties every morning.", "fields": ["invoiceNumber", "vendorId", "invoiceTotal"] },
-    { "id": "exception-queue", "label": "Exception Queue", "daily": true, "owner": "AP Manager", "description": "Today's holds, each with a reason, waiting for an owner.", "fields": ["invoiceNumber", "reason"] },
-    { "id": "payment-run-archive", "label": "Payment Run Archive", "keyField": "runId", "owner": "AP Manager", "description": "Every delivered run, with what was paid and who approved it.", "fields": ["runId", "count", "total"] },
-    { "id": "dead-letter", "label": "Dead Letter", "daily": true, "owner": "on-call owner", "description": "Records a step could not process after retries. Parked here so a person can see them.", "fields": ["recordLabel", "cause"] }
+    { "id": "vendor-master", "label": "Vendor Master", "keyField": "vendorId", "owner": "Vendor Relations Desk", "tone": "neutral", "description": "Every vendor Beacon may pay: legal name, remit-to, bank on file, status. Unknown payee = hard stop.", "fields": ["vendorId", "legalName", "status", "bankOnFile", "remitTo"] },
+    { "id": "po-register", "label": "PO Register", "keyField": "poNumber", "owner": "Procurement Lead", "tone": "neutral", "description": "Purchase orders: what was agreed, at what price, for which vendor.", "fields": ["poNumber", "vendorId", "quantityOrdered", "unitPricePO", "poTotal"] },
+    { "id": "receipt-log", "label": "Receipt Log", "keyField": "poNumber", "owner": "Receiving Desk", "tone": "neutral", "description": "Goods receipts posted against POs: what actually arrived.", "fields": ["poNumber", "quantityReceived", "receiptDate", "status"] },
+    { "id": "tolerance-policy", "label": "Tolerance Policy", "keyField": "version", "owner": "Controller", "tone": "neutral", "description": "The governed rule: a price matches if the variance is within the LARGER of pricePct% of the PO or priceAbs dollars. Quantity must match exactly.", "fields": ["version", "pricePct", "priceAbs", "qtyTolerance", "approvedBy"] },
+    { "id": "payment-history", "label": "Payment History", "keyField": "invoiceNumber", "owner": "AP Clerk", "tone": "neutral", "description": "Everything already paid. Identity key = vendorId + invoiceNumber + invoiceTotal. Yesterday's run seeds today's duplicate check.", "fields": ["invoiceNumber", "vendorId", "invoiceTotal", "paidOn"] },
+    { "id": "payment-batch", "label": "Payment Batch", "daily": true, "owner": "AP Clerk", "tone": "good", "description": "Today's invoices cleared to pay. Empties every morning.", "fields": ["invoiceNumber", "vendorId", "invoiceTotal"] },
+    { "id": "exception-queue", "label": "Exception Queue", "daily": true, "owner": "AP Manager", "tone": "hold", "description": "Today's holds, each with a reason, waiting for an owner.", "fields": ["invoiceNumber", "reason"] },
+    { "id": "payment-run-archive", "label": "Payment Run Archive", "keyField": "runId", "owner": "AP Manager", "tone": "good", "description": "Every delivered run, with what was paid and who approved it.", "fields": ["runId", "count", "total"] },
+    { "id": "dead-letter", "label": "Dead Letter", "daily": true, "owner": "on-call owner", "tone": "bad", "description": "Records a step could not process after retries. Parked here so a person can see them.", "fields": ["recordLabel", "cause"] }
   ],
   "flows": [
     { "id": "invoice-flow", "name": "Invoice intake and match", "description": "Runs once per invoice as it arrives.", "trigger": { "mode": "event", "source": "invoice-inbox" } },
@@ -123,18 +138,29 @@
       "dayId": "day-1",
       "flowId": "invoice-flow",
       "title": "Capture and look up",
-      "goal": "When an invoice arrives, fetch the purchase order it bills against and the goods receipt for that PO, and attach both to the invoice.",
-      "hints": [
-        "Start with the Trigger: connect it to the Invoice Inbox.",
-        "Add a Lookup on the PO Register where poNumber = poNumber. Name the result po.",
-        "Add a Lookup on the Receipt Log where poNumber = poNumber. Name the result receipt.",
-        "Run it. Click INV-58831 in the run to see what each step attached."
+      "goal": "An invoice has arrived. Before the desk can judge it, the flow has to put next to it the two things the invoice claims to bill against: what Beacon ordered, and what actually arrived. Make the invoice record carry both.",
+      "outcome": "Every invoice that enters the flow leaves this stage carrying its purchase order and its goods receipt, so the next build can compare real numbers instead of trusting the invoice.",
+      "constraints": [
+        "The invoice names its PO; the PO Register and the Receipt Log are both keyed by that PO number.",
+        "Attach the two records as po and receipt - the next build computes against those names.",
+        "Do not compute or decide anything yet. This build only gathers."
       ],
+      "requires": ["trigger", "lookup", "json-record"],
+      "hints": {
+        "question": "Before the desk pays an invoice, what does it need to know about the thing it is paying for, and which table holds each of those facts?",
+        "nudge": "Two Lookups: one against the PO Register and one against the Receipt Log, both joined by PO number. Each returns one JSON record that is attached to the invoice under the name you give it (po, receipt); the Data tab shows the fields each table will hand back.",
+        "steps": [
+          "Start with the Trigger: connect it to the Invoice Inbox.",
+          "Add a Lookup on the PO Register where poNumber = poNumber. Name the result po.",
+          "Add a Lookup on the Receipt Log where poNumber = poNumber. Name the result receipt.",
+          "Run it. Click INV-58831 in the run to see what each step attached."
+        ]
+      },
       "mapNodes": ["invoice-inbox", "invoice-record", "po-register", "receipt-log"],
       "checks": [
-        { "id": "b1-run", "kind": "runStatus", "flowId": "invoice-flow", "equals": "succeeded", "label": "The invoice flow runs without failing" },
-        { "id": "b1-po", "kind": "recordField", "where": { "invoiceNumber": "INV-58831" }, "field": ["po.poTotal", "po-register.poTotal"], "equals": 1200, "label": "INV-58831 carries its PO (poTotal 1200.00)" },
-        { "id": "b1-receipt", "kind": "recordField", "where": { "invoiceNumber": "INV-58831" }, "field": ["receipt.quantityReceived", "receipt-log.quantityReceived"], "equals": 500, "label": "INV-58831 carries its receipt (500 received)" }
+        { "id": "b1-run", "kind": "runStatus", "flowId": "invoice-flow", "equals": "succeeded", "why": "A flow that fails on a clean invoice pays nothing, and the desk never gets started.", "label": "The invoice flow runs without failing" },
+        { "id": "b1-po", "kind": "recordField", "where": { "invoiceNumber": "INV-58831" }, "field": ["po.poTotal", "po-register.poTotal"], "equals": 1200, "why": "The PO is the agreed price; without it there is nothing to match the invoice against.", "label": "INV-58831 carries its PO (poTotal 1200.00)" },
+        { "id": "b1-receipt", "kind": "recordField", "where": { "invoiceNumber": "INV-58831" }, "field": ["receipt.quantityReceived", "receipt-log.quantityReceived"], "equals": 500, "why": "The receipt is proof the goods arrived; without it the desk would be paying for a promise.", "label": "INV-58831 carries its receipt (500 received)" }
       ]
     },
     {
@@ -142,19 +168,30 @@
       "dayId": "day-1",
       "flowId": "invoice-flow",
       "title": "Compute the match",
-      "goal": "Work out the price variance against the PO, the tolerance band (the larger of 2% of the PO or 25.00 - read it from the Tolerance Policy rather than typing the numbers), the variance as a percent, and whether the quantity received equals the quantity ordered. Name them variance, variancePct, band, qtyMatch - the decision reads those names.",
-      "hints": [
-        "Add a Lookup on the Tolerance Policy where version = '1.0.0' (quotes make it a literal). Name it policy.",
-        "Add a Transform that sets variance = invoiceTotal - po.poTotal.",
-        "In the same Transform: variancePct = round(variance / po.poTotal * 100, 2), band = max(po.poTotal * policy.pricePct / 100, policy.priceAbs), qtyMatch = receipt.quantityReceived == po.quantityOrdered.",
-        "Run it and read the Transform step's note - it shows every value it set."
+      "goal": "The invoice now carries its PO and its receipt. Turn those three records into the facts the desk's decision will read: how far the billed price is from the agreed price, whether that gap is inside the governed tolerance, and whether what arrived is what was ordered.",
+      "outcome": "Every invoice carries four computed facts - variance, variancePct, band, qtyMatch - derived from its PO, its receipt and the Tolerance Policy, ready for a decision to read.",
+      "constraints": [
+        "Name the computed fields variance, variancePct, band, qtyMatch - the decision reads those names.",
+        "Read the tolerance from the Tolerance Policy table; do not type 2 and 25.",
+        "The band is the LARGER of pricePct% of the PO total and priceAbs dollars. Quantity must match exactly."
       ],
+      "requires": ["transform", "fields-and-paths", "data-types"],
+      "hints": {
+        "question": "The Controller owns the tolerance and will change it one day without telling you. Where does the number have to live for your flow to still be right the next morning?",
+        "nudge": "A Lookup on the Tolerance Policy (its key is the version, a literal string in quotes) attaches a policy record; then a Transform writes new fields onto the invoice using arithmetic and comparisons over the po.*, receipt.* and policy.* paths. Watch the data types: variance is a number, qtyMatch is a boolean.",
+        "steps": [
+          "Add a Lookup on the Tolerance Policy where version = '1.0.0' (quotes make it a literal). Name it policy.",
+          "Add a Transform that sets variance = invoiceTotal - po.poTotal.",
+          "In the same Transform: variancePct = round(variance / po.poTotal * 100, 2), band = max(po.poTotal * policy.pricePct / 100, policy.priceAbs), qtyMatch = receipt.quantityReceived == po.quantityOrdered.",
+          "Run it and read the Transform step's note - it shows every value it set."
+        ]
+      },
       "mapNodes": ["tolerance-policy", "three-way-match"],
       "checks": [
-        { "id": "b2-variance", "kind": "recordField", "where": { "invoiceNumber": "INV-58831" }, "field": "variance", "equals": 20, "label": "variance = 20.00 (1220.00 - 1200.00)" },
-        { "id": "b2-pct", "kind": "recordField", "where": { "invoiceNumber": "INV-58831" }, "field": "variancePct", "equals": 1.67, "label": "variancePct = 1.67" },
-        { "id": "b2-band", "kind": "recordField", "where": { "invoiceNumber": "INV-58831" }, "field": "band", "equals": 25, "label": "band = 25.00 (the larger of 24.00 and 25.00)" },
-        { "id": "b2-qty", "kind": "recordField", "where": { "invoiceNumber": "INV-58831" }, "field": "qtyMatch", "equals": true, "label": "qtyMatch = true (500 received, 500 ordered)" }
+        { "id": "b2-variance", "kind": "recordField", "where": { "invoiceNumber": "INV-58831" }, "field": "variance", "equals": 20, "why": "The desk needs the dollar gap between what was billed and what was agreed before it can judge anything.", "label": "variance = 20.00 (1220.00 - 1200.00)" },
+        { "id": "b2-pct", "kind": "recordField", "where": { "invoiceNumber": "INV-58831" }, "field": "variancePct", "equals": 1.67, "why": "A percent puts the gap in proportion - 20.00 is small on a 1200.00 PO and large on a 200.00 one.", "label": "variancePct = 1.67" },
+        { "id": "b2-band", "kind": "recordField", "where": { "invoiceNumber": "INV-58831" }, "field": "band", "equals": 25, "why": "The band is the governed limit; it must come from the policy so a change by the Controller changes what the desk pays.", "label": "band = 25.00 (the larger of 24.00 and 25.00)" },
+        { "id": "b2-qty", "kind": "recordField", "where": { "invoiceNumber": "INV-58831" }, "field": "qtyMatch", "equals": true, "why": "Paying for 500 when fewer arrived is paying for goods Beacon does not have.", "label": "qtyMatch = true (500 received, 500 ordered)" }
       ]
     },
     {
@@ -162,18 +199,29 @@
       "dayId": "day-1",
       "flowId": "invoice-flow",
       "title": "Decide and route",
-      "goal": "Route the invoice. Within tolerance AND quantities match: write it to the Payment Batch. Otherwise: give it a reason, tell the Procurement Lead, and write it to the Exception Queue.",
-      "hints": [
-        "Add a Condition: variance <= band (compare to the field band, not a number) AND qtyMatch == true.",
-        "In the YES lane: Store in Payment Batch.",
-        "In the NO lane: a Transform setting reason = 'price over tolerance', a Send to Procurement Lead, then Store in Exception Queue.",
-        "Run it. INV-58831 should land in the batch and the Exception Queue should stay empty."
+      "goal": "The invoice carries its numbers. Now the desk has to act on them: a clean invoice goes into today's batch to be paid; anything else is held with a reason, and the person who can fix it is told.",
+      "outcome": "A clean invoice lands in the Payment Batch. Anything outside tolerance or short on goods lands in the Exception Queue with a reason, and the Procurement Lead hears about it.",
+      "constraints": [
+        "Clean means the price is inside the band AND the quantities match. Both, not either.",
+        "Compare against the band field the invoice carries, not a typed number.",
+        "A hold always carries a reason - an Exception Queue row without one tells its owner nothing."
       ],
+      "requires": ["condition", "store", "send", "stop"],
+      "hints": {
+        "question": "If you were the AP Manager reading the Exception Queue at 2:00 PM, what would each row need to say for you to know who to call?",
+        "nudge": "One Condition over the computed fields splits the flow: a YES lane that Stores to the Payment Batch, and a NO lane that Transforms a reason, Sends to the Procurement Lead, and Stores to the Exception Queue. A Store writes the record into a table; a Send writes a message to a person.",
+        "steps": [
+          "Add a Condition: variance <= band (compare to the field band, not a number) AND qtyMatch == true.",
+          "In the YES lane: Store in Payment Batch.",
+          "In the NO lane: a Transform setting reason = 'price over tolerance', a Send to Procurement Lead, then Store in Exception Queue.",
+          "Run it. INV-58831 should land in the batch and the Exception Queue should stay empty."
+        ]
+      },
       "mapNodes": ["match-decision", "auto-approve-path", "exception-queue", "payment-batch"],
       "checks": [
-        { "id": "b3-paid", "kind": "storeContains", "store": "payment-batch", "where": { "invoiceNumber": "INV-58831" }, "label": "INV-58831 is in the Payment Batch" },
-        { "id": "b3-count", "kind": "storeCount", "store": "payment-batch", "equals": 1, "label": "The Payment Batch has exactly one invoice" },
-        { "id": "b3-held", "kind": "storeCount", "store": "exception-queue", "equals": 0, "label": "The Exception Queue is empty today" }
+        { "id": "b3-paid", "kind": "storeContains", "store": "payment-batch", "where": { "invoiceNumber": "INV-58831" }, "why": "A clean invoice has to reach the batch or the vendor is not paid on time.", "label": "INV-58831 is in the Payment Batch" },
+        { "id": "b3-count", "kind": "storeCount", "store": "payment-batch", "equals": 1, "why": "One invoice in, one row in the batch - a second row here would be paid twice.", "label": "The Payment Batch has exactly one invoice" },
+        { "id": "b3-held", "kind": "storeCount", "store": "exception-queue", "equals": 0, "why": "Holding a clean invoice wastes the AP Manager's afternoon and delays a vendor for nothing.", "label": "The Exception Queue is empty today" }
       ]
     },
     {
@@ -181,32 +229,44 @@
       "dayId": "day-2",
       "flowId": "invoice-flow",
       "title": "Day 2: the mess",
-      "goal": "Five invoices land and only INV-59001 is clean. Run your Day 1 flow first and watch what it pays. Then make it hold the duplicate (already in Payment History), the vendor that is not in the Vendor Master, the invoice whose goods never arrived, and the price outside tolerance - each with a reason that says which, routed to the desk that owns it. Pay only what is clean.",
-      "hints": [
-        "Run the flow as-is first. Open INV-58962 and INV-59004 in the run and follow their paths. They get paid. Why?",
-        "A duplicate always wins: Lookup Payment History where invoiceNumber = invoiceNumber, vendorId = vendorId, invoiceTotal = invoiceTotal. Name it priorPayment. Then a Condition: priorPayment exists -> YES lane: reason = 'duplicate - already paid', Send to AP Clerk, Store in Exception Queue, Stop.",
-        "Unknown payee is a hard stop: Lookup Vendor Master where vendorId = vendorId (name it vendor); Condition vendor missing -> reason 'vendor not in master', Send to Vendor Relations Desk, Store in Exception Queue, Stop.",
-        "No receipt, no three-way match: Condition receipt missing -> reason 'missing receipt', Send to Receiving Desk, Store in Exception Queue, Stop.",
-        "Put the guards BEFORE the tolerance decision. A record that passes every guard reaches your original Condition; its NO lane already routes price exceptions to the Procurement Lead.",
-        "Forgot the Stop? The record is held AND paid. The run will show you."
+      "goal": "Day 2 is the real desk: five invoices, one clean. Run the flow you built on Day 1 and watch what it pays. Then teach it the four ways an invoice can be wrong - already paid, a payee nobody has onboarded, goods that never arrived, a price outside tolerance - so it pays only what is clean and tells the right desk about each hold.",
+      "outcome": "Only INV-59001 is paid. The other four are held, each with a reason that names its problem, and each routed to the desk that owns that kind of problem.",
+      "constraints": [
+        "A duplicate always wins over a clean match - check it first.",
+        "Unknown payee is a hard stop, never a tolerance judgement.",
+        "No receipt, no three-way match.",
+        "A held record must not also be paid - every guard ends its lane."
       ],
+      "requires": [],
+      "hints": {
+        "question": "Your Day 1 flow pays INV-58962 and INV-59004, and nothing about their numbers is wrong. What does the desk know about them that your flow never asked?",
+        "nudge": "Two more Lookups - Payment History (the identity key is vendorId + invoiceNumber + invoiceTotal) and the Vendor Master by vendorId - and three guard Conditions that test whether a lookup found anything, placed before the tolerance decision. Each guard's YES lane holds, sends to the owning desk, and Stops.",
+        "steps": [
+          "Run the flow as-is first. Open INV-58962 and INV-59004 in the run and follow their paths. They get paid. Why?",
+          "A duplicate always wins: Lookup Payment History where invoiceNumber = invoiceNumber, vendorId = vendorId, invoiceTotal = invoiceTotal. Name it priorPayment. Then a Condition: priorPayment exists -> YES lane: reason = 'duplicate - already paid', Send to AP Clerk, Store in Exception Queue, Stop.",
+          "Unknown payee is a hard stop: Lookup Vendor Master where vendorId = vendorId (name it vendor); Condition vendor missing -> reason 'vendor not in master', Send to Vendor Relations Desk, Store in Exception Queue, Stop.",
+          "No receipt, no three-way match: Condition receipt missing -> reason 'missing receipt', Send to Receiving Desk, Store in Exception Queue, Stop.",
+          "Put the guards BEFORE the tolerance decision. A record that passes every guard reaches your original Condition; its NO lane already routes price exceptions to the Procurement Lead.",
+          "Forgot the Stop? The record is held AND paid. The run will show you."
+        ]
+      },
       "mapNodes": ["vendor-master", "payment-history", "duplicate-check", "exception-queue"],
       "checks": [
-        { "id": "b4-paid", "kind": "storeContains", "store": "payment-batch", "where": { "invoiceNumber": "INV-59001" }, "label": "INV-59001 (the clean one) is in the Payment Batch" },
-        { "id": "b4-count", "kind": "storeCount", "store": "payment-batch", "equals": 1, "label": "The Payment Batch holds exactly one invoice" },
-        { "id": "b4-total", "kind": "storeSum", "store": "payment-batch", "field": "invoiceTotal", "equals": 1200, "label": "The Payment Batch totals 1200.00" },
+        { "id": "b4-paid", "kind": "storeContains", "store": "payment-batch", "where": { "invoiceNumber": "INV-59001" }, "why": "The clean invoice still has to be paid - guards that hold everything are not a desk.", "label": "INV-59001 (the clean one) is in the Payment Batch" },
+        { "id": "b4-count", "kind": "storeCount", "store": "payment-batch", "equals": 1, "why": "Exactly one invoice was clean; a second row is a payment the desk cannot justify.", "label": "The Payment Batch holds exactly one invoice" },
+        { "id": "b4-total", "kind": "storeSum", "store": "payment-batch", "field": "invoiceTotal", "equals": 1200, "why": "The batch total is the money the run will release; it must equal the one clean invoice.", "label": "The Payment Batch totals 1200.00" },
         { "id": "b4-dup-not-paid", "kind": "storeMissing", "store": "payment-batch", "where": { "invoiceNumber": "INV-58962" }, "why": "it was already paid on day-0 for 640.00", "label": "INV-58962 (duplicate) is NOT paid" },
         { "id": "b4-vendor-not-paid", "kind": "storeMissing", "store": "payment-batch", "where": { "invoiceNumber": "INV-59004" }, "why": "V-1205 Sierra Tooling is not in the Vendor Master, so there is no bank to pay", "label": "INV-59004 (unknown vendor) is NOT paid" },
         { "id": "b4-price-not-paid", "kind": "storeMissing", "store": "payment-batch", "where": { "invoiceNumber": "INV-59002" }, "why": "90.00 over a 1140.00 PO is far outside the 25.00 band", "label": "INV-59002 (price over tolerance) is NOT paid" },
         { "id": "b4-receipt-not-paid", "kind": "storeMissing", "store": "payment-batch", "where": { "invoiceNumber": "INV-59005" }, "why": "no goods receipt exists for PO-7763", "label": "INV-59005 (missing receipt) is NOT paid" },
-        { "id": "b4-dup-reason", "kind": "storeContains", "store": "exception-queue", "where": { "invoiceNumber": "INV-58962" }, "fieldsContain": { "reason": ["duplicate", "already paid"] }, "label": "INV-58962 is held with a reason that says duplicate" },
-        { "id": "b4-vendor-reason", "kind": "storeContains", "store": "exception-queue", "where": { "invoiceNumber": "INV-59004" }, "fieldsContain": { "reason": ["vendor", "master", "payee"] }, "label": "INV-59004 is held with a reason that says vendor" },
-        { "id": "b4-price-reason", "kind": "storeContains", "store": "exception-queue", "where": { "invoiceNumber": "INV-59002" }, "fieldsContain": { "reason": ["tolerance", "price", "variance"] }, "label": "INV-59002 is held with a reason that says price" },
-        { "id": "b4-receipt-reason", "kind": "storeContains", "store": "exception-queue", "where": { "invoiceNumber": "INV-59005" }, "fieldsContain": { "reason": ["receipt", "received", "goods"] }, "label": "INV-59005 is held with a reason that says receipt" },
-        { "id": "b4-send-dup", "kind": "outboxContains", "to": "AP Clerk", "recordLabel": "INV-58962", "label": "The AP Clerk is told about the duplicate" },
-        { "id": "b4-send-vendor", "kind": "outboxContains", "to": "Vendor Relations Desk", "recordLabel": "INV-59004", "label": "Vendor Relations is asked to onboard Sierra Tooling" },
-        { "id": "b4-send-price", "kind": "outboxContains", "to": "Procurement Lead", "recordLabel": "INV-59002", "label": "The Procurement Lead is asked about the price" },
-        { "id": "b4-send-receipt", "kind": "outboxContains", "to": "Receiving Desk", "recordLabel": "INV-59005", "label": "The Receiving Desk is asked about the missing receipt" }
+        { "id": "b4-dup-reason", "kind": "storeContains", "store": "exception-queue", "where": { "invoiceNumber": "INV-58962" }, "fieldsContain": { "reason": ["duplicate", "already paid"] }, "why": "The AP Clerk needs to know this is a repeat, not a price or vendor problem, to act on it.", "label": "INV-58962 is held with a reason that says duplicate" },
+        { "id": "b4-vendor-reason", "kind": "storeContains", "store": "exception-queue", "where": { "invoiceNumber": "INV-59004" }, "fieldsContain": { "reason": ["vendor", "master", "payee"] }, "why": "Vendor Relations needs to know the hold is about onboarding, not about the invoice itself.", "label": "INV-59004 is held with a reason that says vendor" },
+        { "id": "b4-price-reason", "kind": "storeContains", "store": "exception-queue", "where": { "invoiceNumber": "INV-59002" }, "fieldsContain": { "reason": ["tolerance", "price", "variance"] }, "why": "The Procurement Lead needs to know it is a price dispute to take it up with the vendor.", "label": "INV-59002 is held with a reason that says price" },
+        { "id": "b4-receipt-reason", "kind": "storeContains", "store": "exception-queue", "where": { "invoiceNumber": "INV-59005" }, "fieldsContain": { "reason": ["receipt", "received", "goods"] }, "why": "The Receiving Desk needs to know goods are unaccounted for, not that a price is wrong.", "label": "INV-59005 is held with a reason that says receipt" },
+        { "id": "b4-send-dup", "kind": "outboxContains", "to": "AP Clerk", "recordLabel": "INV-58962", "why": "The AP Clerk owns Payment History and is the one who can confirm the earlier payment.", "label": "The AP Clerk is told about the duplicate" },
+        { "id": "b4-send-vendor", "kind": "outboxContains", "to": "Vendor Relations Desk", "recordLabel": "INV-59004", "why": "Only Vendor Relations can onboard a payee; nobody else can clear this hold.", "label": "Vendor Relations is asked to onboard Sierra Tooling" },
+        { "id": "b4-send-price", "kind": "outboxContains", "to": "Procurement Lead", "recordLabel": "INV-59002", "why": "The Procurement Lead owns the PO and the relationship that agreed the price.", "label": "The Procurement Lead is asked about the price" },
+        { "id": "b4-send-receipt", "kind": "outboxContains", "to": "Receiving Desk", "recordLabel": "INV-59005", "why": "The Receiving Desk owns the Receipt Log and can find or post the missing receipt.", "label": "The Receiving Desk is asked about the missing receipt" }
       ]
     },
     {
@@ -214,23 +274,34 @@
       "dayId": "day-2",
       "flowId": "run-flow",
       "title": "The 2:30 PM run",
-      "goal": "Build the second flow. At 2:30 PM: collect everything in today's Payment Batch, count it and total it, get the AP Manager's approval, compose the payment run, deliver it to the Payables DL, archive the run, and write every paid invoice into Payment History so tomorrow's duplicate check sees it. If the manager does not approve, tell the AP Clerk and stop.",
-      "hints": [
-        "The trigger is already on a schedule. Add a Lookup on Payment Batch, mode ALL rows, no match fields. Name it batch.",
-        "Transform: count = len(batch), total = sum(batch, 'invoiceTotal').",
-        "Approval: AP Manager, about 'payment run'. The reply lands on approval.outcome.",
-        "Condition: approval.outcome == 'approved' (a value, in quotes or not). YES lane: Compose the run with {{count}}, {{total}} and {{#each batch}}- {{invoiceNumber}} {{invoiceTotal}} {{/each}}; Send to Payables DL with the composed body; Store in Payment Run Archive; Store in Payment History FROM batch. NO lane: Send to AP Clerk, Stop.",
-        "Run it. The run doc should list INV-59001 and Payment History should now contain it."
+      "goal": "It is 2:30 PM and the batch holds what the invoice flow cleared today. Build the second flow: gather the batch, put a count and a total on it, get the AP Manager's sign-off, deliver the run to the people who release the money, keep a record of it, and make sure tomorrow's duplicate check knows what was paid today. If the manager says no, nothing moves and the AP Clerk is told.",
+      "outcome": "By 3:00 PM the Payables DL holds an approved run that lists every paid invoice with its count and total, the run is archived, and every invoice in it now sits in Payment History.",
+      "constraints": [
+        "The run flow reads the whole batch at once, not one invoice at a time - it works on a list.",
+        "Nothing is delivered or archived without the AP Manager's approval captured on the run.",
+        "Payment History grows by one row per paid invoice, not one row per run."
       ],
+      "requires": ["schedule-trigger", "lookup-all", "approval", "compose", "lists"],
+      "hints": {
+        "question": "Tomorrow morning the invoice flow will ask 'was this already paid?'. What has to be true tonight for that question to get a correct answer?",
+        "nudge": "A schedule trigger starts from an empty run record. A Lookup in ALL mode returns a list; len() and sum() summarize it; an Approval step writes the reply to approval.outcome; a Compose step renders {{placeholders}} and {{#each}} over the list; a Store FROM the batch writes one row per item.",
+        "steps": [
+          "The trigger is already on a schedule. Add a Lookup on Payment Batch, mode ALL rows, no match fields. Name it batch.",
+          "Transform: count = len(batch), total = sum(batch, 'invoiceTotal').",
+          "Approval: AP Manager, about 'payment run'. The reply lands on approval.outcome.",
+          "Condition: approval.outcome == 'approved' (a value, in quotes or not). YES lane: Compose the run with {{count}}, {{total}} and {{#each batch}}- {{invoiceNumber}} {{invoiceTotal}} {{/each}}; Send to Payables DL with the composed body; Store in Payment Run Archive; Store in Payment History FROM batch. NO lane: Send to AP Clerk, Stop.",
+          "Run it. The run doc should list INV-59001 and Payment History should now contain it."
+        ]
+      },
       "mapNodes": ["payment-batch", "run-approval", "payment-run", "remittance-advice", "payment-archive"],
       "checks": [
-        { "id": "b5-run", "kind": "runStatus", "flowId": "run-flow", "equals": "succeeded", "label": "The payment-run flow runs without failing" },
-        { "id": "b5-count", "kind": "recordField", "where": { "runId": "day-2-run" }, "field": ["count", "invoiceCount"], "equals": 1, "label": "The run counts 1 invoice" },
-        { "id": "b5-total", "kind": "recordField", "where": { "runId": "day-2-run" }, "field": ["total", "runTotal", "batchTotal"], "equals": 1200, "label": "The run totals 1200.00" },
-        { "id": "b5-approved", "kind": "recordField", "where": { "runId": "day-2-run" }, "field": "approval.outcome", "equals": "approved", "label": "The AP Manager's approval is captured on the run" },
-        { "id": "b5-delivered", "kind": "outboxContains", "to": "Payables DL", "contains": "INV-59001", "label": "The Payables DL receives the run, and it names INV-59001" },
-        { "id": "b5-archived", "kind": "storeContains", "store": "payment-run-archive", "where": { "runId": "day-2-run" }, "label": "The run is archived" },
-        { "id": "b5-history", "kind": "storeContains", "store": "payment-history", "where": { "invoiceNumber": "INV-59001" }, "label": "INV-59001 is now in Payment History (tomorrow's duplicate baseline)" }
+        { "id": "b5-run", "kind": "runStatus", "flowId": "run-flow", "equals": "succeeded", "why": "A run flow that fails means no payment run, and the desk misses 3:00 PM.", "label": "The payment-run flow runs without failing" },
+        { "id": "b5-count", "kind": "recordField", "where": { "runId": "day-2-run" }, "field": ["count", "invoiceCount"], "equals": 1, "why": "The AP Manager approves a known number of payments, not a vague batch.", "label": "The run counts 1 invoice" },
+        { "id": "b5-total", "kind": "recordField", "where": { "runId": "day-2-run" }, "field": ["total", "runTotal", "batchTotal"], "equals": 1200, "why": "The total is the money that leaves Beacon; the manager and the Payables DL both read it.", "label": "The run totals 1200.00" },
+        { "id": "b5-approved", "kind": "recordField", "where": { "runId": "day-2-run" }, "field": "approval.outcome", "equals": "approved", "why": "Money moves only on a recorded approval - the run must show who said yes.", "label": "The AP Manager's approval is captured on the run" },
+        { "id": "b5-delivered", "kind": "outboxContains", "to": "Payables DL", "contains": "INV-59001", "why": "The Payables DL releases payments from the run document; an invoice it does not name is not paid.", "label": "The Payables DL receives the run, and it names INV-59001" },
+        { "id": "b5-archived", "kind": "storeContains", "store": "payment-run-archive", "where": { "runId": "day-2-run" }, "why": "The archive is the audit trail: what was paid, when, and on whose approval.", "label": "The run is archived" },
+        { "id": "b5-history", "kind": "storeContains", "store": "payment-history", "where": { "invoiceNumber": "INV-59001" }, "why": "Tomorrow's duplicate check reads Payment History; a paid invoice missing from it can be paid again.", "label": "INV-59001 is now in Payment History (tomorrow's duplicate baseline)" }
       ]
     },
     {
@@ -238,20 +309,31 @@
       "dayId": "day-3",
       "flowId": "invoice-flow",
       "title": "Day 3: it breaks in production",
-      "goal": "The PO register rejects the first call of the morning (its token was rotated overnight). Run the flow and watch INV-59101 vanish. Then make the flow survive: retry a few times, and if a step still fails, park the record where a person will see it and alert the on-call owner.",
-      "hints": [
-        "Run first. Open INV-59101: the PO lookup failed and the record was dropped silently. Nobody was told. That is the worst outcome available.",
-        "Open Settings (the gear on the flow). Set retries to 3 and On failure to dead-letter and alert.",
-        "Run again. The lookup recovers on attempt 2 and the invoice is paid. The retry is visible in the step note.",
-        "Zero retries gives up on a hiccup; ten turns an outage into an attack. Three clears a blip."
+      "goal": "One clean invoice, and a dependency that rejects the first call of the morning. Run the flow and watch INV-59101 vanish. Then make the flow survive a failure that will clear on its own - and when a failure does not clear, make sure a person sees the record instead of losing it.",
+      "outcome": "A transient failure on a lookup no longer drops the invoice: the flow recovers on a retry and the invoice is paid, and any record that still cannot be processed is parked in Dead Letter with the on-call owner alerted.",
+      "constraints": [
+        "Retries are a small number: enough to clear a blip, not enough to turn an outage into a hammering of someone else's system.",
+        "A failure nobody sees is the worst outcome. A silent drop is never acceptable.",
+        "This build changes the flow's settings, not its steps."
       ],
+      "requires": ["operate-retry"],
+      "hints": {
+        "question": "When a step fails, who finds out, and when? If the honest answer is 'nobody, ever', what did the desk just lose?",
+        "nudge": "Open the flow's Settings: retries (how many more tries a failed step gets) and on-failure (what happens to a record that is still failing after the last retry - dead-letter and alert parks it where a person will see it). The run trace marks the step that recovered.",
+        "steps": [
+          "Run first. Open INV-59101: the PO lookup failed and the record was dropped silently. Nobody was told. That is the worst outcome available.",
+          "Open Settings (the gear on the flow). Set retries to 3 and On failure to dead-letter and alert.",
+          "Run again. The lookup recovers on attempt 2 and the invoice is paid. The retry is visible in the step note.",
+          "Zero retries gives up on a hiccup; ten turns an outage into an attack. Three clears a blip."
+        ]
+      },
       "mapNodes": ["run-operations"],
       "checks": [
-        { "id": "b6-run", "kind": "runStatus", "flowId": "invoice-flow", "equals": "succeeded", "label": "The invoice flow survives the rejected first call" },
-        { "id": "b6-retry", "kind": "stepRetried", "flowId": "invoice-flow", "stepKind": "lookup", "store": "po-register", "label": "The PO lookup recovered on a retry" },
-        { "id": "b6-paid", "kind": "storeContains", "store": "payment-batch", "where": { "invoiceNumber": "INV-59101" }, "label": "INV-59101 is in the Payment Batch" },
-        { "id": "b6-retries", "kind": "settingInRange", "flowId": "invoice-flow", "path": "retries", "min": 1, "max": 5, "label": "Retries are set between 1 and 5" },
-        { "id": "b6-policy", "kind": "settingEquals", "flowId": "invoice-flow", "path": "onFailure", "equals": "dead-letter", "label": "On failure: dead-letter and alert (a failure nobody sees is the worst outcome)" }
+        { "id": "b6-run", "kind": "runStatus", "flowId": "invoice-flow", "equals": "succeeded", "why": "A flow that dies on the first hiccup of the morning pays nobody that day.", "label": "The invoice flow survives the rejected first call" },
+        { "id": "b6-retry", "kind": "stepRetried", "flowId": "invoice-flow", "stepKind": "lookup", "store": "po-register", "why": "Recovery must be visible in the trace so the on-call owner can tell a blip from an outage.", "label": "The PO lookup recovered on a retry" },
+        { "id": "b6-paid", "kind": "storeContains", "store": "payment-batch", "where": { "invoiceNumber": "INV-59101" }, "why": "The invoice was clean; a rotated token is not a reason for the vendor to wait.", "label": "INV-59101 is in the Payment Batch" },
+        { "id": "b6-retries", "kind": "settingInRange", "flowId": "invoice-flow", "path": "retries", "min": 1, "max": 5, "why": "Too few retries give up on a blip; too many turn an outage into a hammering of a dependency.", "label": "Retries are set between 1 and 5" },
+        { "id": "b6-policy", "kind": "settingEquals", "flowId": "invoice-flow", "path": "onFailure", "equals": "dead-letter", "why": "A record that still fails after every retry must land where a person will see it.", "label": "On failure: dead-letter and alert (a failure nobody sees is the worst outcome)" }
       ]
     }
   ]

@@ -14,7 +14,8 @@
     "test:lessons": "node scripts/validate-lessons.mjs",
     "test:validators": "node scripts/test-validators.mjs",
     "test:runtime": "node scripts/test-runtime.mjs",
-    "check": "npm run lint && npm run lint:map && npm run lint:lessons && npm run lint:giveaway && npm run lint:glossary && npm run test:lessons && npm run test:validators && npm run test:runtime && npm run build",
+    "lint:flows": "node scripts/lint-flows.mjs",
+    "check": "npm run lint && npm run lint:map && npm run lint:lessons && npm run lint:giveaway && npm run lint:glossary && npm run lint:flows && npm run test:lessons && npm run test:validators && npm run test:runtime && npm run build",
     "preview": "vite preview"
   },
   "dependencies": {

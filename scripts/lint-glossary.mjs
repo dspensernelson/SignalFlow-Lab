@@ -83,6 +83,42 @@ function lessonPathFor(projectId) {
   return (meta.LESSON_PATH || []).map((nodeId) => taskIdOf[nodeId]).filter(Boolean)
 }
 
+// Runnable-flow modules: the teaching order is the build order, and the
+// learner-visible copy is the module's world, days, and builds. A glossary
+// entry's teachesIn is a build id or a concept id the build requires.
+function flowsFor(projectId) {
+  const file = path.join(root, 'src', 'data', 'flows', `${projectId}.json`)
+  if (!existsSync(file)) return null
+  return JSON.parse(readFileSync(file, 'utf8'))
+}
+function flowTeachOrder(flows, teachesIn) {
+  const builds = flows.builds || []
+  return builds.findIndex((b) => b.id === teachesIn || (b.requires || []).includes(teachesIn))
+}
+function flowUnits(flows) {
+  const strings = (v, out = []) => {
+    if (typeof v === 'string') out.push(v)
+    else if (Array.isArray(v)) v.forEach((x) => strings(x, out))
+    else if (v && typeof v === 'object') Object.values(v).forEach((x) => strings(x, out))
+    return out
+  }
+  const units = []
+  const world = strings(flows.world || {}).concat([flows.intro || ''])
+  ;(flows.builds || []).forEach((b, i) => {
+    const day = (flows.days || []).find((d) => d.id === b.dayId)
+    const text = [
+      i === 0 ? world.join('\n') : '',
+      day ? day.description || '' : '',
+      b.title, b.outcome || '', b.goal || '',
+      ...(b.constraints || []),
+      ...strings(b.hints || {}),
+      ...(b.checks || []).flatMap((c) => [c.label || '', c.why || '']),
+    ].join('\n')
+    units.push({ id: b.id, text })
+  })
+  return units
+}
+
 const projects = registry.map((p) => p.id)
 const moduleOrder = Object.fromEntries(projects.map((id, i) => [id, i]))
 
@@ -92,13 +128,15 @@ for (const projectId of projects) {
   const file = path.join(root, 'curriculum', projectId, 'glossary.json')
   if (!existsSync(file)) continue
   const glossary = JSON.parse(readFileSync(file, 'utf8'))
+  const flows = flowsFor(projectId)
   const order = lessonPathFor(projectId) || []
   for (const entry of glossary.terms || []) {
     const surfaces = [entry.term, ...(entry.aliases || [])]
-    // Where in this module's teaching order the gloss appears. The taskId of
-    // the teaching lesson, stripped of any tier suffix, indexes LESSON_PATH.
+    // Where in this module's teaching order the gloss appears. Worksheet
+    // modules: the taskId of the teaching lesson indexes LESSON_PATH. Flow
+    // modules: the build id (or a concept the build requires) indexes builds.
     const taskId = String(entry.teachesIn).replace(/-(medium|hard)$/, '')
-    const idx = order.indexOf(taskId)
+    const idx = flows ? flowTeachOrder(flows, entry.teachesIn) : order.indexOf(taskId)
     taught.push({
       term: entry.term,
       surfaces,
@@ -158,16 +196,20 @@ let scanned = 0
 const missingTeacher = []
 
 for (const projectId of projects) {
-  const order = lessonPathFor(projectId)
-  if (!order) continue
+  const flows = flowsFor(projectId)
+  const order = flows ? null : lessonPathFor(projectId)
+  if (!flows && !order) continue
   const mIdx = moduleOrder[projectId]
-  for (let i = 0; i < order.length; i += 1) {
-    const taskId = order[i]
-    for (const suffix of ['', '-medium', '-hard']) {
-      const lesson = lessons[taskId + suffix]
-      if (!lesson) continue
+  // Units of learner-visible text in teaching order: builds (flow modules) or
+  // lessons per tier (worksheet modules).
+  const units = flows
+    ? flowUnits(flows).map((u) => [u])
+    : order.map((taskId) => ['', '-medium', '-hard'].map((suffix) => lessons[taskId + suffix]).filter(Boolean).map((lesson) => ({ id: lesson.id, text: learnerText(lesson) })))
+  for (let i = 0; i < units.length; i += 1) {
+    for (const unit of units[i]) {
+      const lesson = { id: unit.id }
       scanned += 1
-      const text = learnerText(lesson)
+      const text = unit.text
       for (const t of taught) {
         if (GLOBALLY_TAUGHT.has(t.term.toLowerCase())) continue
         if (!t.regex.test(text)) continue
@@ -191,7 +233,7 @@ for (const projectId of projects) {
 
 for (const t of taught) {
   if (!t.teachOrderKnown) {
-    missingTeacher.push(`${t.module}: "${t.term}" names teachesIn "${t.teachesIn}", which is not on that module's LESSON_PATH`)
+    missingTeacher.push(`${t.module}: "${t.term}" names teachesIn "${t.teachesIn}", which is not on that module's LESSON_PATH / build list`)
   }
 }
 

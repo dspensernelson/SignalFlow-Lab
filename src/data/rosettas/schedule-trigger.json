@@ -1,0 +1,96 @@
+{
+  "id": "schedule-trigger",
+  "kind": "rosetta",
+  "exercise": "add-step",
+  "label": "Schedule trigger",
+  "introducedBy": "module-02",
+  "gloss": "a clock fires at a set time and one run starts with no record from a source",
+  "why": "Some work is not driven by an arrival but by a deadline. A schedule trigger starts one run at a set time; the record it emits carries only the run id, the day, and the time, and the run builds everything else from stores. At Beacon, the 2:30 PM run collects whatever the invoice flow put in the Payment Batch and delivers it before the 3:00 PM cutoff.",
+  "cue": "if the question is \"what did we collect today\" rather than \"what just arrived\", the trigger is a clock, not an event",
+  "sample": {
+    "sources": [],
+    "stores": [
+      {
+        "id": "payment-batch",
+        "label": "Payment Batch",
+        "daily": true,
+        "fields": [
+          "invoiceNumber",
+          "vendorId",
+          "invoiceTotal"
+        ]
+      }
+    ],
+    "owners": [
+      "AP Clerk",
+      "AP Manager",
+      "Payables DL"
+    ],
+    "day": {
+      "sources": {},
+      "seeds": {
+        "payment-batch": [
+          {
+            "invoiceNumber": "INV-1",
+            "vendorId": "V-1",
+            "invoiceTotal": 1220
+          },
+          {
+            "invoiceNumber": "INV-2",
+            "vendorId": "V-2",
+            "invoiceTotal": 980
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [],
+  "task": "Start a run every day at 2:30 PM, with no inbox behind it.",
+  "add": {
+    "kind": "trigger"
+  },
+  "solution": {
+    "kind": "trigger",
+    "config": {
+      "source": "",
+      "mode": "schedule",
+      "at": "2:30 PM"
+    }
+  },
+  "notes": [
+    "Mode: schedule; At: the time the clock fires.",
+    "The run record is { runId, scheduledAt, day } - no invoice fields. Later steps read the batch from a store.",
+    "One run per day, not one per record."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "runStatus",
+      "flowId": "concept",
+      "equals": "succeeded",
+      "label": "The scheduled run fires"
+    },
+    {
+      "id": "c2",
+      "kind": "recordField",
+      "where": {
+        "runId": "day-1-run"
+      },
+      "field": "day",
+      "equals": "day-1",
+      "label": "The run record carries the day (day-1)",
+      "why": "a scheduled run has no invoice; it knows only when it fired"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "'Recurrence' trigger - Frequency: Day, At these hours / minutes",
+    "powerAppsCopilot": "a scheduled cloud flow the app or agent calls, or a Copilot Studio agent on a schedule trigger",
+    "make": "the scenario's Schedule setting (Run scenario: Every day at a time)",
+    "n8n": "a Schedule Trigger node (cron or interval)",
+    "zapier": "Schedule by Zapier: Every Day, at a time of day",
+    "python": "a cron entry or Task Scheduler job that calls main() with no input record",
+    "langgraph": "an external scheduler invokes the graph; START has no inbound record, only the run context"
+  }
+}

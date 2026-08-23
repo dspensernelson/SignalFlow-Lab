@@ -1,0 +1,147 @@
+{
+  "id": "fields-and-paths",
+  "kind": "waypoint",
+  "exercise": "add-step",
+  "label": "Fields and dotted paths",
+  "introducedBy": "module-02",
+  "gloss": "a field name reads a value off the record; a dotted path reads inside a nested object, like po.poTotal",
+  "why": "Records nest. A lookup attaches a whole row under one name (po), and a source can carry an object (vendor) inside the record. A dotted path walks into those: po.poTotal is the poTotal field of the po object; vendor.id is the id inside vendor. Every tool has a way to say this, and getting the path wrong is the most common reason an expression comes back null.",
+  "cue": "when an expression is null, check the path step by step: does po exist, and does it have poTotal with that exact spelling",
+  "sample": {
+    "sources": [
+      {
+        "id": "inbox",
+        "label": "Invoice Inbox",
+        "labelField": "invoiceNumber",
+        "fields": [
+          "invoiceNumber",
+          "vendor",
+          "poNumber",
+          "invoiceTotal"
+        ]
+      }
+    ],
+    "stores": [
+      {
+        "id": "po-register",
+        "label": "PO Register",
+        "keyField": "poNumber",
+        "owner": "Procurement Lead",
+        "fields": [
+          "poNumber",
+          "vendorId",
+          "poTotal"
+        ]
+      }
+    ],
+    "owners": [
+      "AP Clerk",
+      "Procurement Lead"
+    ],
+    "day": {
+      "sources": {
+        "inbox": [
+          {
+            "invoiceNumber": "INV-1",
+            "vendor": {
+              "id": "V-1",
+              "name": "Northwind Fasteners"
+            },
+            "poNumber": "PO-1",
+            "invoiceTotal": 1220
+          }
+        ]
+      },
+      "seeds": {
+        "po-register": [
+          {
+            "poNumber": "PO-1",
+            "vendorId": "V-1",
+            "poTotal": 1200
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "inbox",
+        "mode": "event",
+        "at": ""
+      }
+    },
+    {
+      "kind": "lookup",
+      "config": {
+        "store": "po-register",
+        "matchOn": [
+          {
+            "recordField": "poNumber",
+            "storeField": "poNumber"
+          }
+        ],
+        "as": "po",
+        "mode": "one"
+      }
+    }
+  ],
+  "task": "Read into the nested parts of the record: set variance to invoiceTotal minus the PO total, and vendorMatch to whether the vendor id on the invoice equals the vendor id on the PO.",
+  "add": {
+    "kind": "transform"
+  },
+  "solution": {
+    "kind": "transform",
+    "config": {
+      "set": [
+        {
+          "field": "variance",
+          "expr": "invoiceTotal - po.poTotal"
+        },
+        {
+          "field": "vendorMatch",
+          "expr": "vendor.id == po.vendorId"
+        }
+      ]
+    }
+  },
+  "notes": [
+    "invoiceTotal is a top-level field; po.poTotal reads poTotal inside the po object the lookup attached.",
+    "vendor.id reads id inside the vendor object that arrived with the invoice.",
+    "Spelling and case matter: po.PoTotal is a different (missing) path."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "recordField",
+      "where": {
+        "invoiceNumber": "INV-1"
+      },
+      "field": "variance",
+      "equals": 20,
+      "label": "INV-1 variance is 20 (read po.poTotal)"
+    },
+    {
+      "id": "c2",
+      "kind": "recordField",
+      "where": {
+        "invoiceNumber": "INV-1"
+      },
+      "field": "vendorMatch",
+      "equals": true,
+      "label": "INV-1 vendorMatch is true (vendor.id equals po.vendorId)"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "outputs('Get_items')?['body/value'][0]?['poTotal'] - the ?['field'] expression path, or the dynamic-content pill",
+    "powerAppsCopilot": "dot notation in Power Fx: po.poTotal, vendor.id",
+    "make": "the mapping pill from a prior module: {{2.poTotal}}, nested as {{1.vendor.id}}",
+    "n8n": "{{ $json.po.poTotal }} and {{ $json.vendor.id }} in an expression",
+    "zapier": "the field picker: 'Find Record: Po Total'; nested fields appear as Vendor Id",
+    "python": "rec['po']['poTotal'] or a get-path helper g(rec, 'po.poTotal')",
+    "langgraph": "state['po']['poTotal'] - keys into the state dict"
+  }
+}

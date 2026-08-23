@@ -20,7 +20,6 @@ import module01LessonMeta from '../data/projects/module-01/lessonMeta.json'
 import module02Nodes from '../data/projects/module-02/workflowNodes.json'
 import module02Phases from '../data/projects/module-02/phases.json'
 import module02Edges from '../data/projects/module-02/workflowEdges.json'
-import module02LessonMeta from '../data/projects/module-02/lessonMeta.json'
 
 import module03Nodes from '../data/projects/module-03/workflowNodes.json'
 import module03Phases from '../data/projects/module-03/phases.json'
@@ -49,7 +48,7 @@ const PROJECT_DATA = {
     nodes: module02Nodes,
     phases: module02Phases,
     edges: module02Edges,
-    lessonMeta: module02LessonMeta,
+    lessonMeta: null, // retired: module-02 is a runnable-flow module (src/data/flows)
   },
   'module-03': {
     nodes: module03Nodes,
@@ -116,57 +115,6 @@ export const BUILT_LESSONS = {
       'lesson-approval-decision-hard',
     ],
   },
-  'module-02': {
-    easy: [
-      'lesson-desk-operations',
-      'lesson-invoice-inbox',
-      'lesson-vendor-master',
-      'lesson-po-register',
-      'lesson-invoice-record',
-      'lesson-receipt-log',
-      'lesson-tolerance-policy',
-      'lesson-payment-history',
-      'lesson-duplicate-check',
-      'lesson-three-way-match',
-      'lesson-match-decision',
-      'lesson-auto-approve-path',
-      'lesson-exception-queue',
-      'lesson-payment-batch',
-      'lesson-run-approval',
-      'lesson-payment-run',
-      'lesson-remittance-advice',
-      'lesson-payment-archive',
-    ],
-    medium: [
-      'lesson-desk-operations-medium',
-      'lesson-invoice-inbox-medium',
-      'lesson-invoice-record-medium',
-      'lesson-vendor-master-medium',
-      'lesson-po-register-medium',
-      'lesson-receipt-log-medium',
-      'lesson-tolerance-policy-medium',
-      'lesson-payment-history-medium',
-      'lesson-duplicate-check-medium',
-      'lesson-three-way-match-medium',
-      'lesson-match-decision-medium',
-      'lesson-exception-queue-medium',
-      'lesson-auto-approve-path-medium',
-      'lesson-payment-batch-medium',
-      'lesson-run-approval-medium',
-      'lesson-payment-run-medium',
-      'lesson-remittance-advice-medium',
-      'lesson-payment-archive-medium',
-    ],
-    hard: [
-      'lesson-desk-operations-hard',
-      'lesson-tolerance-policy-hard',
-      'lesson-duplicate-check-hard',
-      'lesson-vendor-master-hard',
-      'lesson-three-way-match-hard',
-      'lesson-match-decision-hard',
-      'lesson-payment-run-hard',
-    ],
-  },
   'module-03': {
     easy: [
       'lesson-onboarding-operations',
@@ -218,7 +166,7 @@ export const BUILT_LESSONS = {
   },
 }
 
-// True when a project has a working data set (map + lesson meta) on disk.
+// True when a project has a working data set (map data) on disk.
 export function hasProjectData(projectId) {
   return Boolean(PROJECT_DATA[projectId])
 }
