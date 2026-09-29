@@ -53,20 +53,20 @@ function Block({ title, subtitle, count, defaultOpen, children }) {
   )
 }
 
-export default function DataPanel({ dayState, moduleData }) {
+export default function DataPanel({ dayState, moduleData, compact = false }) {
   const day = moduleData.days.find((d) => d.id === dayState.dayId)
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-xs leading-relaxed text-sf-body">{day ? day.description : ''}</p>
-      <span className="mt-1 text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">Arrives today</span>
+      {!compact && day && day.description && <p className="text-xs leading-relaxed text-sf-body">{day.description}</p>}
+      <span className="text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">Arrives today</span>
       {(moduleData.sources || []).map((s) => (
-        <Block key={s.id} title={s.label} subtitle={s.description} count={dayState.sources[s.id].rows.length} defaultOpen>
+        <Block key={s.id} title={s.label} subtitle={compact ? null : s.description} count={dayState.sources[s.id].rows.length} defaultOpen>
           <Table rows={dayState.sources[s.id].rows} fields={s.fields} />
         </Block>
       ))}
-      <span className="mt-1 text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">Tables before the run</span>
+      {(moduleData.stores || []).length > 0 && <span className="mt-1 text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">Tables</span>}
       {(moduleData.stores || []).map((s) => (
-        <Block key={s.id} title={s.label} subtitle={`${s.owner ? `Owned by ${s.owner}. ` : ''}${s.description || ''}`} count={(dayState.stores[s.id] || []).length}>
+        <Block key={s.id} title={s.label} subtitle={compact ? null : `${s.owner ? `Owned by ${s.owner}. ` : ''}${s.description || ''}`} count={(dayState.stores[s.id] || []).length}>
           <Table rows={dayState.stores[s.id] || []} fields={s.fields} />
         </Block>
       ))}

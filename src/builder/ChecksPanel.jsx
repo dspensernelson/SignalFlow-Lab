@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Button, Icon } from '../components/ui'
 
 // The build: the situation, the outcome, the desk's rules, and its
@@ -12,9 +13,6 @@ function hintsOf(build) {
 
 export default function ChecksPanel({
   build,
-  index,
-  total,
-  dayLabel,
   results,
   stale,
   passedRec,
@@ -29,59 +27,67 @@ export default function ChecksPanel({
   conceptLabel,
   onOpenConcept,
   onSelectRecord,
+  stepProblem = null,
+  plain = (t) => t,
 }) {
   const hints = hintsOf(build)
   const passedCount = results ? results.filter((r) => r.passed).length : 0
+  const [showPassed, setShowPassed] = useState(false)
+  // One prioritized problem, not a stack: a step that broke beats a check
+  // that missed, because the check usually missed because the step broke.
+  const firstFail = results && !stale ? build.checks.map((c) => results.find((x) => x.id === c.id)).find((r) => r && !r.passed) : null
+  const fixNext = firstFail ? plain(stepProblem || firstFail.detail) : null
   const gated = pending.length > 0
   const sorted = results ? [...build.checks].sort((a, b) => {
     const ra = results.find((x) => x.id === a.id)
     const rb = results.find((x) => x.id === b.id)
     return (ra && !ra.passed ? 0 : 1) - (rb && !rb.passed ? 0 : 1)
   }) : build.checks
+  // While something fails, show only what fails; passing checks fold into one line.
+  const failingCount = results ? results.filter((r) => !r.passed).length : 0
+  const collapsePassed = failingCount > 0 && passedCount > 0 && !showPassed
+  const visible = collapsePassed ? sorted.slice(0, failingCount) : sorted
 
   return (
     <div className="flex flex-col gap-2.5">
       <div>
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">
-            Build {index + 1} of {total}
-          </span>
-          {dayLabel && <span className="rounded-full bg-sf-surface-inset px-2 py-0.5 text-[10px] font-medium text-sf-muted">{dayLabel}</span>}
+        <div className="flex items-center gap-2">
+          <h2 className="text-base font-semibold text-sf-text">{build.title}</h2>
           {passedRec && (
             <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${passedRec.assisted ? 'bg-sf-warning-weak text-sf-progress-text' : 'bg-sf-complete-weak text-sf-complete-text'}`}>
               <Icon name="check" size={10} strokeWidth={3} /> {passedRec.assisted ? 'passed (assisted)' : 'passed'}
             </span>
           )}
         </div>
-        <h2 className="text-base font-semibold text-sf-text">{build.title}</h2>
-        {build.outcome && <p className="mt-0.5 text-xs font-semibold text-sf-text">{build.outcome}</p>}
-        <p className="mt-0.5 text-xs leading-relaxed text-sf-body">{build.goal}</p>
-        {build.constraints && build.constraints.length > 0 && (
-          <ul className="mt-1.5 flex flex-col gap-0.5">
-            {build.constraints.map((c, i) => (
-              <li key={i} className="flex items-start gap-1.5 text-[11px] text-sf-body">
-                <Icon name="shield" size={11} className="mt-0.5 flex-none text-sf-muted" />
-                <span>{c}</span>
-              </li>
-            ))}
-          </ul>
+        <p className="mt-0.5 text-sm text-sf-body">{build.brief || build.outcome || build.goal}</p>
+        {(build.goal || (build.constraints && build.constraints.length > 0)) && (
+          <details className="group mt-1">
+            <summary className="cursor-pointer list-none text-[11px] font-medium text-sf-subtle hover:text-sf-accent">
+              <span className="group-open:hidden">More about this build</span>
+              <span className="hidden group-open:inline">Less</span>
+            </summary>
+            <p className="mt-1 text-xs leading-relaxed text-sf-body">{build.goal}</p>
+            {build.constraints && build.constraints.length > 0 && (
+              <ul className="mt-1 flex list-disc flex-col gap-0.5 pl-4 text-[11px] text-sf-muted">
+                {build.constraints.map((c, i) => (
+                  <li key={i}>{c}</li>
+                ))}
+              </ul>
+            )}
+          </details>
         )}
       </div>
 
       {gated && (
         <div className="rounded-lg border border-sf-context bg-sf-context-weak p-2.5">
-          <div className="text-[10px] font-semibold uppercase tracking-sf-wide text-sf-context-text">Before this build</div>
-          <p className="mt-0.5 text-[11px] text-sf-body">This build uses {pending.length === 1 ? 'a concept' : `${pending.length} concepts`} you have not met yet. Each one is a two-minute sample you run yourself, then see in every tool.</p>
-          <ul className="mt-1.5 flex flex-col gap-1">
+          <div className="text-xs font-semibold text-sf-context-text">First, try {pending.length === 1 ? 'this' : `these ${pending.length}`}</div>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
             {pending.map((id, i) => (
-              <li key={id} className="flex items-center justify-between gap-2 rounded-md bg-sf-surface px-2 py-1">
-                <span className="text-xs font-medium text-sf-text">{conceptLabel ? conceptLabel(id) : id}</span>
-                <Button variant={i === 0 ? 'primary' : 'neutral'} size="sm" iconRight="arrow-right" onClick={() => onOpenConcept(id)}>
-                  {i === 0 ? 'Start' : 'Open'}
-                </Button>
-              </li>
+              <Button key={id} variant={i === 0 ? 'primary' : 'neutral'} size="sm" iconRight={i === 0 ? 'arrow-right' : undefined} onClick={() => onOpenConcept(id)}>
+                {conceptLabel ? conceptLabel(id) : id}
+              </Button>
             ))}
-          </ul>
+          </div>
         </div>
       )}
 
@@ -91,17 +97,26 @@ export default function ChecksPanel({
           {results && (
             <span className={`text-[10px] font-semibold ${passedCount === results.length ? 'text-sf-complete-text' : 'text-sf-muted'}`}>
               {passedCount} of {results.length}
-              {stale ? ' (run again to refresh)' : ''}
+              {stale ? ' - run again' : ''}
             </span>
           )}
         </div>
+        {fixNext && (
+          <div className="mb-1.5 flex items-start gap-2 rounded-lg border border-sf-warning bg-sf-warning-weak px-2.5 py-2">
+            <Icon name="arrow-right" size={13} className="mt-0.5 flex-none text-sf-progress-text" />
+            <div className="min-w-0 text-xs leading-snug text-sf-text">
+              <span className="font-semibold">Fix this next: </span>
+              {fixNext}
+            </div>
+          </div>
+        )}
         <ul className="flex flex-col gap-1">
-          {sorted.map((c) => {
+          {visible.map((c) => {
             const r = results ? results.find((x) => x.id === c.id) : null
             const state = !r ? 'pending' : r.passed ? 'pass' : 'fail'
             const recordLabel = c.where ? String(Object.values(c.where)[0]) : c.recordLabel || null
             return (
-              <li key={c.id} className={`rounded-md border px-2 py-1.5 ${state === 'pass' ? 'border-sf-complete bg-sf-success-weak' : state === 'fail' ? 'border-sf-danger bg-sf-danger-weak' : 'border-sf-border bg-sf-surface'} ${stale ? 'opacity-70' : ''}`}>
+              <li key={c.id} title={r && state === 'fail' ? [r.detail, c.why].filter(Boolean).join(' - ') : undefined} className={`rounded-md border border-sf-border-subtle px-2 py-1.5 ${state === 'pass' ? 'bg-sf-success-weak' : 'bg-sf-surface'} ${stale ? 'opacity-70' : ''}`}>
                 <div className="flex items-start gap-2">
                   <span className={`mt-0.5 flex h-4 w-4 flex-none items-center justify-center rounded-full ${state === 'pass' ? 'bg-sf-complete text-white' : state === 'fail' ? 'bg-sf-danger text-white' : 'border border-sf-border-strong'}`}>
                     {state === 'pass' && <Icon name="check" size={10} strokeWidth={3} />}
@@ -116,51 +131,48 @@ export default function ChecksPanel({
                         </button>
                       )}
                     </div>
-                    {r && state === 'fail' && <div className="mt-0.5 text-[11px] leading-snug text-sf-danger">{r.detail}</div>}
-                    {r && state === 'fail' && c.why && <div className="mt-0.5 text-[11px] leading-snug text-sf-body">Why it matters: {c.why}</div>}
-                    {r && state === 'pass' && r.detail && <div className="mt-0.5 text-[11px] leading-snug text-sf-complete-text">{r.detail}</div>}
+
                   </div>
                 </div>
               </li>
             )
           })}
         </ul>
+        {failingCount > 0 && passedCount > 0 && (
+          <button type="button" onClick={() => setShowPassed((v) => !v)} className="mt-1 flex items-center gap-1.5 px-2 text-[11px] text-sf-complete-text hover:underline">
+            <Icon name="check" size={11} strokeWidth={3} />
+            {showPassed ? 'Hide passing' : `${passedCount} passing`}
+          </button>
+        )}
       </div>
 
-      {!passedRec && (
-        <div className="rounded-lg border border-sf-border bg-sf-surface p-2.5">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">Stuck?</span>
-            <span className="text-[10px] text-sf-subtle">{hintLevel === 0 ? 'Try the data first' : `hint ${hintLevel} of 3`}</span>
-          </div>
-          {hintLevel >= 1 && hints.question && <p className="mt-1 text-xs italic text-sf-text">{hints.question}</p>}
-          {hintLevel >= 2 && hints.nudge && <p className="mt-1 text-xs text-sf-body">{hints.nudge}</p>}
+      {!passedRec && hintLevel > 0 && (
+        <div className="flex flex-col gap-1 rounded-lg bg-sf-surface-subtle px-2.5 py-2 text-xs text-sf-body">
+          {hints.question && <p className="italic text-sf-text">{hints.question}</p>}
+          {hintLevel >= 2 && hints.nudge && <p>{hints.nudge}</p>}
           {hintLevel >= 3 && hints.steps.length > 0 && (
-            <ol className="mt-1 flex list-decimal flex-col gap-0.5 pl-5 text-[11px] leading-relaxed text-sf-body">
+            <ol className="flex list-decimal flex-col gap-0.5 pl-5 text-[11px] leading-relaxed">
               {hints.steps.map((h, i) => (
                 <li key={i}>{h}</li>
               ))}
             </ol>
           )}
-          <div className="mt-1.5 flex items-center gap-2">
-            {hintLevel < 3 && (
-              <button type="button" onClick={() => onHint(hintLevel + 1)} className="text-[11px] font-medium text-sf-accent hover:underline">
-                {hintLevel === 0 ? (hints.question ? 'Ask me a question' : 'Show me the steps') : hintLevel === 1 ? (hints.nudge ? 'Give me a nudge' : 'Show me the steps') : 'Show me the steps'}
-              </button>
-            )}
-            {hintLevel >= 1 && hintLevel < 3 && !hints.question && !hints.nudge && null}
-          </div>
         </div>
       )}
 
       <div className="flex items-center justify-between">
-        {canLoadExample ? (
-          <button type="button" onClick={onLoadExample} className="text-[11px] text-sf-subtle hover:text-sf-accent hover:underline" title="Replace your flows with the example solution through this build; the build is marked assisted">
-            Load the example (marks this build assisted)
-          </button>
-        ) : (
-          <span />
-        )}
+        <div className="flex items-center gap-3">
+          {!passedRec && !gated && hintLevel < 3 && (
+            <button type="button" onClick={() => onHint(hintLevel + 1)} className="text-[11px] font-medium text-sf-accent hover:underline">
+              {hintLevel === 0 ? 'Hint' : 'Another hint'}
+            </button>
+          )}
+          {canLoadExample && (
+            <button type="button" onClick={onLoadExample} className="text-[11px] text-sf-subtle hover:text-sf-accent hover:underline" title="Replace your flows with the example solution through this build; the build is marked assisted">
+              Show the answer
+            </button>
+          )}
+        </div>
         {passedRec && hasNext && (
           <Button variant="success" size="sm" iconRight="arrow-right" onClick={onNext}>
             Next build

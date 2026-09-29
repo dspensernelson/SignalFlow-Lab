@@ -6,11 +6,21 @@ import Palette from './Palette.jsx'
 // to bottom; a Condition opens two lanes beneath it (yes / no) that rejoin.
 // "+" insertion points sit between steps and at the end of every lane.
 
-function InsertPoint({ open, onOpen, onPick, onCancel, skin, compact, kinds, allowTrigger }) {
+function InsertPoint({ open, onOpen, onPick, onCancel, skin, compact, kinds, allowTrigger, prominent }) {
   if (open) {
     return (
       <div className="py-1.5">
         <Palette skin={skin} onPick={onPick} onCancel={onCancel} kinds={kinds} allowTrigger={allowTrigger} />
+      </div>
+    )
+  }
+  if (prominent) {
+    return (
+      <div className="relative pt-2">
+        <button type="button" onClick={onOpen} aria-label="Add a step here" className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-sf-border-strong py-2.5 text-xs font-semibold text-sf-muted transition-colors hover:border-sf-accent-border hover:bg-sf-accent-weak hover:text-sf-accent">
+          <Icon name="plus" size={13} strokeWidth={2.5} />
+          Add a step
+        </button>
       </div>
     )
   }
@@ -111,6 +121,7 @@ export default function FlowRail(props) {
         onCancel={onCancelInsert}
         kinds={paletteKinds}
         allowTrigger={allowTrigger && depth === 0 && list.length === 0}
+        prominent={depth === 0}
       />
     )
     return items

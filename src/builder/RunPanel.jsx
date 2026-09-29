@@ -109,8 +109,7 @@ export default function RunPanel({ run, flow, moduleData, skin, selectedRecordId
     return (
       <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-sf-border-strong px-4 py-10 text-center">
         <Icon name="circle-play" size={28} className="text-sf-muted" />
-        <p className="text-sm font-medium text-sf-text">Nothing has run yet.</p>
-        <p className="max-w-sm text-xs text-sf-muted">Press Run. Every record that arrives today will walk your flow step by step, and you will see where each one ends up.</p>
+        <p className="text-sm text-sf-muted">Press Run to see what your flow does.</p>
       </div>
     )
   }

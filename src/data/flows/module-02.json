@@ -135,6 +135,7 @@
   "builds": [
     {
       "id": "b1",
+      "brief": "Give each invoice its PO and its receipt.",
       "dayId": "day-1",
       "flowId": "invoice-flow",
       "title": "Capture and look up",
@@ -165,6 +166,7 @@
     },
     {
       "id": "b2",
+      "brief": "Work out how far the price is off, and whether all the goods arrived.",
       "dayId": "day-1",
       "flowId": "invoice-flow",
       "title": "Compute the match",
@@ -196,6 +198,7 @@
     },
     {
       "id": "b3",
+      "brief": "Pay the clean invoice. Hold anything else and tell Procurement.",
       "dayId": "day-1",
       "flowId": "invoice-flow",
       "title": "Decide and route",
@@ -226,6 +229,7 @@
     },
     {
       "id": "b4",
+      "brief": "Five invoices, one clean. Pay only that one; hold the rest with a reason.",
       "dayId": "day-2",
       "flowId": "invoice-flow",
       "title": "Day 2: the mess",
@@ -271,6 +275,7 @@
     },
     {
       "id": "b5",
+      "brief": "At 2:30, get the batch approved and send it to Payables.",
       "dayId": "day-2",
       "flowId": "run-flow",
       "title": "The 2:30 PM run",
@@ -306,6 +311,7 @@
     },
     {
       "id": "b6",
+      "brief": "The PO system fails its first call. Don't let the invoice vanish.",
       "dayId": "day-3",
       "flowId": "invoice-flow",
       "title": "Day 3: it breaks in production",

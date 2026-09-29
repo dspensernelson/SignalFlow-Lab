@@ -156,12 +156,7 @@ export default function ConceptScreen({ concept, skinId, onDone, onClose }) {
       <div className="mx-auto grid min-h-0 w-full max-w-[1680px] flex-1 grid-cols-12 gap-4 overflow-y-auto px-4 py-3">
         <section className="col-span-12 flex flex-col gap-3 lg:col-span-4">
           <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
-            <div className="text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">Why this exists</div>
-            <p className="mt-1 text-xs leading-relaxed text-sf-body">{concept.why}</p>
-            {concept.cue && <p className="mt-2 border-l-2 border-sf-accent-border pl-2 text-[11px] italic text-sf-muted">{concept.cue}</p>}
-          </div>
-          <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
-            <div className="mb-1 text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">The sample</div>
+            {exercise === 'json-edit' && <div className="mb-1 text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">The record</div>}
             {exercise === 'json-edit' ? (
               <>
                 <JsonEditor value={recordText} onChange={(v) => { setRecordText(v); setRun(null) }} error={jsonError} onReset={() => setRecordText(JSON.stringify(concept.brokenRecord, null, 2))} />
@@ -174,15 +169,18 @@ export default function ConceptScreen({ concept, skinId, onDone, onClose }) {
                 )}
               </>
             ) : (
-              <DataPanel dayState={dayState} moduleData={moduleData} />
+              <DataPanel dayState={dayState} moduleData={moduleData} compact />
             )}
           </div>
+          <details className="group rounded-xl border border-sf-border bg-sf-surface px-3 py-2">
+            <summary className="cursor-pointer list-none text-[11px] font-medium text-sf-subtle hover:text-sf-accent">Why this matters</summary>
+            <p className="mt-1 text-xs leading-relaxed text-sf-body">{concept.why}</p>
+          </details>
         </section>
 
         <section className="col-span-12 flex flex-col gap-3 lg:col-span-8">
           <div className="rounded-xl border border-sf-accent-border bg-sf-accent-weak px-3 py-2.5">
-            <div className="text-[10px] font-semibold uppercase tracking-sf-wide text-sf-accent-text">Your task</div>
-            <p className="text-sm text-sf-text">{concept.task}</p>
+            <p className="text-sm font-medium text-sf-text">{concept.task}</p>
           </div>
           <div className="grid grid-cols-12 gap-3">
             <div className="col-span-12 rounded-xl border border-sf-border bg-sf-surface-subtle p-3 xl:col-span-6">
@@ -225,7 +223,7 @@ export default function ConceptScreen({ concept, skinId, onDone, onClose }) {
                 <div className="mt-2 flex items-center justify-between">
                   {runs >= 2 && !passed && !revealed ? (
                     <button type="button" onClick={showMe} className="text-[11px] text-sf-subtle hover:text-sf-accent hover:underline">
-                      Show me
+                      Show the answer
                     </button>
                   ) : (
                     <span />
@@ -243,9 +241,9 @@ export default function ConceptScreen({ concept, skinId, onDone, onClose }) {
             </div>
           </div>
 
-          {(showcaseStep || Object.keys(dialect).length > 0) && (
+          {passed && (showcaseStep || Object.keys(dialect).length > 0) && (
             <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
-              <div className="mb-2 text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">{isRosetta ? 'The same step in every tool' : 'How each tool shows this'}</div>
+              <div className="mb-2 text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">{isRosetta ? 'You just built this. Here it is in every tool' : 'How each tool shows this'}</div>
               <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
                 {TOOL_ORDER.filter((t) => dialect[t] || SKINS.some((s) => s.id === t)).map((toolId) => {
                   const sk = SKINS.find((s) => s.id === toolId)
@@ -255,7 +253,7 @@ export default function ConceptScreen({ concept, skinId, onDone, onClose }) {
                       <div className="text-[10px] font-bold uppercase tracking-sf-wide text-sf-muted">{TOOL_LABEL[toolId] || toolId}</div>
                       {d && <div className="text-xs font-semibold text-sf-text">{d.title}</div>}
                       {d && d.subtitle && <div className="truncate text-[11px] text-sf-muted" title={d.subtitle}>{d.subtitle}</div>}
-                      {dialect[toolId] && <div className={`text-[11px] leading-snug text-sf-body ${d ? 'mt-1 border-t border-sf-border-subtle pt-1' : ''}`}>{dialect[toolId]}</div>}
+                      {dialect[toolId] && !d && <div className="text-[11px] leading-snug text-sf-body">{dialect[toolId]}</div>}
                     </div>
                   )
                 })}

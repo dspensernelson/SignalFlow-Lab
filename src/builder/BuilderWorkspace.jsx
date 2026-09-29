@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Icon, Logo, ThemeToggle } from '../components/ui'
-import { createStep, insertStep, updateStep, removeStep, moveStep, updateSettings } from '../runtime/flowModel.js'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Button, Icon, Logo } from '../components/ui'
+import { createStep, insertStep, updateStep, removeStep, moveStep, updateSettings, findStep, KIND_LABEL } from '../runtime/flowModel.js'
 import { runModule } from '../runtime/engine.js'
 import { evaluateChecks, allPassed } from '../runtime/checks.js'
 import { getSkin } from '../runtime/skins/index.js'
@@ -29,6 +29,36 @@ import SettingsPanel from './SettingsPanel.jsx'
 const REPLAY_TOTAL_MS = 3000
 const REPLAY_MIN_MS = 45
 const REPLAY_MAX_MS = 160
+// Wall clock, read only from event handlers and timers.
+const now = () => Date.now()
+
+// A check or step message in the learner's words: table names instead of
+// ids, and no machine path (the run panel draws the path).
+function plainWords(text, moduleData) {
+  if (!text) return text
+  let out = String(text).replace(/\s*Path: .*$/s, '')
+  for (const st of moduleData.stores || []) {
+    out = out.replace(new RegExp(`(^|[^\\w-])${st.id}(?![\\w-])`, 'g'), (_m, pre) => `${pre}${st.label}`)
+  }
+  return out
+}
+
+// The first step that broke in a run, in plain words, or null.
+function firstStepProblem(result, flows, skin, moduleData) {
+  for (const f of flows) {
+    const t = result.traces[f.id]
+    if (!t) continue
+    if (t.records.length === 0 && t.log.length) return `${f.name}: ${t.log[0]}`
+    for (const rec of t.records) {
+      const bad = rec.steps.find((st) => st.status === 'failed')
+      if (!bad) continue
+      const found = findStep(f, bad.stepId)
+      const title = found ? skin.describe(found.step, { moduleData, flow: f }).title : KIND_LABEL[bad.kind]
+      return `${title} - ${bad.note}`
+    }
+  }
+  return null
+}
 
 export default function BuilderWorkspace({ moduleData, loadReference, theme, onToggleTheme, onWorld, headerLeft }) {
   const [state, setState] = useState(() => loadFlowState(moduleData))
@@ -72,13 +102,11 @@ export default function BuilderWorkspace({ moduleData, loadReference, theme, onT
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.flows, moduleData, build.dayId])
 
-  const updateFlow = useCallback(
-    (fn) => {
-      setState((s) => ({ ...s, flows: { ...s.flows, [flow.id]: fn(s.flows[flow.id]) } }))
-      setRun((r) => (r ? { ...r, stale: true } : r))
-    },
-    [flow.id]
-  )
+  const flowId = flow.id
+  function updateFlow(fn) {
+    setState((s) => ({ ...s, flows: { ...s.flows, [flowId]: fn(s.flows[flowId]) } }))
+    setRun((r) => (r ? { ...r, stale: true } : r))
+  }
 
   function stopReplay() {
     if (replayTimer.current) {
@@ -107,7 +135,7 @@ export default function BuilderWorkspace({ moduleData, loadReference, theme, onT
       if (!passed) return { ...s, runs }
       const prev = s.passed[build.id]
       // A later unassisted pass upgrades an assisted one; never downgrade.
-      const rec = prev && !prev.assisted ? prev : { at: Date.now(), hintsUsed: s.hintLevel[build.id] || 0, runs: runs[build.id], assisted: !!s.assistedBuilds && !!s.assistedBuilds[build.id] }
+      const rec = prev && !prev.assisted ? prev : { at: now(), hintsUsed: s.hintLevel[build.id] || 0, runs: runs[build.id], assisted: !!s.assistedBuilds && !!s.assistedBuilds[build.id] }
       return { ...s, runs, passed: { ...s.passed, [build.id]: rec } }
     })
     // Replay: walk every record through its steps, one step per tick. The
@@ -117,11 +145,11 @@ export default function BuilderWorkspace({ moduleData, loadReference, theme, onT
     const total = lens.reduce((a, b) => a + b, 0)
     if (total > 0) {
       const tick = Math.max(REPLAY_MIN_MS, Math.min(REPLAY_MAX_MS, Math.round(REPLAY_TOTAL_MS / total)))
-      const startedAt = Date.now()
+      const startedAt = now()
       setReplay({ startedAt, total, tick, lens })
       setReplayClock(startedAt)
       replayTimer.current = setInterval(() => {
-        setReplayClock(Date.now())
+        setReplayClock(now())
       }, tick)
     }
   }
@@ -156,7 +184,7 @@ export default function BuilderWorkspace({ moduleData, loadReference, theme, onT
   const gated = pending.length > 0
 
   function handleConceptDone(conceptId) {
-    setConcepts((c) => markConceptPassed(c, conceptId, moduleData.moduleId, Date.now()))
+    setConcepts((c) => markConceptPassed(c, conceptId, moduleData.moduleId, now()))
     setOpenConceptId(null)
   }
 
@@ -234,6 +262,7 @@ export default function BuilderWorkspace({ moduleData, loadReference, theme, onT
   const replayStepId = replayPos && records[replayPos.recordIdx] && records[replayPos.recordIdx].steps[replayPos.stepIdx] ? records[replayPos.recordIdx].steps[replayPos.stepIdx].stepId : null
 
   const day = moduleData.days.find((d) => d.id === build.dayId)
+  const stepProblem = run && run.buildId === build.id ? firstStepProblem(run.result, flows, skin, moduleData) : null
   const allDone = builds.every((b) => state.passed[b.id])
   const openConcept = openConceptId ? getConcept(openConceptId) : null
   const viewProps = { flow, skin, ctx, selectedStepId, onSelectStep: setSelectedStepId, insertAt, onOpenInsert: openInsert, onPick: pick, onCancelInsert: () => setInsertAt(null), onChangeStep: changeStep, onRemoveStep: remove, onMoveStep: move, stepStatus, hasRun: !!trace, replayStepId, replayActive: !!replayView, fieldsFor }
@@ -272,7 +301,7 @@ export default function BuilderWorkspace({ moduleData, loadReference, theme, onT
               <button type="button" onClick={() => setBuildMenu((o) => !o)} className="flex min-w-[200px] max-w-[260px] items-center gap-2 rounded-lg border border-sf-border bg-sf-surface-subtle px-2.5 py-1 text-left hover:border-sf-border-strong">
                 <div className="min-w-0 flex-1 leading-tight">
                   <div className="truncate text-[9px] font-semibold uppercase tracking-sf-wide text-sf-subtle">
-                    {moduleData.title} - build {buildIndex + 1} of {builds.length}
+                    Build {buildIndex + 1} of {builds.length}{day ? ` - ${day.label.split(' - ')[0]}` : ''}
                   </div>
                   <div className="truncate text-sm font-semibold text-sf-text">{build.title}</div>
                 </div>
@@ -308,24 +337,24 @@ export default function BuilderWorkspace({ moduleData, loadReference, theme, onT
                 </>
               )}
             </div>
-            <span className="hidden items-center gap-1.5 whitespace-nowrap rounded-full border border-sf-border bg-sf-surface-subtle px-2.5 py-1 text-xs font-medium text-sf-muted xl:inline-flex">
-              <Icon name="clock" size={13} />
-              {day ? day.label : build.dayId}
-            </span>
           </div>
           <div className="flex flex-none items-center gap-2">
             <div className="flex items-center gap-1">
               <Button variant="neutral" size="sm" icon="circle-help" onClick={() => setIntroOpen(true)} title="The world: who, what arrives, what tables exist, what you owe" className="whitespace-nowrap">
-                <span className="hidden 2xl:inline">World</span>
+                World
               </Button>
               {onWorld && (
                 <Button variant="neutral" size="sm" icon="workflow" onClick={onWorld} title="The workflow map, lit up by what you have built" className="whitespace-nowrap">
-                  <span className="hidden 2xl:inline">Map</span>
+                  Map
                 </Button>
               )}
             </div>
             <SkinSwitch value={state.skin} onChange={(id) => setState((s) => ({ ...s, skin: id }))} />
-            {onToggleTheme && <ThemeToggle value={theme} onChange={onToggleTheme} />}
+            {onToggleTheme && (
+              <button type="button" onClick={() => onToggleTheme(theme === 'dark' ? 'light' : 'dark')} title={theme === 'dark' ? 'Light mode' : 'Dark mode'} aria-label={theme === 'dark' ? 'Light mode' : 'Dark mode'} className="rounded-lg border border-sf-border p-1.5 text-sf-muted hover:text-sf-text">
+                <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={15} />
+              </button>
+            )}
             <Button variant="primary" size="md" icon="circle-play" onClick={handleRun} disabled={!!replayView || gated} title={gated ? 'Finish the concepts for this build first' : `Run every flow for ${day ? day.label : 'today'}`}>
               {replayView ? 'Running...' : 'Run today'}
             </Button>
@@ -348,7 +377,7 @@ export default function BuilderWorkspace({ moduleData, loadReference, theme, onT
           <div className={`relative min-h-0 flex-1 overflow-y-auto rounded-xl border border-sf-border bg-sf-surface-subtle p-3 ${gated ? 'opacity-60' : ''}`}>
             {gated && (
               <div className="pointer-events-none sticky top-0 z-10 mb-2 rounded-lg border border-sf-context bg-sf-context-weak px-3 py-1.5 text-[11px] text-sf-context-text">
-                Meet the concepts on the right first; then build.
+                Try the concepts on the right first.
               </div>
             )}
             {skin.layout === 'code' ? <CodeView flow={flow} moduleData={moduleData} /> : skin.layout === 'line' ? <FlowLine {...viewProps} /> : <FlowRail {...viewProps} />}
@@ -360,9 +389,6 @@ export default function BuilderWorkspace({ moduleData, loadReference, theme, onT
           <div className="max-h-[55%] flex-none overflow-y-auto rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
             <ChecksPanel
               build={build}
-              index={buildIndex}
-              total={builds.length}
-              dayLabel={day ? day.label : null}
               results={run && run.buildId === build.id ? run.checks : null}
               stale={!!(run && run.stale)}
               passedRec={state.passed[build.id] || null}
@@ -376,6 +402,8 @@ export default function BuilderWorkspace({ moduleData, loadReference, theme, onT
               pending={pending}
               conceptLabel={conceptLabel}
               onOpenConcept={(id) => setOpenConceptId(id)}
+              stepProblem={stepProblem}
+              plain={(t) => plainWords(t, moduleData)}
               onSelectRecord={(label) => {
                 setTab('run')
                 const rec = records.find((r) => r.label === label)
