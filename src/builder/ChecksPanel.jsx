@@ -114,7 +114,8 @@ export default function ChecksPanel({
           {visible.map((c) => {
             const r = results ? results.find((x) => x.id === c.id) : null
             const state = !r ? 'pending' : r.passed ? 'pass' : 'fail'
-            const recordLabel = c.where ? String(Object.values(c.where)[0]) : c.recordLabel || null
+            const firstWhere = c.where ? Object.values(c.where)[0] : null
+            const recordLabel = firstWhere !== null && firstWhere !== undefined && firstWhere !== '' ? String(firstWhere) : c.recordLabel || null
             return (
               <li key={c.id} title={r && state === 'fail' ? [r.detail, c.why].filter(Boolean).join(' - ') : undefined} className={`rounded-md border border-sf-border-subtle px-2 py-1.5 ${state === 'pass' ? 'bg-sf-success-weak' : 'bg-sf-surface'} ${stale ? 'opacity-70' : ''}`}>
                 <div className="flex items-start gap-2">

@@ -1,0 +1,1175 @@
+{
+  "moduleId": "module-04",
+  "title": "Relay Ticket Triage",
+  "org": "Relay Software",
+  "intro": "Relay's support desk gets a steady stream of tickets, and every one has to reach the right queue within 15 minutes. You are going to build the triage automation: classify each ticket against the taxonomy, score it with the priority matrix, route it by the routing table, page an engineer for a P1, track every resolution against its SLA, and send a 5:00 PM digest. Then it meets tickets that do not fit.",
+  "world": {
+    "oneLiner": "Relay Software's support desk classifies, prioritizes and routes every customer ticket within 15 minutes, and sends a queue-health digest at 5:00 PM.",
+    "roles": [
+      {
+        "name": "Support Agent",
+        "does": "Works tickets in the standard queues and records how each was resolved."
+      },
+      {
+        "name": "Queue Lead",
+        "does": "Owns the routing table and the SLA targets; picks up tickets nobody can classify."
+      },
+      {
+        "name": "Tier-2 Engineer",
+        "does": "Is paged for every P1 and has to acknowledge it."
+      },
+      {
+        "name": "Duty Manager",
+        "does": "Is paged when a P1 page goes unanswered."
+      },
+      {
+        "name": "Support Ops Analyst",
+        "does": "Owns the intent taxonomy and the priority matrix, and hears about every misroute."
+      },
+      {
+        "name": "Support DL",
+        "does": "The distribution list that receives the 5:00 PM digest."
+      }
+    ],
+    "deliverable": "every ticket in the right queue within 15 minutes, and the 5:00 PM digest",
+    "clock": "All afternoon: tickets arrive and are triaged as they land; agents record resolutions as they close them. 5:00 PM: the digest counts the day.",
+    "stakes": "Get it wrong and a customer outage sits in the how-to queue, or an angry but minor ticket pages an engineer out of a real incident."
+  },
+  "owners": [
+    "Support Agent",
+    "Queue Lead",
+    "Tier-2 Engineer",
+    "Duty Manager",
+    "Support Ops Analyst",
+    "Support DL"
+  ],
+  "sources": [
+    {
+      "id": "ticket-inbox",
+      "label": "Ticket Inbox",
+      "labelField": "ticketId",
+      "description": "Tickets from the support form: what the customer saw, how many are affected, how blocked they are, and what they think it is.",
+      "fields": [
+        "ticketId",
+        "from",
+        "subject",
+        "symptom",
+        "customerCategory",
+        "impact",
+        "urgency",
+        "tone",
+        "product"
+      ]
+    },
+    {
+      "id": "resolutions",
+      "label": "Resolutions",
+      "labelField": "ticketId",
+      "description": "An agent's note when a ticket is closed: what it really was, how long it took, what fixed it.",
+      "fields": [
+        "ticketId",
+        "workedCategory",
+        "minutes",
+        "fix",
+        "resolvedBy"
+      ]
+    }
+  ],
+  "stores": [
+    {
+      "id": "intent-taxonomy",
+      "label": "Intent Taxonomy",
+      "keyField": "symptom",
+      "owner": "Support Ops Analyst",
+      "tone": "neutral",
+      "description": "Which category each reported symptom belongs to.",
+      "fields": [
+        "symptom",
+        "category",
+        "version"
+      ]
+    },
+    {
+      "id": "priority-matrix",
+      "label": "Priority Matrix",
+      "owner": "Support Ops Analyst",
+      "tone": "neutral",
+      "description": "Impact x urgency -> priority. P1 is high impact AND high urgency; tone never counts.",
+      "fields": [
+        "impact",
+        "urgency",
+        "priority"
+      ]
+    },
+    {
+      "id": "routing-table",
+      "label": "Routing Table",
+      "keyField": "category",
+      "owner": "Queue Lead",
+      "tone": "neutral",
+      "description": "Which queue works each category.",
+      "fields": [
+        "category",
+        "queue"
+      ]
+    },
+    {
+      "id": "sla-targets",
+      "label": "SLA Targets",
+      "keyField": "priority",
+      "owner": "Queue Lead",
+      "tone": "neutral",
+      "description": "How many minutes each priority may take to resolve.",
+      "fields": [
+        "priority",
+        "minutes"
+      ]
+    },
+    {
+      "id": "ticket-log",
+      "label": "Ticket Log",
+      "keyField": "ticketId",
+      "daily": true,
+      "owner": "Queue Lead",
+      "tone": "neutral",
+      "description": "Today's tickets: category, priority, queue, and how they were resolved.",
+      "fields": [
+        "ticketId",
+        "category",
+        "priority",
+        "queue",
+        "workedCategory",
+        "minutes",
+        "breached",
+        "misrouted"
+      ]
+    },
+    {
+      "id": "queue-assignments",
+      "label": "Queue Assignments",
+      "daily": true,
+      "owner": "Queue Lead",
+      "tone": "good",
+      "description": "Tickets placed in a standard queue today.",
+      "fields": [
+        "ticketId",
+        "queue",
+        "priority"
+      ]
+    },
+    {
+      "id": "escalations",
+      "label": "Escalations",
+      "daily": true,
+      "owner": "Duty Manager",
+      "tone": "hold",
+      "description": "P1 tickets paged today, and who was paged last.",
+      "fields": [
+        "ticketId",
+        "priority",
+        "escalatedTo"
+      ]
+    },
+    {
+      "id": "misroutes",
+      "label": "Misroutes",
+      "owner": "Support Ops Analyst",
+      "tone": "bad",
+      "description": "Tickets that turned out to be a different category than triage said. Tomorrow's taxonomy review starts here.",
+      "fields": [
+        "ticketId",
+        "workedCategory",
+        "fix"
+      ]
+    },
+    {
+      "id": "triage-archive",
+      "label": "Triage Archive",
+      "keyField": "runId",
+      "owner": "Queue Lead",
+      "tone": "good",
+      "description": "Every digest sent, kept a year.",
+      "fields": [
+        "runId",
+        "total",
+        "p1"
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "triage-flow",
+      "name": "Ticket triage",
+      "description": "Runs once per ticket as it arrives.",
+      "trigger": {
+        "mode": "event",
+        "source": "ticket-inbox"
+      }
+    },
+    {
+      "id": "resolution-flow",
+      "name": "Resolutions",
+      "description": "Runs once per resolution note.",
+      "trigger": {
+        "mode": "event",
+        "source": "resolutions"
+      }
+    },
+    {
+      "id": "digest-flow",
+      "name": "The 5:00 PM digest",
+      "description": "Runs every day at 5:00 PM.",
+      "trigger": {
+        "mode": "schedule",
+        "at": "5:00 PM"
+      }
+    }
+  ],
+  "days": [
+    {
+      "id": "day-1",
+      "label": "Day 1 - three clean tickets",
+      "description": "Three tickets, each with an obvious category. One is a real outage - and the customer guessed it was billing. Tier-2 answers the page.",
+      "sources": {
+        "ticket-inbox": [
+          {
+            "ticketId": "TKT-4001",
+            "from": "Dana at Northwind",
+            "subject": "Checkout is down for all users",
+            "symptom": "service down",
+            "customerCategory": "billing",
+            "impact": "high",
+            "urgency": "high",
+            "tone": "calm",
+            "product": "Checkout"
+          },
+          {
+            "ticketId": "TKT-4002",
+            "from": "Lee at Cascade",
+            "subject": "Export button throws an error on one report",
+            "symptom": "error message",
+            "customerCategory": "bug",
+            "impact": "low",
+            "urgency": "high",
+            "tone": "calm",
+            "product": "Reports"
+          },
+          {
+            "ticketId": "TKT-4003",
+            "from": "Sam at Sierra",
+            "subject": "How do I add a teammate?",
+            "symptom": "question",
+            "customerCategory": "how-to",
+            "impact": "low",
+            "urgency": "low",
+            "tone": "calm",
+            "product": "Admin"
+          }
+        ],
+        "resolutions": [
+          {
+            "ticketId": "TKT-4001",
+            "workedCategory": "outage",
+            "minutes": 12,
+            "fix": "restarted the checkout service",
+            "resolvedBy": "Tier-2 Engineer"
+          },
+          {
+            "ticketId": "TKT-4002",
+            "workedCategory": "bug",
+            "minutes": 180,
+            "fix": "patched the export template",
+            "resolvedBy": "Support Agent"
+          },
+          {
+            "ticketId": "TKT-4003",
+            "workedCategory": "how-to",
+            "minutes": 30,
+            "fix": "sent the teammate invite guide",
+            "resolvedBy": "Support Agent"
+          }
+        ]
+      },
+      "seeds": {
+        "intent-taxonomy": [
+          {
+            "symptom": "service down",
+            "category": "outage",
+            "version": "1.0.0"
+          },
+          {
+            "symptom": "error message",
+            "category": "bug",
+            "version": "1.0.0"
+          },
+          {
+            "symptom": "question",
+            "category": "how-to",
+            "version": "1.0.0"
+          },
+          {
+            "symptom": "invoice or payment",
+            "category": "billing",
+            "version": "1.0.0"
+          }
+        ],
+        "priority-matrix": [
+          {
+            "impact": "high",
+            "urgency": "high",
+            "priority": "P1"
+          },
+          {
+            "impact": "high",
+            "urgency": "low",
+            "priority": "P2"
+          },
+          {
+            "impact": "low",
+            "urgency": "high",
+            "priority": "P3"
+          },
+          {
+            "impact": "low",
+            "urgency": "low",
+            "priority": "P4"
+          }
+        ],
+        "routing-table": [
+          {
+            "category": "outage",
+            "queue": "incident-bridge"
+          },
+          {
+            "category": "bug",
+            "queue": "bug-queue"
+          },
+          {
+            "category": "how-to",
+            "queue": "support-queue"
+          },
+          {
+            "category": "billing",
+            "queue": "billing-queue"
+          }
+        ],
+        "sla-targets": [
+          {
+            "priority": "P1",
+            "minutes": 15
+          },
+          {
+            "priority": "P2",
+            "minutes": 240
+          },
+          {
+            "priority": "P3",
+            "minutes": 480
+          },
+          {
+            "priority": "P4",
+            "minutes": 2880
+          }
+        ]
+      },
+      "approvals": {
+        "Tier-2 Engineer": {
+          "outcome": "acknowledged",
+          "at": "2:14 PM"
+        }
+      },
+      "failures": []
+    },
+    {
+      "id": "day-2",
+      "label": "Day 2 - tickets that do not fit",
+      "description": "Four tickets. One reports a symptom the taxonomy has never heard of. One is in capitals and furious, about a minor bug. One looks like a bug and turns out to be billing. The Queue Lead has opened a triage-review queue for tickets nobody can classify.",
+      "sources": {
+        "ticket-inbox": [
+          {
+            "ticketId": "TKT-4101",
+            "from": "Ari at Harbor",
+            "subject": "Login page is blank for everyone",
+            "symptom": "service down",
+            "customerCategory": "how-to",
+            "impact": "high",
+            "urgency": "high",
+            "tone": "calm",
+            "product": "SSO"
+          },
+          {
+            "ticketId": "TKT-4102",
+            "from": "Max at Depot",
+            "subject": "URGENT!!! FIX THIS NOW!!! Dark mode colours are wrong",
+            "symptom": "error message",
+            "customerCategory": "outage",
+            "impact": "low",
+            "urgency": "high",
+            "tone": "furious",
+            "product": "UI"
+          },
+          {
+            "ticketId": "TKT-4103",
+            "from": "Pat at Ledger",
+            "subject": "Invoice PDF shows an error",
+            "symptom": "error message",
+            "customerCategory": "bug",
+            "impact": "low",
+            "urgency": "high",
+            "tone": "calm",
+            "product": "Billing portal"
+          },
+          {
+            "ticketId": "TKT-4104",
+            "from": "Jo at Compass",
+            "subject": "Your app changed my timezone?",
+            "symptom": "something else",
+            "customerCategory": "how-to",
+            "impact": "low",
+            "urgency": "low",
+            "tone": "calm",
+            "product": "Settings"
+          }
+        ],
+        "resolutions": [
+          {
+            "ticketId": "TKT-4101",
+            "workedCategory": "outage",
+            "minutes": 14,
+            "fix": "rolled back the SSO config",
+            "resolvedBy": "Tier-2 Engineer"
+          },
+          {
+            "ticketId": "TKT-4102",
+            "workedCategory": "bug",
+            "minutes": 500,
+            "fix": "fixed the dark mode palette",
+            "resolvedBy": "Support Agent"
+          },
+          {
+            "ticketId": "TKT-4103",
+            "workedCategory": "billing",
+            "minutes": 95,
+            "fix": "regenerated the invoice; the template had a bad tax line",
+            "resolvedBy": "Support Agent"
+          },
+          {
+            "ticketId": "TKT-4104",
+            "workedCategory": "how-to",
+            "minutes": 40,
+            "fix": "showed where the timezone setting lives",
+            "resolvedBy": "Support Agent"
+          }
+        ]
+      },
+      "seeds": {
+        "routing-table": [
+          {
+            "category": "unclassified",
+            "queue": "triage-review"
+          }
+        ]
+      },
+      "approvals": {
+        "Tier-2 Engineer": {
+          "outcome": "acknowledged",
+          "at": "2:31 PM"
+        }
+      },
+      "failures": []
+    },
+    {
+      "id": "day-3",
+      "label": "Day 3 - the page nobody answers",
+      "description": "A P1: payments are failing for every merchant. The flow pages Tier-2 - and Tier-2 is on a flight. Nobody acknowledges.",
+      "sources": {
+        "ticket-inbox": [
+          {
+            "ticketId": "TKT-4201",
+            "from": "Kim at Studio",
+            "subject": "Payments API returning 500s for all merchants",
+            "symptom": "service down",
+            "customerCategory": "billing",
+            "impact": "high",
+            "urgency": "high",
+            "tone": "calm",
+            "product": "Payments"
+          },
+          {
+            "ticketId": "TKT-4202",
+            "from": "Ray at Watchtower",
+            "subject": "How do I export to CSV?",
+            "symptom": "question",
+            "customerCategory": "how-to",
+            "impact": "low",
+            "urgency": "low",
+            "tone": "calm",
+            "product": "Reports"
+          }
+        ],
+        "resolutions": [
+          {
+            "ticketId": "TKT-4202",
+            "workedCategory": "how-to",
+            "minutes": 20,
+            "fix": "sent the export guide",
+            "resolvedBy": "Support Agent"
+          }
+        ]
+      },
+      "seeds": {},
+      "approvals": {},
+      "failures": []
+    }
+  ],
+  "builds": [
+    {
+      "id": "b1",
+      "dayId": "day-1",
+      "flowId": "triage-flow",
+      "title": "Classify",
+      "brief": "Give each ticket a category from the taxonomy - by what the customer saw, not what they guessed.",
+      "goal": "Every ticket says what the customer saw (the symptom) and what they think it is (their guess). Customers guess wrong: Dana thinks a checkout outage is a billing problem. Classify each ticket by its symptom, using the Intent Taxonomy, and log it.",
+      "outcome": "Every ticket is in the Ticket Log with a category taken from the Intent Taxonomy by its symptom.",
+      "constraints": [
+        "Classify the symptom, never the customer's guess.",
+        "The category comes from the taxonomy; nobody types it.",
+        "Name the field category."
+      ],
+      "requires": [
+        "trigger",
+        "lookup",
+        "transform",
+        "store",
+        "json-record"
+      ],
+      "hints": {
+        "question": "Dana says 'billing'. Dana also says checkout is down for everyone. Which one does the desk act on?",
+        "nudge": "A Lookup on the Intent Taxonomy where symptom = symptom attaches intent; a Transform sets category = intent.category; a Store writes the Ticket Log.",
+        "steps": [
+          "Connect the Trigger to the Ticket Inbox.",
+          "Add a Lookup on Intent Taxonomy where symptom = symptom. Name it intent.",
+          "Add a Transform: category = intent.category.",
+          "Add a Store into the Ticket Log. Run it."
+        ]
+      },
+      "mapNodes": [
+        "ticket-inbox",
+        "ticket-record",
+        "intent-taxonomy",
+        "classification"
+      ],
+      "checks": [
+        {
+          "id": "b1-run",
+          "kind": "runStatus",
+          "flowId": "triage-flow",
+          "equals": "succeeded",
+          "why": "A triage flow that fails leaves every ticket unrouted.",
+          "label": "The triage flow runs without failing"
+        },
+        {
+          "id": "b1-outage",
+          "kind": "storeContains",
+          "store": "ticket-log",
+          "where": {
+            "ticketId": "TKT-4001"
+          },
+          "fields": {
+            "category": "outage"
+          },
+          "why": "Checkout down for everyone is an outage, whatever the customer guessed.",
+          "label": "TKT-4001 is an outage (not billing, the customer's guess)"
+        },
+        {
+          "id": "b1-howto",
+          "kind": "storeContains",
+          "store": "ticket-log",
+          "where": {
+            "ticketId": "TKT-4003"
+          },
+          "fields": {
+            "category": "how-to"
+          },
+          "why": "A question is a how-to; nothing is broken.",
+          "label": "TKT-4003 is a how-to"
+        },
+        {
+          "id": "b1-all",
+          "kind": "storeCount",
+          "store": "ticket-log",
+          "equals": 3,
+          "why": "Every ticket is logged, or it can be lost.",
+          "label": "All 3 tickets are logged"
+        }
+      ]
+    },
+    {
+      "id": "b2",
+      "dayId": "day-1",
+      "flowId": "triage-flow",
+      "title": "Score priority",
+      "brief": "Give each ticket a priority from the matrix: impact and urgency, nothing else.",
+      "goal": "Priority decides who gets woken up. The Support Ops Analyst owns a matrix: high impact and high urgency is P1, and so on down to P4. Look each ticket up in the matrix by both its impact and its urgency.",
+      "outcome": "Every ticket carries a priority read from the Priority Matrix by impact AND urgency.",
+      "constraints": [
+        "Match on both impact and urgency.",
+        "Name the field priority.",
+        "Tone is not in the matrix."
+      ],
+      "requires": [
+        "fields-and-paths"
+      ],
+      "hints": {
+        "question": "Two tickets are high urgency. Why is only one of them a P1?",
+        "nudge": "One Lookup on the Priority Matrix with two match fields (impact = impact, urgency = urgency) attaches matrix; a Transform sets priority = matrix.priority.",
+        "steps": [
+          "Before the Store, add a Lookup on Priority Matrix where impact = impact and urgency = urgency. Name it matrix.",
+          "Add a Transform: priority = matrix.priority.",
+          "Run it."
+        ]
+      },
+      "mapNodes": [
+        "priority-matrix",
+        "priority-assignment"
+      ],
+      "checks": [
+        {
+          "id": "b2-p1",
+          "kind": "storeContains",
+          "store": "ticket-log",
+          "where": {
+            "ticketId": "TKT-4001"
+          },
+          "fields": {
+            "priority": "P1"
+          },
+          "why": "Everyone affected and blocked: that is what P1 means.",
+          "label": "TKT-4001 is P1"
+        },
+        {
+          "id": "b2-p3",
+          "kind": "storeContains",
+          "store": "ticket-log",
+          "where": {
+            "ticketId": "TKT-4002"
+          },
+          "fields": {
+            "priority": "P3"
+          },
+          "why": "Urgent for one person, small in impact: P3.",
+          "label": "TKT-4002 is P3"
+        },
+        {
+          "id": "b2-p4",
+          "kind": "storeContains",
+          "store": "ticket-log",
+          "where": {
+            "ticketId": "TKT-4003"
+          },
+          "fields": {
+            "priority": "P4"
+          },
+          "why": "A question with nobody blocked is P4.",
+          "label": "TKT-4003 is P4"
+        }
+      ]
+    },
+    {
+      "id": "b3",
+      "dayId": "day-1",
+      "flowId": "triage-flow",
+      "title": "Route",
+      "brief": "Page Tier-2 for a P1; put everything else in its queue from the routing table.",
+      "goal": "A P1 skips the queue: page the Tier-2 Engineer, capture the acknowledgement, and log the escalation. Every other ticket goes to the queue the routing table names for its category. Either way, the ticket log records the queue.",
+      "outcome": "P1 tickets page Tier-2 and are logged in Escalations with the acknowledgement; the rest land in Queue Assignments in the queue the Routing Table names.",
+      "constraints": [
+        "P1 escalates, whatever its category.",
+        "Queue names come only from the Routing Table.",
+        "Log who was paged: escalatedTo."
+      ],
+      "requires": [
+        "condition",
+        "send",
+        "approval"
+      ],
+      "hints": {
+        "question": "TKT-4001 is an outage and a P1. Where does it go first, and who has to say they have it?",
+        "nudge": "Look up the Routing Table by category (route) and set queue = route.queue. A Condition on priority == P1: YES lane pages Tier-2 (Send), waits for the acknowledgement (Approval), sets escalatedTo and stores Escalations; NO lane stores Queue Assignments. Both lanes rejoin before the Ticket Log store.",
+        "steps": [
+          "Before the Store, add a Lookup on Routing Table where category = category. Name it route, and add a Transform: queue = route.queue.",
+          "Add a Condition: priority == P1.",
+          "YES lane: Send to Tier-2 Engineer ('P1 {{ticketId}}: {{subject}}'); Approval from Tier-2 Engineer about 'P1 {{ticketId}}'; Transform escalatedTo = 'Tier-2 Engineer'; Store into Escalations.",
+          "NO lane: Store into Queue Assignments.",
+          "Run it."
+        ]
+      },
+      "mapNodes": [
+        "routing-table",
+        "route-decision",
+        "escalation-handoff",
+        "queue-assignment"
+      ],
+      "checks": [
+        {
+          "id": "b3-paged",
+          "kind": "outboxContains",
+          "to": "Tier-2 Engineer",
+          "recordLabel": "TKT-4001",
+          "why": "A P1 nobody is paged about is an outage nobody is fixing.",
+          "label": "Tier-2 is paged about TKT-4001"
+        },
+        {
+          "id": "b3-esc",
+          "kind": "storeContains",
+          "store": "escalations",
+          "where": {
+            "ticketId": "TKT-4001"
+          },
+          "fields": {
+            "escalatedTo": "Tier-2 Engineer"
+          },
+          "why": "The escalation log is how the Duty Manager sees who has the incident.",
+          "label": "TKT-4001 is logged as escalated to Tier-2"
+        },
+        {
+          "id": "b3-bug",
+          "kind": "storeContains",
+          "store": "queue-assignments",
+          "where": {
+            "ticketId": "TKT-4002"
+          },
+          "fields": {
+            "queue": "bug-queue"
+          },
+          "why": "A bug belongs to the people who fix bugs.",
+          "label": "TKT-4002 goes to bug-queue"
+        },
+        {
+          "id": "b3-howto",
+          "kind": "storeContains",
+          "store": "queue-assignments",
+          "where": {
+            "ticketId": "TKT-4003"
+          },
+          "fields": {
+            "queue": "support-queue"
+          },
+          "why": "How-to questions go to the agents who answer them.",
+          "label": "TKT-4003 goes to support-queue"
+        },
+        {
+          "id": "b3-not-esc",
+          "kind": "storeMissing",
+          "store": "escalations",
+          "where": {
+            "ticketId": "TKT-4002"
+          },
+          "why": "a P3 does not page an engineer",
+          "label": "TKT-4002 is not escalated"
+        }
+      ]
+    },
+    {
+      "id": "b4",
+      "dayId": "day-1",
+      "flowId": "resolution-flow",
+      "title": "Close the loop",
+      "brief": "When a ticket is resolved, record how it went and whether it beat its SLA.",
+      "goal": "As agents close tickets, they note what the ticket really was and how many minutes it took. Put that on the ticket's row in the Ticket Log, and compare the minutes with the SLA target for the ticket's priority.",
+      "outcome": "Every resolved ticket's row carries its worked category, its minutes, and whether it breached its SLA.",
+      "constraints": [
+        "Update the ticket's existing row; never add a second.",
+        "The SLA target comes from SLA Targets by the ticket's priority.",
+        "Name the field breached (true or false)."
+      ],
+      "requires": [
+        "update-row",
+        "data-types"
+      ],
+      "hints": {
+        "question": "TKT-4001 took 12 minutes. Is that good?",
+        "nudge": "Look up the ticket in the Ticket Log (ticket), then SLA Targets by ticket.priority (sla); breached = minutes > sla.minutes; a Store updates the Ticket Log row by ticketId.",
+        "steps": [
+          "Open the Resolutions flow and connect its Trigger to Resolutions.",
+          "Lookup Ticket Log where ticketId = ticketId. Name it ticket.",
+          "Lookup SLA Targets where priority = ticket.priority. Name it sla.",
+          "Transform: breached = minutes > sla.minutes.",
+          "Store into Ticket Log, update the existing row, same row when ticketId."
+        ]
+      },
+      "mapNodes": [
+        "sla-tracker",
+        "resolution-record"
+      ],
+      "checks": [
+        {
+          "id": "b4-run",
+          "kind": "runStatus",
+          "flowId": "resolution-flow",
+          "equals": "succeeded",
+          "why": "A resolution that is not recorded is a ticket the digest cannot count.",
+          "label": "The resolutions flow runs without failing"
+        },
+        {
+          "id": "b4-p1",
+          "kind": "storeContains",
+          "store": "ticket-log",
+          "where": {
+            "ticketId": "TKT-4001"
+          },
+          "fields": {
+            "workedCategory": "outage",
+            "minutes": 12,
+            "breached": false
+          },
+          "why": "12 minutes against a 15 minute P1 target: inside SLA.",
+          "label": "TKT-4001: resolved in 12 minutes, inside its 15 minute SLA"
+        },
+        {
+          "id": "b4-p3",
+          "kind": "storeContains",
+          "store": "ticket-log",
+          "where": {
+            "ticketId": "TKT-4002"
+          },
+          "fields": {
+            "breached": false
+          },
+          "why": "180 minutes against 480: inside SLA.",
+          "label": "TKT-4002 is inside its SLA"
+        },
+        {
+          "id": "b4-rows",
+          "kind": "storeCount",
+          "store": "ticket-log",
+          "equals": 3,
+          "why": "A resolution updates the ticket; it is not a new ticket.",
+          "label": "Still 3 tickets in the log"
+        }
+      ]
+    },
+    {
+      "id": "b5",
+      "dayId": "day-1",
+      "flowId": "digest-flow",
+      "title": "The 5 PM digest",
+      "brief": "At 5:00, count the day and send the digest.",
+      "goal": "At 5:00 PM the Support DL wants the day in a few lines: how many tickets, how many P1s, how many breached their SLA. Read the whole Ticket Log, count it, send the digest and archive it.",
+      "outcome": "At 5:00 PM the Support DL receives a digest with the day's totals, and a copy is archived.",
+      "constraints": [
+        "Name the counts total, p1 and breaches.",
+        "Count from the Ticket Log; do not type numbers."
+      ],
+      "requires": [
+        "schedule-trigger",
+        "lookup-all",
+        "lists",
+        "compose",
+        "send"
+      ],
+      "hints": {
+        "question": "How many P1s were there today, and where would a machine find out?",
+        "nudge": "A Lookup (all rows) on the Ticket Log gives tickets; len() and count(tickets, 'field', value) do the counting; Compose, Send, Store.",
+        "steps": [
+          "Open the 5:00 PM digest flow.",
+          "Lookup Ticket Log, all rows. Name it tickets.",
+          "Transform: total = len(tickets), p1 = count(tickets, 'priority', 'P1'), breaches = count(tickets, 'breached', true).",
+          "Compose digest: 'Tickets: {{total}}. P1: {{p1}}. SLA breaches: {{breaches}}.' plus {{#each tickets}}- {{ticketId}} {{priority}} {{category}}{{/each}}.",
+          "Send to Support DL with {{digest}}; Store into Triage Archive."
+        ]
+      },
+      "mapNodes": [
+        "queue-digest",
+        "triage-archive"
+      ],
+      "checks": [
+        {
+          "id": "b5-total",
+          "kind": "recordField",
+          "where": {
+            "runId": "day-1-run"
+          },
+          "field": "total",
+          "equals": 3,
+          "why": "The digest starts with the day's volume.",
+          "label": "The digest counts 3 tickets"
+        },
+        {
+          "id": "b5-p1",
+          "kind": "recordField",
+          "where": {
+            "runId": "day-1-run"
+          },
+          "field": "p1",
+          "equals": 1,
+          "why": "P1s are what the Duty Manager reads first.",
+          "label": "The digest counts 1 P1"
+        },
+        {
+          "id": "b5-breaches",
+          "kind": "recordField",
+          "where": {
+            "runId": "day-1-run"
+          },
+          "field": "breaches",
+          "equals": 0,
+          "why": "A clean day says so.",
+          "label": "The digest counts 0 SLA breaches"
+        },
+        {
+          "id": "b5-sent",
+          "kind": "outboxContains",
+          "to": "Support DL",
+          "count": 1,
+          "why": "One digest a day.",
+          "label": "The Support DL receives the digest"
+        },
+        {
+          "id": "b5-archive",
+          "kind": "storeContains",
+          "store": "triage-archive",
+          "where": {
+            "runId": "day-1-run"
+          },
+          "why": "The archive is the record behind next month's staffing call.",
+          "label": "The digest is archived"
+        }
+      ]
+    },
+    {
+      "id": "b6",
+      "dayId": "day-2",
+      "flowId": "triage-flow",
+      "title": "Day 2: nobody's category",
+      "brief": "A symptom the taxonomy has never seen goes to a person, not to no queue.",
+      "goal": "TKT-4104 reports a symptom that is not in the taxonomy. Run your Day 1 flow and find it: no category, no queue - it is assigned to nowhere and nobody will ever see it. When a ticket cannot be classified, call it unclassified (the routing table sends that to triage-review) and tell the Queue Lead.",
+      "outcome": "A ticket the taxonomy cannot classify lands in triage-review and the Queue Lead is told; no ticket is ever assigned to no queue.",
+      "constraints": [
+        "Unknown is a category too: unclassified.",
+        "A person is told - the taxonomy may need a new symptom.",
+        "Priority is still the matrix's: a furious ticket is not a P1 because it is furious."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "Where did TKT-4104 go?",
+        "nudge": "coalesce(intent.category, 'unclassified') gives a category even when the lookup found nothing. A Condition on intent missing can Send to the Queue Lead.",
+        "steps": [
+          "Run first and open TKT-4104 in the run.",
+          "Change category to coalesce(intent.category, 'unclassified').",
+          "After the classify Transform, add a Condition: intent missing. YES lane: Send to Queue Lead ('Unclassified: {{ticketId}} {{subject}}').",
+          "Run again: TKT-4104 is in triage-review."
+        ]
+      },
+      "mapNodes": [
+        "classification",
+        "queue-assignment"
+      ],
+      "checks": [
+        {
+          "id": "b6-review",
+          "kind": "storeContains",
+          "store": "queue-assignments",
+          "where": {
+            "ticketId": "TKT-4104"
+          },
+          "fields": {
+            "queue": "triage-review"
+          },
+          "why": "A ticket in no queue is a customer nobody answers.",
+          "label": "TKT-4104 lands in triage-review"
+        },
+        {
+          "id": "b6-told",
+          "kind": "outboxContains",
+          "to": "Queue Lead",
+          "recordLabel": "TKT-4104",
+          "why": "A new symptom is news for the taxonomy, not just for this ticket.",
+          "label": "The Queue Lead is told about TKT-4104"
+        },
+        {
+          "id": "b6-no-null",
+          "kind": "storeMissing",
+          "store": "queue-assignments",
+          "where": {
+            "queue": null
+          },
+          "why": "no ticket may be assigned to no queue",
+          "label": "No ticket is assigned to no queue"
+        },
+        {
+          "id": "b6-furious",
+          "kind": "storeMissing",
+          "store": "escalations",
+          "where": {
+            "ticketId": "TKT-4102"
+          },
+          "why": "low impact is P3 however loud the subject line",
+          "label": "TKT-4102 (URGENT!!!) is not escalated - the matrix says P3"
+        },
+        {
+          "id": "b6-p1",
+          "kind": "storeContains",
+          "store": "escalations",
+          "where": {
+            "ticketId": "TKT-4101"
+          },
+          "why": "The login outage is a real P1.",
+          "label": "TKT-4101 (login down for everyone) is escalated"
+        }
+      ]
+    },
+    {
+      "id": "b7",
+      "dayId": "day-2",
+      "flowId": "resolution-flow",
+      "title": "Day 2: wrong queue",
+      "brief": "When a ticket turns out to be a different category, record the misroute and tell the taxonomy owner.",
+      "goal": "TKT-4103 looked like a bug and went to bug-queue; the agent who fixed it says it was billing. Nothing failed - the ticket was solved - but the taxonomy sent it to the wrong people. Compare the worked category with the triage category, log misroutes, tell the Support Ops Analyst, and count them in the digest.",
+      "outcome": "Every misroute is logged in Misroutes, the Support Ops Analyst is told, the ticket's row says misrouted, and the 5:00 PM digest counts them.",
+      "constraints": [
+        "Misrouted means triage gave it a category and the work proved it was another one.",
+        "A ticket sent to triage-review was never misrouted - a person was always going to classify it.",
+        "Name the fields misrouted and misroutes (the digest's count)."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "TKT-4103 was solved. Why does anyone care where it went first?",
+        "nudge": "In Resolutions, misrouted = workedCategory != ticket.category and ticket.category != 'unclassified'; a Condition on misrouted == true sends and logs. In the digest, misroutes = count(tickets, 'misrouted', true).",
+        "steps": [
+          "Run first and read TKT-4103's row in the Ticket Log.",
+          "In Resolutions, add misrouted = workedCategory != ticket.category and ticket.category != 'unclassified' to the Transform.",
+          "Add a Condition: misrouted == true. YES lane: Send to Support Ops Analyst ('{{ticketId}} was triaged {{ticket.category}}, worked as {{workedCategory}}'); Store into Misroutes.",
+          "In the digest flow, add misroutes = count(tickets, 'misrouted', true) and put {{misroutes}} in the digest."
+        ]
+      },
+      "mapNodes": [
+        "misroute-check",
+        "taxonomy-feedback"
+      ],
+      "checks": [
+        {
+          "id": "b7-logged",
+          "kind": "storeContains",
+          "store": "misroutes",
+          "where": {
+            "ticketId": "TKT-4103"
+          },
+          "fields": {
+            "workedCategory": "billing"
+          },
+          "why": "The misroute log is what the taxonomy review reads.",
+          "label": "TKT-4103 is logged as a misroute (worked as billing)"
+        },
+        {
+          "id": "b7-told",
+          "kind": "outboxContains",
+          "to": "Support Ops Analyst",
+          "recordLabel": "TKT-4103",
+          "why": "The taxonomy only improves if its owner hears about its mistakes.",
+          "label": "The Support Ops Analyst is told"
+        },
+        {
+          "id": "b7-row",
+          "kind": "storeContains",
+          "store": "ticket-log",
+          "where": {
+            "ticketId": "TKT-4103"
+          },
+          "fields": {
+            "misrouted": true
+          },
+          "why": "The ticket's own row has to say it went to the wrong queue.",
+          "label": "TKT-4103's row says misrouted"
+        },
+        {
+          "id": "b7-only",
+          "kind": "storeCount",
+          "store": "misroutes",
+          "equals": 1,
+          "why": "Flagging right-routed tickets would bury the real one.",
+          "label": "Only the real misroute is logged"
+        },
+        {
+          "id": "b7-digest",
+          "kind": "recordField",
+          "where": {
+            "runId": "day-2-run"
+          },
+          "field": "misroutes",
+          "equals": 1,
+          "why": "The Support DL sees taxonomy health every day.",
+          "label": "The digest counts 1 misroute"
+        }
+      ]
+    },
+    {
+      "id": "b8",
+      "dayId": "day-3",
+      "flowId": "triage-flow",
+      "title": "Day 3: nobody picked up",
+      "brief": "If Tier-2 does not acknowledge a P1 page, page the Duty Manager.",
+      "goal": "Payments are failing for every merchant, and the flow pages Tier-2 - who is on a flight. Run your Day 2 flow: the page goes out, nobody acknowledges, and the escalation log says Tier-2 has it. When a P1 page is not acknowledged, page the Duty Manager and log that the escalation went up a rung.",
+      "outcome": "An unacknowledged P1 page escalates to the Duty Manager, and Escalations shows who was paged last.",
+      "constraints": [
+        "Tier-2 is still paged first.",
+        "Not acknowledged is anything other than acknowledged.",
+        "escalatedTo names the last person paged."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "The page went out at 2:05. It is 2:20. Who knows the outage has nobody on it?",
+        "nudge": "In the P1 lane, after the acknowledgement Approval and the escalatedTo Transform, a Condition on approval.outcome != 'acknowledged': YES lane Sends to the Duty Manager and sets escalatedTo = 'Duty Manager'.",
+        "steps": [
+          "Run first and read TKT-4201's path.",
+          "In the P1 lane, after escalatedTo = 'Tier-2 Engineer', add a Condition: approval.outcome != acknowledged.",
+          "YES lane: Send to Duty Manager ('P1 {{ticketId}} not acknowledged by Tier-2'); Transform escalatedTo = 'Duty Manager'.",
+          "Keep the Escalations store last in the P1 lane. Run again."
+        ]
+      },
+      "mapNodes": [
+        "run-operations",
+        "escalation-handoff"
+      ],
+      "checks": [
+        {
+          "id": "b8-tier2",
+          "kind": "outboxContains",
+          "to": "Tier-2 Engineer",
+          "recordLabel": "TKT-4201",
+          "why": "The first rung is still the first rung.",
+          "label": "Tier-2 is paged first"
+        },
+        {
+          "id": "b8-duty",
+          "kind": "outboxContains",
+          "to": "Duty Manager",
+          "recordLabel": "TKT-4201",
+          "why": "An outage with nobody on it has to wake the next person up.",
+          "label": "The Duty Manager is paged about TKT-4201"
+        },
+        {
+          "id": "b8-log",
+          "kind": "storeContains",
+          "store": "escalations",
+          "where": {
+            "ticketId": "TKT-4201"
+          },
+          "fields": {
+            "escalatedTo": "Duty Manager"
+          },
+          "why": "The log must show where the incident actually sits.",
+          "label": "Escalations shows the Duty Manager has it"
+        },
+        {
+          "id": "b8-once",
+          "kind": "outboxContains",
+          "to": "Duty Manager",
+          "count": 1,
+          "why": "A how-to question never wakes the Duty Manager.",
+          "label": "The Duty Manager is paged once, for the P1 only"
+        }
+      ]
+    }
+  ]
+}

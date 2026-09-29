@@ -87,7 +87,7 @@ function explainRecord(runResult, where) {
 function rowsLabel(rows, keyGuess) {
   return rows
     .map((r) => {
-      const k = keyGuess || ['invoiceNumber', 'runId', 'recordLabel', 'id', 'poNumber', 'vendorId'].find((f) => !isNil(getPath(r, f)))
+      const k = keyGuess || ['invoiceNumber', 'ticketId', 'hireId', 'hub', 'runId', 'recordLabel', 'id', 'poNumber', 'vendorId'].find((f) => !isNil(getPath(r, f)))
       return k ? String(getPath(r, k)) : '(row)'
     })
     .join(', ')

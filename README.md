@@ -27,7 +27,8 @@ as Power Automate, Make, n8n, Zapier or Python, and exported.
 | 1 - Meridian Morning Brief | Runnable flows: 8 builds, 3 days |
 | 2 - Beacon Invoice Desk | Runnable flows: 6 builds, 3 days |
 | 3 - Harbor Onboarding | Runnable flows: 7 builds, 3 days |
-| 4-10 | Chartered in `curriculum/charters/`, not built |
+| 4 - Relay Ticket Triage | Runnable flows: 8 builds, 3 days |
+| 5-10 | Chartered in `curriculum/charters/`, not built |
 
 The worksheet lessons are retired; every module is a flow module.
 

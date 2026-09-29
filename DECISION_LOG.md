@@ -2,6 +2,26 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-09-29 (Relay built as runnable flows)
+
+- RELAY (module-04) BUILT from its ratified charter and the map on the old
+  feat/module-04-relay branch (the worksheet lessons there were never
+  merged and are superseded). 3 flows (ticket triage, resolutions, the 5:00
+  PM digest), 3 days, 8 builds, 35 checks, 30 canon facts. Tickets arrive as
+  support-form fields (the engine does not read prose): classification is a
+  taxonomy lookup by SYMPTOM, never the customer's guess; priority is a
+  two-field matrix lookup (impact x urgency), so the furious "URGENT!!!"
+  ticket stays P3. Day 2: an unknown symptom is assigned to no queue by the
+  Day 1 flow (fix: coalesce to 'unclassified' -> triage-review, tell the
+  Queue Lead); a misroute found at resolution is logged, the taxonomy owner
+  told, and the digest counts it (a ticket sent to triage-review is not a
+  misroute). Day 3: the P1 page is never acknowledged - the ladder pages the
+  Duty Manager.
+- MAP: added the Operations node the lint requires (Triage Run Operations,
+  the escalation ladder); moved Taxonomy Feedback into the Classification
+  column (the last column held 6 nodes; the canvas fits 5).
+- Check failure text now names ticket, hire and hub rows instead of "(row)".
+
 ## 2026-09-29 (Meridian as flows; the worksheet path removed)
 
 - MERIDIAN (module-01) PORTED: 3 flows (desk notes, overnight prices, the

@@ -1,0 +1,68 @@
+{
+  "note": "Terms module-04 introduces, and the build that teaches each. Enforced by scripts/lint-glossary.mjs. Keep ASCII-only.",
+  "module": "module-04",
+  "terms": [
+    {
+      "term": "taxonomy",
+      "aliases": [
+        "intent taxonomy"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The governed list of categories a ticket can be, and which symptom means which. Owned by one person so it changes on purpose."
+    },
+    {
+      "term": "triage",
+      "teachesIn": "b1",
+      "gloss": "Deciding, fast, what something is, how bad it is and who gets it - before anyone works on it."
+    },
+    {
+      "term": "P1",
+      "aliases": [
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Priority levels from the matrix. P1 means many people are affected AND blocked - the only level that pages an engineer."
+    },
+    {
+      "term": "priority matrix",
+      "aliases": [
+        "impact x urgency"
+      ],
+      "teachesIn": "b1",
+      "gloss": "A grid that turns impact and urgency into a priority, so priority is decided by a rule instead of by how loudly someone asked."
+    },
+    {
+      "term": "routing table",
+      "teachesIn": "b1",
+      "gloss": "Which queue works which category. Config, owned by the Queue Lead - change the table, not the flow."
+    },
+    {
+      "term": "acknowledge",
+      "aliases": [
+        "acknowledged",
+        "acknowledgement"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The on-call person saying 'I have it'. A page is not handled until it is acknowledged."
+    },
+    {
+      "term": "misroute",
+      "aliases": [
+        "misrouted",
+        "misroutes"
+      ],
+      "teachesIn": "b1",
+      "gloss": "A ticket triage sent to one queue that turned out to belong to another. The raw material for improving the taxonomy."
+    },
+    {
+      "term": "escalation ladder",
+      "aliases": [
+        "duty manager"
+      ],
+      "teachesIn": "b8",
+      "gloss": "Who is paged next when the first person does not answer, and after how long."
+    }
+  ]
+}

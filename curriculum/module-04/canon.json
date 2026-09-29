@@ -1,0 +1,293 @@
+{
+  "_comment": "Canon for a runnable-flow module, enforced by scripts/lint-flows.mjs. Flow modules have no per-lesson answer keys to drift apart; what can drift is the world data (sources and seeds) and the reference solution that proves every build. So each assertion is checked against the raw day data (kind data) or against the reference solution's run of the whole module (kinds record and store), with every day's stores carried into the next. Change a number in the data and the canon names every fact that moved. The pre-port per-lesson assertions are in git history. ASCII only.",
+  "module": "module-04",
+  "format": "flows",
+  "assertions": [
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "ticketId": "TKT-4001"
+      },
+      "field": "symptom",
+      "equals": "service down",
+      "source": "ticket-inbox"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "ticketId": "TKT-4001"
+      },
+      "field": "customerCategory",
+      "equals": "billing",
+      "source": "ticket-inbox"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "symptom": "service down"
+      },
+      "field": "category",
+      "equals": "outage",
+      "seed": "intent-taxonomy"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "impact": "high",
+        "urgency": "high"
+      },
+      "field": "priority",
+      "equals": "P1",
+      "seed": "priority-matrix"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "impact": "low",
+        "urgency": "high"
+      },
+      "field": "priority",
+      "equals": "P3",
+      "seed": "priority-matrix"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "category": "outage"
+      },
+      "field": "queue",
+      "equals": "incident-bridge",
+      "seed": "routing-table"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "category": "bug"
+      },
+      "field": "queue",
+      "equals": "bug-queue",
+      "seed": "routing-table"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "priority": "P1"
+      },
+      "field": "minutes",
+      "equals": 15,
+      "seed": "sla-targets"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "priority": "P3"
+      },
+      "field": "minutes",
+      "equals": 480,
+      "seed": "sla-targets"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "ticket-log",
+      "where": {
+        "ticketId": "TKT-4001"
+      },
+      "field": "category",
+      "equals": "outage"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "ticket-log",
+      "where": {
+        "ticketId": "TKT-4001"
+      },
+      "field": "priority",
+      "equals": "P1"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "ticket-log",
+      "where": {
+        "ticketId": "TKT-4002"
+      },
+      "field": "priority",
+      "equals": "P3"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "ticket-log",
+      "where": {
+        "ticketId": "TKT-4003"
+      },
+      "field": "priority",
+      "equals": "P4"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "escalations",
+      "where": {
+        "ticketId": "TKT-4001"
+      },
+      "field": "escalatedTo",
+      "equals": "Tier-2 Engineer"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "queue-assignments",
+      "where": {
+        "ticketId": "TKT-4002"
+      },
+      "field": "queue",
+      "equals": "bug-queue"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "queue-assignments",
+      "where": {
+        "ticketId": "TKT-4003"
+      },
+      "field": "queue",
+      "equals": "support-queue"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "ticket-log",
+      "where": {
+        "ticketId": "TKT-4001"
+      },
+      "field": "breached",
+      "equals": false
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run 5:00 PM",
+      "field": "total",
+      "equals": 3,
+      "flow": "digest-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run 5:00 PM",
+      "field": "p1",
+      "equals": 1,
+      "flow": "digest-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run 5:00 PM",
+      "field": "breaches",
+      "equals": 0,
+      "flow": "digest-flow"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "ticket-log",
+      "where": {
+        "ticketId": "TKT-4102"
+      },
+      "field": "priority",
+      "equals": "P3"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "ticket-log",
+      "where": {
+        "ticketId": "TKT-4102"
+      },
+      "field": "breached",
+      "equals": true
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "queue-assignments",
+      "where": {
+        "ticketId": "TKT-4104"
+      },
+      "field": "queue",
+      "equals": "triage-review"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "misroutes",
+      "where": {
+        "ticketId": "TKT-4103"
+      },
+      "field": "workedCategory",
+      "equals": "billing"
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "Scheduled run 5:00 PM",
+      "field": "total",
+      "equals": 4,
+      "flow": "digest-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "Scheduled run 5:00 PM",
+      "field": "p1",
+      "equals": 1,
+      "flow": "digest-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "Scheduled run 5:00 PM",
+      "field": "breaches",
+      "equals": 1,
+      "flow": "digest-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "Scheduled run 5:00 PM",
+      "field": "misroutes",
+      "equals": 1,
+      "flow": "digest-flow"
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "escalations",
+      "where": {
+        "ticketId": "TKT-4201"
+      },
+      "field": "escalatedTo",
+      "equals": "Duty Manager"
+    },
+    {
+      "kind": "record",
+      "day": "day-3",
+      "label": "Scheduled run 5:00 PM",
+      "field": "total",
+      "equals": 2,
+      "flow": "digest-flow"
+    }
+  ]
+}
