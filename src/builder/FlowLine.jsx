@@ -2,7 +2,7 @@ import { Icon } from '../components/ui'
 import { kindStyle, tint, STATUS_STYLE } from './kindStyles.js'
 import Palette from './Palette.jsx'
 import StepEditor from './StepEditor.jsx'
-import { findStep } from '../runtime/flowModel.js'
+import { findStep, branchKeys } from '../runtime/flowModel.js'
 
 // Horizontal line: the Make and n8n layouts. Modules sit on a line left to
 // right; a Router/IF fans out into two rows that rejoin. The selected node's
@@ -49,9 +49,9 @@ function Node({ step, skin, ctx, selected, status, dimmed, replaying, onSelect, 
         className={`relative flex items-center justify-center border-2 bg-sf-surface transition-all ${round ? 'h-14 w-14 rounded-full' : 'h-12 w-full rounded-lg px-2'} ${selected ? 'shadow-sf-md' : 'shadow-sf-sm'} ${replaying ? 'ring-4 ring-sf-accent/40' : ''}`}
         style={{ borderColor: selected ? 'var(--sf-accent)' : st.color, background: round ? tint(st.color, 22) : undefined }}
       >
-        <span className="flex items-center gap-1.5" style={{ color: st.color }}>
-          <Icon name={st.icon} size={round ? 20 : 16} />
-          {!round && <span className="truncate text-left text-[11px] font-semibold text-sf-text">{d.title}</span>}
+        <span className={`flex min-w-0 items-center gap-1.5 ${round ? '' : 'w-full'}`} style={{ color: st.color }}>
+          <Icon name={st.icon} size={round ? 20 : 16} className="flex-none" />
+          {!round && <span className="min-w-0 truncate text-left text-[11px] font-semibold text-sf-text">{d.title}</span>}
         </span>
         {statusStyle && (
           <span className={`absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full ${statusStyle.className}`}>
@@ -81,15 +81,15 @@ export default function FlowLine(props) {
       items.push(
         <Node key={step.id} step={step} skin={skin} ctx={ctx} shape={shape} selected={selectedStepId === step.id} status={status} dimmed={hasRun && !status && !replayStepId} replaying={replayStepId === step.id} onSelect={() => onSelectStep(selectedStepId === step.id ? null : step.id)} />
       )
-      if (step.kind === 'condition') {
+      if (step.branches) {
         const d = skin.describe(step, ctx)
-        const labels = d.branchLabels || { yes: 'yes', no: 'no' }
+        const labels = d.branchLabels || { yes: 'yes', no: 'no', each: 'each' }
         items.push(
-          <div key={`lanes-${step.id}`} className="flex flex-col gap-2 border-l border-dashed border-sf-border-strong pl-1">
-            {['yes', 'no'].map((b) => (
-              <div key={b} className="flex items-center">
-                <span className={`mr-1 rounded px-1 py-0.5 text-[9px] font-bold uppercase ${b === 'yes' ? 'bg-sf-complete-weak text-sf-complete-text' : 'bg-sf-warning-weak text-sf-progress-text'}`}>{labels[b]}</span>
-                <div className="flex items-center">{renderList(step.branches[b], [...path, step.id, b], depth + 1)}</div>
+          <div key={`lanes-${step.id}`} className="flex min-w-0 max-w-full flex-col gap-2 border-l border-dashed border-sf-border-strong pl-1">
+            {branchKeys(step).map((b) => (
+              <div key={b} className="flex min-w-0 items-center">
+                <span className={`mr-1 rounded px-1 py-0.5 text-[9px] font-bold uppercase ${b === 'yes' ? 'bg-sf-complete-weak text-sf-complete-text' : b === 'no' ? 'bg-sf-warning-weak text-sf-progress-text' : 'bg-sf-info-weak text-sf-info'}`}>{labels[b] || b}</span>
+                <div className="flex min-w-0 flex-wrap items-center gap-y-3">{renderList(step.branches[b] || [], [...path, step.id, b], depth + 1)}</div>
               </div>
             ))}
           </div>
@@ -105,7 +105,7 @@ export default function FlowLine(props) {
   return (
     <div className="flex flex-col gap-3">
       <div className="overflow-x-auto rounded-xl border border-sf-border bg-sf-surface-subtle p-4" style={{ backgroundImage: 'radial-gradient(var(--sf-border) 1px, transparent 1px)', backgroundSize: '14px 14px' }}>
-        <div className="flex min-w-max items-center">{renderList(flow.steps, [], 0)}</div>
+        <div className="flex flex-wrap items-center gap-y-5">{renderList(flow.steps, [], 0)}</div>
       </div>
       {sel && (
         <div className="rounded-xl border border-sf-accent-border bg-sf-surface p-3 shadow-sf-sm">

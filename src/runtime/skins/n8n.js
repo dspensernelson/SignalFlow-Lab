@@ -12,6 +12,7 @@ export const n8nSkin = {
       lookup: 'Google Sheets: Get row(s)',
       transform: 'Edit Fields (Set)',
       condition: 'IF',
+      foreach: 'Loop Over Items',
       approval: 'Wait (resume on webhook)',
       send: 'Send Email',
       compose: 'Edit Fields (Set)',
@@ -38,8 +39,10 @@ export const n8nSkin = {
         return { title: c.channel === 'chat' ? 'Slack: Send message' : 'Send Email', subtitle: `To: ${c.to || '?'}${c.subject ? ` - Subject: ${truncate(c.subject, 40)}` : ''}` }
       case 'compose':
         return { title: 'Edit Fields (Set)', subtitle: `${c.as || 'body'} = ${truncate(c.template || '')}` }
+      case 'foreach':
+        return { title: 'Loop Over Items (Split in Batches)', subtitle: `Items: ${c.list || '?'} - Batch size: 1`, branchLabels: { each: 'loop' } }
       case 'store':
-        return { title: c.mode === 'upsert' ? 'Google Sheets: Append or update row' : 'Google Sheets: Append row', subtitle: `Sheet: ${storeLabel(ctx, c.store)}${c.from ? ` - Split Out ${c.from} first` : ''}` }
+        return { title: c.mode === 'update' ? 'Google Sheets: Update row' : c.mode === 'upsert' ? 'Google Sheets: Append or update row' : 'Google Sheets: Append row', subtitle: `Sheet: ${storeLabel(ctx, c.store)}${c.from ? ` - Split Out ${c.from} first` : ''}` }
       case 'stop':
         return { title: 'No Operation, do nothing', subtitle: 'Branch ends here' }
       default:

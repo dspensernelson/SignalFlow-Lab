@@ -12,6 +12,7 @@ const FUNCTIONS = [
   { name: 'abs', sig: 'abs(x)', ex: 'abs(variance)' },
   { name: 'round', sig: 'round(x, decimals)', ex: 'round(variance / po.poTotal * 100, 2)' },
   { name: 'len', sig: 'len(list)', ex: 'len(batch)' },
+  { name: 'count', sig: "count(list, 'field', value)", ex: "count(tasks, 'state', 'done')" },
   { name: 'sum', sig: "sum(list, 'field')", ex: "sum(batch, 'invoiceTotal')" },
   { name: 'num', sig: 'num(text)', ex: "num('$1,220.00')" },
   { name: 'upper', sig: 'upper(text)', ex: 'upper(hub)' },
@@ -47,7 +48,8 @@ function PickerButton({ label, icon, children, title }) {
 // never types JSON. Expressions get an inline parse check so a typo is caught
 // before a run, not during it.
 
-const inputCls = 'w-full rounded-md border border-sf-border bg-sf-surface px-2 py-1 text-xs text-sf-text placeholder:text-sf-subtle focus:border-sf-accent-border focus:outline-none'
+const inputBase = 'rounded-md border border-sf-border bg-sf-surface px-2 py-1 text-xs text-sf-text placeholder:text-sf-subtle focus:border-sf-accent-border focus:outline-none'
+const inputCls = `w-full ${inputBase}`
 const selectCls = inputCls
 const labelCls = 'block text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle'
 
@@ -206,11 +208,11 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
         <div className="flex flex-col gap-1.5">
           {datalist}
           {sets.map((s, i) => (
-            <div key={i} className="flex items-start gap-1.5">
-              <input className={`${inputCls} w-36 flex-none font-mono`} value={s.field} onChange={(e) => setRow(i, { field: e.target.value })} placeholder="field name" spellCheck={false} />
+            <div key={i} className="flex flex-wrap items-start gap-1.5">
+              <input className={`${inputBase} w-32 flex-none font-mono`} value={s.field} onChange={(e) => setRow(i, { field: e.target.value })} placeholder="field name" spellCheck={false} />
               <span className="pt-1 text-xs text-sf-muted">=</span>
-              <div className="flex-1">
-                <ExprInput value={s.expr} onChange={(v) => setRow(i, { expr: v })} list={listId} placeholder="invoiceTotal - po.poTotal" fields={fields} functions />
+              <div className="min-w-[10rem] flex-1">
+                <ExprInput value={s.expr} onChange={(v) => setRow(i, { expr: v })} list={listId} placeholder="a value or a formula" fields={fields} functions />
               </div>
               <RowButton icon="x" label="Remove" onClick={() => set({ set: sets.filter((_, j) => j !== i) })} />
             </div>
@@ -219,7 +221,7 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
             <button type="button" onClick={() => set({ set: [...sets, { field: '', expr: '' }] })} className="text-[11px] font-medium text-sf-accent hover:underline">
               + set another field
             </button>
-            <span className="text-[10px] text-sf-subtle">text in 'quotes'; and / or / not; the fn button lists the functions</span>
+            <span className="text-[10px] text-sf-subtle">text in 'quotes'</span>
           </div>
         </div>
       )
@@ -234,13 +236,13 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
           {rules.map((r, i) => {
             const noRight = r.op === 'exists' || r.op === 'missing'
             return (
-              <div key={i} className="flex items-start gap-1.5">
+              <div key={i} className="flex flex-wrap items-start gap-1.5">
                 {i > 0 && <span className="w-9 flex-none pt-1 text-[10px] font-semibold uppercase text-sf-subtle">{c.combine === 'any' ? 'or' : 'and'}</span>}
                 {i === 0 && <span className="w-9 flex-none pt-1 text-[10px] font-semibold uppercase text-sf-subtle">if</span>}
-                <div className="flex-1">
+                <div className="min-w-[8rem] flex-1">
                   <ExprInput value={r.left} onChange={(v) => setRule(i, { left: v })} list={listId} placeholder="field" fields={fields} />
                 </div>
-                <select className={`${selectCls} w-24 flex-none font-mono`} value={r.op} onChange={(e) => setRule(i, { op: e.target.value })}>
+                <select className={`${inputBase} w-24 flex-none font-mono`} value={r.op} onChange={(e) => setRule(i, { op: e.target.value })}>
                   {CONDITION_OPS.map((op) => (
                     <option key={op} value={op}>
                       {op}
@@ -249,7 +251,7 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
                 </select>
                 {!noRight && (
                   <>
-                    <div className="flex-1">
+                    <div className="min-w-[8rem] flex-1">
                       {r.rightKind === 'field' ? (
                         <ExprInput value={r.right} onChange={(v) => setRule(i, { right: v })} list={listId} placeholder="field" fields={fields} />
                       ) : (
@@ -287,11 +289,22 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
       )
     }
 
+    case 'foreach':
+      return (
+        <div className="flex flex-col gap-1.5">
+          {datalist}
+          <Field label="For each item in" hint="a list on the record - a Lookup that returns all rows makes one">
+            <ExprInput value={c.list || ''} onChange={(v) => set({ list: v })} list={listId} placeholder="tasks" fields={fields} />
+          </Field>
+          <p className="text-[11px] text-sf-muted">Steps inside run once per item. There, the item is the record; the outer record is <span className="font-mono">parent</span>.</p>
+        </div>
+      )
+
     case 'approval':
       return (
         <div className="grid grid-cols-2 gap-2">
           <Field label="Ask">
-            <input className={inputCls} list={`owners-${step.id}`} value={c.approver || ''} onChange={(e) => set({ approver: e.target.value })} placeholder="AP Manager" />
+            <input className={inputCls} list={`owners-${step.id}`} value={c.approver || ''} onChange={(e) => set({ approver: e.target.value })} placeholder={owners[0] || "who decides"} />
             <datalist id={`owners-${step.id}`}>
               {owners.map((o) => (
                 <option key={o} value={o} />
@@ -299,7 +312,7 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
             </datalist>
           </Field>
           <Field label="About" hint="the reply lands on approval.outcome">
-            <input className={inputCls} value={c.about || ''} onChange={(e) => set({ about: e.target.value })} placeholder="payment run" />
+            <input className={inputCls} value={c.about || ''} onChange={(e) => set({ about: e.target.value })} placeholder="what they are approving" />
           </Field>
         </div>
       )
@@ -310,7 +323,7 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
           {datalist}
           <div className="grid grid-cols-3 gap-2">
             <Field label="To">
-              <input className={inputCls} list={`owners-${step.id}`} value={c.to || ''} onChange={(e) => set({ to: e.target.value })} placeholder="Procurement Lead" />
+              <input className={inputCls} list={`owners-${step.id}`} value={c.to || ''} onChange={(e) => set({ to: e.target.value })} placeholder={owners[0] || "who"} />
               <datalist id={`owners-${step.id}`}>
                 {owners.map((o) => (
                   <option key={o} value={o} />
@@ -325,11 +338,11 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
               </select>
             </Field>
             <Field label="Subject">
-              <input className={inputCls} value={c.subject || ''} onChange={(e) => set({ subject: e.target.value })} placeholder="Hold on {{invoiceNumber}}" />
+              <input className={inputCls} value={c.subject || ''} onChange={(e) => set({ subject: e.target.value })} placeholder="Subject - {{field}} fills in a value" />
             </Field>
           </div>
           <Field label="Body" hint="{{field}} fills in from the record; {{#each list}}...{{/each}} repeats">
-            <textarea className={`${inputCls} min-h-[56px] font-mono`} value={c.body || ''} onChange={(e) => set({ body: e.target.value })} placeholder="Invoice {{invoiceNumber}} is on hold: {{reason}}" spellCheck={false} />
+            <textarea className={`${inputCls} min-h-[56px] font-mono`} value={c.body || ''} onChange={(e) => set({ body: e.target.value })} placeholder="The message. {{field}} fills in a value from the record." spellCheck={false} />
           </Field>
         </div>
       )
@@ -338,7 +351,7 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
       return (
         <div className="flex flex-col gap-2">
           <Field label="Save as" hint="a field later steps can send or store">
-            <input className={`${inputCls} w-40 font-mono`} value={c.as || ''} onChange={(e) => set({ as: e.target.value })} placeholder="body" />
+            <input className={`${inputBase} w-40 font-mono`} value={c.as || ''} onChange={(e) => set({ as: e.target.value })} placeholder="body" />
           </Field>
           <Field label="Template" hint="{{field}} fills in; {{#each batch}}- {{invoiceNumber}}{{/each}} repeats; {{ sum(batch, 'invoiceTotal') }} computes">
             <textarea className={`${inputCls} min-h-[96px] font-mono`} value={c.template || ''} onChange={(e) => set({ template: e.target.value })} spellCheck={false} />
@@ -362,13 +375,14 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
           </Field>
           <Field label="How">
             <select className={selectCls} value={c.mode || 'append'} onChange={(e) => set({ mode: e.target.value })}>
-              <option value="append">append a row</option>
-              <option value="upsert">upsert by key</option>
+              <option value="append">add a new row</option>
+              <option value="upsert">add, or replace if it exists</option>
+              <option value="update">update the existing row</option>
             </select>
           </Field>
-          {c.mode === 'upsert' ? (
-            <Field label="Key field">
-              <input className={`${inputCls} font-mono`} value={c.key || ''} onChange={(e) => set({ key: e.target.value })} list={listId} placeholder="invoiceNumber" />
+          {c.mode === 'upsert' || c.mode === 'update' ? (
+            <Field label="Same row when" hint="one field, or several: hireId, taskId">
+              <input className={`${inputCls} font-mono`} value={c.key || ''} onChange={(e) => set({ key: e.target.value })} list={listId} placeholder="hireId, taskId" />
             </Field>
           ) : (
             <Field label="Rows from" hint="blank = this record; or a list field">
@@ -379,7 +393,7 @@ export default function StepEditor({ step, moduleData, fields, onChange }) {
       )
 
     case 'stop':
-      return <p className="text-xs text-sf-muted">Nothing to configure. A record that reaches this step is finished: nothing after it runs for that record. Use it at the end of a hold lane so a held invoice is never also paid.</p>
+      return <p className="text-xs text-sf-muted">Nothing to configure. A record that reaches this step is finished: nothing after it runs for that record. Inside a For each it ends only the current item. Use it at the end of a lane so a record that was held is not also handled below.</p>
 
     default:
       return null

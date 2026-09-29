@@ -641,60 +641,15 @@
     ],
     "soloRebuildPath": [
       "Write the completed onboarding to a dated archive",
-      "Export what this role needed to the feedback loop",
       "Later integrate with the records system"
-    ],
-    "reusedBy": [
-      "role-profile-catalog",
-      "profile-feedback"
-    ],
-    "governanceNote": "Retention length is a compliance decision; the archive is also what makes the catalog improve, so it is a loop input, not a dead end.",
-    "auditNote": "The archive origin of the temporal loop (onboarding-archive -> role-profile-catalog), refined by profile-feedback.",
-    "taskId": "lesson-onboarding-archive",
-    "artifactName": "onboarding-archive.json"
-  },
-  {
-    "id": "profile-feedback",
-    "label": "Profile Feedback",
-    "type": "process",
-    "thingOrAction": "action",
-    "phaseId": "day-one-package",
-    "x": 1020,
-    "y": 410,
-    "description": "What the archive teaches the catalog: a hire needed a tool the role profile missed, or never used one it listed. The improvement note that closes the onboarding loop.",
-    "lesson": {
-      "type": "transformation",
-      "status": "intent",
-      "intent": "Turn the archived onboarding into a catalog improvement: identify what the role actually needed versus what the profile listed, and propose the change.",
-      "concepts": [
-        "Loop close",
-        "Reference improvement",
-        "Learning from the run"
-      ]
-    },
-    "labVersion": "Run by you in the Profile Feedback task from the onboarding archive fixture.",
-    "realWorldSources": [
-      "Onboarding retrospective notes",
-      "Access-usage analytics",
-      "People Ops catalog change requests"
-    ],
-    "accessNeeded": [
-      "The archived onboarding",
-      "The current role profile",
-      "A catalog change-request channel"
-    ],
-    "soloRebuildPath": [
-      "Compare what the hire needed to the role profile",
-      "Write the proposed catalog change",
-      "Later feed usage analytics into the review"
     ],
     "reusedBy": [
       "role-profile-catalog"
     ],
-    "governanceNote": "Catalog changes still go through People Ops governance; feedback proposes, it does not silently rewrite the provisioning matrix.",
-    "auditNote": "Closes the temporal loop into role-profile-catalog; the improvement is a proposal the catalog owner ratifies.",
-    "taskId": "lesson-profile-feedback",
-    "artifactName": "profile-feedback.json"
+    "governanceNote": "Retention length is a compliance decision; the archive is also what makes the catalog improve, so it is a loop input, not a dead end.",
+    "auditNote": "The archive origin of the temporal loop (onboarding-archive -> role-profile-catalog).",
+    "taskId": "lesson-onboarding-archive",
+    "artifactName": "onboarding-archive.json"
   },
   {
     "id": "run-operations",

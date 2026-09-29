@@ -1,13 +1,18 @@
 // Flow model: the thing a learner builds. Pure data + immutable helpers.
 //
 //   Flow { id, moduleId, name, settings, steps: Step[] }
-//   Step { id, kind, config, branches? }   // condition steps carry branches {yes, no}
+//   Step { id, kind, config, branches? }   // condition: branches {yes, no}; foreach: branches {each}
 //
 // A "list path" addresses a step list inside the tree: [] is the root list,
-// [stepId, 'yes'] is the yes-branch of the condition with that id. Lists can
-// nest (a condition inside a branch), so paths can be longer: [id1,'no',id2,'yes'].
+// [stepId, 'yes'] is the yes-branch of the condition with that id, [stepId,
+// 'each'] the body of a For each. Lists nest, so paths can be longer:
+// [id1,'no',id2,'yes'].
 
-export const STEP_KINDS = ['trigger', 'lookup', 'transform', 'condition', 'approval', 'send', 'compose', 'store', 'stop']
+export const STEP_KINDS = ['trigger', 'lookup', 'transform', 'condition', 'foreach', 'approval', 'send', 'compose', 'store', 'stop']
+
+// The named step lists a step kind owns, in display order.
+export const BRANCH_KEYS = { condition: ['yes', 'no'], foreach: ['each'] }
+export const branchKeys = (step) => (step && step.branches ? BRANCH_KEYS[step.kind] || Object.keys(step.branches) : [])
 
 export const CONDITION_OPS = ['==', '!=', '<', '<=', '>', '>=', 'exists', 'missing', 'contains']
 
@@ -27,6 +32,8 @@ export function defaultConfig(kind) {
       return { set: [{ field: '', expr: '' }] }
     case 'condition':
       return { rules: [{ left: '', op: '==', right: '', rightKind: 'value' }], combine: 'all' }
+    case 'foreach':
+      return { list: '' }
     case 'approval':
       return { approver: '', about: '' }
     case 'send':
@@ -54,7 +61,7 @@ export function defaultSettings() {
 export function createStep(kind, configPatch = {}, id) {
   if (!STEP_KINDS.includes(kind)) throw new Error(`Unknown step kind "${kind}"`)
   const step = { id: id || newId(kind), kind, config: { ...defaultConfig(kind), ...configPatch } }
-  if (kind === 'condition') step.branches = { yes: [], no: [] }
+  if (BRANCH_KEYS[kind]) step.branches = Object.fromEntries(BRANCH_KEYS[kind].map((k) => [k, []]))
   return step
 }
 
@@ -88,10 +95,7 @@ export function getList(flow, path = []) {
 export function walkSteps(steps, fn, path = []) {
   steps.forEach((step, index) => {
     fn(step, path, index)
-    if (step.branches) {
-      walkSteps(step.branches.yes, fn, [...path, step.id, 'yes'])
-      walkSteps(step.branches.no, fn, [...path, step.id, 'no'])
-    }
+    for (const k of branchKeys(step)) walkSteps(step.branches[k] || [], fn, [...path, step.id, k])
   })
 }
 
@@ -122,13 +126,7 @@ function mapLists(steps, edit, path = []) {
   const edited = edit(steps, path)
   return edited.map((step) => {
     if (!step.branches) return step
-    return {
-      ...step,
-      branches: {
-        yes: mapLists(step.branches.yes, edit, [...path, step.id, 'yes']),
-        no: mapLists(step.branches.no, edit, [...path, step.id, 'no']),
-      },
-    }
+    return { ...step, branches: Object.fromEntries(branchKeys(step).map((k) => [k, mapLists(step.branches[k] || [], edit, [...path, step.id, k])])) }
   })
 }
 
@@ -197,6 +195,7 @@ export const KIND_LABEL = {
   lookup: 'Lookup',
   transform: 'Transform',
   condition: 'Condition',
+  foreach: 'For each',
   approval: 'Approval',
   send: 'Send',
   compose: 'Compose',
@@ -209,6 +208,7 @@ export const KIND_GLOSS = {
   lookup: 'read the reference table or history the run needs',
   transform: 'compute or normalize so the data is safe to compare',
   condition: 'branch the run on a rule someone owns',
+  foreach: 'repeat the steps inside once for every item in a list',
   approval: 'a person decides, and the reply is captured',
   send: 'notify, route, or deliver to a person or queue',
   compose: 'assemble the deliverable from the record',

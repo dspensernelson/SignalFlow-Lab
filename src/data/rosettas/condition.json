@@ -133,7 +133,10 @@
   ],
   "task": "Route on the price rule: if variance is within band, write the invoice to the Payment Batch; otherwise write it to the Exception Queue.",
   "add": {
-    "kind": "condition"
+    "kind": "condition",
+    "also": [
+      "store"
+    ]
   },
   "solution": {
     "kind": "condition",

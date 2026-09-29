@@ -1,0 +1,190 @@
+{
+  "id": "foreach",
+  "kind": "rosetta",
+  "exercise": "add-step",
+  "label": "For each",
+  "introducedBy": "module-03",
+  "gloss": "repeat the same steps once for every item in a list",
+  "why": "A lookup in all-rows mode hands you a list: every SLA line, every row of a batch. Most work then has to happen once per item - one task per SLA line, one email per late task. A For each walks the list and runs the steps inside it once per item. Inside the loop the record is the item; the record you started with is still there as parent.",
+  "cue": "when someone says 'for every one of these, do...', that is a loop",
+  "sample": {
+    "sources": [
+      {
+        "id": "offers",
+        "label": "Signed Offers",
+        "labelField": "hireId",
+        "fields": [
+          "hireId",
+          "name",
+          "role",
+          "startDate"
+        ]
+      }
+    ],
+    "stores": [
+      {
+        "id": "sla-policy",
+        "label": "SLA Policy",
+        "keyField": "taskId",
+        "owner": "People Ops Lead",
+        "fields": [
+          "taskId",
+          "owner",
+          "daysBefore"
+        ]
+      },
+      {
+        "id": "task-board",
+        "label": "Task Board",
+        "owner": "People Ops Lead",
+        "fields": [
+          "hireId",
+          "taskId",
+          "owner",
+          "due",
+          "state"
+        ]
+      }
+    ],
+    "owners": [
+      "People Ops Lead"
+    ],
+    "day": {
+      "sources": {
+        "offers": [
+          {
+            "hireId": "H-1",
+            "name": "Test Hire",
+            "role": "Logistics Coordinator",
+            "startDate": "SD"
+          }
+        ]
+      },
+      "seeds": {
+        "sla-policy": [
+          {
+            "taskId": "accounts",
+            "owner": "IT Provisioner",
+            "daysBefore": 2
+          },
+          {
+            "taskId": "hardware",
+            "owner": "IT Provisioner",
+            "daysBefore": 1
+          },
+          {
+            "taskId": "payroll",
+            "owner": "Payroll Specialist",
+            "daysBefore": 3
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "offers",
+        "mode": "event",
+        "at": ""
+      }
+    },
+    {
+      "kind": "lookup",
+      "config": {
+        "store": "sla-policy",
+        "matchOn": [],
+        "as": "sla",
+        "mode": "all"
+      }
+    }
+  ],
+  "task": "Give H-1 one row on the Task Board for every line in sla, each marked with H-1's hireId.",
+  "add": {
+    "kind": "foreach",
+    "also": [
+      "transform",
+      "store"
+    ]
+  },
+  "solution": {
+    "kind": "foreach",
+    "config": {
+      "list": "sla"
+    },
+    "branches": {
+      "each": [
+        {
+          "kind": "transform",
+          "config": {
+            "set": [
+              {
+                "field": "hireId",
+                "expr": "parent.hireId"
+              }
+            ]
+          }
+        },
+        {
+          "kind": "store",
+          "config": {
+            "store": "task-board",
+            "from": "",
+            "mode": "append",
+            "key": ""
+          }
+        }
+      ]
+    }
+  },
+  "notes": [
+    "Inside the loop, the record is one SLA line. The hire is parent: parent.hireId.",
+    "Three lines in, three rows out."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "storeCount",
+      "store": "task-board",
+      "equals": 3,
+      "label": "The Task Board has 3 rows, one per SLA line"
+    },
+    {
+      "id": "c2",
+      "kind": "storeContains",
+      "store": "task-board",
+      "where": {
+        "taskId": "payroll"
+      },
+      "fields": {
+        "hireId": "H-1"
+      },
+      "label": "The payroll row belongs to H-1"
+    },
+    {
+      "id": "c3",
+      "kind": "storeContains",
+      "store": "task-board",
+      "where": {
+        "taskId": "accounts"
+      },
+      "fields": {
+        "hireId": "H-1",
+        "owner": "IT Provisioner"
+      },
+      "label": "The accounts row belongs to H-1 and keeps its owner"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "'Apply to each' over the value array of the Get items step",
+    "powerAppsCopilot": "ForAll() in Power Fx; a loop in a Copilot Studio topic",
+    "make": "an Iterator module: each item becomes its own bundle",
+    "n8n": "most nodes run once per item already; Loop Over Items (Split in Batches) when you need control",
+    "zapier": "Looping by Zapier over line items",
+    "python": "for item in items:",
+    "langgraph": "a map step (Send API) fanning out one call per item"
+  }
+}

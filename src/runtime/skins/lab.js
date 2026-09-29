@@ -7,7 +7,7 @@ export const labSkin = {
   layout: 'rail',
   family: 'neutral',
   paletteLabel(kind) {
-    return { trigger: 'Trigger', lookup: 'Lookup', transform: 'Transform', condition: 'Condition', approval: 'Approval', send: 'Send', compose: 'Compose', store: 'Store', stop: 'Stop' }[kind] || kind
+    return { trigger: 'Trigger', lookup: 'Lookup', transform: 'Transform', condition: 'Condition', foreach: 'For each', approval: 'Approval', send: 'Send', compose: 'Compose', store: 'Store', stop: 'Stop' }[kind] || kind
   },
   describe(step, ctx) {
     const c = step.config || {}
@@ -22,6 +22,8 @@ export const labSkin = {
         return { title: `Transform: ${setFields(c).join(', ') || 'nothing yet'}`, subtitle: setText(c) }
       case 'condition':
         return { title: 'Condition', subtitle: `If ${rulesText(c)}` }
+      case 'foreach':
+        return { title: `For each item in ${c.list || '?'}`, subtitle: 'Run the steps inside once per item', branchLabels: { each: 'Each item' } }
       case 'approval':
         return { title: `Approval: ${c.approver || 'who?'}`, subtitle: c.about ? `About ${c.about}` : 'Ask, and store the reply' }
       case 'send':
@@ -29,7 +31,7 @@ export const labSkin = {
       case 'compose':
         return { title: `Compose ${c.as || 'body'}`, subtitle: truncate(c.template || '(empty template)') }
       case 'store':
-        return { title: `Store in ${storeLabel(ctx, c.store)}`, subtitle: c.from ? `each row of ${c.from}` : c.mode === 'upsert' ? `upsert by ${c.key || '?'}` : 'append the record' }
+        return { title: `Store in ${storeLabel(ctx, c.store)}`, subtitle: c.from ? `each row of ${c.from}` : c.mode === 'upsert' ? `add, or replace the row with the same ${c.key || '?'}` : c.mode === 'update' ? `update the row with the same ${c.key || '?'}` : 'add the record as a new row' }
       case 'stop':
         return { title: 'Stop here', subtitle: 'This record is done; nothing below runs for it' }
       default:

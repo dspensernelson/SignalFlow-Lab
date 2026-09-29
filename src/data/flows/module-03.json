@@ -1,0 +1,965 @@
+{
+  "moduleId": "module-03",
+  "title": "Harbor Onboarding",
+  "org": "Harbor Logistics",
+  "intro": "Harbor hires about ten people a month, and every one of them has to be ready by 8:00 AM on their first day. You are going to build the automation that makes that reliable: a signed offer opens a hire, the flow plans four tasks for four teams, keeps a board of who has done what, and hands the hiring manager a Day-One Package the moment everything is done. Then it meets a week where things go wrong.",
+  "world": {
+    "oneLiner": "Harbor Logistics gets every new hire Day-One Ready: accounts live, laptop delivered, badge active and payroll enrolled before 8:00 AM on their start date.",
+    "roles": [
+      {
+        "name": "Recruiter",
+        "does": "Sends the signed offer. That is what starts a hire."
+      },
+      {
+        "name": "People Ops Lead",
+        "does": "Owns the role profiles, the SLA policy and the Task Board, and is the person to tell when a task is stuck."
+      },
+      {
+        "name": "IT Provisioner",
+        "does": "Creates the accounts and ships the laptop."
+      },
+      {
+        "name": "Facilities Coordinator",
+        "does": "Activates the badge and grants building and system access from the role profile."
+      },
+      {
+        "name": "Payroll Specialist",
+        "does": "Enrolls the hire in payroll. It has the earliest deadline, because it has to hit the first pay cycle."
+      },
+      {
+        "name": "Hiring Manager",
+        "does": "Receives the Day-One Package the evening before the start."
+      }
+    ],
+    "deliverable": "a Day-One Package for every hire, the evening before they start",
+    "clock": "A signed offer arrives and the hire is planned the same day; each team reports as it finishes; by 5:00 PM the day before the start (SD-1) the hire is either ready and packaged, or someone has been told why not.",
+    "stakes": "Get it wrong and someone starts a new job with no laptop, no login and no paycheck - or the manager is told they are ready when they are not."
+  },
+  "owners": [
+    "Recruiter",
+    "People Ops Lead",
+    "IT Provisioner",
+    "Facilities Coordinator",
+    "Payroll Specialist",
+    "Hiring Manager"
+  ],
+  "sources": [
+    {
+      "id": "signed-offers",
+      "label": "Signed Offers",
+      "labelField": "offerId",
+      "description": "Offers the Recruiter has had signed, one per hire.",
+      "fields": [
+        "offerId",
+        "hireId",
+        "name",
+        "role",
+        "department",
+        "startDate",
+        "manager"
+      ]
+    },
+    {
+      "id": "task-updates",
+      "label": "Task Updates",
+      "labelField": "updateId",
+      "description": "Each team's report on its task for a hire: done, or blocked with a reason.",
+      "fields": [
+        "updateId",
+        "hireId",
+        "taskId",
+        "state",
+        "note",
+        "by"
+      ]
+    }
+  ],
+  "stores": [
+    {
+      "id": "role-profiles",
+      "label": "Role Profiles",
+      "keyField": "role",
+      "owner": "People Ops Lead",
+      "tone": "neutral",
+      "description": "What each job gets: laptop, access groups, pay class.",
+      "fields": [
+        "role",
+        "laptop",
+        "accessGroups",
+        "payClass",
+        "version"
+      ]
+    },
+    {
+      "id": "sla-policy",
+      "label": "SLA Policy",
+      "keyField": "taskId",
+      "owner": "People Ops Lead",
+      "tone": "neutral",
+      "description": "The four onboarding tasks, who owns each, and how many days before the start it must be done.",
+      "fields": [
+        "taskId",
+        "owner",
+        "daysBefore",
+        "version"
+      ]
+    },
+    {
+      "id": "onboarding-records",
+      "label": "Onboarding Records",
+      "keyField": "hireId",
+      "owner": "People Ops Lead",
+      "tone": "neutral",
+      "description": "One record per hire: who, which role, which start date.",
+      "fields": [
+        "hireId",
+        "name",
+        "role",
+        "startDate"
+      ]
+    },
+    {
+      "id": "task-board",
+      "label": "Task Board",
+      "owner": "People Ops Lead",
+      "tone": "neutral",
+      "description": "One row per task per hire, with its owner, due date and state.",
+      "fields": [
+        "hireId",
+        "taskId",
+        "owner",
+        "due",
+        "state",
+        "note"
+      ]
+    },
+    {
+      "id": "day-one-packages",
+      "label": "Day-One Packages",
+      "keyField": "hireId",
+      "owner": "Hiring Manager",
+      "tone": "good",
+      "description": "Every package handed to a hiring manager, kept for seven years.",
+      "fields": [
+        "hireId",
+        "done"
+      ]
+    },
+    {
+      "id": "escalations",
+      "label": "Escalations",
+      "owner": "People Ops Lead",
+      "tone": "hold",
+      "description": "Tasks someone has been told about because they are blocked or late.",
+      "fields": [
+        "hireId",
+        "taskId",
+        "owner",
+        "state",
+        "note"
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "offer-flow",
+      "name": "New hire intake",
+      "description": "Runs once per signed offer.",
+      "trigger": {
+        "mode": "event",
+        "source": "signed-offers"
+      }
+    },
+    {
+      "id": "update-flow",
+      "name": "Task updates",
+      "description": "Runs once per task update from a team.",
+      "trigger": {
+        "mode": "event",
+        "source": "task-updates"
+      }
+    },
+    {
+      "id": "sweep-flow",
+      "name": "The 5:00 PM check",
+      "description": "Runs every evening: what is still not done?",
+      "trigger": {
+        "mode": "schedule",
+        "at": "5:00 PM"
+      }
+    }
+  ],
+  "days": [
+    {
+      "id": "day-1",
+      "label": "Day 1 - Jordan's week, everything lands",
+      "description": "One hire, Jordan Lee, Logistics Coordinator. The offer arrives, and all four teams report done. Build the whole desk on a week where the pattern is visible.",
+      "sources": {
+        "signed-offers": [
+          {
+            "offerId": "OFF-4021",
+            "hireId": "H-4021",
+            "name": "Jordan Lee",
+            "role": "Logistics Coordinator",
+            "department": "Operations",
+            "startDate": "SD",
+            "manager": "Hiring Manager"
+          }
+        ],
+        "task-updates": [
+          {
+            "updateId": "H-4021 payroll",
+            "hireId": "H-4021",
+            "taskId": "payroll",
+            "state": "done",
+            "note": "enrolled, Non-exempt / Hourly",
+            "by": "Payroll Specialist"
+          },
+          {
+            "updateId": "H-4021 accounts",
+            "hireId": "H-4021",
+            "taskId": "accounts",
+            "state": "done",
+            "note": "created acct-4021",
+            "by": "IT Provisioner"
+          },
+          {
+            "updateId": "H-4021 hardware",
+            "hireId": "H-4021",
+            "taskId": "hardware",
+            "state": "done",
+            "note": "Standard laptop delivered",
+            "by": "IT Provisioner"
+          },
+          {
+            "updateId": "H-4021 access",
+            "hireId": "H-4021",
+            "taskId": "access",
+            "state": "done",
+            "note": "granted ops-general, warehouse-readonly",
+            "by": "Facilities Coordinator"
+          }
+        ]
+      },
+      "seeds": {
+        "role-profiles": [
+          {
+            "role": "Logistics Coordinator",
+            "department": "Operations",
+            "laptop": "Standard laptop",
+            "accessGroups": "ops-general, warehouse-readonly",
+            "payClass": "Non-exempt / Hourly",
+            "version": "1.0.0"
+          }
+        ],
+        "sla-policy": [
+          {
+            "taskId": "accounts",
+            "owner": "IT Provisioner",
+            "daysBefore": 2,
+            "version": "1.0.0"
+          },
+          {
+            "taskId": "hardware",
+            "owner": "IT Provisioner",
+            "daysBefore": 1,
+            "version": "1.0.0"
+          },
+          {
+            "taskId": "access",
+            "owner": "Facilities Coordinator",
+            "daysBefore": 1,
+            "version": "1.0.0"
+          },
+          {
+            "taskId": "payroll",
+            "owner": "Payroll Specialist",
+            "daysBefore": 3,
+            "version": "1.0.0"
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    },
+    {
+      "id": "day-2",
+      "label": "Day 2 - Sam's week, sent twice and a backorder",
+      "description": "Sam Rivera's offer arrives - and then arrives again, re-sent after an email timeout. Three teams report done. IT reports the laptop is backordered until three days after the start.",
+      "sources": {
+        "signed-offers": [
+          {
+            "offerId": "OFF-4022",
+            "hireId": "H-4022",
+            "name": "Sam Rivera",
+            "role": "Logistics Coordinator",
+            "department": "Operations",
+            "startDate": "SD",
+            "manager": "Hiring Manager"
+          },
+          {
+            "offerId": "OFF-4022",
+            "hireId": "H-4022",
+            "name": "Sam Rivera",
+            "role": "Logistics Coordinator",
+            "department": "Operations",
+            "startDate": "SD",
+            "manager": "Hiring Manager"
+          }
+        ],
+        "task-updates": [
+          {
+            "updateId": "H-4022 payroll",
+            "hireId": "H-4022",
+            "taskId": "payroll",
+            "state": "done",
+            "note": "enrolled, rush",
+            "by": "Payroll Specialist"
+          },
+          {
+            "updateId": "H-4022 accounts",
+            "hireId": "H-4022",
+            "taskId": "accounts",
+            "state": "done",
+            "note": "created acct-4022",
+            "by": "IT Provisioner"
+          },
+          {
+            "updateId": "H-4022 access",
+            "hireId": "H-4022",
+            "taskId": "access",
+            "state": "done",
+            "note": "granted ops-general, warehouse-readonly",
+            "by": "Facilities Coordinator"
+          },
+          {
+            "updateId": "H-4022 hardware",
+            "hireId": "H-4022",
+            "taskId": "hardware",
+            "state": "blocked",
+            "note": "laptop backordered to SD+3",
+            "by": "IT Provisioner"
+          }
+        ]
+      },
+      "seeds": {},
+      "approvals": {},
+      "failures": []
+    },
+    {
+      "id": "day-3",
+      "label": "Day 3 - Riley's week, someone goes quiet",
+      "description": "Riley Chen's offer arrives. Payroll, accounts and hardware report done. Facilities never reports on access. Nothing breaks - nothing happens at all.",
+      "sources": {
+        "signed-offers": [
+          {
+            "offerId": "OFF-4023",
+            "hireId": "H-4023",
+            "name": "Riley Chen",
+            "role": "Logistics Coordinator",
+            "department": "Operations",
+            "startDate": "SD",
+            "manager": "Hiring Manager"
+          }
+        ],
+        "task-updates": [
+          {
+            "updateId": "H-4023 payroll",
+            "hireId": "H-4023",
+            "taskId": "payroll",
+            "state": "done",
+            "note": "enrolled, Non-exempt / Hourly",
+            "by": "Payroll Specialist"
+          },
+          {
+            "updateId": "H-4023 accounts",
+            "hireId": "H-4023",
+            "taskId": "accounts",
+            "state": "done",
+            "note": "created acct-4023",
+            "by": "IT Provisioner"
+          },
+          {
+            "updateId": "H-4023 hardware",
+            "hireId": "H-4023",
+            "taskId": "hardware",
+            "state": "done",
+            "note": "Standard laptop delivered",
+            "by": "IT Provisioner"
+          }
+        ]
+      },
+      "seeds": {},
+      "approvals": {},
+      "failures": []
+    }
+  ],
+  "builds": [
+    {
+      "id": "b1",
+      "dayId": "day-1",
+      "flowId": "offer-flow",
+      "title": "Open the hire",
+      "brief": "Turn Jordan's signed offer into an onboarding record that knows what the role gets.",
+      "goal": "Jordan Lee's offer is signed. Before anyone can do anything, Harbor needs one record for the hire that says who they are, which role, which start date - and what that role is entitled to, from the governed role profile rather than from memory.",
+      "outcome": "Every signed offer leaves a record in Onboarding Records, carrying the role profile it was matched to.",
+      "constraints": [
+        "The role profile is looked up by role; nobody types the laptop or the access groups.",
+        "Attach the profile as profile - later builds read it under that name.",
+        "One record per hire, keyed by hireId."
+      ],
+      "requires": [
+        "trigger",
+        "lookup",
+        "store",
+        "json-record"
+      ],
+      "hints": {
+        "question": "When IT asks 'what does a Logistics Coordinator get?', where does the answer live, and who owns it?",
+        "nudge": "The trigger watches Signed Offers. A Lookup on Role Profiles by role attaches the profile; a Store writes the record into Onboarding Records.",
+        "steps": [
+          "Connect the Trigger to Signed Offers.",
+          "Add a Lookup on Role Profiles where role = role. Name it profile.",
+          "Add a Store into Onboarding Records.",
+          "Run it and open OFF-4021: the record now carries profile.laptop."
+        ]
+      },
+      "mapNodes": [
+        "signed-offer",
+        "role-profile-catalog",
+        "onboarding-record"
+      ],
+      "checks": [
+        {
+          "id": "b1-run",
+          "kind": "runStatus",
+          "flowId": "offer-flow",
+          "equals": "succeeded",
+          "why": "If intake fails, nothing else about this hire can start.",
+          "label": "The intake flow runs without failing"
+        },
+        {
+          "id": "b1-record",
+          "kind": "storeContains",
+          "store": "onboarding-records",
+          "where": {
+            "hireId": "H-4021"
+          },
+          "fields": {
+            "role": "Logistics Coordinator",
+            "startDate": "SD"
+          },
+          "why": "Every team works from this record; without it they are working from an email.",
+          "label": "Jordan (H-4021) has an onboarding record"
+        },
+        {
+          "id": "b1-profile",
+          "kind": "recordField",
+          "where": {
+            "offerId": "OFF-4021"
+          },
+          "field": "profile.laptop",
+          "equals": "Standard laptop",
+          "why": "What a role gets is governed. Reading it from the profile means a profile change changes every future hire.",
+          "label": "The record carries the role profile (Standard laptop)"
+        }
+      ]
+    },
+    {
+      "id": "b2",
+      "dayId": "day-1",
+      "flowId": "offer-flow",
+      "title": "Plan the four tasks",
+      "brief": "Put one task per team on the Task Board, each with its owner and due date.",
+      "goal": "Four teams have to do something for Jordan, in parallel, each by its own deadline. The SLA Policy lists the tasks, their owners, and how many days before the start each is due. Turn it into four rows on the Task Board, one per task, so every team can see what it owes.",
+      "outcome": "Every hire gets four pending tasks on the Task Board, each owned and dated from the SLA Policy.",
+      "constraints": [
+        "Read the tasks from the SLA Policy; do not hard-code four steps.",
+        "Due dates are relative to the start: payroll due 3 days before is SD-3.",
+        "Each row names the hire it belongs to."
+      ],
+      "requires": [
+        "lookup-all",
+        "foreach",
+        "transform",
+        "fields-and-paths"
+      ],
+      "hints": {
+        "question": "If People Ops adds a fifth task to the policy next month, what should your flow have to change?",
+        "nudge": "A Lookup in all-rows mode reads the whole SLA Policy as a list. A For each over that list runs once per task; inside, a Transform stamps the hire's id (parent.hireId), the due date and the state, and a Store adds the row.",
+        "steps": [
+          "After the Store, add a Lookup on SLA Policy, all rows, no match fields. Name it sla.",
+          "Add a For each over sla.",
+          "Inside it: a Transform setting hireId = parent.hireId, due = concat('SD-', daysBefore), state = 'pending'.",
+          "Still inside: a Store into Task Board.",
+          "Run it. The Task Board should hold four rows for H-4021."
+        ]
+      },
+      "mapNodes": [
+        "sla-policy",
+        "provisioning-plan"
+      ],
+      "checks": [
+        {
+          "id": "b2-four",
+          "kind": "storeCount",
+          "store": "task-board",
+          "where": {
+            "hireId": "H-4021"
+          },
+          "equals": 4,
+          "why": "Four teams, four tasks. A missing row is a team that never hears about Jordan.",
+          "label": "Jordan has exactly 4 tasks on the Task Board"
+        },
+        {
+          "id": "b2-payroll",
+          "kind": "storeContains",
+          "store": "task-board",
+          "where": {
+            "hireId": "H-4021",
+            "taskId": "payroll"
+          },
+          "fields": {
+            "owner": "Payroll Specialist",
+            "due": "SD-3"
+          },
+          "why": "Payroll is due first so the hire is paid in the first cycle.",
+          "label": "Payroll is owned by the Payroll Specialist, due SD-3"
+        },
+        {
+          "id": "b2-accounts",
+          "kind": "storeContains",
+          "store": "task-board",
+          "where": {
+            "hireId": "H-4021",
+            "taskId": "accounts"
+          },
+          "fields": {
+            "owner": "IT Provisioner",
+            "due": "SD-2"
+          },
+          "why": "Accounts must exist before access can be granted to them.",
+          "label": "Accounts is owned by the IT Provisioner, due SD-2"
+        },
+        {
+          "id": "b2-access",
+          "kind": "storeContains",
+          "store": "task-board",
+          "where": {
+            "hireId": "H-4021",
+            "taskId": "access"
+          },
+          "fields": {
+            "owner": "Facilities Coordinator",
+            "due": "SD-1"
+          },
+          "why": "The badge has to work at 8:00 AM on day one.",
+          "label": "Access is owned by Facilities, due SD-1"
+        }
+      ]
+    },
+    {
+      "id": "b3",
+      "dayId": "day-1",
+      "flowId": "update-flow",
+      "title": "Keep the board current",
+      "brief": "When a team reports in, mark its task on the board.",
+      "goal": "The teams report as they finish: payroll first, then accounts, hardware and access. Each report is news about a row that already exists on the Task Board. Build the second flow so every report updates the right row - and only that row.",
+      "outcome": "Every task update lands on its own row of the Task Board; the board shows the truth about every task.",
+      "constraints": [
+        "An update changes the existing row; it never adds a second row for the same task.",
+        "The same row means the same hire AND the same task.",
+        "The row keeps its owner and due date."
+      ],
+      "requires": [
+        "update-row"
+      ],
+      "hints": {
+        "question": "Jordan has four rows on the board. Which one does 'H-4021 hardware done' belong to, and how would a machine know?",
+        "nudge": "Switch to the Task updates flow. Its trigger watches Task Updates; one Store in 'update the existing row' mode, with the row matched on hireId and taskId, is the whole build.",
+        "steps": [
+          "Open the Task updates flow (tab above the flow).",
+          "Connect its Trigger to Task Updates.",
+          "Add a Store into Task Board, How: update the existing row, Same row when: hireId, taskId.",
+          "Run it. All four of Jordan's rows should say done."
+        ]
+      },
+      "mapNodes": [
+        "accounts-task",
+        "hardware-task",
+        "access-task",
+        "payroll-task",
+        "task-tracker"
+      ],
+      "checks": [
+        {
+          "id": "b3-run",
+          "kind": "runStatus",
+          "flowId": "update-flow",
+          "equals": "succeeded",
+          "why": "An update that fails leaves the board saying pending when the work is done.",
+          "label": "The updates flow runs without failing"
+        },
+        {
+          "id": "b3-done",
+          "kind": "storeCount",
+          "store": "task-board",
+          "where": {
+            "hireId": "H-4021",
+            "state": "done"
+          },
+          "equals": 4,
+          "why": "The board is only useful if it tells the truth about every task.",
+          "label": "All 4 of Jordan's tasks show done"
+        },
+        {
+          "id": "b3-rows",
+          "kind": "storeCount",
+          "store": "task-board",
+          "where": {
+            "hireId": "H-4021"
+          },
+          "equals": 4,
+          "why": "A second row for the same task means two answers to 'is it done?'.",
+          "label": "Still 4 rows for Jordan - nothing duplicated"
+        },
+        {
+          "id": "b3-kept",
+          "kind": "storeContains",
+          "store": "task-board",
+          "where": {
+            "hireId": "H-4021",
+            "taskId": "payroll"
+          },
+          "fields": {
+            "due": "SD-3",
+            "state": "done"
+          },
+          "why": "The due date is how lateness is measured; an update must not erase it.",
+          "label": "Payroll is done and still due SD-3"
+        }
+      ]
+    },
+    {
+      "id": "b4",
+      "dayId": "day-1",
+      "flowId": "update-flow",
+      "title": "All four done: the package",
+      "brief": "When the last task is done, hand the hiring manager the Day-One Package - once.",
+      "goal": "Four teams finish in any order. Only when ALL of Jordan's tasks are done is Jordan Day-One Ready. After each update, count what is done; when it is everything, assemble the Day-One Package, send it to the Hiring Manager, and keep a copy.",
+      "outcome": "The moment a hire's last task is done, the Hiring Manager gets one Day-One Package listing every task, and a copy is archived.",
+      "constraints": [
+        "Ready means all tasks done - not three of four.",
+        "Compare the count to the number of tasks the hire has, not to a typed 4.",
+        "One package per hire: the first three updates must not send one."
+      ],
+      "requires": [
+        "lists",
+        "condition",
+        "compose",
+        "send"
+      ],
+      "hints": {
+        "question": "After the payroll update, is Jordan ready? After the access update? What is the difference your flow can see?",
+        "nudge": "After the Store, a Lookup (all rows) on Task Board where hireId = hireId gives this hire's tasks as a list; count(tasks, 'state', 'done') counts the done ones. A Condition compares that to len(tasks). In the YES lane: look up the onboarding record, Compose the package, Send it, Store it.",
+        "steps": [
+          "Add a Lookup on Task Board, all rows, where hireId = hireId. Name it tasks.",
+          "Add a Transform: done = count(tasks, 'state', 'done').",
+          "Add a Condition: done == len(tasks) (compare to a field).",
+          "YES lane: Lookup Onboarding Records where hireId = hireId, name it hire.",
+          "YES lane: Compose package: '# Day-One Package - {{hire.name}}' plus {{#each tasks}}- {{taskId}}: {{state}}{{/each}}.",
+          "YES lane: Send to Hiring Manager with the package as the body; then Store into Day-One Packages."
+        ]
+      },
+      "mapNodes": [
+        "readiness-gate",
+        "day-one-package",
+        "manager-handoff",
+        "onboarding-archive"
+      ],
+      "checks": [
+        {
+          "id": "b4-package",
+          "kind": "storeContains",
+          "store": "day-one-packages",
+          "where": {
+            "hireId": "H-4021"
+          },
+          "why": "The archived package is the record that Jordan was declared ready, and by what evidence.",
+          "label": "Jordan's Day-One Package is archived"
+        },
+        {
+          "id": "b4-once",
+          "kind": "storeCount",
+          "store": "day-one-packages",
+          "equals": 1,
+          "why": "Four packages for one hire means three of them went out before Jordan was ready.",
+          "label": "Exactly one package - not one per update"
+        },
+        {
+          "id": "b4-sent",
+          "kind": "outboxContains",
+          "to": "Hiring Manager",
+          "contains": "Jordan Lee",
+          "why": "The manager plans day one from this package; it has to name the person.",
+          "label": "The Hiring Manager receives it, and it names Jordan Lee"
+        },
+        {
+          "id": "b4-sent-once",
+          "kind": "outboxContains",
+          "to": "Hiring Manager",
+          "count": 1,
+          "why": "A manager who gets 'ready' three times stops reading the fourth.",
+          "label": "The Hiring Manager is told once"
+        }
+      ]
+    },
+    {
+      "id": "b5",
+      "dayId": "day-2",
+      "flowId": "offer-flow",
+      "title": "Day 2: sent twice",
+      "brief": "Sam's offer arrived twice. Make intake safe to run twice.",
+      "goal": "Sam Rivera's offer was re-sent after an email timeout, so intake runs twice. Run your Day 1 flow and look at the board: two records, eight tasks, and updates that only reach half of them. Make every write in intake safe to repeat.",
+      "outcome": "However many times an offer arrives, a hire has one onboarding record and one row per task.",
+      "constraints": [
+        "Running twice must leave the same result as running once.",
+        "The record is the same when the hireId is the same.",
+        "A task row is the same when the hireId AND the taskId are the same."
+      ],
+      "requires": [
+        "upsert"
+      ],
+      "hints": {
+        "question": "Your flow did exactly what it was told, twice. What should the second write have noticed?",
+        "nudge": "Both Stores in intake should add or replace instead of add: the onboarding record by hireId, the task rows by hireId, taskId.",
+        "steps": [
+          "Run first. Open the Task Board in the Data tab: count Sam's rows.",
+          "In New hire intake, set the Store into Onboarding Records to 'add, or replace if it exists', same row when hireId.",
+          "Set the Store into Task Board (inside the For each) the same way, same row when hireId, taskId.",
+          "Run again: one record and four tasks for H-4022."
+        ]
+      },
+      "mapNodes": [
+        "onboarding-record",
+        "provisioning-plan",
+        "accounts-task"
+      ],
+      "checks": [
+        {
+          "id": "b5-one-record",
+          "kind": "storeCount",
+          "store": "onboarding-records",
+          "where": {
+            "hireId": "H-4022"
+          },
+          "equals": 1,
+          "why": "Two records for one person means two versions of the truth.",
+          "label": "Sam (H-4022) has one onboarding record"
+        },
+        {
+          "id": "b5-four",
+          "kind": "storeCount",
+          "store": "task-board",
+          "where": {
+            "hireId": "H-4022"
+          },
+          "equals": 4,
+          "why": "Eight tasks means every team is asked twice, and half the rows never get updated.",
+          "label": "Sam has exactly 4 tasks, not 8"
+        },
+        {
+          "id": "b5-updated",
+          "kind": "storeContains",
+          "store": "task-board",
+          "where": {
+            "hireId": "H-4022",
+            "taskId": "payroll"
+          },
+          "fields": {
+            "state": "done"
+          },
+          "why": "With one row per task, every update lands where the board is read.",
+          "label": "Sam's payroll row shows done"
+        },
+        {
+          "id": "b5-jordan",
+          "kind": "storeCount",
+          "store": "task-board",
+          "where": {
+            "hireId": "H-4021"
+          },
+          "equals": 4,
+          "why": "A fix for Sam must not disturb Jordan.",
+          "label": "Jordan still has 4 tasks"
+        }
+      ]
+    },
+    {
+      "id": "b6",
+      "dayId": "day-2",
+      "flowId": "update-flow",
+      "title": "Day 2: blocked",
+      "brief": "A blocked task should reach a person today, not at 5 PM.",
+      "goal": "IT reports that Sam's laptop is backordered to three days after the start. Your flow records it on the board - and then says nothing. Nobody will issue a loaner until someone notices. When an update says blocked, tell the People Ops Lead right away, with the reason, and log the escalation.",
+      "outcome": "A blocked task reaches the People Ops Lead the moment it is reported, with the reason, and is logged in Escalations; the hire is not packaged.",
+      "constraints": [
+        "Blocked always carries a reason; pass it on.",
+        "A blocked hire is not ready - no package.",
+        "Escalate the task, not the whole hire."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "The board says blocked. Who is looking at the board right now?",
+        "nudge": "In Task updates, a Condition on state == 'blocked' right after the board update. Its YES lane Sends to the People Ops Lead (put {{note}} in the message) and Stores into Escalations. The NO lane stays empty, so every update still reaches the package check.",
+        "steps": [
+          "Run first: Sam's hardware row says blocked, and the outbox is silent.",
+          "After the Store into Task Board, add a Condition: state == blocked.",
+          "YES lane: Send to People Ops Lead, subject 'Blocked: {{taskId}} for {{hireId}}', body '{{note}}'.",
+          "YES lane: Store into Escalations.",
+          "Run again."
+        ]
+      },
+      "mapNodes": [
+        "escalation-path",
+        "task-tracker"
+      ],
+      "checks": [
+        {
+          "id": "b6-told",
+          "kind": "outboxContains",
+          "to": "People Ops Lead",
+          "contains": "backordered",
+          "why": "The reason is what lets the People Ops Lead choose a fix - a loaner, not a lecture.",
+          "label": "The People Ops Lead is told, with the reason (backordered)"
+        },
+        {
+          "id": "b6-logged",
+          "kind": "storeContains",
+          "store": "escalations",
+          "where": {
+            "hireId": "H-4022",
+            "taskId": "hardware"
+          },
+          "why": "An escalation that is only an email cannot be followed up.",
+          "label": "Sam's hardware is logged in Escalations"
+        },
+        {
+          "id": "b6-board",
+          "kind": "storeContains",
+          "store": "task-board",
+          "where": {
+            "hireId": "H-4022",
+            "taskId": "hardware"
+          },
+          "fields": {
+            "state": "blocked"
+          },
+          "why": "The board has to show blocked, not pending, so nobody assumes it is in hand.",
+          "label": "The board shows Sam's hardware as blocked"
+        },
+        {
+          "id": "b6-no-package",
+          "kind": "storeMissing",
+          "store": "day-one-packages",
+          "where": {
+            "hireId": "H-4022"
+          },
+          "why": "Sam is not ready; a package would tell the manager otherwise",
+          "label": "Sam gets no Day-One Package"
+        },
+        {
+          "id": "b6-only-blocked",
+          "kind": "storeCount",
+          "store": "escalations",
+          "equals": 1,
+          "why": "Escalating tasks that are fine buries the one that is not.",
+          "label": "Only the blocked task is escalated"
+        }
+      ]
+    },
+    {
+      "id": "b7",
+      "dayId": "day-3",
+      "flowId": "sweep-flow",
+      "title": "Day 3: nobody answered",
+      "brief": "Silence never triggers anything. At 5 PM, find every task that is still not done.",
+      "goal": "Facilities never reported on Riley's access. Nothing failed, nothing was blocked, and nothing happened: every flow you have waits for a message that never comes. Build the evening check - at 5:00 PM, read the whole board and escalate every task that is not done.",
+      "outcome": "Every evening at 5:00 PM, every task that is not done - blocked or simply silent - is escalated to the People Ops Lead and logged; done tasks are left alone.",
+      "constraints": [
+        "Silence is not done. Anything not done at the check is escalated.",
+        "Tasks that are done are not escalated.",
+        "This runs on a clock, not on a message."
+      ],
+      "requires": [
+        "schedule-trigger"
+      ],
+      "hints": {
+        "question": "Every flow you built starts when something arrives. What starts a flow when nothing does?",
+        "nudge": "The 5:00 PM check is already on a schedule. Read the whole Task Board as a list, loop over it, and in the loop let a Condition on state != 'done' send and log.",
+        "steps": [
+          "Open The 5:00 PM check.",
+          "Add a Lookup on Task Board, all rows, no match fields. Name it tasks.",
+          "Add a For each over tasks.",
+          "Inside: a Condition state != done (a value).",
+          "YES lane: Send to People Ops Lead ('{{taskId}} for {{hireId}} is {{state}} at the 5 PM check'), then Store into Escalations.",
+          "Run it."
+        ]
+      },
+      "mapNodes": [
+        "readiness-gate",
+        "escalation-path",
+        "run-operations"
+      ],
+      "checks": [
+        {
+          "id": "b7-run",
+          "kind": "runStatus",
+          "flowId": "sweep-flow",
+          "equals": "succeeded",
+          "why": "A check that fails is a check that did not happen.",
+          "label": "The 5:00 PM check runs"
+        },
+        {
+          "id": "b7-riley",
+          "kind": "storeContains",
+          "store": "escalations",
+          "where": {
+            "hireId": "H-4023",
+            "taskId": "access"
+          },
+          "why": "Riley's badge will not work on Monday unless someone chases Facilities tonight.",
+          "label": "Riley's silent access task is escalated"
+        },
+        {
+          "id": "b7-told",
+          "kind": "outboxContains",
+          "to": "People Ops Lead",
+          "contains": "H-4023",
+          "why": "Logging it is not enough; a person has to hear it tonight.",
+          "label": "The People Ops Lead hears about Riley (H-4023)"
+        },
+        {
+          "id": "b7-quiet",
+          "kind": "storeMissing",
+          "store": "escalations",
+          "where": {
+            "hireId": "H-4021"
+          },
+          "why": "Jordan's tasks are all done; escalating them is noise",
+          "label": "Nothing of Jordan's is escalated"
+        },
+        {
+          "id": "b7-no-package",
+          "kind": "storeMissing",
+          "store": "day-one-packages",
+          "where": {
+            "hireId": "H-4023"
+          },
+          "why": "Riley is not ready; access is not done",
+          "label": "Riley gets no Day-One Package"
+        }
+      ]
+    }
+  ]
+}

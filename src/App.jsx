@@ -31,7 +31,6 @@ import { loadTheme, saveTheme, applyTheme } from './lib/theme'
 // no built lessons yet resolve to an empty map.
 const LESSON_MODULE_LOADERS = {
   'module-01': () => import('./data/lessons/module01Lessons.js'),
-  'module-03': () => import('./data/lessons/module03Lessons.js'),
 }
 
 // Runnable-flow modules (the builder). A project with an entry here gets a
@@ -39,6 +38,10 @@ const LESSON_MODULE_LOADERS = {
 const FLOW_MODULE_LOADERS = {
   'module-02': async () => {
     const [data, ref] = await Promise.all([import('./data/flows/module-02.json'), import('./data/flows/module-02.reference.js')])
+    return { moduleData: data.default, loadReference: ref.referenceFlowsFor }
+  },
+  'module-03': async () => {
+    const [data, ref] = await Promise.all([import('./data/flows/module-03.json'), import('./data/flows/module-03.reference.js')])
     return { moduleData: data.default, loadReference: ref.referenceFlowsFor }
   },
 }

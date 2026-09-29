@@ -1,0 +1,144 @@
+{
+  "id": "update-row",
+  "kind": "rosetta",
+  "exercise": "add-step",
+  "label": "Update a row",
+  "introducedBy": "module-03",
+  "gloss": "change the row that already exists instead of adding a new one",
+  "why": "Some records are news about a row that already exists: a task moved from pending to done. Adding a new row leaves the old one behind, and replacing the whole row throws away what the update did not mention, like the due date. Update finds the row with the same key and changes only the fields the update carries.",
+  "cue": "when the message says 'X is now Y', you are updating a row, not adding one",
+  "sample": {
+    "sources": [
+      {
+        "id": "updates",
+        "label": "Task Updates",
+        "labelField": "taskId",
+        "fields": [
+          "hireId",
+          "taskId",
+          "state",
+          "note"
+        ]
+      }
+    ],
+    "stores": [
+      {
+        "id": "task-board",
+        "label": "Task Board",
+        "owner": "People Ops Lead",
+        "fields": [
+          "hireId",
+          "taskId",
+          "owner",
+          "due",
+          "state"
+        ]
+      }
+    ],
+    "owners": [
+      "People Ops Lead"
+    ],
+    "day": {
+      "sources": {
+        "updates": [
+          {
+            "hireId": "H-1",
+            "taskId": "payroll",
+            "state": "done",
+            "note": "enrolled"
+          }
+        ]
+      },
+      "seeds": {
+        "task-board": [
+          {
+            "hireId": "H-1",
+            "taskId": "payroll",
+            "owner": "Payroll Specialist",
+            "due": "SD-3",
+            "state": "pending"
+          },
+          {
+            "hireId": "H-1",
+            "taskId": "accounts",
+            "owner": "IT Provisioner",
+            "due": "SD-2",
+            "state": "pending"
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "updates",
+        "mode": "event",
+        "at": ""
+      }
+    }
+  ],
+  "task": "Payroll says H-1 is done. Mark that row done on the Task Board, keeping its owner and due date.",
+  "add": {
+    "kind": "store"
+  },
+  "solution": {
+    "kind": "store",
+    "config": {
+      "store": "task-board",
+      "from": "",
+      "mode": "update",
+      "key": "hireId, taskId"
+    }
+  },
+  "notes": [
+    "One field is not enough to find the row: H-1 has several tasks. The row is the same when hireId AND taskId match.",
+    "Try 'add a new row' first and look at the table."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "storeCount",
+      "store": "task-board",
+      "equals": 2,
+      "label": "Still 2 rows - nothing added"
+    },
+    {
+      "id": "c2",
+      "kind": "storeContains",
+      "store": "task-board",
+      "where": {
+        "taskId": "payroll"
+      },
+      "fields": {
+        "state": "done",
+        "due": "SD-3"
+      },
+      "label": "Payroll is done, and still due SD-3"
+    },
+    {
+      "id": "c3",
+      "kind": "storeContains",
+      "store": "task-board",
+      "where": {
+        "taskId": "accounts"
+      },
+      "fields": {
+        "state": "pending"
+      },
+      "label": "Accounts is untouched"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "'Update item' (SharePoint) or 'Update a row' (Dataverse / Excel) by its id",
+    "powerAppsCopilot": "Patch() on the existing record",
+    "make": "Data store > Update a Record by key",
+    "n8n": "Google Sheets / Postgres 'Update' with a column to match on",
+    "zapier": "Update Record (Airtable), Update Spreadsheet Row (Sheets)",
+    "python": "find the row, then row.update(changes) - or UPDATE ... WHERE",
+    "langgraph": "a state reducer that merges into the existing entry"
+  }
+}

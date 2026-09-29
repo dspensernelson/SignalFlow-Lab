@@ -250,7 +250,18 @@ const FUNCS = {
     return Math.round(toNumber(a) * f) / f
   },
   len: (a) => (isNil(a) ? 0 : Array.isArray(a) || typeof a === 'string' ? a.length : 0),
-  count: (a) => (isNil(a) ? 0 : Array.isArray(a) ? a.length : 0),
+  // count(list) is len(list); count(list, 'field', value) counts rows whose
+  // field equals value (case-insensitive for text).
+  count: (a, field, value) => {
+    if (!Array.isArray(a)) return 0
+    if (field === undefined) return a.length
+    const want = isNil(value) ? value : String(value).trim().toLowerCase()
+    return a.filter((row) => {
+      const v = getPath(row, String(field).split('.'))
+      if (isNil(v) || isNil(want)) return isNil(v) && isNil(want)
+      return String(v).trim().toLowerCase() === want
+    }).length
+  },
   sum: (arr, field) => {
     if (!Array.isArray(arr)) return null
     let total = 0
@@ -344,7 +355,8 @@ const PY_FUNCS = {
   abs: (a) => `abs(${a[0]})`,
   round: (a) => `round(${a.join(', ')})`,
   len: (a) => `len(${a[0]} or [])`,
-  count: (a) => `len(${a[0]} or [])`,
+  count: (a, raw) =>
+    a.length >= 3 && raw[1] && raw[1].t === 'str' ? `sum(1 for r in ${a[0]} if str(g(r, "${raw[1].v}")).lower() == str(${a[2]}).lower())` : `len(${a[0]} or [])`,
   sum: (a, raw) =>
     raw[1] && raw[1].t === 'str' ? `sum(g(r, "${raw[1].v}") for r in ${a[0]})` : `sum(${a[0]})`,
   num: (a) => `num(${a[0]})`,

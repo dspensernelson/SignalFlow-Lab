@@ -83,6 +83,17 @@ function renderList(steps, indent, lines, ctx) {
         }
         break
       }
+      case 'foreach': {
+        const depth = (ctx.loopDepth || 0) + 1
+        const outer = depth === 1 ? 'outer' : `outer${depth}`
+        lines.push(`${pad}# For each item in ${c.list || '?'}: inside, rec is the item and rec["parent"] the outer record`)
+        lines.push(`${pad}${outer} = rec`)
+        lines.push(`${pad}for item in list(${c.list ? pyExpr(c.list).replace(/\brec\b/g, outer) : '[]'} or []):`)
+        lines.push(`${pad}    rec = dict(item, parent=${outer})`)
+        renderList(step.branches ? step.branches.each || [] : [], indent + 1, lines, { ...ctx, loopDepth: depth })
+        lines.push(`${pad}rec = ${outer}`)
+        break
+      }
       case 'approval':
         lines.push(`${pad}# Approval: a person decides; store the reply on the record`)
         lines.push(`${pad}rec["approval"] = ask_approval(approvals, ${pyLit(c.approver)}, about=${pyLit(c.about || '')})`)
@@ -101,14 +112,15 @@ function renderList(steps, indent, lines, ctx) {
         if (c.from) {
           lines.push(`${pad}for row in rec[${pyLit(c.from)}] or []:`)
           lines.push(`${pad}    stores[${pyLit(c.store)}].append(dict(row))`)
-        } else if (c.mode === 'upsert' && c.key) {
-          lines.push(`${pad}upsert(stores[${pyLit(c.store)}], dict(rec), key=${pyLit(c.key)})`)
+        } else if ((c.mode === 'upsert' || c.mode === 'update') && c.key) {
+          const keys = String(c.key).split(',').map((k) => k.trim()).filter(Boolean)
+          lines.push(`${pad}${c.mode}(stores[${pyLit(c.store)}], data_of(rec), keys=[${keys.map(pyLit).join(', ')}])`)
         } else {
-          lines.push(`${pad}stores[${pyLit(c.store)}].append(dict(rec))`)
+          lines.push(`${pad}stores[${pyLit(c.store)}].append(data_of(rec))`)
         }
         break
       case 'stop':
-        lines.push(`${pad}return  # Stop: this record is done`)
+        lines.push(ctx.loopDepth ? `${pad}continue  # Stop: this item is done` : `${pad}return  # Stop: this record is done`)
         break
       default:
         lines.push(`${pad}# (${step.kind})`)
@@ -153,12 +165,37 @@ def find_all(rows, **match):
     return [dict(row) for row in rows if all(str(row.get(k)) == str(v) for k, v in match.items())]
 
 
-def upsert(rows, row, key):
+def data_of(rec):
+    """What a Store writes: the record, without the loop's parent context."""
+    return {k: v for k, v in rec.items() if k != "parent"}
+
+
+def same(a, b, keys):
+    return all(str(a.get(k)) == str(b.get(k)) for k in keys)
+
+
+def upsert(rows, row, keys):
+    """Add the row, or replace the one with the same key(s): re-running never duplicates."""
     for i, existing in enumerate(rows):
-        if existing.get(key) == row.get(key):
+        if same(existing, row, keys):
             rows[i] = row
             return
     rows.append(row)
+
+
+def update(rows, row, keys):
+    """Patch the existing row with the same key(s); it must already exist."""
+    for existing in rows:
+        if same(existing, row, keys):
+            existing.update({k: v for k, v in row.items() if not isinstance(v, (dict, list))})
+            return
+    raise KeyError(f"no row with {[row.get(k) for k in keys]}")
+
+
+def count(rows, field=None, value=None):
+    if field is None:
+        return len(rows or [])
+    return sum(1 for r in rows or [] if str(g(r, field)).lower() == str(value).lower())
 
 
 def render(template, rec):

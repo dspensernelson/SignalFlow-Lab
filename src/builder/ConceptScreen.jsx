@@ -122,13 +122,15 @@ export default function ConceptScreen({ concept, skinId, onDone, onClose }) {
     replayStepId: null,
     fieldsFor: (id) => availableFields(flow, moduleData, id),
     lockedIds: givenIds,
-    paletteKinds: addKind ? [addKind] : null,
+    // A concept names the one step it teaches, plus any it needs inside that
+    // step (a Condition's lanes need somewhere to put the record).
+    paletteKinds: addKind ? [addKind, ...((concept.add && concept.add.also) || [])] : null,
     allowTrigger: flow.steps.length === 0 || addKind === 'trigger',
     readOnly: exercise === 'json-edit',
   }
 
   // The step to show across tools: the learner's added step, else the solution's.
-  const addedStep = exercise === 'add-step' ? allSteps(flow).map((s) => s.step).find((s) => !givenIds.has(s.id)) : null
+  const addedStep = exercise === 'add-step' ? allSteps(flow).map((s) => s.step).find((s) => !givenIds.has(s.id) && s.kind === addKind) : null
   const showcaseStep = addedStep || (concept.solution && concept.solution.kind ? placeStep(conceptFlow(concept), createStep(concept.solution.kind, concept.solution.config || {}, 'showcase'), concept.solution.placement).steps.find((s) => s.id === 'showcase') || createStep(concept.solution.kind, concept.solution.config || {}, 'showcase') : null)
   const dialect = concept.dialect || {}
   const passed = !!(run && run.passed)

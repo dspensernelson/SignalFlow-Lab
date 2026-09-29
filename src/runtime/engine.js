@@ -185,8 +185,12 @@ export function runFlow(flow, dayState) {
 
   const ctx = { stores, outbox, alerts, settings, dayState }
 
+  const seenLabels = {}
   for (const seed of seeds) {
-    const rt = { id: seed.label, label: seed.label, steps: [], terminal: null, final: null }
+    // The same label twice (an offer re-sent) gets a suffix so each run is addressable.
+    seenLabels[seed.label] = (seenLabels[seed.label] || 0) + 1
+    const label = seenLabels[seed.label] > 1 ? `${seed.label} (${seenLabels[seed.label]})` : seed.label
+    const rt = { id: label, label, steps: [], terminal: null, final: null }
     rt.steps.push({ stepId: trigger.id, kind: 'trigger', status: 'succeeded', note: trigger.config.mode === 'schedule' ? `fired at ${trigger.config.at || 'schedule'}` : `arrived in ${dayState.sources[trigger.config.source].label}` })
     const record = seed.record
     runList(flow.steps.slice(1), record, rt, ctx)
@@ -207,6 +211,7 @@ export function runFlow(flow, dayState) {
 function runList(steps, record, rt, ctx) {
   for (const step of steps) {
     const entry = { stepId: step.id, kind: step.kind, status: 'succeeded', note: '' }
+    if (rt.iter) entry.iter = rt.iter
     rt.steps.push(entry)
     const failure = matchFailure(step, ctx.dayState.failures)
     if (failure) {
@@ -245,8 +250,52 @@ function runList(steps, record, rt, ctx) {
       if (done) return true
       // Branches rejoin: the record continues with the steps after the condition.
     }
+    if (step.kind === 'foreach') {
+      if (runEach(step, result.items, record, rt, ctx)) return true
+    }
   }
   return false
+}
+
+// For each: run the body once per item. Inside, the record IS the item, and
+// the outer record is readable as parent (without its lists, so a loop never
+// carries the list it is walking). A Stop inside ends that item only; a
+// failure ends the whole record.
+function runEach(step, items, record, rt, ctx) {
+  const body = (step.branches && step.branches.each) || []
+  const parent = {}
+  for (const [k, v] of Object.entries(record)) if (!Array.isArray(v)) parent[k] = clone(v)
+  const outerIter = rt.iter
+  for (let i = 0; i < items.length; i += 1) {
+    const item = items[i] && typeof items[i] === 'object' && !Array.isArray(items[i]) ? clone(items[i]) : { value: clone(items[i]) }
+    const inner = { ...item, parent }
+    rt.iter = `${outerIter ? `${outerIter} > ` : ''}${itemLabel(item, i)}`
+    const done = runList(body, inner, rt, ctx)
+    if (done && !rt.stopped) {
+      rt.iter = outerIter
+      return true
+    }
+    rt.stopped = false
+  }
+  rt.iter = outerIter
+  return false
+}
+
+function itemLabel(item, i) {
+  const k = ['taskId', 'id', 'hireId', 'invoiceNumber', 'name'].find((f) => !isNil(item[f]))
+  return k ? String(item[k]) : `item ${i + 1}`
+}
+
+// Store keys may name several fields: "hireId, taskId".
+function keyFields(key) {
+  return String(key || '')
+    .split(',')
+    .map((k) => k.trim())
+    .filter(Boolean)
+}
+
+function sameKey(a, b, keys) {
+  return keys.every((k) => looseEq(getPath(a, k), getPath(b, k)))
 }
 
 function matchFailure(step, failures) {
@@ -375,7 +424,19 @@ function execStep(step, record, rt, ctx) {
     }
 
     case 'stop':
-      return { status: 'succeeded', note: 'stopped here - nothing after this runs for this record', stop: true }
+      return { status: 'succeeded', note: rt.iter ? 'stopped here - nothing after this runs for this item' : 'stopped here - nothing after this runs for this record', stop: true }
+
+    case 'foreach': {
+      if (!c.list) return { status: 'failed', note: 'no list chosen - which list should it walk?' }
+      let items
+      try {
+        items = evalExpr(c.list, record)
+      } catch (e) {
+        return { status: 'failed', note: `list "${c.list}": ${e.message}` }
+      }
+      if (!Array.isArray(items)) return { status: 'failed', note: `${c.list} is ${fmt(items)}, not a list` }
+      return { status: 'succeeded', note: `${items.length} item${items.length === 1 ? '' : 's'} in ${c.list}`, items }
+    }
 
     case 'store': {
       if (!c.store) return { status: 'failed', note: 'no store chosen' }
@@ -387,16 +448,33 @@ function execStep(step, record, rt, ctx) {
         if (!Array.isArray(v)) return { status: 'failed', note: `${c.from} is ${fmt(v)}, not a list` }
         rows = v
       } else rows = [record]
+      const keys = keyFields(c.key)
+      if ((c.mode === 'upsert' || c.mode === 'update') && keys.length === 0) return { status: 'failed', note: `${c.mode} needs a key - which field says two rows are the same thing?` }
       let written = 0
+      let replaced = 0
       for (const row of rows) {
         const copy = clone(row)
-        if (c.mode === 'upsert' && c.key) {
-          const i = target.findIndex((r) => looseEq(getPath(r, c.key), getPath(copy, c.key)))
-          if (i >= 0) target[i] = copy
-          else target.push(copy)
+        // parent is loop context, not data: it is never written.
+        delete copy.parent
+        if (c.mode === 'update') {
+          const i = target.findIndex((r) => sameKey(r, copy, keys))
+          if (i < 0) return { status: 'failed', note: `no row in ${c.store} where ${keys.map((k) => `${k} = ${fmt(getPath(copy, k))}`).join(', ')} - nothing to update` }
+          const patch = {}
+          for (const [k, v] of Object.entries(copy)) if (v === null || typeof v !== 'object') patch[k] = v
+          target[i] = { ...target[i], ...patch }
+          replaced += 1
+        } else if (c.mode === 'upsert') {
+          const i = target.findIndex((r) => sameKey(r, copy, keys))
+          if (i >= 0) {
+            target[i] = copy
+            replaced += 1
+          } else target.push(copy)
         } else target.push(copy)
         written += 1
       }
+      const keyNote = keys.length ? ` by ${keys.join(' + ')}` : ''
+      if (c.mode === 'update') return { status: 'succeeded', note: `updated ${replaced} row${replaced === 1 ? '' : 's'} in ${c.store}${keyNote}`, target: c.store }
+      if (c.mode === 'upsert') return { status: 'succeeded', note: replaced ? `${c.store} already had it${keyNote} - replaced, not duplicated` : `wrote ${written} new row${written === 1 ? '' : 's'} to ${c.store}${keyNote}`, target: c.store }
       return { status: 'succeeded', note: `wrote ${written} row${written === 1 ? '' : 's'} to ${c.store}`, target: c.store }
     }
 

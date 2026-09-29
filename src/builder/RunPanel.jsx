@@ -177,7 +177,7 @@ export default function RunPanel({ run, flow, moduleData, skin, selectedRecordId
                   const visible = !replay || !replay.active || replay.recordIdx > recIdx || (replay.recordIdx === recIdx && replay.stepIdx >= i)
                   if (!visible) return null
                   return (
-                    <li key={i} className="flex items-start gap-2 rounded-md bg-sf-surface px-2 py-1">
+                    <li key={i} className={`flex items-start gap-2 rounded-md bg-sf-surface px-2 py-1 ${s.iter ? 'ml-4 border-l-2 border-sf-info' : ''}`}>
                       <span className={`mt-0.5 flex h-4 w-4 flex-none items-center justify-center rounded-full ${ss.className}`}>
                         <Icon name={ss.icon} size={10} strokeWidth={3} />
                       </span>
@@ -185,6 +185,7 @@ export default function RunPanel({ run, flow, moduleData, skin, selectedRecordId
                         <div className="flex items-center gap-1.5">
                           <Icon name={st.icon} size={11} style={{ color: st.color }} />
                           <span className="truncate text-[11px] font-semibold text-sf-text">{title}</span>
+                          {s.iter && <span className="rounded bg-sf-info-weak px-1 font-mono text-[9px] text-sf-info">{s.iter}</span>}
                           {s.branch && <span className={`rounded px-1 text-[9px] font-bold uppercase ${s.branch === 'yes' ? 'bg-sf-complete-weak text-sf-complete-text' : 'bg-sf-warning-weak text-sf-progress-text'}`}>{s.branch}</span>}
                         </div>
                         {s.note && <div className={`text-[11px] ${s.status === 'failed' ? 'text-sf-danger' : 'text-sf-muted'}`}>{s.note}</div>}

@@ -21,6 +21,7 @@ export const pythonSkin = {
       lookup: 'find_one / find_all',
       transform: 'assignment',
       condition: 'if / else',
+      foreach: 'for item in list:',
       approval: 'ask_approval()',
       send: 'send()',
       compose: 'render()',

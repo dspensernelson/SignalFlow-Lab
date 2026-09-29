@@ -1,0 +1,124 @@
+{
+  "id": "upsert",
+  "kind": "rosetta",
+  "exercise": "add-step",
+  "label": "Add or replace",
+  "introducedBy": "module-03",
+  "gloss": "write the row, or replace it if it is already there - so running twice makes one",
+  "why": "Things arrive twice: an email is re-sent, a run is retried after a timeout, someone clicks Submit again. A flow that always adds a row turns every repeat into a duplicate - two records for one hire, two laptops ordered. Add or replace checks the key first: new key, new row; known key, same row. That property has a name, idempotent: running it twice leaves the same result as running it once.",
+  "cue": "ask 'what happens if this runs twice?' - if the answer is 'two of everything', make the write add-or-replace",
+  "sample": {
+    "sources": [
+      {
+        "id": "offers",
+        "label": "Signed Offers",
+        "labelField": "hireId",
+        "fields": [
+          "hireId",
+          "name",
+          "role",
+          "startDate"
+        ]
+      }
+    ],
+    "stores": [
+      {
+        "id": "onboarding-records",
+        "label": "Onboarding Records",
+        "keyField": "hireId",
+        "owner": "People Ops Lead",
+        "fields": [
+          "hireId",
+          "name",
+          "role",
+          "startDate"
+        ]
+      }
+    ],
+    "owners": [
+      "People Ops Lead"
+    ],
+    "day": {
+      "sources": {
+        "offers": [
+          {
+            "hireId": "H-1",
+            "name": "Test Hire",
+            "role": "Logistics Coordinator",
+            "startDate": "SD"
+          },
+          {
+            "hireId": "H-1",
+            "name": "Test Hire",
+            "role": "Logistics Coordinator",
+            "startDate": "SD"
+          }
+        ]
+      },
+      "seeds": {},
+      "approvals": {},
+      "failures": []
+    }
+  },
+  "given": [
+    {
+      "kind": "trigger",
+      "config": {
+        "source": "offers",
+        "mode": "event",
+        "at": ""
+      }
+    }
+  ],
+  "task": "The same offer arrived twice. Keep one onboarding record for H-1, however many times it arrives.",
+  "add": {
+    "kind": "store"
+  },
+  "solution": {
+    "kind": "store",
+    "config": {
+      "store": "onboarding-records",
+      "from": "",
+      "mode": "upsert",
+      "key": "hireId"
+    }
+  },
+  "notes": [
+    "Try 'add a new row' first: two records for one person.",
+    "The key is the field that says two rows are the same thing."
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "kind": "storeCount",
+      "store": "onboarding-records",
+      "equals": 1,
+      "label": "One record for H-1, not two"
+    },
+    {
+      "id": "c2",
+      "kind": "storeContains",
+      "store": "onboarding-records",
+      "where": {
+        "hireId": "H-1"
+      },
+      "label": "H-1 has a record"
+    },
+    {
+      "id": "c3",
+      "kind": "runStatus",
+      "flowId": "concept",
+      "equals": "succeeded",
+      "label": "Both arrivals ran cleanly"
+    }
+  ],
+  "dialect": {
+    "powerAutomate": "'Upsert a row' (Dataverse), or Get items + Condition (length = 0) then Create item",
+    "powerAppsCopilot": "Patch(Table, LookUp(Table, key = x), ...) - LookUp returns blank when new",
+    "make": "Data store > Add/replace a Record with the key set",
+    "n8n": "Google Sheets 'Append or Update Row', Postgres 'Insert or Update'",
+    "zapier": "Find Record with 'create if not found', or Airtable Update or Create",
+    "python": "rows[key] = row (a dict keyed by id), or INSERT ... ON CONFLICT DO UPDATE",
+    "langgraph": "write state keyed by id so a replayed node overwrites, not appends"
+  }
+}

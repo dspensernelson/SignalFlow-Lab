@@ -23,11 +23,8 @@ function withIds(steps, prefix) {
   return (steps || []).map((s, i) => {
     const id = `${prefix}-${i}`
     const step = createStep(s.kind, s.config || {}, id)
-    if (s.kind === 'condition') {
-      step.branches = {
-        yes: withIds(s.branches ? s.branches.yes : [], `${id}-yes`),
-        no: withIds(s.branches ? s.branches.no : [], `${id}-no`),
-      }
+    if (step.branches) {
+      step.branches = Object.fromEntries(Object.keys(step.branches).map((k) => [k, withIds(s.branches ? s.branches[k] : [], `${id}-${k}`)]))
     }
     return step
   })
@@ -91,8 +88,8 @@ export function applySolution(concept) {
     record = sol.record || null
   } else if (sol.kind) {
     const step = createStep(sol.kind, sol.config || {}, 'solution')
-    if (sol.kind === 'condition' && sol.branches) {
-      step.branches = { yes: withIds(sol.branches.yes, 'solution-yes'), no: withIds(sol.branches.no, 'solution-no') }
+    if (step.branches && sol.branches) {
+      step.branches = Object.fromEntries(Object.keys(step.branches).map((k) => [k, withIds(sol.branches[k], `solution-${k}`)]))
     }
     flow = placeStep(flow, step, sol.placement)
   }

@@ -101,16 +101,6 @@
   },
   {
     "from": "onboarding-archive",
-    "to": "profile-feedback",
-    "label": "mined for"
-  },
-  {
-    "from": "profile-feedback",
-    "to": "role-profile-catalog",
-    "label": "refines"
-  },
-  {
-    "from": "onboarding-archive",
     "to": "run-operations",
     "label": "run history"
   }

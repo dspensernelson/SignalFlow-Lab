@@ -12,6 +12,7 @@ export const makeSkin = {
       lookup: 'Data store > Search Records',
       transform: 'Tools > Set Multiple Variables',
       condition: 'Flow Control > Router',
+      foreach: 'Flow Control > Iterator',
       approval: 'Webhooks > Custom Webhook (reply)',
       send: 'Email > Send an Email',
       compose: 'Tools > Text Aggregator',
@@ -38,8 +39,10 @@ export const makeSkin = {
         return { title: c.channel === 'chat' ? 'Slack > Create a Message' : 'Email > Send an Email', subtitle: `To: ${c.to || '?'}${c.subject ? ` - Subject: ${truncate(c.subject, 40)}` : ''}` }
       case 'compose':
         return { title: 'Tools > Text Aggregator', subtitle: truncate(c.template || '') }
+      case 'foreach':
+        return { title: 'Flow Control > Iterator', subtitle: `Array: ${c.list || '?'}`, branchLabels: { each: 'each bundle' } }
       case 'store':
-        return { title: c.mode === 'upsert' ? 'Data store > Update a Record' : 'Data store > Add a Record', subtitle: `Data store: ${storeLabel(ctx, c.store)}${c.from ? ` - via Iterator on ${c.from}` : ''}` }
+        return { title: c.mode === 'update' ? 'Data store > Update a Record' : c.mode === 'upsert' ? 'Data store > Add/replace a Record' : 'Data store > Add a Record', subtitle: `Data store: ${storeLabel(ctx, c.store)}${c.from ? ` - via Iterator on ${c.from}` : ''}` }
       case 'stop':
         return { title: '(route ends)', subtitle: 'Nothing further on this route' }
       default:

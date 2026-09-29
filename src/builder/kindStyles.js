@@ -6,6 +6,7 @@ export const KIND_STYLE = {
   lookup: { icon: 'database', color: 'var(--sf-type-reference)' },
   transform: { icon: 'braces', color: 'var(--sf-type-process)' },
   condition: { icon: 'git-branch', color: 'var(--sf-type-decision)' },
+  foreach: { icon: 'repeat', color: 'var(--sf-type-process)' },
   approval: { icon: 'user-check', color: 'var(--sf-type-handoff)' },
   send: { icon: 'send', color: 'var(--sf-type-handoff)' },
   compose: { icon: 'file-text', color: 'var(--sf-type-artifact)' },

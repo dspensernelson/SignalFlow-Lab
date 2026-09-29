@@ -13,6 +13,7 @@ export const zapierSkin = {
       lookup: 'Find Record',
       transform: 'Formatter by Zapier',
       condition: 'Paths by Zapier',
+      foreach: 'Looping by Zapier',
       approval: 'Delay + Form reply',
       send: 'Gmail: Send Email',
       compose: 'Formatter: Text',
@@ -39,8 +40,10 @@ export const zapierSkin = {
         return { title: c.channel === 'chat' ? 'Slack: Send Channel Message' : 'Gmail: Send Email', subtitle: `To: ${c.to || '?'}${c.subject ? ` - Subject: ${truncate(c.subject, 40)}` : ''}` }
       case 'compose':
         return { title: 'Formatter by Zapier: Text', subtitle: truncate(c.template || '') }
+      case 'foreach':
+        return { title: 'Looping by Zapier', subtitle: `Create Loop From Line Items: ${c.list || '?'}`, branchLabels: { each: 'each loop' } }
       case 'store':
-        return { title: c.mode === 'upsert' ? 'Airtable: Update Record' : 'Airtable: Create Record', subtitle: `Table: ${storeLabel(ctx, c.store)}${c.from ? ` - Looping by Zapier over ${c.from}` : ''}` }
+        return { title: c.mode === 'update' ? 'Airtable: Update Record' : c.mode === 'upsert' ? 'Airtable: Create or Update Record' : 'Airtable: Create Record', subtitle: `Table: ${storeLabel(ctx, c.store)}${c.from ? ` - Looping by Zapier over ${c.from}` : ''}` }
       case 'stop':
         return { title: '(path ends)', subtitle: 'Zap stops for this record' }
       default:

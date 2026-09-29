@@ -469,6 +469,141 @@ await test('codegen: python renders the reference flow and compiles', async () =
   }
 })
 
+// ============================================================ engine wave 1: For each, update, two-field keys, count()
+await test('engine: For each runs its body once per item; parent is the outer record; Stop ends one item', () => {
+  const mod = {
+    moduleId: 't', sources: [{ id: 'in', label: 'In', labelField: 'id' }],
+    stores: [{ id: 'list', label: 'List' }, { id: 'out', label: 'Out' }],
+    flows: [{ id: 'f' }],
+    days: [{ id: 'd1', sources: { in: [{ id: 'H-1' }] }, seeds: { list: [{ taskId: 'a' }, { taskId: 'b' }, { taskId: 'c' }] } }],
+  }
+  const loop = fm.createStep('foreach', { list: 'items' }, 'loop')
+  const skip = fm.createStep('condition', { rules: [{ left: 'taskId', op: '==', right: 'b', rightKind: 'value' }], combine: 'all' }, 'skip')
+  skip.branches = { yes: [fm.createStep('stop', {}, 'stop')], no: [] }
+  loop.branches = { each: [skip, fm.createStep('transform', { set: [{ field: 'hireId', expr: 'parent.id' }] }, 't'), fm.createStep('store', { store: 'out' }, 's')] }
+  const flow = fm.createFlow({ id: 'f', steps: [fm.createStep('trigger', { source: 'in' }, 'tr'), fm.createStep('lookup', { store: 'list', matchOn: [], as: 'items', mode: 'all' }, 'l'), loop, fm.createStep('store', { store: 'list', mode: 'upsert', key: 'taskId' }, 'after')] })
+  const res = eng.runModule([flow], mod, 'd1').byDay.d1
+  eq(res.stores.out.map((r) => `${r.taskId}:${r.hireId}`), ['a:H-1', 'c:H-1'])
+  ok(res.stores.out.every((r) => r.parent === undefined), 'parent is never written')
+  const rec = res.traces.f.records[0]
+  eq(rec.terminal.type, 'store')
+  ok(rec.steps.some((st) => st.iter === 'b' && st.kind === 'stop'), 'the stop is tagged with its item')
+  ok(rec.steps.some((st) => st.stepId === 'after'), 'the record continues after the loop')
+})
+
+await test('engine: store update patches the row with the same two-field key; missing row fails; upsert never duplicates', () => {
+  const mod = {
+    moduleId: 't', sources: [{ id: 'in', label: 'In', labelField: 'taskId' }],
+    stores: [{ id: 'board', label: 'Board' }],
+    flows: [{ id: 'f' }],
+    days: [{ id: 'd1', sources: { in: [{ hireId: 'H-1', taskId: 'a', state: 'done' }, { hireId: 'H-2', taskId: 'a', state: 'done' }] }, seeds: { board: [{ hireId: 'H-1', taskId: 'a', due: 'SD-2', state: 'pending' }, { hireId: 'H-1', taskId: 'b', due: 'SD-1', state: 'pending' }] } }],
+  }
+  const up = fm.createFlow({ id: 'f', steps: [fm.createStep('trigger', { source: 'in' }, 'tr'), fm.createStep('store', { store: 'board', mode: 'update', key: 'hireId, taskId' }, 's')] })
+  const res = eng.runModule([up], mod, 'd1').byDay.d1
+  eq(res.stores.board.length, 2)
+  eq(res.stores.board[0], { hireId: 'H-1', taskId: 'a', due: 'SD-2', state: 'done' })
+  eq(res.stores.board[1].state, 'pending')
+  eq(res.traces.f.records[1].terminal.type, 'failed')
+  ok(res.traces.f.records[1].steps[1].note.includes('nothing to update'))
+  const ups = fm.createFlow({ id: 'f', steps: [fm.createStep('trigger', { source: 'in' }, 'tr'), fm.createStep('store', { store: 'board', mode: 'upsert', key: 'hireId, taskId' }, 's')] })
+  const res2 = eng.runModule([ups], mod, 'd1').byDay.d1
+  eq(res2.stores.board.length, 3)
+  const noKey = fm.createFlow({ id: 'f', steps: [fm.createStep('trigger', { source: 'in' }, 'tr'), fm.createStep('store', { store: 'board', mode: 'update', key: '' }, 's')] })
+  ok(eng.runModule([noKey], mod, 'd1').byDay.d1.traces.f.records[0].steps[1].note.includes('needs a key'))
+})
+
+await test('engine: repeated labels get a suffix so each run is addressable', () => {
+  const mod = { moduleId: 't', sources: [{ id: 'in', label: 'In', labelField: 'id' }], stores: [], flows: [{ id: 'f' }], days: [{ id: 'd1', sources: { in: [{ id: 'X' }, { id: 'X' }] } }] }
+  const f = fm.createFlow({ id: 'f', steps: [fm.createStep('trigger', { source: 'in' }, 'tr')] })
+  eq(eng.runModule([f], mod, 'd1').byDay.d1.traces.f.records.map((r) => r.id), ['X', 'X (2)'])
+})
+
+await test('expr: count(list) and count(list, field, value)', () => {
+  const t = [{ state: 'done' }, { state: 'Done' }, { state: 'blocked' }]
+  eq(evalExpr('count(t)', { t }), 3)
+  eq(evalExpr("count(t, 'state', 'done')", { t }), 2)
+  eq(evalExpr("count(t, 'state', 'done') == len(t)", { t }), false)
+  eq(evalExpr("count(x, 'state', 'done')", {}), 0)
+})
+
+// ============================================================ Harbor golden
+const MOD3 = JSON.parse(readFileSync(path.join(root, 'src/data/flows/module-03.json'), 'utf8'))
+const ref3 = await imp('src/data/flows/module-03.reference.js')
+
+function runBuild3(level, build) {
+  const flows = Object.values(ref3.referenceFlowsFor(level))
+  const dayRes = eng.runModule(flows, MOD3, build.dayId).byDay[build.dayId]
+  return chk.evaluateChecks(build.checks, dayRes, dayRes.dayState, flows)
+}
+const b3id = (id) => MOD3.builds.find((b) => b.id === id)
+
+await test('golden: module-03 builds match the reference levels', () => {
+  eq(MOD3.builds.map((b) => b.id), ref3.REFERENCE_BUILD_IDS)
+})
+
+for (const build of MOD3.builds) {
+  await test(`golden: Harbor reference passes ${build.id} (${build.title})`, () => {
+    const results = runBuild3(build.id, build)
+    ok(chk.allPassed(results), `\n    ${failing(results)}`)
+  })
+}
+
+await test('golden: Harbor Day 1 flows FAIL Day 2 - the re-sent offer makes two records and eight tasks', () => {
+  const r = Object.fromEntries(runBuild3('b4', b3id('b5')).map((x) => [x.id, x]))
+  ok(!r['b5-one-record'].passed && !r['b5-four'].passed)
+  ok(r['b5-four'].detail.includes('8 rows'))
+})
+
+await test('golden: without escalation the backorder is silent; the Day 2 flows FAIL Day 3 on a task nobody reports', () => {
+  const r6 = Object.fromEntries(runBuild3('b5', b3id('b6')).map((x) => [x.id, x]))
+  ok(!r6['b6-told'].passed && !r6['b6-logged'].passed)
+  ok(r6['b6-board'].passed && r6['b6-no-package'].passed)
+  const r7 = Object.fromEntries(runBuild3('b6', b3id('b7')).map((x) => [x.id, x]))
+  ok(!r7['b7-riley'].passed && !r7['b7-told'].passed)
+  ok(r7['b7-no-package'].passed)
+})
+
+await test('golden: a gate that fires on every update sends four packages (the fan-in is what b4 teaches)', () => {
+  const flows = ref3.referenceFlowsFor('b4')
+  const gate = fm.findStep(flows['update-flow'], 'ref-gate').step
+  const loose = fm.updateStep(flows['update-flow'], gate.id, { config: { rules: [{ left: 'done', op: '>=', right: '1', rightKind: 'value' }] } })
+  const all = eng.runModule([flows['offer-flow'], loose, flows['sweep-flow']], MOD3, 'day-1').byDay['day-1']
+  const r = Object.fromEntries(chk.evaluateChecks(b3id('b4').checks, all, all.dayState, []).map((x) => [x.id, x]))
+  ok(!r['b4-once'].passed && !r['b4-sent-once'].passed)
+})
+
+await test('codegen: python renders Harbor loops, updates and upserts, and compiles', async () => {
+  const flows = ref3.referenceFlowsFor('b7')
+  const offer = renderPython(flows['offer-flow'], MOD3)
+  ok(offer.includes('for item in list(rec["sla"] or []):') || offer.includes('for item in list(outer["sla"] or []):'), offer)
+  ok(offer.includes('rec = dict(item, parent=outer)'))
+  ok(offer.includes('upsert(stores["task-board"], data_of(rec), keys=["hireId", "taskId"])'))
+  const upd = renderPython(flows['update-flow'], MOD3)
+  ok(upd.includes('update(stores["task-board"], data_of(rec), keys=["hireId", "taskId"])'))
+  ok(upd.includes("sum(1 for r in rec[\"tasks\"] if str(g(r, \"state\")).lower() == str(\"done\").lower())"), upd)
+  const sweep = renderPython(flows['sweep-flow'], MOD3)
+  const { execFileSync } = await import('node:child_process')
+  const { writeFileSync, mkdtempSync } = await import('node:fs')
+  const os = await import('node:os')
+  let python = null
+  for (const cand of ['python3', 'python']) {
+    try {
+      execFileSync(cand, ['--version'], { stdio: 'ignore' })
+      python = cand
+      break
+    } catch {
+      // try next
+    }
+  }
+  if (!python) return
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'sf-py3-'))
+  for (const [name, src] of [['offer.py', offer], ['update.py', upd], ['sweep.py', sweep]]) {
+    const f = path.join(dir, name)
+    writeFileSync(f, src)
+    execFileSync(python, ['-c', `import ast,sys; ast.parse(open(sys.argv[1]).read())`, f], { stdio: 'pipe' })
+  }
+})
+
 // ============================================================ flowProgress (pure parts)
 const fp = await imp('src/lib/flowProgress.js')
 
@@ -541,8 +676,8 @@ for (const { file, concept } of CONCEPT_FILES) {
   })
 }
 
-await test('concepts: every build.requires in module-02 names an existing concept', () => {
-  for (const b of MOD2.builds) for (const id of b.requires || []) ok(CONCEPT_IDS.has(id), `${b.id} requires unknown concept ${id}`)
+await test('concepts: every build.requires in modules 02 and 03 names an existing concept', () => {
+  for (const b of [...MOD2.builds, ...MOD3.builds]) for (const id of b.requires || []) ok(CONCEPT_IDS.has(id), `${b.id} requires unknown concept ${id}`)
   // Every step kind used by the Beacon reference has a rosetta.
   const kinds = new Set()
   for (const f of Object.values(referenceFlowsFor('b6'))) fm.walkSteps(f.steps, (st) => kinds.add(st.kind))

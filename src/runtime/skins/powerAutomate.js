@@ -12,6 +12,7 @@ export const powerAutomateSkin = {
       lookup: 'Get items',
       transform: 'Compose',
       condition: 'Condition',
+      foreach: 'Apply to each',
       approval: 'Start and wait for an approval',
       send: 'Send an email (V2)',
       compose: 'Compose (HTML)',
@@ -32,6 +33,8 @@ export const powerAutomateSkin = {
         return { title: 'Compose', subtitle: `Inputs: ${setText(c)}` }
       case 'condition':
         return { title: 'Condition', subtitle: rulesText(c), branchLabels: { yes: 'If yes', no: 'If no' } }
+      case 'foreach':
+        return { title: 'Apply to each', subtitle: `Select an output from previous steps: ${c.list || '?'}`, branchLabels: { each: 'Apply to each' } }
       case 'approval':
         return { title: 'Start and wait for an approval', subtitle: `Approval type: Approve/Reject - Assigned to: ${c.approver || '?'}${c.about ? ` - Title: ${c.about}` : ''}` }
       case 'send':
@@ -39,7 +42,7 @@ export const powerAutomateSkin = {
       case 'compose':
         return { title: 'Compose (HTML)', subtitle: `Inputs: ${truncate(c.template || '')}` }
       case 'store':
-        return { title: c.mode === 'upsert' ? 'Update item' : 'Create item', subtitle: `Site: Beacon AP - List Name: ${storeLabel(ctx, c.store)}${c.from ? ` - Apply to each: ${c.from}` : ''}` }
+        return { title: c.mode === 'update' ? 'Update item' : c.mode === 'upsert' ? 'Create or update item' : 'Create item', subtitle: `Site: ${(ctx && ctx.moduleData && ctx.moduleData.org) || 'Team site'} - List Name: ${storeLabel(ctx, c.store)}${c.from ? ` - Apply to each: ${c.from}` : ''}` }
       case 'stop':
         return { title: 'Terminate', subtitle: 'Status: Succeeded - this record is done' }
       default:

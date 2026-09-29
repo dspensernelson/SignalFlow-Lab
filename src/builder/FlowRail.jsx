@@ -1,6 +1,7 @@
 import { Icon } from '../components/ui'
 import StepCard from './StepCard.jsx'
 import Palette from './Palette.jsx'
+import { branchKeys } from '../runtime/flowModel.js'
 
 // Vertical rail: the Lab, Power Automate, and Zapier layouts. Steps stack top
 // to bottom; a Condition opens two lanes beneath it (yes / no) that rejoin.
@@ -91,19 +92,20 @@ export default function FlowRail(props) {
           fields={fieldsFor(step.id)}
         />
       )
-      if (step.kind === 'condition') {
+      if (step.branches) {
         const d = skin.describe(step, ctx)
-        const labels = d.branchLabels || { yes: 'If yes', no: 'If no' }
+        const labels = d.branchLabels || { yes: 'If yes', no: 'If no', each: 'Each item' }
+        const loop = step.kind === 'foreach'
         items.push(
-          <div key={`lanes-${step.id}`} className="ml-4 flex flex-col gap-1 border-l-2 border-dashed border-sf-border pl-3 pt-1">
-            {['yes', 'no'].map((b) => (
+          <div key={`lanes-${step.id}`} className={`ml-4 flex flex-col gap-1 border-l-2 pl-3 pt-1 ${loop ? 'border-sf-info' : 'border-dashed border-sf-border'}`}>
+            {branchKeys(step).map((b) => (
               <div key={b} className="rounded-lg border border-sf-border-subtle bg-sf-surface-subtle/60 px-2 pb-1 pt-1.5">
                 <div className="mb-1 flex items-center gap-1.5">
-                  <span className={`inline-flex h-2 w-2 rounded-full ${b === 'yes' ? 'bg-sf-complete' : 'bg-sf-warning'}`} aria-hidden="true" />
-                  <span className="text-[10px] font-bold uppercase tracking-sf-wide text-sf-muted">{labels[b]}</span>
-                  {step.branches[b].length === 0 && <span className="text-[10px] text-sf-subtle">- empty, the record continues below</span>}
+                  {loop ? <Icon name="repeat" size={11} className="text-sf-info" /> : <span className={`inline-flex h-2 w-2 rounded-full ${b === 'yes' ? 'bg-sf-complete' : 'bg-sf-warning'}`} aria-hidden="true" />}
+                  <span className="text-[10px] font-bold uppercase tracking-sf-wide text-sf-muted">{labels[b] || b}</span>
+                  {(step.branches[b] || []).length === 0 && <span className="text-[10px] text-sf-subtle">{loop ? '- add the steps to repeat' : '- empty, the record continues below'}</span>}
                 </div>
-                <div className="flex flex-col">{renderList(step.branches[b], [...path, step.id, b], depth + 1)}</div>
+                <div className="flex flex-col">{renderList(step.branches[b] || [], [...path, step.id, b], depth + 1)}</div>
               </div>
             ))}
           </div>
