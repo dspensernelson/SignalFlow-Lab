@@ -1,27 +1,25 @@
-## Imported Claude Cowork project instructions
+## Project instructions
 
-> Entry point: start at BUILDER_KICKOFF.md, obey AUTONOMY_CHARTER.md, and run
-> `npm run check` before every commit. See .github/copilot-instructions.md.
+> Entry point: start at BUILDER_KICKOFF.md, then FLOW_MODULE_PLAYBOOK.md.
+> Run `npm run check` before every commit.
 
-## HARD RULE: No-scroll Exercise/workbench screens (NON-NEGOTIABLE)
+## HARD RULE: simple, polished, minimal text (owner, 2026-09-29)
 
-On lesson Exercise/workbench screens, the learner must be able to see the
-source/input, the work area, the validation/readiness state, and the next
-action together on a standard laptop/desktop viewport. Feedback must not create
-a long page-scroll stack while the learner is actively building and fixing the
-artifact.
+Whoever uses this should feel it is a super simple way to learn - clean, not
+overbearing. On every screen:
 
-- This is scoped to Exercise/workbench screens. It does NOT mean every page in
-  the product can never scroll - Intro and Takeaway may scroll if needed.
-- The validation / readiness feedback area must NOT grow off the page when it
-  expands. Keep it a fixed, bounded size (inline per-line error chips beside the
-  editor PLUS a single prioritized "Fix this next" callout), never an unbounded
-  stack of callouts.
-- Target: no page scroll on the Exercise screen at a standard desktop/laptop
-  viewport (innerHeight >= 800), including the wrong-answer state. Verify by
-  checking document.documentElement.scrollHeight === clientHeight after
-  validating a WRONG answer (the tallest state).
-- When adding content to an Exercise screen, remove or compact something else so
-  it still fits. Compactness wins over extra detail.
-- This rule is intentionally duplicated in PRODUCT_DOCTRINE.md and
-  LESSON_DESIGN_FRAMEWORK.md so it is never lost.
+- One short line tells the learner what to do (a build's `brief`). Story,
+  rules and hints sit behind a disclosure until asked for.
+- Feedback is ONE prioritized "Fix this next" line plus a compact checklist
+  (failing checks first, passing ones folded into one line) - never a stack
+  of explanations.
+- When adding something to a screen, remove or compact something else.
+  Compactness wins over extra detail.
+
+## Worksheet screens (module-01 until it is ported)
+
+The legacy no-scroll rule still applies to worksheet Exercise screens: the
+source, the work area, the validation state and the next action fit together
+at innerHeight >= 800, including the wrong-answer state. The flow builder is
+exempt (a flow and its run trace scroll inside their panels); the page itself
+should not scroll at 1280x720 or larger.

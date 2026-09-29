@@ -2,6 +2,44 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-09-29 (cleanup pass, Harbor as flows, engine wave 1, canon)
+
+- OWNER (2026-09-29): "go" on: clean up P0 myself, then port Harbor on top of
+  the unmerged P0 branch, then keep going module by module; nothing reaches
+  main without owner approval. Direction mid-session: "a clean, polished
+  move with a minimal amount of text" - recorded as the HARD RULE in
+  AGENTS.md and the design rules in FLOW_MODULE_PLAYBOOK.md.
+- CLEANUP (walked in a browser as a learner): one-row header (View-as menu,
+  theme icon, day folded into the build picker); a one-line `brief` per
+  build with story/rules behind "More"; one "Fix this next" line (the step
+  that broke, else the first missed check, in table names); failing checks
+  only, passing folded; short welcome; concept tool cards shown after the
+  pass (no answer leak); visible "Add a step". Bugs fixed: the Condition
+  rosetta could not be finished by hand (palette lacked Store; concepts now
+  take `add.also`); editor inputs collapsed in narrow lanes (w-full clashing
+  with fixed widths); n8n/Make node titles overflowed; the horizontal line
+  hid steps off-screen (now wraps).
+- HARBOR (module-03) PORTED: 3 flows (intake, task updates, the 5:00 PM
+  check), 3 days (Jordan clean; Sam's offer sent twice + backordered laptop;
+  Riley's silent Facilities task), 7 builds, 29 checks. The teaching arc:
+  fan-out (For each over the SLA policy), update-in-place, fan-in on ALL
+  done, idempotency, escalate blocked now, and "silence triggers nothing -
+  only a clock catches it". 41 worksheet lessons retired. Map: Profile
+  Feedback removed (no build makes it); archive feeds the role profiles.
+- ENGINE WAVE 1 (only what Harbor needed): For each step; store modes update
+  and add-or-replace with multi-field keys; count(list, field, value);
+  unique record labels. Three rosettas: For each, Update a row, Add or
+  replace. All skins and the Python codegen speak them.
+- CANON: flow modules' canon.json is now format "flows" (facts about the data
+  and the finished reference run), enforced by lint-flows. It caught that
+  Build 6's "exactly one escalation" would go red after Build 7; the check
+  now asserts "no finished task is escalated", and a golden test holds that
+  the finished desk passes every earlier build, in both modules.
+- DOCS: BUILDER_KICKOFF, AGENTS, NEXT_SESSION_PROMPT, README status and
+  copilot instructions now describe the flows world; FLOW_MODULE_PLAYBOOK.md
+  is the procedure. The worksheet docs remain as history and govern
+  module-01 until it is ported.
+
 ## 2026-08-23 (P0 of the runnable-flows plan: Beacon opens the product)
 
 - OWNER (2026-08-22/23): "this is insane, I love it, needs some cleaning up."

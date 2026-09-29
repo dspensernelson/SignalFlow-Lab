@@ -1,6 +1,6 @@
 # SignalFlow Lab
 
-A React app for practicing workplace automation by rebuilding real workflow maps one useful artifact at a time. The first project is **Meridian Morning Market Brief**, a fictional energy-market workflow that turns messy overnight market inputs into an approval-ready 7:00 AM brief.
+A React app for practicing workplace automation: build a flow, run it on a day of real-looking work, watch it break, fix it, and see it in the tool your employer uses.
 
 **Live:** https://signal-flow-lab.vercel.app
 
@@ -14,37 +14,35 @@ I am the learner here. If it turns out to be worth handing to someone else, it i
 
 ## Status
 
-Modules 1 through 3 are complete across all three tiers. Module 4 is in progress and I have not walked it yet.
+The learner builds automations and runs them. Each module is a small
+workplace with two or three flows to build, over three days: a clean day
+where the pattern is visible, a messy day that breaks the Day 1 flow in
+front of you, and a day where something fails or goes quiet. A build passes
+when the run does the right thing (the right invoices paid, the right people
+told), not when a typed value matches an answer key. Any flow can be viewed
+as Power Automate, Make, n8n, Zapier or Python, and exported.
 
-### Runnable flows (slice, branch `feat/runnable-flows`)
+| Module | State |
+| --- | --- |
+| 2 - Beacon Invoice Desk | Runnable flows: 6 builds, 3 days |
+| 3 - Harbor Onboarding | Runnable flows: 7 builds, 3 days |
+| 1 - Meridian Morning Brief | Worksheet lessons (next to port) |
+| 4-10 | Chartered in `curriculum/charters/`, not built |
 
-REIMAGINE_BRIEF.md named the problem: every lesson is type-a-value or
-pick-a-value and nothing the learner makes ever runs. The answer on this branch
-is a deterministic in-browser flow runtime and a builder. The learner assembles
-typed steps (trigger, lookup, transform, condition, approval, send, compose,
-store, stop), runs them against a day of real scenario data, watches every
-record walk the steps, and passes a build when the desk's acceptance checks
-hold on the run. Day 2 brings the messy batch and the Day 1 flow pays a
-duplicate, visibly; Day 3 injects an auth-expired failure. The same flow
-renders as Lab, Power Automate, Make, n8n, Zapier, or Python.
-
-- Entry: the app opens on the Beacon builder. "World" = the module intro;
-  "Map" = the workflow map lit by what you have built. Concepts (rosettas
-  and waypoints, `src/data/rosettas`, `src/data/waypoints`) gate builds just
-  in time; hints are graduated (question, nudge, steps).
-- Code: `src/runtime/` (expr, engine, checks, skins, python codegen),
-  `src/builder/` (UI), `src/data/flows/module-02.json` (days, builds, checks),
-  `src/data/flows/module-02.reference.js` (example solution).
-- Proof: `npm run test:runtime` - unit tests, golden tests that the
-  reference passes all six builds and that the Day 1 flow FAILS Day 2, and
-  one test per concept (solution passes, starting point does not);
-  `npm run lint:flows` holds the authoring invariants.
+- Start here: `BUILDER_KICKOFF.md`, then `FLOW_MODULE_PLAYBOOK.md`.
+- Code: `src/runtime/` (engine, expressions, checks, tool skins, Python
+  codegen), `src/builder/` (the UI), `src/data/flows/` (modules and their
+  reference solutions), `src/data/rosettas/` and `src/data/waypoints/`
+  (the concepts that gate each build).
+- Proof: `npm run test:runtime` (engine units, one test per concept, and
+  golden tests: every build is passable, each day breaks the previous day's
+  flow, the finished desk passes every build); `npm run lint:flows`
+  (authoring rules and canon).
 - Design: `docs/superpowers/specs/2026-08-22-runnable-flows-design.md`.
-- The worksheet lesson path is untouched; nothing live regresses.
 
-## Build log
+## Build log (worksheet era, kept for history)
 
-Where things stand if you are picking this back up:
+Where things stood before the runnable-flows port (see Status above for now):
 
 - **Module 3 (Harbor Onboarding) is COMPLETE across all three tiers** (Easy
   16/16, Medium 16/16, Hard 6/6 = 38 lessons). It teaches ORCHESTRATION:
@@ -157,7 +155,9 @@ Individually: `npm run lint`, `npm run lint:lessons`, `npm run test:lessons`,
 
 ## Key Docs
 
-- `BUILDER_KICKOFF.md` - the autonomous builder's entry point (read order, startup ritual, the fixed work queue).
+- `BUILDER_KICKOFF.md` - the builder's entry point (read order, startup ritual, the work queue).
+- `FLOW_MODULE_PLAYBOOK.md` - how a module is built as runnable flows, and the design rules.
+- `REIMAGINE_BRIEF.md` - why the product moved from worksheets to runnable flows.
 - `AUTONOMY_CHARTER.md` - standing owner approvals: the North Star, gate-by-gate decisions, the tie-breaker rule, and the PARK protocol.
 - `curriculum/charters/` - ratified charters for modules 2-10.
 - `SPEC_ARTIFACT_IMPORT.md` / `SPEC_MULTI_PROJECT.md` - the two pre-approved engine changes.

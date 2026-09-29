@@ -1,53 +1,45 @@
 # Builder Kickoff - start here
 
-You are the autonomous BUILDER for SignalFlow Lab. The owner is not
-available and does not need to be: every product decision you would ask
-about is either committed to this repo or covered by a standing approval.
-Your job is to build the remaining curriculum - Module 1's capstone, then
-modules 2 through 10 - and stop when module 10 ships.
+SignalFlow Lab teaches workplace automation by having the learner BUILD
+flows, RUN them on a day of real-looking data, watch them break on a messier
+day, fix them, and see the same flow in Power Automate, Make, n8n, Zapier and
+Python. That is the product since the 2026-08 reimagine (REIMAGINE_BRIEF.md).
+The earlier worksheet lessons are being retired module by module.
 
-## Read, in this order, before any work
+## Read, in this order
 
-1. AUTONOMY_CHARTER.md - your standing approvals, prohibitions, the North
-   Star, the tie-breaker rule, and the PARK protocol. This governs you.
-2. DECISION_BOUNDARIES.md - the gate list the charter answers.
-3. README.md (Current Status) - where things stand.
-4. MODULE_AUTHORING_PLAYBOOK.md - the procedure for every module.
-5. VERIFICATION_PLAYBOOK.md - how to prove work correct.
-6. curriculum/charters/_INDEX.md - the nine ratified module charters.
-7. SPEC_ARTIFACT_IMPORT.md and SPEC_MULTI_PROJECT.md - your two
-   pre-approved engine changes.
-8. OPEN_QUESTIONS.md - anything parked by a previous session.
+1. REIMAGINE_BRIEF.md - why the product changed and what done looks like.
+2. FLOW_MODULE_PLAYBOOK.md - how a module is built as flows, and the owner's
+   design rules (simple, minimal text, one "Fix this next").
+3. README.md (Status) and the top of DECISION_LOG.md - where things stand.
+4. src/data/flows/module-03.json and module-03.reference.js - a complete
+   worked module.
+5. AUTONOMY_CHARTER.md - standing approvals and prohibitions. Where it
+   protects the worksheet design (validators, the no-scroll rule for lesson
+   exercises), it applies to module-01's remaining worksheets only.
+6. OPEN_QUESTIONS.md - anything parked for the owner.
 
-## Session startup ritual (every session)
+## Session startup
 
-1. `git status` and `git log --oneline -5` - know where you are.
-2. `npm run check` - confirm green before touching anything. If red, fixing
-   it IS the first task.
-3. Read OPEN_QUESTIONS.md and LESSON_DESIGN_FRAMEWORK.md section 7 (the
-   living handoff) for the current frontier.
+1. `git status`, `git log --oneline -5`.
+2. `npm run check` - green before touching anything. If red, fixing it is
+   the first task.
 
-## The work queue (fixed order)
+## The work queue (owner-approved order)
 
-1. Module 1 capstone: implement SPEC_ARTIFACT_IMPORT.md as written.
-2. Module 1 wrap: playbook Step 8 (playthrough, docs sync, case study,
-   release tag, PR report).
-3. Engine: implement SPEC_MULTI_PROJECT.md as written.
-4. Modules 2-10, in numeric order, each strictly via
-   MODULE_AUTHORING_PLAYBOOK.md against its ratified charter. One module
-   at a time; a module is DONE (Step 8 complete, PR opened with the module
-   report) before the next begins.
-5. After module 10 and its wrap: STOP. The build phase is complete.
+1. DONE - Beacon (module-02) as flows.
+2. DONE - Harbor (module-03) as flows, with engine wave 1 (For each, update
+   a row, add-or-replace keys, count()).
+3. Meridian (module-01) as flows; retire its worksheets and the worksheet
+   path (lesson workspace, validators, lesson lints) once nothing uses them.
+4. Modules 04-10 as flows, in order, from their charters in
+   curriculum/charters/. A charter's map and scenario carry over; its
+   interaction-type notes do not.
 
-## Standing rules (violations are never worth it)
+## Standing rules
 
 - `npm run check` green before every commit. Never weaken a check to pass.
-- Live no-scroll verification (wrong-answer state) for every new or changed
-  exercise surface.
-- Owner gates are answered by AUTONOMY_CHARTER.md, not by your judgment.
-  Anything it prohibits or leaves ambiguous: PARK it in OPEN_QUESTIONS.md
-  and move to unblocked work. Three failed attempts at one problem: park.
-- Update the living handoff (LESSON_DESIGN_FRAMEWORK.md section 7) and
-  DECISION_LOG.md as you go; commit small; push to origin; one PR per
-  module; never merge your own PRs; never deploy or publish.
-- Keep repo docs ASCII-only. Leave the app demoable after every commit.
+- Walk every new or changed screen in a real browser before calling it done.
+- Keep repo docs ASCII-only; " - " not em-dashes.
+- Log decisions in DECISION_LOG.md. Commit small. Do not merge your own PRs
+  or deploy; the owner merges main, and Vercel deploys main.
