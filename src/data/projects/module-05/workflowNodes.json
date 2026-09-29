@@ -1,0 +1,630 @@
+[
+  {
+    "id": "trial-balance",
+    "label": "Trial Balance",
+    "type": "source",
+    "thingOrAction": "thing",
+    "phaseId": "calendar-prep",
+    "x": 20,
+    "y": 80,
+    "description": "The book balance of every account at period cutoff, extracted from the general ledger.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "Arrives in Account Balances as bookBalance, one row per account.",
+      "concepts": []
+    },
+    "labVersion": "Arrives in Account Balances as bookBalance, one row per account.",
+    "realWorldSources": [
+      "General ledger TB export",
+      "ERP period-close report"
+    ],
+    "accessNeeded": [
+      "Read access to the GL",
+      "Agreement on the cutoff timestamp"
+    ],
+    "soloRebuildPath": [
+      "Export the TB at cutoff",
+      "Keep one row per account",
+      "Later pull it from the ERP API"
+    ],
+    "reusedBy": [
+      "cash-recon",
+      "accrual-recon"
+    ],
+    "governanceNote": "The cutoff is the Controller's call; a balance pulled after it is a different period.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-trial-balance",
+    "artifactName": "trial-balance.json"
+  },
+  {
+    "id": "bank-feed",
+    "label": "Bank Feed",
+    "type": "source",
+    "thingOrAction": "thing",
+    "phaseId": "calendar-prep",
+    "x": 20,
+    "y": 190,
+    "description": "The bank's statement balance for cash, posted by the Treasury Desk with a lag of about a day.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "Arrives in Account Balances as externalBalance for Cash; Month 3 arrives without it.",
+      "concepts": []
+    },
+    "labVersion": "Arrives in Account Balances as externalBalance for Cash; Month 3 arrives without it.",
+    "realWorldSources": [
+      "Bank statement feed (BAI2/MT940)",
+      "Treasury workstation"
+    ],
+    "accessNeeded": [
+      "Read access to the bank feed",
+      "The Treasury Desk's posting schedule"
+    ],
+    "soloRebuildPath": [
+      "Download the statement",
+      "Match the closing balance to the cutoff date",
+      "Later subscribe to the feed"
+    ],
+    "reusedBy": [
+      "cash-recon"
+    ],
+    "governanceNote": "Treasury owns the feed; when it is late, cash is unreconciled, not assumed.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-bank-feed",
+    "artifactName": "bank-feed.json"
+  },
+  {
+    "id": "close-calendar",
+    "label": "Close Calendar",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "calendar-prep",
+    "x": 20,
+    "y": 300,
+    "description": "Which task happens on which workday, and what it waits on. The package flow runs on Workday 5.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Workday 5 schedule that starts the package flow.",
+      "concepts": []
+    },
+    "labVersion": "The Workday 5 schedule that starts the package flow.",
+    "realWorldSources": [
+      "Close checklist in the ERP",
+      "A shared close calendar"
+    ],
+    "accessNeeded": [
+      "The Controller's calendar",
+      "Workday arithmetic for the month"
+    ],
+    "soloRebuildPath": [
+      "List the tasks and their predecessors",
+      "Put each on a workday",
+      "Later drive schedules from it"
+    ],
+    "reusedBy": [
+      "close-package"
+    ],
+    "governanceNote": "The Controller owns the calendar; a task cannot run before what it depends on has landed.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-close-calendar",
+    "artifactName": "close-calendar.json"
+  },
+  {
+    "id": "prior-period-balances",
+    "label": "Prior Period Balances",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "calendar-prep",
+    "x": 20,
+    "y": 410,
+    "description": "Last month's certified balance for every account - the opening this month's movement is measured from.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Prior Period Balances table; refilled by the roll-forward at the end of every close.",
+      "concepts": []
+    },
+    "labVersion": "The Prior Period Balances table; refilled by the roll-forward at the end of every close.",
+    "realWorldSources": [
+      "Last month's certified package",
+      "GL opening balances"
+    ],
+    "accessNeeded": [
+      "Read access to the archive",
+      "One row per account"
+    ],
+    "soloRebuildPath": [
+      "Copy last month's closing balances",
+      "Key them by account code",
+      "Later read them from the archive"
+    ],
+    "reusedBy": [
+      "variance-analysis"
+    ],
+    "governanceNote": "Openings come from a certified package, never from a re-pulled TB.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-prior-period-balances",
+    "artifactName": "prior-period-balances.json"
+  },
+  {
+    "id": "recon-policy",
+    "label": "Recon Policy",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "reconciliation",
+    "x": 270,
+    "y": 80,
+    "description": "The governed materiality: at or above this many dollars a difference is booked; below, it is passed.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Recon Policy table (materiality 500, owned by the Controller).",
+      "concepts": []
+    },
+    "labVersion": "The Recon Policy table (materiality 500, owned by the Controller).",
+    "realWorldSources": [
+      "Accounting policy manual",
+      "Materiality memo"
+    ],
+    "accessNeeded": [
+      "The Controller's sign-off on the number",
+      "A version"
+    ],
+    "soloRebuildPath": [
+      "Write down the number and who owns it",
+      "Version it",
+      "Later store it where the flow reads it"
+    ],
+    "reusedBy": [
+      "materiality-decision"
+    ],
+    "governanceNote": "Materiality is one governed number; changing it is a policy change with a version.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-recon-policy",
+    "artifactName": "recon-policy.json"
+  },
+  {
+    "id": "cash-recon",
+    "label": "Cash Reconciliation",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "reconciliation",
+    "x": 270,
+    "y": 190,
+    "description": "Book cash against the bank balance: the difference, aged and explained.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "Cash's row in Recon Results, built by the Reconcile flow.",
+      "concepts": []
+    },
+    "labVersion": "Cash's row in Recon Results, built by the Reconcile flow.",
+    "realWorldSources": [
+      "Bank reconciliation workpaper"
+    ],
+    "accessNeeded": [
+      "The TB row and the bank balance",
+      "Last month's opening"
+    ],
+    "soloRebuildPath": [
+      "Subtract bank from book",
+      "Explain the difference",
+      "Later automate the matching"
+    ],
+    "reusedBy": [
+      "materiality-decision"
+    ],
+    "governanceNote": "An unexplained cash difference is the first thing an auditor asks about.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-cash-recon",
+    "artifactName": "cash-recon.json"
+  },
+  {
+    "id": "accrual-recon",
+    "label": "Accrual Reconciliation",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "reconciliation",
+    "x": 270,
+    "y": 300,
+    "description": "Book accrued liabilities against the accruals subledger - the same discipline on a second account.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "Accrued Liabilities' row in Recon Results.",
+      "concepts": []
+    },
+    "labVersion": "Accrued Liabilities' row in Recon Results.",
+    "realWorldSources": [
+      "Accruals subledger",
+      "Reconciliation workpaper"
+    ],
+    "accessNeeded": [
+      "The subledger balance",
+      "Last month's opening"
+    ],
+    "soloRebuildPath": [
+      "Subtract subledger from book",
+      "Explain the difference",
+      "Later automate the pull"
+    ],
+    "reusedBy": [
+      "materiality-decision"
+    ],
+    "governanceNote": "Every balance-sheet account gets the same reconciliation, or the package is not complete.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-accrual-recon",
+    "artifactName": "accrual-recon.json"
+  },
+  {
+    "id": "variance-analysis",
+    "label": "Variance Analysis",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "reconciliation",
+    "x": 270,
+    "y": 410,
+    "description": "The movement in each account since last month, against what was expected.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The movement field on every Recon Results row.",
+      "concepts": []
+    },
+    "labVersion": "The movement field on every Recon Results row.",
+    "realWorldSources": [
+      "Flux analysis workpaper",
+      "FP&A expectations"
+    ],
+    "accessNeeded": [
+      "This month's and last month's balances"
+    ],
+    "soloRebuildPath": [
+      "Subtract last month from this month",
+      "Flag movements that need a story",
+      "Later compare with the forecast"
+    ],
+    "reusedBy": [
+      "close-package"
+    ],
+    "governanceNote": "A large movement with no explanation is a finding, even when the account reconciles.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-variance-analysis",
+    "artifactName": "variance-analysis.json"
+  },
+  {
+    "id": "materiality-decision",
+    "label": "Materiality Decision",
+    "type": "decision",
+    "thingOrAction": "action",
+    "phaseId": "adjustments",
+    "x": 520,
+    "y": 80,
+    "description": "Book it or pass it: a difference at or above materiality becomes a journal entry; below, a passed item.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Condition in the Reconcile flow that reads materiality from the Recon Policy.",
+      "concepts": []
+    },
+    "labVersion": "The Condition in the Reconcile flow that reads materiality from the Recon Policy.",
+    "realWorldSources": [
+      "Close checklist step",
+      "Adjustment approval matrix"
+    ],
+    "accessNeeded": [
+      "The policy's materiality",
+      "The reconciled difference"
+    ],
+    "soloRebuildPath": [
+      "Compare the size of the difference with materiality",
+      "Route to an entry or the passed log",
+      "Later add account-specific thresholds"
+    ],
+    "reusedBy": [
+      "adjustment-entries",
+      "passed-items-log"
+    ],
+    "governanceNote": "Exactly-at adjusts. The line is included, in writing.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-materiality-decision",
+    "artifactName": "materiality-decision.json"
+  },
+  {
+    "id": "adjustment-entries",
+    "label": "Adjustment Entries",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "adjustments",
+    "x": 520,
+    "y": 190,
+    "description": "Journal entries booked this month, each with a reason and a preparer.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Adjustments table, one row per entry.",
+      "concepts": []
+    },
+    "labVersion": "The Adjustments table, one row per entry.",
+    "realWorldSources": [
+      "Journal entry batch",
+      "Manual JE form"
+    ],
+    "accessNeeded": [
+      "Posting rights",
+      "An entry numbering scheme"
+    ],
+    "soloRebuildPath": [
+      "Create an entry per material difference",
+      "Record the reason and the preparer",
+      "Later post to the GL"
+    ],
+    "reusedBy": [
+      "signoff-route",
+      "close-package"
+    ],
+    "governanceNote": "An entry without a preparer cannot be reviewed for separation of duties.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-adjustment-entries",
+    "artifactName": "adjustment-entries.json"
+  },
+  {
+    "id": "passed-items-log",
+    "label": "Passed Items Log",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "adjustments",
+    "x": 520,
+    "y": 300,
+    "description": "The quiet path: differences too small to book, still logged - because they add up.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Passed Items table, and the aggregation flag in the package.",
+      "concepts": []
+    },
+    "labVersion": "The Passed Items table, and the aggregation flag in the package.",
+    "realWorldSources": [
+      "Passed adjustments schedule (SAD)"
+    ],
+    "accessNeeded": [
+      "The reconciled difference"
+    ],
+    "soloRebuildPath": [
+      "Log every immaterial difference",
+      "Total them each month",
+      "Later carry them across periods"
+    ],
+    "reusedBy": [
+      "close-package"
+    ],
+    "governanceNote": "Three items under materiality can sum past it; the total is reported, not just the items.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-passed-items-log",
+    "artifactName": "passed-items-log.json"
+  },
+  {
+    "id": "signoff-route",
+    "label": "Sign-off Route",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "review-signoff",
+    "x": 770,
+    "y": 80,
+    "description": "Preparer to reviewer. The reviewer records a decision on the entry; the preparer can never be the reviewer.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Sign-offs flow: reviews update the entry; a self-review is blocked and reported.",
+      "concepts": []
+    },
+    "labVersion": "The Sign-offs flow: reviews update the entry; a self-review is blocked and reported.",
+    "realWorldSources": [
+      "Review workflow in the close tool",
+      "Email approvals"
+    ],
+    "accessNeeded": [
+      "A list of who prepared what",
+      "Reviewer assignments"
+    ],
+    "soloRebuildPath": [
+      "Send each entry to a reviewer who did not prepare it",
+      "Record the decision on the entry",
+      "Later enforce it in the tool"
+    ],
+    "reusedBy": [
+      "controller-certification"
+    ],
+    "governanceNote": "Separation of duties is a control, not a courtesy: the flow refuses a self-review.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-signoff-route",
+    "artifactName": "signoff-route.json"
+  },
+  {
+    "id": "review-checklist",
+    "label": "Review Checklist",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "review-signoff",
+    "x": 770,
+    "y": 190,
+    "description": "What a reviewer attests to: the difference is explained, the amount is right, the preparer is someone else.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "What the Sign-offs flow checks before recording a review.",
+      "concepts": []
+    },
+    "labVersion": "What the Sign-offs flow checks before recording a review.",
+    "realWorldSources": [
+      "Review checklist template"
+    ],
+    "accessNeeded": [
+      "The Controller's review standard"
+    ],
+    "soloRebuildPath": [
+      "Write the questions a reviewer must answer",
+      "Attach them to every review",
+      "Later make them fields"
+    ],
+    "reusedBy": [
+      "signoff-route"
+    ],
+    "governanceNote": "A review that did not check the preparer is not a review.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-review-checklist",
+    "artifactName": "review-checklist.json"
+  },
+  {
+    "id": "close-package",
+    "label": "Close Package",
+    "type": "output",
+    "thingOrAction": "thing",
+    "phaseId": "package",
+    "x": 1020,
+    "y": 80,
+    "description": "The Workday 5 package: every reconciliation, every entry with its reviewer, every passed item and their total, certified.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "Composed by the Workday 5 package flow and sent to Finance DL.",
+      "concepts": []
+    },
+    "labVersion": "Composed by the Workday 5 package flow and sent to Finance DL.",
+    "realWorldSources": [
+      "Close binder",
+      "Month-end package PDF"
+    ],
+    "accessNeeded": [
+      "Everything the close produced",
+      "The Controller's certification"
+    ],
+    "soloRebuildPath": [
+      "Gather the month's records",
+      "Assemble the sections",
+      "Later render it from data"
+    ],
+    "reusedBy": [
+      "controller-certification",
+      "close-archive"
+    ],
+    "governanceNote": "The package reports the passed-items total and any unreconciled account in plain words.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-close-package",
+    "artifactName": "close-package.json"
+  },
+  {
+    "id": "controller-certification",
+    "label": "Controller Certification",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "package",
+    "x": 1020,
+    "y": 190,
+    "description": "The Controller certifies the package before it goes to Finance.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Approval step in the package flow.",
+      "concepts": []
+    },
+    "labVersion": "The Approval step in the package flow.",
+    "realWorldSources": [
+      "Certification sign-off",
+      "Sub-certification letters"
+    ],
+    "accessNeeded": [
+      "The Controller's attention on Workday 5"
+    ],
+    "soloRebuildPath": [
+      "Ask for certification with the package in hand",
+      "Record who certified and when",
+      "Later chase it on a timer"
+    ],
+    "reusedBy": [
+      "close-archive"
+    ],
+    "governanceNote": "No certification, no package. The approval is captured on the run.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-controller-certification",
+    "artifactName": "controller-certification.json"
+  },
+  {
+    "id": "close-archive",
+    "label": "Close Archive",
+    "type": "archive",
+    "thingOrAction": "thing",
+    "phaseId": "package",
+    "x": 1020,
+    "y": 300,
+    "description": "Every certified package, kept seven years; this month's balances become next month's openings.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Close Archive table and the roll-forward into Prior Period Balances.",
+      "concepts": []
+    },
+    "labVersion": "The Close Archive table and the roll-forward into Prior Period Balances.",
+    "realWorldSources": [
+      "Workpaper archive",
+      "Document management system"
+    ],
+    "accessNeeded": [
+      "Write access to the archive",
+      "The retention policy"
+    ],
+    "soloRebuildPath": [
+      "Store the package with its date",
+      "Copy closing balances to openings",
+      "Later automate retention"
+    ],
+    "reusedBy": [
+      "prior-period-balances"
+    ],
+    "governanceNote": "Retention is an audit floor: seven years, and the openings come from here.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-close-archive",
+    "artifactName": "close-archive.json"
+  },
+  {
+    "id": "run-operations",
+    "label": "Close Run Operations",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "package",
+    "x": 1020,
+    "y": 410,
+    "description": "The close automation depends on feeds it does not own. When one does not post, the close still has to say what it knows and what it does not.",
+    "lesson": {
+      "type": "governance",
+      "status": "now",
+      "intent": "Handle a feed that did not post without pretending it did.",
+      "concepts": [
+        "Feed dependencies",
+        "Degraded close"
+      ]
+    },
+    "labVersion": "Built by you in Month 3: a missing bank balance is reported as unreconciled, not assumed.",
+    "realWorldSources": [
+      "Feed monitoring",
+      "Close status dashboard"
+    ],
+    "accessNeeded": [
+      "Alerts from the bank feed",
+      "The Treasury Desk's contact"
+    ],
+    "soloRebuildPath": [
+      "Detect a missing feed before the decision step",
+      "Tell the owner",
+      "Mark the account rather than guess"
+    ],
+    "reusedBy": [],
+    "governanceNote": "A close that reports a number it never checked is worse than one that reports a gap.",
+    "auditNote": "Authored for the runnable-flow build of Ledger (2026-09-29).",
+    "taskId": "lesson-run-operations",
+    "artifactName": "escalation-policy.json",
+    "skeletonStage": "operate"
+  }
+]

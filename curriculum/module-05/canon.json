@@ -1,0 +1,292 @@
+{
+  "_comment": "Canon for a runnable-flow module, enforced by scripts/lint-flows.mjs. Flow modules have no per-lesson answer keys to drift apart; what can drift is the world data (sources and seeds) and the reference solution that proves every build. So each assertion is checked against the raw day data (kind data) or against the reference solution's run of the whole module (kinds record and store), with every day's stores carried into the next. Change a number in the data and the canon names every fact that moved. The pre-port per-lesson assertions are in git history. ASCII only.",
+  "module": "module-05",
+  "format": "flows",
+  "assertions": [
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "version": "1.0.0"
+      },
+      "field": "materiality",
+      "equals": 500,
+      "seed": "recon-policy"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "accountCode": "1000"
+      },
+      "field": "bookBalance",
+      "equals": 48285,
+      "source": "account-balances"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "accountCode": "1000"
+      },
+      "field": "externalBalance",
+      "equals": 48250,
+      "source": "account-balances"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "accountCode": "2100"
+      },
+      "field": "bookBalance",
+      "equals": 12400,
+      "source": "account-balances"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "accountCode": "2100"
+      },
+      "field": "externalBalance",
+      "equals": 13150,
+      "source": "account-balances"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "accountCode": "1300"
+      },
+      "field": "externalBalance",
+      "equals": 90320,
+      "source": "account-balances"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "accountCode": "1000"
+      },
+      "field": "balance",
+      "equals": 47900,
+      "seed": "prior-period-balances"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "recon-results",
+      "where": {
+        "accountCode": "1000"
+      },
+      "field": "difference",
+      "equals": 35
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "recon-results",
+      "where": {
+        "accountCode": "1000"
+      },
+      "field": "movement",
+      "equals": 385
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "recon-results",
+      "where": {
+        "accountCode": "2100"
+      },
+      "field": "difference",
+      "equals": -750
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "recon-results",
+      "where": {
+        "accountCode": "1300"
+      },
+      "field": "difference",
+      "equals": -220
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "adjustments",
+      "where": {
+        "entryId": "JE-2100"
+      },
+      "field": "amount",
+      "equals": 750
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "adjustments",
+      "where": {
+        "entryId": "JE-2100"
+      },
+      "field": "reviewedBy",
+      "equals": "Senior Accountant"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "adjustments",
+      "where": {},
+      "count": 1
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "passed-items",
+      "where": {},
+      "count": 2
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run WD5 4:00 PM",
+      "field": "passedTotal",
+      "equals": 255,
+      "flow": "package-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run WD5 4:00 PM",
+      "field": "adjustmentCount",
+      "equals": 1,
+      "flow": "package-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run WD5 4:00 PM",
+      "field": "approval.outcome",
+      "equals": "certified",
+      "flow": "package-flow"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "prior-period-balances",
+      "where": {
+        "accountCode": "1000"
+      },
+      "field": "balance",
+      "equals": 48285
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "prior-period-balances",
+      "where": {},
+      "count": 3
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "accountCode": "2100"
+      },
+      "field": "preparer",
+      "equals": "Senior Accountant",
+      "source": "account-balances"
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "reviewId": "R-201"
+      },
+      "field": "reviewer",
+      "equals": "Senior Accountant",
+      "source": "reviews"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "adjustments",
+      "where": {
+        "entryId": "JE-2100"
+      },
+      "field": "amount",
+      "equals": 500
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "adjustments",
+      "where": {
+        "entryId": "JE-2100"
+      },
+      "field": "reviewedBy",
+      "equals": "Controller"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "passed-items",
+      "where": {},
+      "count": 3
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "Scheduled run WD5 4:00 PM",
+      "field": "passedTotal",
+      "equals": 550,
+      "flow": "package-flow"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "prior-period-balances",
+      "where": {},
+      "count": 4
+    },
+    {
+      "kind": "data",
+      "day": "day-3",
+      "where": {
+        "accountCode": "1000"
+      },
+      "field": "externalBalance",
+      "equals": "",
+      "source": "account-balances"
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "recon-results",
+      "where": {
+        "accountCode": "1000"
+      },
+      "field": "status",
+      "equals": "unreconciled"
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "recon-results",
+      "where": {
+        "accountCode": "1200"
+      },
+      "field": "status",
+      "equals": "passed"
+    },
+    {
+      "kind": "record",
+      "day": "day-3",
+      "label": "Scheduled run WD5 4:00 PM",
+      "field": "adjustmentCount",
+      "equals": 0,
+      "flow": "package-flow"
+    }
+  ]
+}

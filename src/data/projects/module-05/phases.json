@@ -1,0 +1,80 @@
+[
+  {
+    "id": "calendar-prep",
+    "order": 1,
+    "title": "Phase 1: Calendar and Prep",
+    "goal": "Know the cutoff, the workday schedule, and last month's openings before reconciling anything.",
+    "statusSource": "prior-period-balances",
+    "nodeIds": [
+      "trial-balance",
+      "bank-feed",
+      "close-calendar",
+      "prior-period-balances"
+    ],
+    "artifactNames": [],
+    "unlocks": "The balances and openings the reconciliations read."
+  },
+  {
+    "id": "reconciliation",
+    "order": 2,
+    "title": "Phase 2: Reconciliation",
+    "goal": "Reconcile each account against its outside source and measure its movement.",
+    "statusSource": "cash-recon",
+    "nodeIds": [
+      "recon-policy",
+      "cash-recon",
+      "accrual-recon",
+      "variance-analysis"
+    ],
+    "artifactNames": [
+      "recon-results.json"
+    ],
+    "unlocks": "Differences and movements ready for the materiality decision."
+  },
+  {
+    "id": "adjustments",
+    "order": 3,
+    "title": "Phase 3: Adjustments",
+    "goal": "Book what is material; log what is not.",
+    "statusSource": "adjustment-entries",
+    "nodeIds": [
+      "materiality-decision",
+      "adjustment-entries",
+      "passed-items-log"
+    ],
+    "artifactNames": [
+      "adjustments.json"
+    ],
+    "unlocks": "Entries ready for review and passed items ready to total."
+  },
+  {
+    "id": "review-signoff",
+    "order": 4,
+    "title": "Phase 4: Review and Sign-off",
+    "goal": "Get every entry reviewed by someone who did not prepare it.",
+    "statusSource": "signoff-route",
+    "nodeIds": [
+      "signoff-route",
+      "review-checklist"
+    ],
+    "artifactNames": [],
+    "unlocks": "Signed entries the package can certify."
+  },
+  {
+    "id": "package",
+    "order": 5,
+    "title": "Phase 5: Package and Carryforward",
+    "goal": "Certify, deliver, archive, and roll this month's balances into next month's openings.",
+    "statusSource": "close-package",
+    "nodeIds": [
+      "close-package",
+      "controller-certification",
+      "close-archive",
+      "run-operations"
+    ],
+    "artifactNames": [
+      "close-package.md"
+    ],
+    "unlocks": "A certified package and next month's openings."
+  }
+]

@@ -2,6 +2,24 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-09-29 (Ledger built as runnable flows)
+
+- LEDGER (module-05) BUILT from its charter; map authored fresh (17 nodes,
+  one decision, temporal loop archive -> prior-period balances, an ops
+  node). 3 flows (reconcile, sign-offs, the Workday 5 package), 3 months,
+  8 builds, 31 checks, 31 canon facts. Month 1: difference and movement per
+  account, materiality from policy (at-or-above books: JE-2100 for 750;
+  35 and 220 passed), reviews update the entry, the Controller certifies,
+  balances roll forward (For each + add-or-replace). Month 2: the Senior
+  Accountant reviews an entry they prepared - the Month 1 flow records it;
+  the fix blocks it, tells the Controller, and the Controller's own review
+  lands; three passed items (180+210+160 = 550) aggregate past materiality
+  and the package must say so; a difference of exactly 500 books. Month 3:
+  the bank feed does not post; the Month 2 flow passes cash as immaterial;
+  the fix marks it unreconciled, tells Treasury, and the package says so.
+- NOTE for authors: an empty string is not "missing" to the engine; test the
+  computed field (difference missing), as Meridian does with pctMove.
+
 ## 2026-09-29 (Relay built as runnable flows)
 
 - RELAY (module-04) BUILT from its ratified charter and the map on the old

@@ -1,0 +1,117 @@
+[
+  {
+    "from": "trial-balance",
+    "to": "cash-recon",
+    "label": "book balance"
+  },
+  {
+    "from": "trial-balance",
+    "to": "accrual-recon",
+    "label": "book balance"
+  },
+  {
+    "from": "bank-feed",
+    "to": "cash-recon",
+    "label": "bank balance"
+  },
+  {
+    "from": "prior-period-balances",
+    "to": "variance-analysis",
+    "label": "openings"
+  },
+  {
+    "from": "cash-recon",
+    "to": "variance-analysis",
+    "label": "movement"
+  },
+  {
+    "from": "accrual-recon",
+    "to": "variance-analysis",
+    "label": "movement"
+  },
+  {
+    "from": "recon-policy",
+    "to": "materiality-decision",
+    "label": "materiality"
+  },
+  {
+    "from": "cash-recon",
+    "to": "materiality-decision",
+    "label": "difference"
+  },
+  {
+    "from": "accrual-recon",
+    "to": "materiality-decision",
+    "label": "difference"
+  },
+  {
+    "from": "materiality-decision",
+    "to": "adjustment-entries",
+    "label": "at or above"
+  },
+  {
+    "from": "materiality-decision",
+    "to": "passed-items-log",
+    "label": "below"
+  },
+  {
+    "from": "adjustment-entries",
+    "to": "signoff-route",
+    "label": "for review"
+  },
+  {
+    "from": "review-checklist",
+    "to": "signoff-route",
+    "label": "attests to"
+  },
+  {
+    "from": "signoff-route",
+    "to": "controller-certification",
+    "label": "signed entries"
+  },
+  {
+    "from": "close-calendar",
+    "to": "close-package",
+    "label": "Workday 5"
+  },
+  {
+    "from": "variance-analysis",
+    "to": "close-package",
+    "label": "movements"
+  },
+  {
+    "from": "passed-items-log",
+    "to": "close-package",
+    "label": "passed total"
+  },
+  {
+    "from": "adjustment-entries",
+    "to": "close-package",
+    "label": "entries"
+  },
+  {
+    "from": "close-package",
+    "to": "controller-certification",
+    "label": "certify"
+  },
+  {
+    "from": "controller-certification",
+    "to": "close-archive",
+    "label": "archived"
+  },
+  {
+    "from": "close-archive",
+    "to": "prior-period-balances",
+    "label": "next month's openings"
+  },
+  {
+    "from": "bank-feed",
+    "to": "run-operations",
+    "label": "feed status"
+  },
+  {
+    "from": "close-archive",
+    "to": "run-operations",
+    "label": "run history"
+  }
+]

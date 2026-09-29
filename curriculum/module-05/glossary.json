@@ -1,0 +1,79 @@
+{
+  "note": "Terms module-05 introduces, and the build that teaches each. Enforced by scripts/lint-glossary.mjs. Keep ASCII-only.",
+  "module": "module-05",
+  "terms": [
+    {
+      "term": "reconcile",
+      "aliases": [
+        "reconciliation",
+        "reconciled",
+        "unreconciled"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Compare what the books say with what an outside source says, and explain the difference. An account is reconciled when the difference is explained, not when it is zero."
+    },
+    {
+      "term": "materiality",
+      "aliases": [
+        "material"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The governed dollar line: a difference at or above it is booked; below it, it is logged as a passed item."
+    },
+    {
+      "term": "passed item",
+      "aliases": [
+        "passed items"
+      ],
+      "teachesIn": "b1",
+      "gloss": "A difference too small to book, logged so it is not forgotten. Passed items add up, and their total is reported."
+    },
+    {
+      "term": "journal entry",
+      "aliases": [
+        "adjustment entry",
+        "adjustment",
+        "JE"
+      ],
+      "teachesIn": "b1",
+      "gloss": "A booked correction to the ledger, with a reason and the name of who prepared it."
+    },
+    {
+      "term": "separation of duties",
+      "aliases": [
+        "self-review",
+        "SoD"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The person who prepared an entry may not be the one who approves it. A control, enforced by the flow."
+    },
+    {
+      "term": "certify",
+      "aliases": [
+        "certification",
+        "certified"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The Controller's formal sign-off that the package is complete and correct."
+    },
+    {
+      "term": "Workday",
+      "aliases": [
+        "WD5",
+        "WD2",
+        "workday"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Business days counted from the first day of the month. The package is due on Workday 5."
+    },
+    {
+      "term": "roll forward",
+      "aliases": [
+        "openings",
+        "opening balance"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Carrying this month's certified balances into next month as the openings its movement is measured from."
+    }
+  ]
+}

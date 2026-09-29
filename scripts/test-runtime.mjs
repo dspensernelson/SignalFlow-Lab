@@ -653,11 +653,47 @@ await test('golden: Relay Day 2 flows FAIL Day 3 - the unacknowledged page never
   ok(r['b8-tier2'].passed && !r['b8-duty'].passed && !r['b8-log'].passed)
 })
 
+// ============================================================ Ledger golden
+const MOD5 = JSON.parse(readFileSync(path.join(root, 'src/data/flows/module-05.json'), 'utf8'))
+const ref5 = await imp('src/data/flows/module-05.reference.js')
+
+function runBuild5(level, build) {
+  const flows = Object.values(ref5.referenceFlowsFor(level))
+  const dayRes = eng.runModule(flows, MOD5, build.dayId).byDay[build.dayId]
+  return chk.evaluateChecks(build.checks, dayRes, dayRes.dayState, flows)
+}
+const b5id = (id) => MOD5.builds.find((b) => b.id === id)
+
+await test('golden: module-05 builds match the reference levels', () => {
+  eq(MOD5.builds.map((b) => b.id), ref5.REFERENCE_BUILD_IDS)
+})
+
+for (const build of MOD5.builds) {
+  await test(`golden: Ledger reference passes ${build.id} (${build.title})`, () => {
+    const results = runBuild5(build.id, build)
+    ok(chk.allPassed(results), `\n    ${failing(results)}`)
+  })
+}
+
+await test('golden: Ledger Month 1 flows FAIL Month 2 - the self-review is recorded and the aggregate is missed', () => {
+  const r6 = Object.fromEntries(runBuild5('b5', b5id('b6')).map((x) => [x.id, x]))
+  ok(!r6['b6-told'].passed)
+  const r7 = Object.fromEntries(runBuild5('b6', b5id('b7')).map((x) => [x.id, x]))
+  ok(r7['b7-total'].passed && !r7['b7-flag'].passed && !r7['b7-told'].passed)
+})
+
+await test('golden: Ledger Month 2 flows FAIL Month 3 - a missing bank balance is silently passed', () => {
+  const r = Object.fromEntries(runBuild5('b7', b5id('b8')).map((x) => [x.id, x]))
+  ok(!r['b8-status'].passed && !r['b8-not-passed'].passed && !r['b8-package'].passed)
+  ok(r['b8-not-passed'].detail.includes('Cash IS in passed-items'))
+})
+
 await test('golden: the finished desk still passes every earlier build (revisiting never turns a build red)', () => {
   for (const b of MOD2.builds) ok(chk.allPassed(runBuild(referenceFlowsFor('b6'), b)), `Beacon ${b.id}:\n    ${failing(runBuild(referenceFlowsFor('b6'), b))}`)
   for (const b of MOD3.builds) ok(chk.allPassed(runBuild3('b7', b)), `Harbor ${b.id}:\n    ${failing(runBuild3('b7', b))}`)
   for (const b of MOD1.builds) ok(chk.allPassed(runBuild1('b8', b)), `Meridian ${b.id}:\n    ${failing(runBuild1('b8', b))}`)
   for (const b of MOD4.builds) ok(chk.allPassed(runBuild4('b8', b)), `Relay ${b.id}:\n    ${failing(runBuild4('b8', b))}`)
+  for (const b of MOD5.builds) ok(chk.allPassed(runBuild5('b8', b)), `Ledger ${b.id}:\n    ${failing(runBuild5('b8', b))}`)
 })
 
 await test('codegen: python renders Harbor loops, updates and upserts, and compiles', async () => {
@@ -765,7 +801,7 @@ for (const { file, concept } of CONCEPT_FILES) {
 }
 
 await test('concepts: every build.requires in modules 02 and 03 names an existing concept', () => {
-  for (const b of [...MOD1.builds, ...MOD2.builds, ...MOD3.builds, ...MOD4.builds]) for (const id of b.requires || []) ok(CONCEPT_IDS.has(id), `${b.id} requires unknown concept ${id}`)
+  for (const b of [...MOD1.builds, ...MOD2.builds, ...MOD3.builds, ...MOD4.builds, ...MOD5.builds]) for (const id of b.requires || []) ok(CONCEPT_IDS.has(id), `${b.id} requires unknown concept ${id}`)
   // Every step kind used by the Beacon reference has a rosetta.
   const kinds = new Set()
   for (const f of Object.values(referenceFlowsFor('b6'))) fm.walkSteps(f.steps, (st) => kinds.add(st.kind))

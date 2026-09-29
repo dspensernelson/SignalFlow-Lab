@@ -32,8 +32,8 @@ The earlier worksheet lessons are retired; git history has them.
    a row, add-or-replace keys, count()).
 3. DONE - Meridian (module-01) as flows; the worksheet path (lesson
    workspace, validators, lesson lints) is removed.
-4. DONE - Relay (module-04) as flows.
-5. Modules 05-10 as flows, in order, from their charters in
+4. DONE - Relay (module-04) and Ledger (module-05) as flows.
+5. Modules 06-10 as flows, in order, from their charters in
    curriculum/charters/. A charter's map and scenario carry over; its
    interaction-type notes do not.
 

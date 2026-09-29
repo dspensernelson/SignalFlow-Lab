@@ -98,6 +98,20 @@
         "archive": "Triage Archive",
         "operate": "Triage Run Operations"
       }
+    },
+    "module-05": {
+      "org": "Ledger",
+      "deliverable": "Workday 5 close package",
+      "map": {
+        "intake": "Trial Balance",
+        "reference": "Recon Policy",
+        "transform": "Cash Reconciliation",
+        "decision": "Materiality Decision",
+        "handoff": "Sign-off Route",
+        "assembly": "Close Package",
+        "archive": "Close Archive",
+        "operate": "Close Run Operations"
+      }
     }
   }
 }
