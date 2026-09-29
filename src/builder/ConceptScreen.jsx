@@ -23,7 +23,7 @@ function JsonEditor({ value, onChange, error, onReset }) {
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">The record, as JSON - edit it</span>
+        <span className="text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">The record, as JSON</span>
         <button type="button" onClick={onReset} className="text-[11px] text-sf-subtle hover:text-sf-accent hover:underline">
           reset
         </button>
@@ -156,7 +156,6 @@ export default function ConceptScreen({ concept, skinId, onDone, onClose }) {
       <div className="mx-auto grid min-h-0 w-full max-w-[1680px] flex-1 grid-cols-12 gap-4 overflow-y-auto px-4 py-3">
         <section className="col-span-12 flex flex-col gap-3 lg:col-span-4">
           <div className="rounded-xl border border-sf-border bg-sf-surface p-3 shadow-sf-sm">
-            {exercise === 'json-edit' && <div className="mb-1 text-[10px] font-semibold uppercase tracking-sf-wide text-sf-subtle">The record</div>}
             {exercise === 'json-edit' ? (
               <>
                 <JsonEditor value={recordText} onChange={(v) => { setRecordText(v); setRun(null) }} error={jsonError} onReset={() => setRecordText(JSON.stringify(concept.brokenRecord, null, 2))} />
