@@ -1,11 +1,10 @@
 # Flow Module Playbook
 
-How to build (or port) a module as runnable flows. This replaces
-MODULE_AUTHORING_PLAYBOOK.md for everything a learner does; that document and
-the worksheet lint gates still govern module-01 until it is ported.
+How to build a module as runnable flows. This replaces
+MODULE_AUTHORING_PLAYBOOK.md (kept as history, like the retired worksheets).
 
-Worked examples: Beacon (`src/data/flows/module-02.json`) and Harbor
-(`src/data/flows/module-03.json`). Read one end to end before starting.
+Worked examples: Meridian, Beacon and Harbor (`src/data/flows/module-0X.json`
+and `.reference.js`). Read one end to end before starting.
 
 ## The shape of a module
 
@@ -52,9 +51,8 @@ Worked examples: Beacon (`src/data/flows/module-02.json`) and Harbor
    named by some build's `mapNodes` (lint-map). A node no build makes is
    removed from the map, not faked.
 5. Wire it: add the module to `FLOW_MODULE_LOADERS` in `src/App.jsx`.
-6. Retire the worksheets: delete the module's lessons, lesson registry,
-   `lessonMeta.json`, fixtures in `scripts/lesson-fixtures.json`, and its
-   `BUILT_LESSONS` block in `src/lib/projects.js`.
+6. (Worksheet retirement is finished; new modules have none to retire.)
+   Add the module's map to PROJECT_DATA in `src/lib/projects.js`.
 7. Glossary: `curriculum/<id>/glossary.json` `teachesIn` names build ids.
 8. Canon: `curriculum/<id>/canon.json` with `"format": "flows"` - facts
    about the raw data (`kind: data`) and the finished reference run

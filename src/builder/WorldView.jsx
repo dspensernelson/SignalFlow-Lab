@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button, Icon } from '../components/ui'
 import WorkflowGraph from '../components/WorkflowGraph'
 import NodeDetail from '../components/NodeDetail'
-import { STATUS } from '../lib/progress'
+import { STATUS } from '../lib/mapStatus.js'
 import { nodeStatusFromBuilds, nodeBuilds, NODE_STATUS } from '../lib/flowProgress.js'
 
 // The world view: the module's workflow map, lit up by what the learner has
@@ -55,13 +55,12 @@ export default function WorldView({ moduleData, project, nodes, phases, edges, p
         </div>
       </header>
       <div className="mx-auto flex w-full max-w-[1680px] flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
-        <p className="max-w-4xl text-sm text-sf-muted">{project ? project.goal : ''}</p>
+        <p className="max-w-4xl text-sm text-sf-muted">How the pieces connect. Click one to see what it is at work and which build makes it.</p>
         <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:gap-6">
           <WorkflowGraph
             nodes={nodes}
             phases={phases}
             edges={edges}
-            progress={{}}
             statusById={statusById}
             actionFor={(node) => {
               const a = actionFor(node)

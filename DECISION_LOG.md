@@ -2,6 +2,30 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-09-29 (Meridian as flows; the worksheet path removed)
+
+- MERIDIAN (module-01) PORTED: 3 flows (desk notes, overnight prices, the
+  6:30 AM brief), 3 days, 8 builds, 30 checks, 31 canon facts. Day 1 is the
+  canon morning (the 2 AM ERCOT spike: 187 vs forecast 170 and yesterday
+  165 -> +13.3%, escalate; MISO -5.1% routine; SPP 4.3% normal; sign-off
+  6:41 AM). Day 2: MISO's price arrives empty and the Day 1 flow calls it
+  normal - the fix marks it "no data" and tells the Risk Desk Lead; SPP moves
+  exactly 12.0% (the line is included). Day 3: the Desk Manager never
+  answers - the brief still goes at 7:00, marked pending, and the Risk Desk
+  Lead is told. Knock-on kept on purpose: Day 2's gap leaves MISO without a
+  Day 3 baseline, and the brief says so.
+- ENGINE: arithmetic results are tidied to 10 decimals (205.2 - 185 showed
+  as 20.19999999999999).
+- REMOVED (no remaining users): 45 Meridian lessons (the last), the lesson
+  workspace and every exercise component, validators, worksheet progress,
+  the tool-map/artifact viewers, unused UI primitives, and the lesson lints
+  (lint-lessons, lint-giveaway, validate-lessons, test-validators, fixtures).
+  `npm run check` is now: eslint, map lint, glossary lint, flow lint (with
+  canon), runtime tests (85), build. The map (WorldView) stays.
+- OPEN FOR THE OWNER: module order. The switcher lists Beacon, Harbor,
+  Meridian (the approved port order). Meridian is the gentlest start
+  (trigger + store first); say if it should come first.
+
 ## 2026-09-29 (cleanup pass, Harbor as flows, engine wave 1, canon)
 
 - OWNER (2026-09-29): "go" on: clean up P0 myself, then port Harbor on top of

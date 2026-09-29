@@ -16,10 +16,7 @@ overbearing. On every screen:
 - When adding something to a screen, remove or compact something else.
   Compactness wins over extra detail.
 
-## Worksheet screens (module-01 until it is ported)
+## Layout
 
-The legacy no-scroll rule still applies to worksheet Exercise screens: the
-source, the work area, the validation state and the next action fit together
-at innerHeight >= 800, including the wrong-answer state. The flow builder is
-exempt (a flow and its run trace scroll inside their panels); the page itself
-should not scroll at 1280x720 or larger.
+The flow builder may scroll inside its panels (a flow and its run trace grow),
+but the page itself must not scroll at 1280x720 or larger.

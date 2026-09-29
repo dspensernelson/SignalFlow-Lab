@@ -1,0 +1,997 @@
+{
+  "moduleId": "module-01",
+  "title": "Meridian Morning Brief",
+  "org": "Meridian Energy",
+  "intro": "Meridian's trading desk reads one document before the market opens: the 7:00 AM morning brief. You are going to build the automation behind it: log the desk's overnight notes, clean the overnight prices, compare them with the forecast and with yesterday, classify each market against the risk policy, get sign-off when a move is big, and deliver the brief. Then it meets mornings that do not go to plan.",
+  "world": {
+    "oneLiner": "Meridian Energy's trading desk gets an approval-ready morning brief at 7:00 AM: what moved overnight in each power market, how much, and whether anyone has signed off on the big moves.",
+    "roles": [
+      {
+        "name": "Overnight Desk Analyst",
+        "does": "Writes the overnight note: what happened in the markets while the desk slept."
+      },
+      {
+        "name": "Desk Trader",
+        "does": "Raises a flag when an overnight move looks like it needs a closer look."
+      },
+      {
+        "name": "Risk Desk Lead",
+        "does": "Owns the risk policy - how big a move has to be before someone signs off - and hears about bad data."
+      },
+      {
+        "name": "Desk Manager",
+        "does": "Signs off on any market that moved past the escalation threshold."
+      },
+      {
+        "name": "Trading Desk DL",
+        "does": "The distribution list that receives the brief at 7:00 AM."
+      }
+    ],
+    "deliverable": "the morning brief at 7:00 AM, every trading day",
+    "clock": "Overnight: notes and prices arrive. 6:30 AM: the brief flow reads everything, asks the Desk Manager if a move needs sign-off, and assembles the brief. 7:00 AM: the Trading Desk DL has it, and today's prices become tomorrow's baseline.",
+    "stakes": "Get it wrong and the desk trades on a number that was never checked, or on a brief that calls a market calm because its data never arrived."
+  },
+  "owners": [
+    "Overnight Desk Analyst",
+    "Desk Trader",
+    "Risk Desk Lead",
+    "Desk Manager",
+    "Trading Desk DL"
+  ],
+  "sources": [
+    {
+      "id": "desk-notes",
+      "label": "Desk Notes",
+      "labelField": "noteId",
+      "description": "The analyst's overnight note and any trader flags.",
+      "fields": [
+        "noteId",
+        "kind",
+        "from",
+        "hub",
+        "text"
+      ]
+    },
+    {
+      "id": "price-feed",
+      "label": "Price Feed",
+      "labelField": "hub",
+      "description": "One row per power market (hub) with its overnight prices, as text from the feed.",
+      "fields": [
+        "hub",
+        "peakPrice",
+        "settledPrice",
+        "interval",
+        "feedId"
+      ]
+    }
+  ],
+  "stores": [
+    {
+      "id": "intake-log",
+      "label": "Intake Log",
+      "daily": true,
+      "owner": "Overnight Desk Analyst",
+      "tone": "neutral",
+      "description": "This morning's notes and flags, as records the brief can read.",
+      "fields": [
+        "noteId",
+        "kind",
+        "from",
+        "hub",
+        "text"
+      ]
+    },
+    {
+      "id": "forecasts",
+      "label": "Forecasts",
+      "keyField": "hub",
+      "daily": true,
+      "owner": "Risk Desk Lead",
+      "tone": "neutral",
+      "description": "Today's expected peak price for each hub.",
+      "fields": [
+        "hub",
+        "forecast"
+      ]
+    },
+    {
+      "id": "prior-day",
+      "label": "Prior Day",
+      "keyField": "hub",
+      "owner": "Risk Desk Lead",
+      "tone": "neutral",
+      "description": "Yesterday's price for each hub - the baseline for today's move.",
+      "fields": [
+        "hub",
+        "price"
+      ]
+    },
+    {
+      "id": "risk-policy",
+      "label": "Risk Policy",
+      "keyField": "version",
+      "owner": "Risk Desk Lead",
+      "tone": "neutral",
+      "description": "How big a day-over-day move has to be: routineThreshold% is worth a note, escalationThreshold% needs sign-off.",
+      "fields": [
+        "version",
+        "routineThreshold",
+        "escalationThreshold",
+        "approver"
+      ]
+    },
+    {
+      "id": "hub-moves",
+      "label": "Hub Moves",
+      "keyField": "hub",
+      "daily": true,
+      "owner": "Risk Desk Lead",
+      "tone": "neutral",
+      "description": "Today's clean price, move and status for each hub.",
+      "fields": [
+        "hub",
+        "price",
+        "vsForecast",
+        "pctMove",
+        "status"
+      ]
+    },
+    {
+      "id": "brief-archive",
+      "label": "Brief Archive",
+      "keyField": "runId",
+      "owner": "Desk Manager",
+      "tone": "good",
+      "description": "Every brief delivered, kept 30 days.",
+      "fields": [
+        "runId",
+        "escalations"
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "notes-flow",
+      "name": "Desk notes",
+      "description": "Runs once per note or flag.",
+      "trigger": {
+        "mode": "event",
+        "source": "desk-notes"
+      }
+    },
+    {
+      "id": "price-flow",
+      "name": "Overnight prices",
+      "description": "Runs once per hub in the price feed.",
+      "trigger": {
+        "mode": "event",
+        "source": "price-feed"
+      }
+    },
+    {
+      "id": "brief-flow",
+      "name": "The 6:30 AM brief",
+      "description": "Runs every morning at 6:30: read everything, get sign-off, deliver.",
+      "trigger": {
+        "mode": "schedule",
+        "at": "6:30 AM"
+      }
+    }
+  ],
+  "days": [
+    {
+      "id": "day-1",
+      "label": "Day 1 - the 2 AM spike",
+      "description": "ERCOT spiked around 2 AM. The analyst's note explains it and a trader has flagged it. Three hubs, clean prices, and a Desk Manager who answers.",
+      "sources": {
+        "desk-notes": [
+          {
+            "noteId": "N-0601",
+            "kind": "analyst note",
+            "from": "Overnight Desk Analyst",
+            "hub": "ERCOT",
+            "text": "ERCOT spiked near 2 AM on a wind shortfall; watch the morning ramp."
+          },
+          {
+            "noteId": "F-0601",
+            "kind": "trader flag",
+            "from": "Desk Trader",
+            "hub": "ERCOT",
+            "text": "The 2 AM spike looks real, not a feed error."
+          }
+        ],
+        "price-feed": [
+          {
+            "hub": "ERCOT",
+            "peakPrice": "$187.00",
+            "settledPrice": "$142.00",
+            "interval": "HE02",
+            "feedId": "ERCOT overnight"
+          },
+          {
+            "hub": "SPP",
+            "peakPrice": "$96.00",
+            "settledPrice": "$88.00",
+            "interval": "HE02",
+            "feedId": "SPP overnight"
+          },
+          {
+            "hub": "MISO",
+            "peakPrice": "$74.00",
+            "settledPrice": "$70.00",
+            "interval": "HE02",
+            "feedId": "MISO overnight"
+          }
+        ]
+      },
+      "seeds": {
+        "forecasts": [
+          {
+            "hub": "ERCOT",
+            "forecast": 170
+          },
+          {
+            "hub": "SPP",
+            "forecast": 96
+          },
+          {
+            "hub": "MISO",
+            "forecast": 80
+          }
+        ],
+        "prior-day": [
+          {
+            "hub": "ERCOT",
+            "price": 165
+          },
+          {
+            "hub": "SPP",
+            "price": 92
+          },
+          {
+            "hub": "MISO",
+            "price": 78
+          }
+        ],
+        "risk-policy": [
+          {
+            "version": "1.0.0",
+            "routineThreshold": 5,
+            "escalationThreshold": 12,
+            "approver": "Desk Manager"
+          }
+        ]
+      },
+      "approvals": {
+        "Desk Manager": {
+          "outcome": "approved",
+          "at": "6:41 AM"
+        }
+      },
+      "failures": []
+    },
+    {
+      "id": "day-2",
+      "label": "Day 2 - a gap in the feed",
+      "description": "The MISO feed was down between 3 and 5 AM and its price arrives empty. SPP moved exactly 12.0 percent - right on the line. Your Day 1 flow will call MISO calm.",
+      "sources": {
+        "desk-notes": [
+          {
+            "noteId": "N-0602",
+            "kind": "analyst note",
+            "from": "Overnight Desk Analyst",
+            "hub": "SPP",
+            "text": "SPP firmed overnight on a transmission outage in the north."
+          },
+          {
+            "noteId": "N-0603",
+            "kind": "analyst note",
+            "from": "Overnight Desk Analyst",
+            "hub": "MISO",
+            "text": "The MISO feed was down 3 to 5 AM; expect a gap."
+          }
+        ],
+        "price-feed": [
+          {
+            "hub": "ERCOT",
+            "peakPrice": "$180.00",
+            "settledPrice": "$150.00",
+            "interval": "HE02",
+            "feedId": "ERCOT overnight"
+          },
+          {
+            "hub": "SPP",
+            "peakPrice": "$107.52",
+            "settledPrice": "$95.00",
+            "interval": "HE02",
+            "feedId": "SPP overnight"
+          },
+          {
+            "hub": "MISO",
+            "peakPrice": "",
+            "settledPrice": "",
+            "interval": "HE02",
+            "feedId": "MISO overnight"
+          }
+        ]
+      },
+      "seeds": {
+        "forecasts": [
+          {
+            "hub": "ERCOT",
+            "forecast": 175
+          },
+          {
+            "hub": "SPP",
+            "forecast": 100
+          },
+          {
+            "hub": "MISO",
+            "forecast": 76
+          }
+        ]
+      },
+      "approvals": {
+        "Desk Manager": {
+          "outcome": "approved",
+          "at": "6:44 AM"
+        }
+      },
+      "failures": []
+    },
+    {
+      "id": "day-3",
+      "label": "Day 3 - nobody signs",
+      "description": "ERCOT jumps again. The flow asks the Desk Manager to sign off - and the Desk Manager is stuck on a call and never answers. The brief is due at 7:00 regardless. (MISO is back in the feed, but yesterday's gap left no baseline, so its move still cannot be computed.)",
+      "sources": {
+        "desk-notes": [
+          {
+            "noteId": "N-0604",
+            "kind": "analyst note",
+            "from": "Overnight Desk Analyst",
+            "hub": "ERCOT",
+            "text": "Heat returns; ERCOT evening peak likely higher."
+          },
+          {
+            "noteId": "F-0604",
+            "kind": "trader flag",
+            "from": "Desk Trader",
+            "hub": "ERCOT",
+            "text": "Watch ERCOT at the open."
+          }
+        ],
+        "price-feed": [
+          {
+            "hub": "ERCOT",
+            "peakPrice": "$205.20",
+            "settledPrice": "$160.00",
+            "interval": "HE02",
+            "feedId": "ERCOT overnight"
+          },
+          {
+            "hub": "SPP",
+            "peakPrice": "$104.30",
+            "settledPrice": "$92.00",
+            "interval": "HE02",
+            "feedId": "SPP overnight"
+          },
+          {
+            "hub": "MISO",
+            "peakPrice": "$71.00",
+            "settledPrice": "$66.00",
+            "interval": "HE02",
+            "feedId": "MISO overnight"
+          }
+        ]
+      },
+      "seeds": {
+        "forecasts": [
+          {
+            "hub": "ERCOT",
+            "forecast": 185
+          },
+          {
+            "hub": "SPP",
+            "forecast": 105
+          },
+          {
+            "hub": "MISO",
+            "forecast": 72
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  ],
+  "builds": [
+    {
+      "id": "b1",
+      "dayId": "day-1",
+      "flowId": "notes-flow",
+      "title": "Log the desk notes",
+      "brief": "Turn each overnight note into a record the brief can read.",
+      "goal": "The analyst's note and the trader's flag arrive as messages. The brief can only use what it can read as data, so the first job is to capture each one as a record in the Intake Log.",
+      "outcome": "Every note and flag that arrives overnight is a record in the Intake Log.",
+      "constraints": [
+        "Capture every message, note and flag alike.",
+        "Keep who sent it and which hub it is about."
+      ],
+      "requires": [
+        "trigger",
+        "store",
+        "json-record"
+      ],
+      "hints": {
+        "question": "If the brief has to quote the trader's flag at 6:30, where does it look?",
+        "nudge": "A Trigger on Desk Notes and a Store into the Intake Log. Each message already arrives as fields.",
+        "steps": [
+          "Connect the Trigger to Desk Notes.",
+          "Add a Store into the Intake Log.",
+          "Run it: two records, one note and one flag."
+        ]
+      },
+      "mapNodes": [
+        "analyst-notes",
+        "trader-flag",
+        "market-intake-record"
+      ],
+      "checks": [
+        {
+          "id": "b1-run",
+          "kind": "runStatus",
+          "flowId": "notes-flow",
+          "equals": "succeeded",
+          "why": "If intake fails, the brief goes out without the desk's own read of the night.",
+          "label": "The notes flow runs without failing"
+        },
+        {
+          "id": "b1-both",
+          "kind": "storeCount",
+          "store": "intake-log",
+          "equals": 2,
+          "why": "A flag that is not logged is a warning nobody reads.",
+          "label": "Both messages are in the Intake Log"
+        },
+        {
+          "id": "b1-flag",
+          "kind": "storeContains",
+          "store": "intake-log",
+          "where": {
+            "noteId": "F-0601"
+          },
+          "fields": {
+            "kind": "trader flag",
+            "hub": "ERCOT"
+          },
+          "why": "The flag is what tells the Desk Manager the spike is real.",
+          "label": "The trader's ERCOT flag is logged"
+        }
+      ]
+    },
+    {
+      "id": "b2",
+      "dayId": "day-1",
+      "flowId": "price-flow",
+      "title": "Clean the prices",
+      "brief": "Turn each hub's price from text into a number.",
+      "goal": "The price feed sends one row per hub, and every price arrives as text: \"$187.00\". Text can be read by a person but cannot be added, compared or charted. Clean each price into a number and keep one row per hub in Hub Moves.",
+      "outcome": "Every hub in the feed has a numeric price in Hub Moves.",
+      "constraints": [
+        "The number goes in a field called price.",
+        "Clean it once here; everything downstream reads price."
+      ],
+      "requires": [
+        "transform",
+        "data-types"
+      ],
+      "hints": {
+        "question": "What is \"$187.00\" plus \"$96.00\"?",
+        "nudge": "A Transform with num() turns text like \"$187.00\" into 187. Then a Store into Hub Moves.",
+        "steps": [
+          "Connect the Trigger to the Price Feed.",
+          "Add a Transform: price = num(peakPrice).",
+          "Add a Store into Hub Moves.",
+          "Run it and open the Data tab: the prices add up to 357."
+        ]
+      },
+      "mapNodes": [
+        "price-feed",
+        "clean-price-data"
+      ],
+      "checks": [
+        {
+          "id": "b2-rows",
+          "kind": "storeCount",
+          "store": "hub-moves",
+          "equals": 3,
+          "why": "One row per hub, or the brief skips a market.",
+          "label": "Hub Moves has one row per hub (3)"
+        },
+        {
+          "id": "b2-total",
+          "kind": "storeSum",
+          "store": "hub-moves",
+          "field": "price",
+          "equals": 357,
+          "why": "If the prices add up, they are numbers; text never adds up.",
+          "label": "The prices are numbers that add up (357)"
+        },
+        {
+          "id": "b2-ercot",
+          "kind": "storeContains",
+          "store": "hub-moves",
+          "where": {
+            "hub": "ERCOT"
+          },
+          "fields": {
+            "price": 187
+          },
+          "why": "ERCOT's 187 is the number the whole morning is about.",
+          "label": "ERCOT's price is 187"
+        }
+      ]
+    },
+    {
+      "id": "b3",
+      "dayId": "day-1",
+      "flowId": "price-flow",
+      "title": "Compare",
+      "brief": "Work out how far each hub moved from its forecast and from yesterday.",
+      "goal": "A price on its own says nothing. The desk wants two comparisons for every hub: against today's forecast, and against yesterday's price - the second as a percent, because a 10 dollar move means more on a 70 dollar market than on a 180 dollar one.",
+      "outcome": "Every hub carries vsForecast, vsPriorDay and pctMove, computed from the Forecasts and Prior Day tables.",
+      "constraints": [
+        "Both tables are keyed by hub.",
+        "pctMove is the move against yesterday as a percent, rounded to one decimal."
+      ],
+      "requires": [
+        "lookup",
+        "fields-and-paths"
+      ],
+      "hints": {
+        "question": "ERCOT is at 187. Is that high?",
+        "nudge": "Two Lookups by hub attach forecast and prior; one Transform computes vsForecast = price - forecast.forecast, vsPriorDay = price - prior.price, pctMove = round(vsPriorDay / prior.price * 100, 1).",
+        "steps": [
+          "After the price Transform, add a Lookup on Forecasts where hub = hub. Name it forecast.",
+          "Add a Lookup on Prior Day where hub = hub. Name it prior.",
+          "Add a Transform: vsForecast = price - forecast.forecast, vsPriorDay = price - prior.price, pctMove = round(vsPriorDay / prior.price * 100, 1).",
+          "Keep the Store last. Run it."
+        ]
+      },
+      "mapNodes": [
+        "forecast-data",
+        "prior-day-reference",
+        "variance-check"
+      ],
+      "checks": [
+        {
+          "id": "b3-ercot",
+          "kind": "storeContains",
+          "store": "hub-moves",
+          "where": {
+            "hub": "ERCOT"
+          },
+          "fields": {
+            "vsForecast": 17,
+            "pctMove": 13.3
+          },
+          "why": "ERCOT is 17 over forecast and 13.3 percent up on yesterday - the spike, in numbers.",
+          "label": "ERCOT: 17 over forecast, up 13.3%"
+        },
+        {
+          "id": "b3-spp",
+          "kind": "storeContains",
+          "store": "hub-moves",
+          "where": {
+            "hub": "SPP"
+          },
+          "fields": {
+            "vsForecast": 0,
+            "pctMove": 4.3
+          },
+          "why": "SPP landed on its forecast and moved a little.",
+          "label": "SPP: on forecast, up 4.3%"
+        },
+        {
+          "id": "b3-miso",
+          "kind": "storeContains",
+          "store": "hub-moves",
+          "where": {
+            "hub": "MISO"
+          },
+          "fields": {
+            "vsForecast": -6,
+            "pctMove": -5.1
+          },
+          "why": "A fall is a move too.",
+          "label": "MISO: 6 under forecast, down 5.1%"
+        }
+      ]
+    },
+    {
+      "id": "b4",
+      "dayId": "day-1",
+      "flowId": "price-flow",
+      "title": "Classify",
+      "brief": "Label each hub normal, routine or escalate, using the risk policy.",
+      "goal": "The Risk Desk Lead owns the rule: a day-over-day move of 12 percent or more, up or down, needs sign-off (escalate); 5 percent or more is worth a note (routine); anything smaller is normal. Read the thresholds from the Risk Policy and label every hub.",
+      "outcome": "Every hub carries a status - normal, routine or escalate - from the Risk Policy.",
+      "constraints": [
+        "Read the thresholds from the Risk Policy; do not type 5 and 12.",
+        "A fall counts the same as a rise: use the size of the move.",
+        "12 or more is escalate - the line is included."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "MISO fell 5.1 percent. Is that calmer than rising 5.1 percent?",
+        "nudge": "A Lookup on Risk Policy (version '1.0.0') attaches policy; one Transform sets status with if(): if(abs(pctMove) >= policy.escalationThreshold, 'escalate', if(abs(pctMove) >= policy.routineThreshold, 'routine', 'normal')).",
+        "steps": [
+          "Add a Lookup on Risk Policy where version = '1.0.0'. Name it policy.",
+          "Add a Transform: status = if(abs(pctMove) >= policy.escalationThreshold, 'escalate', if(abs(pctMove) >= policy.routineThreshold, 'routine', 'normal')).",
+          "Keep the Store last. Run it."
+        ]
+      },
+      "mapNodes": [
+        "threshold-policy",
+        "risk-evaluation",
+        "routine-update-path"
+      ],
+      "checks": [
+        {
+          "id": "b4-ercot",
+          "kind": "storeContains",
+          "store": "hub-moves",
+          "where": {
+            "hub": "ERCOT"
+          },
+          "fields": {
+            "status": "escalate"
+          },
+          "why": "13.3 percent is past the 12 percent line; someone has to sign off.",
+          "label": "ERCOT escalates (13.3% >= 12%)"
+        },
+        {
+          "id": "b4-miso",
+          "kind": "storeContains",
+          "store": "hub-moves",
+          "where": {
+            "hub": "MISO"
+          },
+          "fields": {
+            "status": "routine"
+          },
+          "why": "A 5.1 percent fall is worth a line in the brief.",
+          "label": "MISO is routine (a 5.1% fall)"
+        },
+        {
+          "id": "b4-spp",
+          "kind": "storeContains",
+          "store": "hub-moves",
+          "where": {
+            "hub": "SPP"
+          },
+          "fields": {
+            "status": "normal"
+          },
+          "why": "4.3 percent is under the routine line.",
+          "label": "SPP is normal (4.3%)"
+        }
+      ]
+    },
+    {
+      "id": "b5",
+      "dayId": "day-1",
+      "flowId": "brief-flow",
+      "title": "The brief, signed off",
+      "brief": "At 6:30, get sign-off on the big moves and send the brief.",
+      "goal": "At 6:30 the brief flow reads every hub and every note. If any hub escalates, the Desk Manager has to sign off before the brief goes out. Then assemble the brief - each hub's price, move and status, and the desk's notes - send it to the Trading Desk DL and archive it.",
+      "outcome": "At 7:00 the Trading Desk DL has a brief that lists every hub and note and shows the Desk Manager's sign-off on the escalated move; a copy is archived.",
+      "constraints": [
+        "Count the escalations into a field called escalations.",
+        "Ask for sign-off only when something escalates.",
+        "The brief reads what earlier steps computed; it never recomputes."
+      ],
+      "requires": [
+        "schedule-trigger",
+        "lookup-all",
+        "lists",
+        "condition",
+        "approval",
+        "compose",
+        "send"
+      ],
+      "hints": {
+        "question": "On a quiet morning, should the Desk Manager be asked anything?",
+        "nudge": "Read Hub Moves and the Intake Log as lists; count(moves, 'status', 'escalate') gives the escalations; a Condition on escalations > 0 holds an Approval in its YES lane. After the Condition: Compose the brief with {{#each moves}} and {{#each notes}}, Send it, Store it.",
+        "steps": [
+          "Add a Lookup on Hub Moves, all rows. Name it moves.",
+          "Add a Lookup on Intake Log, all rows. Name it notes.",
+          "Transform: escalations = count(moves, 'status', 'escalate').",
+          "Condition: escalations > 0. YES lane: Approval from Desk Manager about 'overnight moves'.",
+          "After the Condition: Compose brief: '# Morning Brief' + {{#each moves}}- {{hub}}: {{price}} ({{pctMove}}%) {{status}}{{/each}} + {{#each notes}}- {{from}}: {{text}}{{/each}} + 'Sign-off: {{approval.outcome}}'.",
+          "Send to Trading Desk DL with {{brief}} as the body; Store into Brief Archive."
+        ]
+      },
+      "mapNodes": [
+        "approval-template",
+        "approval-decision",
+        "approval-route",
+        "prior-day-brief-template",
+        "morning-brief"
+      ],
+      "checks": [
+        {
+          "id": "b5-run",
+          "kind": "runStatus",
+          "flowId": "brief-flow",
+          "equals": "succeeded",
+          "why": "A brief flow that fails is a desk that opens blind.",
+          "label": "The brief flow runs without failing"
+        },
+        {
+          "id": "b5-count",
+          "kind": "recordField",
+          "where": {
+            "runId": "day-1-run"
+          },
+          "field": "escalations",
+          "equals": 1,
+          "why": "The Desk Manager signs off on a known number of moves.",
+          "label": "The run counts 1 escalation"
+        },
+        {
+          "id": "b5-signed",
+          "kind": "recordField",
+          "where": {
+            "runId": "day-1-run"
+          },
+          "field": "approval.outcome",
+          "equals": "approved",
+          "why": "A big move goes out only with a recorded sign-off.",
+          "label": "The Desk Manager's sign-off is captured"
+        },
+        {
+          "id": "b5-sent",
+          "kind": "outboxContains",
+          "to": "Trading Desk DL",
+          "contains": "ERCOT",
+          "why": "The brief exists to tell the desk about ERCOT.",
+          "label": "The Trading Desk DL receives the brief, and it names ERCOT"
+        },
+        {
+          "id": "b5-notes",
+          "kind": "outboxContains",
+          "to": "Trading Desk DL",
+          "contains": "wind shortfall",
+          "why": "The analyst's note is the why behind the number.",
+          "label": "The brief carries the analyst's note (wind shortfall)"
+        },
+        {
+          "id": "b5-archive",
+          "kind": "storeContains",
+          "store": "brief-archive",
+          "where": {
+            "runId": "day-1-run"
+          },
+          "why": "The archive is the record of what the desk was told.",
+          "label": "The brief is archived"
+        }
+      ]
+    },
+    {
+      "id": "b6",
+      "dayId": "day-1",
+      "flowId": "brief-flow",
+      "title": "Seed tomorrow",
+      "brief": "Make today's prices tomorrow's baseline.",
+      "goal": "Tomorrow's brief compares tomorrow's prices with today's. That only works if, after the brief goes out, today's prices replace yesterday's in the Prior Day table - one row per hub, however many times the flow runs.",
+      "outcome": "After every brief, Prior Day holds today's price for every hub, ready for tomorrow.",
+      "constraints": [
+        "One row per hub in Prior Day - replace, never add.",
+        "Write from the list of moves the brief already read."
+      ],
+      "requires": [
+        "upsert"
+      ],
+      "hints": {
+        "question": "Tomorrow at 6:30, where will the flow look for yesterday's price?",
+        "nudge": "At the end of the brief flow, a Store into Prior Day, rows from moves, add-or-replace by hub.",
+        "steps": [
+          "At the end of the brief flow, add a Store into Prior Day.",
+          "How: add, or replace if it exists. Same row when: hub. Rows from: moves.",
+          "Run it and open Prior Day in the Data tab."
+        ]
+      },
+      "mapNodes": [
+        "distribution-archive",
+        "prior-day-reference"
+      ],
+      "checks": [
+        {
+          "id": "b6-ercot",
+          "kind": "storeContains",
+          "store": "prior-day",
+          "where": {
+            "hub": "ERCOT"
+          },
+          "fields": {
+            "price": 187
+          },
+          "why": "Tomorrow's ERCOT move is measured from today's 187.",
+          "label": "Prior Day now holds ERCOT at 187"
+        },
+        {
+          "id": "b6-miso",
+          "kind": "storeContains",
+          "store": "prior-day",
+          "where": {
+            "hub": "MISO"
+          },
+          "fields": {
+            "price": 74
+          },
+          "why": "Every hub needs tomorrow's baseline, not just the busy one.",
+          "label": "Prior Day now holds MISO at 74"
+        },
+        {
+          "id": "b6-one-each",
+          "kind": "storeCount",
+          "store": "prior-day",
+          "equals": 3,
+          "why": "Two baselines for one hub means two answers to 'how much did it move?'.",
+          "label": "Still one row per hub (3)"
+        }
+      ]
+    },
+    {
+      "id": "b7",
+      "dayId": "day-2",
+      "flowId": "price-flow",
+      "title": "Day 2: a gap in the feed",
+      "brief": "MISO's price is missing. Say so - don't call it calm.",
+      "goal": "The MISO feed was down and its price arrived empty. Run your Day 1 flow and read MISO in Hub Moves: no price, no move - and the status says normal. The brief is about to tell the desk MISO was calm. When a hub's move cannot be computed, mark it no data, tell the Risk Desk Lead, and let the brief say so.",
+      "outcome": "A hub whose move cannot be computed is marked 'no data' in Hub Moves and in the brief, and the Risk Desk Lead is told; it is never labelled normal.",
+      "constraints": [
+        "Missing is not zero, and it is not normal.",
+        "Check before classifying: a guard, then the policy.",
+        "The hub still appears in the brief - as no data."
+      ],
+      "requires": [
+        "stop"
+      ],
+      "hints": {
+        "question": "What does your flow do with a move it could not compute?",
+        "nudge": "After the compare Transform, a Condition on pctMove missing. YES lane: set status = 'no data', Send to Risk Desk Lead, Store into Hub Moves, Stop - so the classification below never sees it.",
+        "steps": [
+          "Run first and open MISO in the run: follow pctMove.",
+          "After the compare Transform, add a Condition: pctMove missing.",
+          "YES lane: Transform status = 'no data'; Send to Risk Desk Lead ('No move for {{hub}} today'); Store into Hub Moves; Stop.",
+          "Run again: MISO says no data, and so does the brief."
+        ]
+      },
+      "mapNodes": [
+        "clean-price-data",
+        "risk-evaluation"
+      ],
+      "checks": [
+        {
+          "id": "b7-nodata",
+          "kind": "storeContains",
+          "store": "hub-moves",
+          "where": {
+            "hub": "MISO"
+          },
+          "fields": {
+            "status": "no data"
+          },
+          "why": "A missing number reported as calm is worse than no report at all",
+          "label": "MISO is marked no data, not normal"
+        },
+        {
+          "id": "b7-told",
+          "kind": "outboxContains",
+          "to": "Risk Desk Lead",
+          "contains": "MISO",
+          "why": "The Risk Desk Lead owns the data; a gap needs a person chasing the feed.",
+          "label": "The Risk Desk Lead is told about MISO"
+        },
+        {
+          "id": "b7-brief",
+          "kind": "outboxContains",
+          "to": "Trading Desk DL",
+          "contains": "no data",
+          "why": "The desk has to see the gap in the brief itself.",
+          "label": "The brief says no data"
+        },
+        {
+          "id": "b7-boundary",
+          "kind": "storeContains",
+          "store": "hub-moves",
+          "where": {
+            "hub": "SPP"
+          },
+          "fields": {
+            "pctMove": 12,
+            "status": "escalate"
+          },
+          "why": "The policy says 12 or more; 12.0 is on the line and the line is included.",
+          "label": "SPP escalates at exactly 12.0%"
+        },
+        {
+          "id": "b7-rows",
+          "kind": "storeCount",
+          "store": "hub-moves",
+          "equals": 3,
+          "why": "The gap hub is reported once, not skipped and not doubled.",
+          "label": "Hub Moves still has one row per hub (3)"
+        }
+      ]
+    },
+    {
+      "id": "b8",
+      "dayId": "day-3",
+      "flowId": "brief-flow",
+      "title": "Day 3: nobody signs",
+      "brief": "The Desk Manager never answers. The brief still goes at 7:00 - marked pending.",
+      "goal": "ERCOT escalates and the flow asks the Desk Manager - who never answers. Run your Day 2 flow: the brief either waits forever or goes out looking signed. The deadline does not wait for people. When sign-off does not come, send the brief anyway, clearly marked pending sign-off, and tell the Risk Desk Lead.",
+      "outcome": "When sign-off does not arrive, the brief still reaches the desk at 7:00, marked pending sign-off, and the Risk Desk Lead is told; nothing pretends to be approved.",
+      "constraints": [
+        "The brief always goes out at 7:00.",
+        "Unsigned is shown as pending, in words the desk cannot miss.",
+        "A person who can chase the sign-off is told."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "At 6:59, with no answer, what should the desk be told?",
+        "nudge": "After the Approval, a Condition on approval.outcome != 'approved' (inside the escalation lane). YES lane: Transform signoff = 'PENDING SIGN-OFF', Send to Risk Desk Lead. Put {{signoff}} at the top of the brief.",
+        "steps": [
+          "Run first and read the brief the desk gets.",
+          "Inside the escalation YES lane, after the Approval, add a Condition: approval.outcome != approved.",
+          "Its YES lane: Transform signoff = 'PENDING SIGN-OFF'; Send to Risk Desk Lead ('No sign-off on {{escalations}} escalated hub(s)').",
+          "Add {{signoff}} to the first line of the brief. Run again."
+        ]
+      },
+      "mapNodes": [
+        "run-operations",
+        "approval-route"
+      ],
+      "checks": [
+        {
+          "id": "b8-sent",
+          "kind": "outboxContains",
+          "to": "Trading Desk DL",
+          "count": 1,
+          "why": "The desk opens at 7:00 whether or not anyone signed.",
+          "label": "The brief still goes out, once"
+        },
+        {
+          "id": "b8-pending",
+          "kind": "outboxContains",
+          "to": "Trading Desk DL",
+          "contains": "pending",
+          "why": "An unsigned brief that looks signed is the worst outcome available.",
+          "label": "The brief is marked pending sign-off"
+        },
+        {
+          "id": "b8-told",
+          "kind": "outboxContains",
+          "to": "Risk Desk Lead",
+          "recordLabel": "Scheduled run 6:30 AM",
+          "why": "Someone has to chase the Desk Manager before the open.",
+          "label": "The Risk Desk Lead is told the sign-off is missing"
+        },
+        {
+          "id": "b8-archive",
+          "kind": "storeContains",
+          "store": "brief-archive",
+          "where": {
+            "runId": "day-3-run"
+          },
+          "why": "What the desk was told, unsigned, is still the record.",
+          "label": "The pending brief is archived"
+        }
+      ]
+    }
+  ]
+}

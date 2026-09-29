@@ -186,7 +186,7 @@ function learnerText(lesson) {
 }
 
 const lessons = {}
-for (const file of readdirSync(lessonsDir).filter((f) => f.endsWith('.json'))) {
+for (const file of existsSync(lessonsDir) ? readdirSync(lessonsDir).filter((f) => f.endsWith('.json')) : []) {
   const lesson = JSON.parse(readFileSync(path.join(lessonsDir, file), 'utf8'))
   lessons[lesson.id] = lesson
 }

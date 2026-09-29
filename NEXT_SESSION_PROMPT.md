@@ -5,17 +5,16 @@ You are the builder for SignalFlow Lab. Read BUILDER_KICKOFF.md, then
 FLOW_MODULE_PLAYBOOK.md, then the top of DECISION_LOG.md. Run `npm run check`
 before touching anything.
 
-STATE: Beacon (module-02) and Harbor (module-03) are runnable-flow modules:
-the learner builds flows, runs them on three days of scenario data, watches
-Day 2 break the Day 1 flow and Day 3 break Day 2, and sees the same flow in
-Power Automate, Make, n8n, Zapier and Python. Meridian (module-01) is still
-worksheet lessons.
+STATE: Meridian (module-01), Beacon (module-02) and Harbor (module-03) are
+runnable-flow modules: the learner builds flows, runs them on three days of
+scenario data, watches Day 2 break the Day 1 flow and Day 3 break Day 2, and
+sees the same flow in Power Automate, Make, n8n, Zapier and Python. The
+worksheet lessons are retired.
 
 OWNER DIRECTION: simple and polished, minimal text. One short line per
 build; everything else behind a disclosure; one "Fix this next" line.
 
-NEXT: port Meridian (module-01) to flows per FLOW_MODULE_PLAYBOOK.md, then
-retire the worksheet path once nothing uses it; then modules 04-10 in order
-from curriculum/charters/. Walk every screen in a real browser. Never weaken
+NEXT: modules 04-10 in order from curriculum/charters/, per
+FLOW_MODULE_PLAYBOOK.md. Walk every screen in a real browser. Never weaken
 a check. Do not merge or deploy.
 ```

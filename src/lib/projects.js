@@ -1,21 +1,17 @@
 // Multi-project registry and per-project static data access.
 //
-// One app, many modules (projects). Each project owns its map data, lesson
-// registry, unlock tree, canon, and per-tier storage. Module 1 keeps every
-// legacy storage key and behavior byte-for-byte (see progress.js keyFor).
+// One app, many modules (projects). Each project owns its workflow map; its
+// builds, days and checks live in src/data/flows/<id>.json.
 //
-// Data is statically imported per project using the same explicit-registry
-// pattern App uses for its LESSONS map, so the bundler can tree-shake and no
-// dynamic path building is needed. New modules add: a projects.json entry, a
-// src/data/projects/<id>/ data directory, a PROJECT_DATA entry here, and a
-// BUILT_LESSONS[<id>] block.
+// Each project's workflow map (nodes, phases, edges) is statically imported
+// here. A new module adds a projects.json entry, a src/data/projects/<id>/
+// directory, a PROJECT_DATA entry here, and a flow module in src/data/flows.
 
 import projects from '../data/projects.json'
 
 import module01Nodes from '../data/projects/module-01/workflowNodes.json'
 import module01Phases from '../data/projects/module-01/phases.json'
 import module01Edges from '../data/projects/module-01/workflowEdges.json'
-import module01LessonMeta from '../data/projects/module-01/lessonMeta.json'
 
 import module02Nodes from '../data/projects/module-02/workflowNodes.json'
 import module02Phases from '../data/projects/module-02/phases.json'
@@ -41,78 +37,16 @@ const PROJECT_DATA = {
     nodes: module01Nodes,
     phases: module01Phases,
     edges: module01Edges,
-    lessonMeta: module01LessonMeta,
   },
   'module-02': {
     nodes: module02Nodes,
     phases: module02Phases,
     edges: module02Edges,
-    lessonMeta: null, // retired: module-02 is a runnable-flow module (src/data/flows)
   },
   'module-03': {
     nodes: module03Nodes,
     phases: module03Phases,
     edges: module03Edges,
-    lessonMeta: null, // retired: module-03 is a runnable-flow module (src/data/flows)
-  },
-}
-
-// Lessons built per project, per tier. Lesson ids are globally unique and the
-// lesson files stay flat in src/data/lessons/. Keep each tier list in sync
-// with App's LESSONS map.
-export const BUILT_LESSONS = {
-  'module-01': {
-    easy: [
-      'lesson-brief-operations',
-      'lesson-intake',
-      'lesson-threshold-policy',
-      'lesson-clean-price-data',
-      'lesson-variance-check',
-      'lesson-risk-evaluation',
-      'lesson-approval-template',
-      'lesson-approval-decision',
-      'lesson-approval-route',
-      'lesson-routine-update-path',
-      'lesson-distribution-archive',
-      'lesson-analyst-notes',
-      'lesson-trader-flag',
-      'lesson-price-feed',
-      'lesson-forecast-data',
-      'lesson-prior-day-reference',
-      'lesson-prior-day-brief-template',
-      'lesson-morning-brief',
-    ],
-    medium: [
-      'lesson-brief-operations-medium',
-      'lesson-intake-medium',
-      'lesson-clean-price-data-medium',
-      'lesson-threshold-policy-medium',
-      'lesson-variance-check-medium',
-      'lesson-risk-evaluation-medium',
-      'lesson-approval-decision-medium',
-      'lesson-approval-route-medium',
-      'lesson-analyst-notes-medium',
-      'lesson-trader-flag-medium',
-      'lesson-price-feed-medium',
-      'lesson-forecast-data-medium',
-      'lesson-prior-day-reference-medium',
-      'lesson-prior-day-brief-template-medium',
-      'lesson-approval-template-medium',
-      'lesson-routine-update-path-medium',
-      'lesson-morning-brief-medium',
-      'lesson-distribution-archive-medium',
-    ],
-    hard: [
-      'lesson-brief-operations-hard',
-      'lesson-intake-hard',
-      'lesson-threshold-policy-hard',
-      'lesson-price-feed-hard',
-      'lesson-approval-route-hard',
-      'lesson-risk-evaluation-hard',
-      'lesson-morning-brief-hard',
-      'lesson-distribution-archive-hard',
-      'lesson-approval-decision-hard',
-    ],
   },
 }
 

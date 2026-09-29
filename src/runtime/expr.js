@@ -230,12 +230,18 @@ function arith(op, a, b) {
   const na = toNumber(a)
   const nb = toNumber(b)
   if (na === null || nb === null) return null
-  if (op === '+') return na + nb
-  if (op === '-') return na - nb
-  if (op === '*') return na * nb
-  if (op === '/') return nb === 0 ? null : na / nb
-  if (op === '%') return nb === 0 ? null : na % nb
+  if (op === '+') return tidy(na + nb)
+  if (op === '-') return tidy(na - nb)
+  if (op === '*') return tidy(na * nb)
+  if (op === '/') return nb === 0 ? null : tidy(na / nb)
+  if (op === '%') return nb === 0 ? null : tidy(na % nb)
   return null
+}
+
+// Binary floating point turns 205.2 - 185 into 20.19999999999999. Money and
+// prices never need more than 10 decimals, so results are tidied to that.
+function tidy(n) {
+  return Number.isFinite(n) ? Number(n.toFixed(10)) : n
 }
 
 const truthy = (v) => !isNil(v) && v !== false && v !== 0 && v !== ''

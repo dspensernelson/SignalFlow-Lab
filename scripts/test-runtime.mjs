@@ -572,9 +572,56 @@ await test('golden: a gate that fires on every update sends four packages (the f
   ok(!r['b4-once'].passed && !r['b4-sent-once'].passed)
 })
 
+// ============================================================ Meridian golden
+const MOD1 = JSON.parse(readFileSync(path.join(root, 'src/data/flows/module-01.json'), 'utf8'))
+const ref1 = await imp('src/data/flows/module-01.reference.js')
+
+function runBuild1(level, build) {
+  const flows = Object.values(ref1.referenceFlowsFor(level))
+  const dayRes = eng.runModule(flows, MOD1, build.dayId).byDay[build.dayId]
+  return chk.evaluateChecks(build.checks, dayRes, dayRes.dayState, flows)
+}
+const b1id = (id) => MOD1.builds.find((b) => b.id === id)
+
+await test('golden: module-01 builds match the reference levels', () => {
+  eq(MOD1.builds.map((b) => b.id), ref1.REFERENCE_BUILD_IDS)
+})
+
+for (const build of MOD1.builds) {
+  await test(`golden: Meridian reference passes ${build.id} (${build.title})`, () => {
+    const results = runBuild1(build.id, build)
+    ok(chk.allPassed(results), `\n    ${failing(results)}`)
+  })
+}
+
+await test('golden: Meridian Day 1 flows FAIL Day 2 - the empty MISO price is reported as normal', () => {
+  const r = Object.fromEntries(runBuild1('b6', b1id('b7')).map((x) => [x.id, x]))
+  ok(!r['b7-nodata'].passed && !r['b7-told'].passed && !r['b7-brief'].passed)
+  ok(r['b7-boundary'].passed, 'SPP at exactly 12.0 escalates with the Day 1 policy')
+})
+
+await test('golden: Meridian Day 2 flows FAIL Day 3 - an unanswered sign-off goes out looking signed', () => {
+  const r = Object.fromEntries(runBuild1('b7', b1id('b8')).map((x) => [x.id, x]))
+  ok(r['b8-sent'].passed && !r['b8-pending'].passed && !r['b8-told'].passed)
+})
+
+await test('golden: a classification that uses > instead of >= misses the 12.0 boundary', () => {
+  const flows = ref1.referenceFlowsFor('b7')
+  const loose = fm.updateStep(flows['price-flow'], 'ref-classify', { config: { set: [{ field: 'status', expr: "if(abs(pctMove) > policy.escalationThreshold, 'escalate', if(abs(pctMove) > policy.routineThreshold, 'routine', 'normal'))" }] } })
+  const day = eng.runModule([flows['notes-flow'], loose, flows['brief-flow']], MOD1, 'day-2').byDay['day-2']
+  const r = Object.fromEntries(chk.evaluateChecks(b1id('b7').checks, day, day.dayState, []).map((x) => [x.id, x]))
+  ok(!r['b7-boundary'].passed)
+})
+
+await test('expr: arithmetic results are tidied (205.2 - 185 is 20.2, not 20.19999999999999)', () => {
+  eq(evalExpr('a - b', { a: 205.2, b: 185 }), 20.2)
+  eq(evalExpr('0.1 + 0.2', {}), 0.3)
+})
+
 await test('golden: the finished desk still passes every earlier build (revisiting never turns a build red)', () => {
   for (const b of MOD2.builds) ok(chk.allPassed(runBuild(referenceFlowsFor('b6'), b)), `Beacon ${b.id}:\n    ${failing(runBuild(referenceFlowsFor('b6'), b))}`)
   for (const b of MOD3.builds) ok(chk.allPassed(runBuild3('b7', b)), `Harbor ${b.id}:\n    ${failing(runBuild3('b7', b))}`)
+  for (const b of MOD1.builds) ok(chk.allPassed(runBuild1('b8', b)), `Meridian ${b.id}:\n    ${failing(runBuild1('b8', b))}`)
 })
 
 await test('codegen: python renders Harbor loops, updates and upserts, and compiles', async () => {
@@ -682,7 +729,7 @@ for (const { file, concept } of CONCEPT_FILES) {
 }
 
 await test('concepts: every build.requires in modules 02 and 03 names an existing concept', () => {
-  for (const b of [...MOD2.builds, ...MOD3.builds]) for (const id of b.requires || []) ok(CONCEPT_IDS.has(id), `${b.id} requires unknown concept ${id}`)
+  for (const b of [...MOD1.builds, ...MOD2.builds, ...MOD3.builds]) for (const id of b.requires || []) ok(CONCEPT_IDS.has(id), `${b.id} requires unknown concept ${id}`)
   // Every step kind used by the Beacon reference has a rosetta.
   const kinds = new Set()
   for (const f of Object.values(referenceFlowsFor('b6'))) fm.walkSteps(f.steps, (st) => kinds.add(st.kind))

@@ -1,10 +1,6 @@
-import { STATUS, isBuildable } from '../lib/progress'
+import { STATUS } from '../lib/mapStatus.js'
 import { TYPE_COLOR } from '../lib/nodeStyles'
-import { Badge, Button, Chip, SectionLabel, Icon } from './ui'
-import taxonomy from '../data/automationTaxonomy.json'
-
-const TOOL_LABEL = Object.fromEntries(taxonomy.tools.map((t) => [t.id, t.label]))
-const ACTION_KIND = Object.fromEntries(taxonomy.actionKinds.map((k) => [k.id, k]))
+import { Badge, SectionLabel, Icon } from './ui'
 
 const TYPE_LABEL = {
   source: 'Source object',
@@ -23,26 +19,6 @@ const STATUS_BADGE = {
   [STATUS.READY]: { label: 'Ready', tone: 'ready' },
   [STATUS.IN_PROGRESS]: { label: 'In progress', tone: 'progress' },
   [STATUS.COMPLETE]: { label: 'Complete', tone: 'complete' },
-}
-
-// Interaction maturity of the lesson, separate from buildable progress status.
-const LESSON_STATUS = {
-  now: { label: 'Interactive now', tone: 'info' },
-  intent: { label: 'Lesson defined', tone: 'neutral' },
-  later: { label: 'Coming later', tone: 'locked' },
-}
-
-const capitalize = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s)
-
-function Chips({ items }) {
-  if (!items || items.length === 0) return null
-  return (
-    <div className="flex flex-wrap gap-1">
-      {items.map((c) => (
-        <Chip key={c}>{c}</Chip>
-      ))}
-    </div>
-  )
 }
 
 function Section({ title, children }) {
@@ -128,21 +104,14 @@ function MiniFlow({ inCount, outCount, accent }) {
 }
 
 export default function NodeDetail({
-  lesson: builtLesson,
   node,
   status,
   phase,
   nodesById,
   edges,
-  unlockAfterLabels = [],
   onSelect,
-  onStart,
-  onContinue,
-  onViewArtifact,
-  onRestart,
-  // World-view mode: { builds: [...], passed: {}, onOpenBuild } replaces the
-  // lesson action zone with links to the builds that make this node.
-  world = null,
+  // { builds: [...], passed: {}, onOpenBuild }: the builds that make this node.
+  world,
 }) {
   if (!node) {
     return (
@@ -152,16 +121,10 @@ export default function NodeDetail({
     )
   }
 
-  const buildable = world ? world.builds.length > 0 : isBuildable(node)
-  const lesson = world ? null : node.lesson
+  const builds = (world && world.builds) || []
   const isComplete = status === STATUS.COMPLETE
   const accent = isComplete && node.type === 'artifact' ? 'var(--sf-artifact-trusted)' : TYPE_COLOR[node.type] || '#9ca3af'
-  // Right-side badge: progress status when buildable, otherwise lesson maturity.
-  const rightBadge = world
-    ? STATUS_BADGE[status] || STATUS_BADGE[STATUS.CONTEXT]
-    : buildable
-      ? STATUS_BADGE[status] || STATUS_BADGE[STATUS.LOCKED]
-      : LESSON_STATUS[lesson?.status] || LESSON_STATUS.later
+  const rightBadge = STATUS_BADGE[status] || STATUS_BADGE[STATUS.CONTEXT]
 
   const feedsInto = edges
     .filter((e) => e.from === node.id)
@@ -181,27 +144,21 @@ export default function NodeDetail({
             {TYPE_LABEL[node.type] || node.type}
           </p>
           <h3 className="text-sm font-bold leading-tight text-sf-text">{node.label}</h3>
-          {node.artifactName && (
-            <p className="font-mono text-[10px] text-sf-muted">{node.artifactName}</p>
-          )}
           {phase && (
             <p className="text-[10px] text-sf-muted">
               Phase {phase.order} · {phase.title.replace(/^Phase \d+: /, '')}
             </p>
           )}
-          {lesson && (
-            <Chip className="mt-1 font-semibold">{capitalize(lesson.type)} lesson</Chip>
-          )}
         </div>
         <Badge tone={rightBadge.tone}>{rightBadge.label}</Badge>
       </div>
 
-      {/* Action zone — kept at the top so the primary action is always visible */}
+      {/* Action zone - kept at the top so the primary action is always visible */}
       <div className="border-b border-sf-border-subtle pb-2">
-        {world && world.builds.length > 0 && (
+        {builds.length > 0 ? (
           <div className="flex flex-col gap-1">
             <SectionLabel size="xs">Built in</SectionLabel>
-            {world.builds.map((b) => {
+            {builds.map((b) => {
               const rec = world.passed[b.id]
               return (
                 <button key={b.id} type="button" onClick={() => world.onOpenBuild(b.id)} className="flex items-center justify-between gap-2 rounded-lg border border-sf-border bg-sf-surface-subtle px-2 py-1 text-left hover:border-sf-accent-border">
@@ -211,53 +168,8 @@ export default function NodeDetail({
               )
             })}
           </div>
-        )}
-        {world && world.builds.length === 0 && (
+        ) : (
           <p className="rounded-lg bg-sf-surface-subtle px-2.5 py-1.5 text-[11px] leading-snug text-sf-body">Context: the flow reads or feeds this; no build makes it directly.</p>
-        )}
-        {!world && buildable && status === STATUS.READY && (
-          <Button variant="primary" size="sm" fullWidth iconRight="arrow-right" onClick={() => onStart(node.id)}>
-            Start lesson
-          </Button>
-        )}
-
-        {!world && buildable && status === STATUS.IN_PROGRESS && (
-          <div className="flex gap-2">
-            <Button variant="warning" size="sm" className="flex-1" onClick={() => onContinue(node.id)}>
-              Continue lesson
-            </Button>
-            <Button variant="neutral" size="sm" onClick={() => onRestart(node.id)}>
-              Restart
-            </Button>
-          </div>
-        )}
-
-        {!world && buildable && status === STATUS.COMPLETE && (
-          <div className="flex gap-2">
-            <Button variant="success" size="sm" className="flex-1" onClick={() => onViewArtifact(node.id)}>
-              View artifact
-            </Button>
-            <Button variant="neutral" size="sm" onClick={() => onRestart(node.id)}>
-              Restart
-            </Button>
-          </div>
-        )}
-
-        {!world && buildable && status === STATUS.LOCKED && (
-          <p className="rounded-lg bg-sf-surface-subtle px-2.5 py-1.5 text-[11px] leading-snug text-sf-body">
-            Locked — the board opens up as you build.
-            {unlockAfterLabels.length > 0
-              ? ` Complete ${unlockAfterLabels.map((l) => `"${l}"`).join(' and ')} to unlock this lesson.`
-              : ' Complete its upstream lessons to unlock it.'}
-          </p>
-        )}
-
-        {!world && !buildable && lesson && (
-          <p className="rounded-lg bg-sf-surface-subtle px-2.5 py-1.5 text-[11px] leading-snug text-sf-body">
-            {lesson.status === 'intent'
-              ? `${capitalize(lesson.type)} lesson — intent is defined; the interaction is coming in a later pass.`
-              : `${capitalize(lesson.type)} lesson — planned for a later pass${phase ? `, in ${phase.title.replace(/^Phase \d+: /, '')}` : ''}.`}
-          </p>
         )}
       </div>
 
@@ -277,34 +189,6 @@ export default function NodeDetail({
       )}
 
       <p className="text-[11px] leading-snug text-sf-body">{node.description}</p>
-
-      {lesson?.intent && <Section title="What you'll do">{lesson.intent}</Section>}
-      {lesson?.concepts?.length > 0 && (
-        <Section title="Concepts">
-          <Chips items={lesson.concepts} />
-        </Section>
-      )}
-
-      {(() => {
-        // Ecosystem beat, promoted out of the 11px reference stack: what KIND of
-        // action this node is, and which real tools fit it. Sourced from the
-        // built lesson so there is exactly one place the mapping lives.
-        const rw = builtLesson?.takeaway?.realWorld
-        const kind = rw && ACTION_KIND[rw.actionKind]
-        if (!kind) return null
-        const tools = (rw.bestFit || []).map((b) => TOOL_LABEL[b.tool] || b.tool)
-        return (
-          <div className="mb-3 rounded-lg border border-sf-border-subtle bg-sf-surface-subtle p-2.5">
-            <Chip title={kind.gloss}>Kind of action: {kind.label}</Chip>
-            <p className="mt-1.5 text-[11px] leading-snug text-sf-body">{kind.gloss}</p>
-            {tools.length > 0 && (
-              <p className="mt-1.5 text-[11px] leading-snug text-sf-subtle">
-                <span className="font-medium text-sf-body">Best fit:</span> {tools.join(', ')}
-              </p>
-            )}
-          </div>
-        )
-      })()}
 
       <Section title="In the lab">{node.labVersion || '—'}</Section>
       <Section title="At work">

@@ -4,7 +4,7 @@ SignalFlow Lab teaches workplace automation by having the learner BUILD
 flows, RUN them on a day of real-looking data, watch them break on a messier
 day, fix them, and see the same flow in Power Automate, Make, n8n, Zapier and
 Python. That is the product since the 2026-08 reimagine (REIMAGINE_BRIEF.md).
-The earlier worksheet lessons are being retired module by module.
+The earlier worksheet lessons are retired; git history has them.
 
 ## Read, in this order
 
@@ -15,8 +15,8 @@ The earlier worksheet lessons are being retired module by module.
 4. src/data/flows/module-03.json and module-03.reference.js - a complete
    worked module.
 5. AUTONOMY_CHARTER.md - standing approvals and prohibitions. Where it
-   protects the worksheet design (validators, the no-scroll rule for lesson
-   exercises), it applies to module-01's remaining worksheets only.
+   protects the retired worksheet design (validators, lesson lints, the
+   no-scroll rule for lesson exercises), it no longer applies.
 6. OPEN_QUESTIONS.md - anything parked for the owner.
 
 ## Session startup
@@ -30,8 +30,8 @@ The earlier worksheet lessons are being retired module by module.
 1. DONE - Beacon (module-02) as flows.
 2. DONE - Harbor (module-03) as flows, with engine wave 1 (For each, update
    a row, add-or-replace keys, count()).
-3. Meridian (module-01) as flows; retire its worksheets and the worksheet
-   path (lesson workspace, validators, lesson lints) once nothing uses them.
+3. DONE - Meridian (module-01) as flows; the worksheet path (lesson
+   workspace, validators, lesson lints) is removed.
 4. Modules 04-10 as flows, in order, from their charters in
    curriculum/charters/. A charter's map and scenario carry over; its
    interaction-type notes do not.

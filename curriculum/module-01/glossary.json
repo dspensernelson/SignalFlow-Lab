@@ -4,76 +4,109 @@
   "terms": [
     {
       "term": "hub",
-      "aliases": ["trading hub", "market hub"],
-      "teachesIn": "lesson-analyst-notes",
-      "gloss": "A regional point where electricity is bought and sold. Prices are quoted per hub the way fuel prices are quoted per region."
+      "aliases": [
+        "trading hub",
+        "market hub"
+      ],
+      "teachesIn": "b1",
+      "gloss": "A regional point where electricity is bought and sold. Prices are quoted per hub the way fuel prices are quoted per region.",
+      "teachesInLesson": "lesson-analyst-notes"
     },
     {
       "term": "MWh",
-      "aliases": ["megawatt-hour", "$/MWh"],
-      "teachesIn": "lesson-analyst-notes",
-      "gloss": "Megawatt-hour: the unit electricity is priced in. Roughly the power an average home uses in a month, so $/MWh is the wholesale price tag."
+      "aliases": [
+        "megawatt-hour",
+        "$/MWh"
+      ],
+      "teachesIn": "b2",
+      "gloss": "Megawatt-hour: the unit electricity is priced in. Roughly the power an average home uses in a month, so $/MWh is the wholesale price tag.",
+      "teachesInLesson": "lesson-analyst-notes"
     },
     {
       "term": "settled price",
-      "aliases": ["settled"],
-      "teachesIn": "lesson-analyst-notes",
-      "gloss": "The final cleared price for the day, after the intraday spikes stop moving. The spike is the drama; the settled price is what the books use."
+      "aliases": [
+        "settled"
+      ],
+      "teachesIn": "b2",
+      "gloss": "The final cleared price for the day, after the intraday spikes stop moving. The spike is the drama; the settled price is what the books use.",
+      "teachesInLesson": "lesson-analyst-notes"
     },
     {
       "term": "ERCOT",
-      "teachesIn": "lesson-analyst-notes",
-      "gloss": "The grid operator that runs most of Texas. Here it is simply the name of the hub the desk watches."
+      "teachesIn": "b1",
+      "gloss": "The grid operator that runs most of Texas. Here it is simply the name of the hub the desk watches.",
+      "teachesInLesson": "lesson-analyst-notes"
     },
     {
       "term": "the desk",
-      "aliases": ["desk", "trading desk"],
-      "teachesIn": "lesson-trader-flag",
-      "gloss": "The team that trades and watches the market. 'The desk' is the group; the analyst and the trader both sit on it."
+      "aliases": [
+        "desk",
+        "trading desk"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The team that trades and watches the market. 'The desk' is the group; the analyst and the trader both sit on it.",
+      "teachesInLesson": "lesson-trader-flag"
     },
     {
       "term": "generation",
-      "teachesIn": "lesson-price-feed",
-      "gloss": "How much power was actually produced, by source (wind, gas, solar). Generation missing forecast is usually why a price moved."
+      "teachesIn": "b3",
+      "gloss": "How much power was actually produced, by source (wind, gas, solar). Generation missing forecast is usually why a price moved.",
+      "teachesInLesson": "lesson-price-feed"
     },
     {
       "term": "variance",
-      "teachesIn": "lesson-variance-check",
-      "gloss": "The gap between two numbers you expected to agree - here, today's price against yesterday's. Computed once and stored, so every later step cites the same figure."
+      "teachesIn": "b3",
+      "gloss": "The gap between two numbers you expected to agree - here, today's price against yesterday's. Computed once and stored, so every later step cites the same figure.",
+      "teachesInLesson": "lesson-variance-check"
     },
     {
       "term": "threshold",
-      "aliases": ["escalation threshold"],
-      "teachesIn": "lesson-threshold-policy",
-      "gloss": "The line that decides routine from escalate. It lives in a policy someone owns, never inside the logic that applies it."
+      "aliases": [
+        "escalation threshold"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The line that decides routine from escalate. It lives in a policy someone owns, never inside the logic that applies it.",
+      "teachesInLesson": "lesson-threshold-policy"
     },
     {
       "term": "artifact",
-      "teachesIn": "lesson-intake",
-      "gloss": "A named, structured object the workflow produces and later steps reuse - market-intake.json, clean-price-data.json. Artifacts are how progress is measured here, not lessons completed."
+      "teachesIn": "b1",
+      "gloss": "A named, structured object the workflow produces and later steps reuse - market-intake.json, clean-price-data.json. Artifacts are how progress is measured here, not lessons completed.",
+      "teachesInLesson": "lesson-intake"
     },
     {
       "term": "upstream",
-      "aliases": ["downstream"],
-      "teachesIn": "lesson-intake",
-      "gloss": "Upstream is what feeds this step; downstream is what consumes it. The map draws both so you can see what breaks if this step is wrong."
+      "aliases": [
+        "downstream"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Upstream is what feeds this step; downstream is what consumes it. The map draws both so you can see what breaks if this step is wrong.",
+      "teachesInLesson": "lesson-intake"
     },
     {
       "term": "schema",
-      "aliases": ["schema version"],
-      "teachesIn": "lesson-intake",
-      "gloss": "The agreed set of field names and types a record must have. Changing it is a breaking change for everything downstream, which is why it carries a version."
+      "aliases": [
+        "schema version"
+      ],
+      "teachesIn": "b2",
+      "gloss": "The agreed set of field names and types a record must have. Changing it is a breaking change for everything downstream, which is why it carries a version.",
+      "teachesInLesson": "lesson-intake"
     },
     {
       "term": "quarantine",
-      "teachesIn": "lesson-price-feed-hard",
-      "gloss": "Setting a bad row aside instead of guessing at it or dropping it silently. A quarantined row is visible, countable, and someone's job."
+      "teachesIn": "b7",
+      "gloss": "Setting a bad row aside instead of guessing at it or dropping it silently. A quarantined row is visible, countable, and someone's job.",
+      "teachesInLesson": "lesson-price-feed-hard"
     },
     {
       "term": "degraded",
-      "aliases": ["degraded mode", "degraded run"],
-      "teachesIn": "lesson-morning-brief-hard",
-      "gloss": "Producing a deliberately reduced output when an input is missing, and saying so on the face of it - rather than producing a confident-looking output built on a hole."
+      "aliases": [
+        "degraded mode",
+        "degraded run"
+      ],
+      "teachesIn": "b8",
+      "gloss": "Producing a deliberately reduced output when an input is missing, and saying so on the face of it - rather than producing a confident-looking output built on a hole.",
+      "teachesInLesson": "lesson-morning-brief-hard"
     }
   ]
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { STATUS, deriveNodeStatus, derivePhaseStatus, isBuildable } from '../lib/progress'
+import { STATUS } from '../lib/mapStatus.js'
 import { TYPE_COLOR } from '../lib/nodeStyles'
 import { Icon } from './ui'
 
@@ -109,15 +109,10 @@ export default function WorkflowGraph({
   nodes,
   phases,
   edges,
-  progress,
   selectedNodeId,
   onSelect,
-  onStart,
-  onContinue,
-  onViewArtifact,
-  // World-view mode: status and actions come from the builder's progress
-  // instead of the worksheet progress model.
-  statusById: statusOverride = null,
+  // Status and the per-node action come from the builder's progress.
+  statusById = {},
   actionFor = null,
 }) {
   const containerRef = useRef(null)
@@ -134,8 +129,6 @@ export default function WorkflowGraph({
   }, [])
 
   const byId = Object.fromEntries(nodes.map((n) => [n.id, n]))
-  const statusById = statusOverride || Object.fromEntries(nodes.map((n) => [n.id, deriveNodeStatus(n, progress)]))
-  const worldMode = Boolean(statusOverride)
   // Node positions in stage space (offset below the phase header band).
   const pos = Object.fromEntries(nodes.map((n) => [n.id, { x: n.x, y: n.y + HEADER_H }]))
 
@@ -158,7 +151,7 @@ export default function WorkflowGraph({
             if (!colNode) return null
             const left = colNode.x - REGION_PAD
             const related = phase.id === relatedPhaseId
-            const phaseStatus = worldMode ? phaseStatusFrom(phase, statusById) : derivePhaseStatus(phase, progress)
+            const phaseStatus = phaseStatusFrom(phase, statusById)
             const bg = related
               ? 'var(--sf-phase-band-sel)'
               : i % 2 === 0
@@ -271,22 +264,14 @@ export default function WorkflowGraph({
             if (selected) ring = 'ring-2 ring-offset-2 ring-offset-sf-surface ring-sf-ring'
             else if (isDown) ring = 'ring-2 ring-offset-1 ring-offset-sf-surface ring-sf-type-artifact'
             else if (isUp) ring = 'ring-2 ring-offset-1 ring-offset-sf-surface ring-sf-type-source'
-            const worldAction = worldMode && actionFor ? actionFor(node) : null
-            const buildable = worldMode ? Boolean(worldAction) : isBuildable(node)
-            // Playable nodes always stay legible: relationship-dimming only applies
-            // to non-playable context nodes, so a buildable lesson never looks disabled.
+            const worldAction = actionFor ? actionFor(node) : null
+            const buildable = Boolean(worldAction)
+            // Buildable nodes always stay legible: relationship-dimming only
+            // applies to context nodes.
             const dimmed = !related && !buildable
             let action = null
-            if (worldMode) {
-              if (worldAction && !worldAction.disabled) {
-                action = { label: worldAction.label, run: worldAction.onClick, cls: status === STATUS.COMPLETE ? 'bg-sf-complete text-white hover:opacity-90' : 'bg-sf-accent text-white hover:bg-sf-accent-hover' }
-              }
-            } else if (buildable && status === STATUS.READY) {
-              action = { label: 'Start lesson', run: () => onStart(node.id), cls: 'bg-sf-accent text-white hover:bg-sf-accent-hover' }
-            } else if (buildable && status === STATUS.IN_PROGRESS) {
-              action = { label: 'Continue', run: () => onContinue(node.id), cls: 'bg-sf-progress text-white hover:opacity-90' }
-            } else if (buildable && status === STATUS.COMPLETE) {
-              action = { label: 'View', run: () => onViewArtifact(node.id), cls: 'bg-sf-complete text-white hover:opacity-90' }
+            if (worldAction && !worldAction.disabled) {
+              action = { label: worldAction.label, run: worldAction.onClick, cls: status === STATUS.COMPLETE ? 'bg-sf-complete text-white hover:opacity-90' : 'bg-sf-accent text-white hover:bg-sf-accent-hover' }
             }
             const eyebrowColor =
               isComplete && node.type === 'artifact'
