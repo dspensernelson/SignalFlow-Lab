@@ -126,6 +126,20 @@
         "archive": "Hygiene Archive",
         "operate": "Hygiene Run Operations"
       }
+    },
+    "module-07": {
+      "org": "Depot",
+      "deliverable": "6:00 PM fulfillment digest",
+      "map": {
+        "intake": "Order Record",
+        "reference": "Inventory Ledger",
+        "transform": "Availability Check",
+        "decision": "Reserve Decision",
+        "handoff": "Backorder Path",
+        "assembly": "Fulfillment Digest",
+        "archive": "Order Archive",
+        "operate": "Order Run Operations"
+      }
     }
   }
 }

@@ -2,6 +2,27 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-09-29 (Depot built as runnable flows)
+
+- DEPOT (module-07) BUILT from its charter; fresh map (18 nodes, ops node,
+  temporal loop archive -> reorder points). 3 flows (order placed, shipment
+  events, the 6:00 PM digest), 3 days, 8 builds, 31 checks, 30 canon facts.
+  Stock is a LEDGER (rows with deltas; on hand and committed are sums), so
+  available = onHand - committed and a reservation is a row the next order
+  sees - the naive on-hand check that double-sells is what Build 1 argues
+  against. Day 1: reserve or backorder, walk states from events (a later
+  event without a tracking id must not blank it), reorder at the point,
+  digest. Day 2: a repeated placed event reserves twice (fix: look the
+  order up, reject the repeat); 'delivered' arrives before shipped and is
+  applied (fix: the State Machine table, two-field lookup from + to; illegal
+  moves are refused and the Warehouse Lead told). Day 3: 'damaged' is a
+  legal move, so the Day 2 flow sets the state and stops; the fix
+  compensates (replacement reserved in the ledger, order compensated,
+  logged, Customer Service told).
+- AUTHORING NOTE: a check on a build must survive later builds' flows on
+  the same day (ORD-5001 is 'reserved' in Build 2 but 'delivered' once the
+  shipment flow exists): `fields` accepts a list of acceptable values.
+
 ## 2026-09-29 (Compass built as runnable flows)
 
 - COMPASS (module-06) BUILT from its charter; fresh map (17 nodes, temporal

@@ -1,0 +1,122 @@
+[
+  {
+    "from": "order-events",
+    "to": "order-record",
+    "label": "materialized"
+  },
+  {
+    "from": "order-events",
+    "to": "availability-check",
+    "label": "on arrival"
+  },
+  {
+    "from": "inventory-ledger",
+    "to": "availability-check",
+    "label": "sums"
+  },
+  {
+    "from": "availability-check",
+    "to": "reserve-decision",
+    "label": "available"
+  },
+  {
+    "from": "reserve-decision",
+    "to": "pick-pack-ship",
+    "label": "reserved"
+  },
+  {
+    "from": "reserve-decision",
+    "to": "backorder-path",
+    "label": "insufficient"
+  },
+  {
+    "from": "inventory-ledger",
+    "to": "reserve-decision",
+    "label": "reservation row"
+  },
+  {
+    "from": "reorder-point-policy",
+    "to": "replenishment-trigger",
+    "label": "points"
+  },
+  {
+    "from": "reserve-decision",
+    "to": "replenishment-trigger",
+    "label": "position"
+  },
+  {
+    "from": "state-machine-policy",
+    "to": "pick-pack-ship",
+    "label": "legal moves"
+  },
+  {
+    "from": "shipment-events",
+    "to": "pick-pack-ship",
+    "label": "events"
+  },
+  {
+    "from": "order-record",
+    "to": "pick-pack-ship",
+    "label": "current state"
+  },
+  {
+    "from": "pick-pack-ship",
+    "to": "carrier-handoff",
+    "label": "shipped"
+  },
+  {
+    "from": "carrier-handoff",
+    "to": "delivery-confirmation",
+    "label": "delivered"
+  },
+  {
+    "from": "shipment-events",
+    "to": "exception-compensation",
+    "label": "damaged"
+  },
+  {
+    "from": "compensation-policy",
+    "to": "exception-compensation",
+    "label": "what to undo"
+  },
+  {
+    "from": "exception-compensation",
+    "to": "fulfillment-digest",
+    "label": "compensated"
+  },
+  {
+    "from": "delivery-confirmation",
+    "to": "fulfillment-digest",
+    "label": "delivered"
+  },
+  {
+    "from": "backorder-path",
+    "to": "fulfillment-digest",
+    "label": "backordered"
+  },
+  {
+    "from": "replenishment-trigger",
+    "to": "fulfillment-digest",
+    "label": "reorders"
+  },
+  {
+    "from": "fulfillment-digest",
+    "to": "order-archive",
+    "label": "archived"
+  },
+  {
+    "from": "order-archive",
+    "to": "reorder-point-policy",
+    "label": "demand history"
+  },
+  {
+    "from": "shipment-events",
+    "to": "run-operations",
+    "label": "event stream"
+  },
+  {
+    "from": "order-archive",
+    "to": "run-operations",
+    "label": "run history"
+  }
+]

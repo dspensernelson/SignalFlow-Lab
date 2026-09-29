@@ -1,0 +1,290 @@
+{
+  "_comment": "Canon for a runnable-flow module, enforced by scripts/lint-flows.mjs. Flow modules have no per-lesson answer keys to drift apart; what can drift is the world data (sources and seeds) and the reference solution that proves every build. So each assertion is checked against the raw day data (kind data) or against the reference solution's run of the whole module (kinds record and store), with every day's stores carried into the next. Change a number in the data and the canon names every fact that moved. The pre-port per-lesson assertions are in git history. ASCII only.",
+  "module": "module-07",
+  "format": "flows",
+  "assertions": [
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "sku": "SKU-101",
+        "reason": "receipt"
+      },
+      "field": "onHandDelta",
+      "equals": 10,
+      "seed": "inventory-ledger"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "orderId": "ORD-4990"
+      },
+      "field": "committedDelta",
+      "equals": 2,
+      "seed": "inventory-ledger"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "sku": "SKU-101"
+      },
+      "field": "reorderPoint",
+      "equals": 5,
+      "seed": "reorder-points"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "sku": "SKU-101"
+      },
+      "field": "reorderQty",
+      "equals": 20,
+      "seed": "reorder-points"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "orderId": "ORD-5001"
+      },
+      "field": "qty",
+      "equals": 4,
+      "source": "order-events"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "orderId": "ORD-5006"
+      },
+      "field": "qty",
+      "equals": 9,
+      "source": "order-events"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "eventId": "E-103"
+      },
+      "field": "tracking",
+      "equals": "TRK-1001",
+      "source": "shipment-events"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "ORD-5001",
+      "field": "available",
+      "equals": 8,
+      "flow": "order-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "ORD-5006",
+      "field": "available",
+      "equals": 4,
+      "flow": "order-flow"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "inventory-ledger",
+      "where": {
+        "orderId": "ORD-5001"
+      },
+      "field": "committedDelta",
+      "equals": 4
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "orders",
+      "where": {
+        "orderId": "ORD-5006"
+      },
+      "field": "state",
+      "equals": "backordered"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "orders",
+      "where": {
+        "orderId": "ORD-5001"
+      },
+      "field": "state",
+      "equals": "delivered"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "orders",
+      "where": {
+        "orderId": "ORD-5001"
+      },
+      "field": "tracking",
+      "equals": "TRK-1001"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "replenishments",
+      "where": {
+        "sku": "SKU-101"
+      },
+      "field": "position",
+      "equals": 4
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "replenishments",
+      "where": {},
+      "count": 1
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run 6:00 PM",
+      "field": "delivered",
+      "equals": 1,
+      "flow": "digest-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run 6:00 PM",
+      "field": "backordered",
+      "equals": 1,
+      "flow": "digest-flow"
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "eventId": "E-207"
+      },
+      "field": "event",
+      "equals": "delivered",
+      "source": "shipment-events"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "inventory-ledger",
+      "where": {
+        "orderId": "ORD-5002"
+      },
+      "count": 1
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "rejected-events",
+      "where": {
+        "orderId": "ORD-5002"
+      },
+      "count": 1
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "rejected-events",
+      "where": {
+        "eventId": "E-207"
+      },
+      "count": 1
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "orders",
+      "where": {
+        "orderId": "ORD-5003"
+      },
+      "field": "state",
+      "equals": "packed"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "orders",
+      "where": {
+        "orderId": "ORD-5002"
+      },
+      "field": "state",
+      "equals": "delivered"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "replenishments",
+      "where": {
+        "sku": "SKU-101"
+      },
+      "field": "position",
+      "equals": 2
+    },
+    {
+      "kind": "data",
+      "day": "day-3",
+      "where": {
+        "eventId": "E-304"
+      },
+      "field": "event",
+      "equals": "damaged",
+      "source": "shipment-events"
+    },
+    {
+      "kind": "data",
+      "day": "day-3",
+      "where": {
+        "event": "damaged"
+      },
+      "field": "tell",
+      "equals": "Customer Service Rep",
+      "seed": "compensation-policy"
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "orders",
+      "where": {
+        "orderId": "ORD-5004"
+      },
+      "field": "state",
+      "equals": "compensated"
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "inventory-ledger",
+      "where": {
+        "orderId": "ORD-5004",
+        "reason": "compensate"
+      },
+      "field": "committedDelta",
+      "equals": 2
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "compensations",
+      "where": {},
+      "count": 1
+    },
+    {
+      "kind": "record",
+      "day": "day-3",
+      "label": "Scheduled run 6:00 PM",
+      "field": "compensated",
+      "equals": 1,
+      "flow": "digest-flow"
+    }
+  ]
+}

@@ -1,0 +1,666 @@
+[
+  {
+    "id": "order-events",
+    "label": "Order Events",
+    "type": "source",
+    "thingOrAction": "thing",
+    "phaseId": "order-events",
+    "x": 20,
+    "y": 80,
+    "description": "Orders as events: they arrive when they arrive, sometimes twice, never as a tidy file.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Order Events source; Day 2 sends one twice.",
+      "concepts": []
+    },
+    "labVersion": "The Order Events source; Day 2 sends one twice.",
+    "realWorldSources": [
+      "Shop webhook",
+      "Order API events"
+    ],
+    "accessNeeded": [
+      "A webhook endpoint",
+      "Agreement on the event's fields"
+    ],
+    "soloRebuildPath": [
+      "Log a day of events",
+      "Notice repeats and gaps",
+      "Later subscribe to the webhook"
+    ],
+    "reusedBy": [
+      "order-record",
+      "availability-check"
+    ],
+    "governanceNote": "An event is a fact that something happened; the flow decides what to do about it, including nothing.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-order-events",
+    "artifactName": "order-events.json"
+  },
+  {
+    "id": "order-record",
+    "label": "Order Record",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "order-events",
+    "x": 20,
+    "y": 190,
+    "description": "One row per order, materialized from its events, carrying its current state.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Orders table, add-or-replace by orderId, updated by each shipment event.",
+      "concepts": []
+    },
+    "labVersion": "The Orders table, add-or-replace by orderId, updated by each shipment event.",
+    "realWorldSources": [
+      "Order management system",
+      "Order table"
+    ],
+    "accessNeeded": [
+      "Write access to the orders table"
+    ],
+    "soloRebuildPath": [
+      "Upsert by order id",
+      "Record the state",
+      "Later replay the events to rebuild it"
+    ],
+    "reusedBy": [
+      "pick-pack-ship",
+      "fulfillment-digest"
+    ],
+    "governanceNote": "The record is derived from events; rerunning the events must rebuild the same record.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-order-record",
+    "artifactName": "order-record.json"
+  },
+  {
+    "id": "inventory-ledger",
+    "label": "Inventory Ledger",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "order-events",
+    "x": 20,
+    "y": 300,
+    "description": "Stock as a running balance: receipts, reservations and compensations as rows with deltas.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Inventory Ledger table; on hand and committed are sums over it.",
+      "concepts": []
+    },
+    "labVersion": "The Inventory Ledger table; on hand and committed are sums over it.",
+    "realWorldSources": [
+      "WMS stock ledger",
+      "Inventory movements table"
+    ],
+    "accessNeeded": [
+      "Read and append access",
+      "A movement reason code list"
+    ],
+    "soloRebuildPath": [
+      "Record every receipt and reservation as a row",
+      "Sum them for on hand and committed",
+      "Later reconcile to a count"
+    ],
+    "reusedBy": [
+      "availability-check",
+      "reserve-decision"
+    ],
+    "governanceNote": "A snapshot lies the moment two orders arrive together; a ledger cannot.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-inventory-ledger",
+    "artifactName": "inventory-ledger.json"
+  },
+  {
+    "id": "availability-check",
+    "label": "Availability Check",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "inventory",
+    "x": 270,
+    "y": 80,
+    "description": "On hand minus committed, from the ledger, at the moment the order lands.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The sums and the available Transform in the Order placed flow.",
+      "concepts": []
+    },
+    "labVersion": "The sums and the available Transform in the Order placed flow.",
+    "realWorldSources": [
+      "ATP calculation",
+      "Stock check API"
+    ],
+    "accessNeeded": [
+      "The ledger"
+    ],
+    "soloRebuildPath": [
+      "Sum the receipts",
+      "Sum the reservations",
+      "Subtract"
+    ],
+    "reusedBy": [
+      "reserve-decision"
+    ],
+    "governanceNote": "Available means on hand MINUS committed; the naive check sells the last unit twice.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-availability-check",
+    "artifactName": "availability-check.json"
+  },
+  {
+    "id": "reserve-decision",
+    "label": "Reserve Decision",
+    "type": "decision",
+    "thingOrAction": "action",
+    "phaseId": "inventory",
+    "x": 270,
+    "y": 190,
+    "description": "Enough available: reserve it in the ledger. Not enough: backorder.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Condition qty <= available in the Order placed flow.",
+      "concepts": []
+    },
+    "labVersion": "The Condition qty <= available in the Order placed flow.",
+    "realWorldSources": [
+      "Allocation rules",
+      "Order promising"
+    ],
+    "accessNeeded": [
+      "The available figure"
+    ],
+    "soloRebuildPath": [
+      "Compare quantity with available",
+      "Reserve or backorder",
+      "Later add partial reservations"
+    ],
+    "reusedBy": [
+      "pick-pack-ship",
+      "backorder-path"
+    ],
+    "governanceNote": "A reservation is a ledger row the next order sees; it is what makes the decision safe.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-reserve-decision",
+    "artifactName": "reserve-decision.json"
+  },
+  {
+    "id": "backorder-path",
+    "label": "Backorder Path",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "inventory",
+    "x": 270,
+    "y": 300,
+    "description": "The order that waits: logged with what was available, and the customer told by a person.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The NO lane: Backorders store and the message to the Customer Service Rep.",
+      "concepts": []
+    },
+    "labVersion": "The NO lane: Backorders store and the message to the Customer Service Rep.",
+    "realWorldSources": [
+      "Backorder report",
+      "Customer notification"
+    ],
+    "accessNeeded": [
+      "The Customer Service Rep's contact"
+    ],
+    "soloRebuildPath": [
+      "Log the shortfall",
+      "Tell the customer with a promise date",
+      "Later release when stock lands"
+    ],
+    "reusedBy": [
+      "fulfillment-digest"
+    ],
+    "governanceNote": "A wait nobody explains is a cancellation.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-backorder-path",
+    "artifactName": "backorder-path.json"
+  },
+  {
+    "id": "reorder-point-policy",
+    "label": "Reorder Points",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "inventory",
+    "x": 270,
+    "y": 410,
+    "description": "Per SKU: the available position at which to reorder, and how much.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Reorder Points table, owned by the Inventory Planner.",
+      "concepts": []
+    },
+    "labVersion": "The Reorder Points table, owned by the Inventory Planner.",
+    "realWorldSources": [
+      "Min/max settings in the WMS",
+      "Replenishment policy"
+    ],
+    "accessNeeded": [
+      "The planner's numbers",
+      "A version"
+    ],
+    "soloRebuildPath": [
+      "Set a point and a quantity per SKU",
+      "Own them",
+      "Later tune them from demand history"
+    ],
+    "reusedBy": [
+      "replenishment-trigger"
+    ],
+    "governanceNote": "The points are the planner's; the flow only compares and signals.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-reorder-point-policy",
+    "artifactName": "reorder-point-policy.json"
+  },
+  {
+    "id": "replenishment-trigger",
+    "label": "Replenishment Trigger",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "inventory",
+    "x": 270,
+    "y": 520,
+    "description": "A reservation that takes the position to the point or below signals a purchase.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The position Transform and Condition in the reserve lane.",
+      "concepts": []
+    },
+    "labVersion": "The position Transform and Condition in the reserve lane.",
+    "realWorldSources": [
+      "Purchase requisition",
+      "Replenishment alert"
+    ],
+    "accessNeeded": [
+      "The reorder points",
+      "The Inventory Planner's inbox"
+    ],
+    "soloRebuildPath": [
+      "Compute the position after the reservation",
+      "Compare with the point",
+      "Log and tell the planner"
+    ],
+    "reusedBy": [
+      "fulfillment-digest"
+    ],
+    "governanceNote": "Only a reservation moves the position; a backorder never triggers a reorder.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-replenishment-trigger",
+    "artifactName": "replenishment-trigger.json"
+  },
+  {
+    "id": "state-machine-policy",
+    "label": "State Machine",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "fulfillment",
+    "x": 520,
+    "y": 80,
+    "description": "The legal transitions: which event may follow which state. Delivered cannot follow packed.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The State Machine table, keyed by from and to.",
+      "concepts": []
+    },
+    "labVersion": "The State Machine table, keyed by from and to.",
+    "realWorldSources": [
+      "Order status model",
+      "Workflow definition"
+    ],
+    "accessNeeded": [
+      "The Warehouse Lead's process"
+    ],
+    "soloRebuildPath": [
+      "List the states",
+      "List the legal moves",
+      "Later add the failure moves"
+    ],
+    "reusedBy": [
+      "pick-pack-ship"
+    ],
+    "governanceNote": "Illegal moves are refused, not corrected; someone sent a bad event and should hear about it.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-state-machine-policy",
+    "artifactName": "state-machine-policy.json"
+  },
+  {
+    "id": "pick-pack-ship",
+    "label": "Pick, Pack, Ship",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "fulfillment",
+    "x": 520,
+    "y": 190,
+    "description": "Each shipment event moves its order to the next state - if the state machine allows it.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Shipment events flow: lookup, transition check, state update.",
+      "concepts": []
+    },
+    "labVersion": "The Shipment events flow: lookup, transition check, state update.",
+    "realWorldSources": [
+      "WMS scans",
+      "Carrier scans"
+    ],
+    "accessNeeded": [
+      "The orders table",
+      "The state machine"
+    ],
+    "soloRebuildPath": [
+      "Look the order up",
+      "Check the move is legal",
+      "Apply it"
+    ],
+    "reusedBy": [
+      "carrier-handoff",
+      "delivery-confirmation"
+    ],
+    "governanceNote": "The order's row is updated in place; its history is the events.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-pick-pack-ship",
+    "artifactName": "pick-pack-ship.json"
+  },
+  {
+    "id": "carrier-handoff",
+    "label": "Carrier Handoff",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "fulfillment",
+    "x": 520,
+    "y": 300,
+    "description": "The boundary crossing: shipped, with a tracking id captured on the order.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The shipped event carrying its tracking id into the Orders row.",
+      "concepts": []
+    },
+    "labVersion": "The shipped event carrying its tracking id into the Orders row.",
+    "realWorldSources": [
+      "Carrier manifest",
+      "Tracking API"
+    ],
+    "accessNeeded": [
+      "The Carrier Desk's tracking ids"
+    ],
+    "soloRebuildPath": [
+      "Capture the tracking id",
+      "Record shipped",
+      "Later subscribe to carrier scans"
+    ],
+    "reusedBy": [
+      "delivery-confirmation"
+    ],
+    "governanceNote": "Once it crosses to the carrier, the flow can only listen.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-carrier-handoff",
+    "artifactName": "carrier-handoff.json"
+  },
+  {
+    "id": "shipment-events",
+    "label": "Shipment Events",
+    "type": "source",
+    "thingOrAction": "thing",
+    "phaseId": "fulfillment",
+    "x": 520,
+    "y": 410,
+    "description": "Mid-flight events from pickers, packers and carriers: delays, damage, delivery.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Shipment Events source; Day 3 reports damage.",
+      "concepts": []
+    },
+    "labVersion": "The Shipment Events source; Day 3 reports damage.",
+    "realWorldSources": [
+      "WMS event feed",
+      "Carrier webhooks"
+    ],
+    "accessNeeded": [
+      "A webhook endpoint",
+      "Agreement on event names"
+    ],
+    "soloRebuildPath": [
+      "Log a day of events",
+      "Notice ones that arrive out of order",
+      "Later subscribe"
+    ],
+    "reusedBy": [
+      "pick-pack-ship",
+      "exception-compensation"
+    ],
+    "governanceNote": "Events can arrive out of order; the state machine is what makes that safe.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-shipment-events",
+    "artifactName": "shipment-events.json"
+  },
+  {
+    "id": "compensation-policy",
+    "label": "Compensation Policy",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "exceptions",
+    "x": 770,
+    "y": 80,
+    "description": "For each failure event: what to undo, in what order, and who tells the customer.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Compensation Policy table.",
+      "concepts": []
+    },
+    "labVersion": "The Compensation Policy table.",
+    "realWorldSources": [
+      "Returns and claims policy",
+      "Runbook"
+    ],
+    "accessNeeded": [
+      "The Customer Service Rep's process"
+    ],
+    "soloRebuildPath": [
+      "List the failure events",
+      "Write what each undoes",
+      "Name who tells the customer"
+    ],
+    "reusedBy": [
+      "exception-compensation"
+    ],
+    "governanceNote": "Undo means a new ledger row, never a deleted one.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-compensation-policy",
+    "artifactName": "compensation-policy.json"
+  },
+  {
+    "id": "exception-compensation",
+    "label": "Exception Compensation",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "exceptions",
+    "x": 770,
+    "y": 190,
+    "description": "Executing the policy: reserve a replacement, mark the order compensated, log it, tell the customer.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The damaged lane in the Shipment events flow.",
+      "concepts": []
+    },
+    "labVersion": "The damaged lane in the Shipment events flow.",
+    "realWorldSources": [
+      "Claims process",
+      "Re-ship workflow"
+    ],
+    "accessNeeded": [
+      "The policy",
+      "The ledger"
+    ],
+    "soloRebuildPath": [
+      "Reserve the replacement",
+      "Mark the order",
+      "Tell the customer"
+    ],
+    "reusedBy": [
+      "fulfillment-digest"
+    ],
+    "governanceNote": "A failure that ends an order silently is worse than the failure.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-exception-compensation",
+    "artifactName": "exception-compensation.json"
+  },
+  {
+    "id": "delivery-confirmation",
+    "label": "Delivery Confirmation",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "exceptions",
+    "x": 770,
+    "y": 300,
+    "description": "The closing event captured on the order: delivered, with when.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The delivered state on the Orders row.",
+      "concepts": []
+    },
+    "labVersion": "The delivered state on the Orders row.",
+    "realWorldSources": [
+      "Proof of delivery",
+      "Carrier scan"
+    ],
+    "accessNeeded": [
+      "The carrier's delivered event"
+    ],
+    "soloRebuildPath": [
+      "Capture the delivered event",
+      "Close the order",
+      "Later reconcile with the carrier"
+    ],
+    "reusedBy": [
+      "fulfillment-digest",
+      "order-archive"
+    ],
+    "governanceNote": "Delivered is the only state a customer cares about; it is also the only one that needs proof.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-delivery-confirmation",
+    "artifactName": "delivery-confirmation.json"
+  },
+  {
+    "id": "fulfillment-digest",
+    "label": "Fulfillment Digest",
+    "type": "output",
+    "thingOrAction": "thing",
+    "phaseId": "confirm",
+    "x": 1020,
+    "y": 80,
+    "description": "The 6:00 PM digest: delivered, backordered, compensated, reorders.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "Composed by the 6:00 PM digest flow and sent to Ops DL.",
+      "concepts": []
+    },
+    "labVersion": "Composed by the 6:00 PM digest flow and sent to Ops DL.",
+    "realWorldSources": [
+      "Daily ops report"
+    ],
+    "accessNeeded": [
+      "The day's tables"
+    ],
+    "soloRebuildPath": [
+      "Count the states",
+      "Assemble the digest",
+      "Later chart it"
+    ],
+    "reusedBy": [
+      "order-archive"
+    ],
+    "governanceNote": "The digest counts what the events did, not what someone remembers.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-fulfillment-digest",
+    "artifactName": "fulfillment-digest.json"
+  },
+  {
+    "id": "order-archive",
+    "label": "Order Archive",
+    "type": "archive",
+    "thingOrAction": "thing",
+    "phaseId": "confirm",
+    "x": 1020,
+    "y": 190,
+    "description": "Every digest, kept; what actually sold tunes the reorder points.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Digest Archive table.",
+      "concepts": []
+    },
+    "labVersion": "The Digest Archive table.",
+    "realWorldSources": [
+      "Sales history",
+      "Demand history"
+    ],
+    "accessNeeded": [
+      "Write access"
+    ],
+    "soloRebuildPath": [
+      "Store each digest",
+      "Keep the counts as fields",
+      "Later feed them to planning"
+    ],
+    "reusedBy": [
+      "reorder-point-policy"
+    ],
+    "governanceNote": "Demand history is how the planner learns where the points should sit.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-order-archive",
+    "artifactName": "order-archive.json"
+  },
+  {
+    "id": "run-operations",
+    "label": "Order Run Operations",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "confirm",
+    "x": 1020,
+    "y": 300,
+    "description": "Event-driven automation is never finished: events repeat, arrive out of order, and report failures mid-flight. The flow handles each without a person, and tells one when it cannot.",
+    "lesson": {
+      "type": "governance",
+      "status": "now",
+      "intent": "Handle repeats, illegal events and failures without a person.",
+      "concepts": [
+        "Idempotency",
+        "State machines",
+        "Compensation"
+      ]
+    },
+    "labVersion": "Built by you on Days 2 and 3: repeats rejected, illegal moves refused, damage compensated.",
+    "realWorldSources": [
+      "Event log",
+      "Dead-letter queue"
+    ],
+    "accessNeeded": [
+      "Alerts from rejected events"
+    ],
+    "soloRebuildPath": [
+      "Reject what you have seen",
+      "Refuse what the state cannot accept",
+      "Compensate what fails"
+    ],
+    "reusedBy": [],
+    "governanceNote": "The rejected-events table is the operator's inbox.",
+    "auditNote": "Authored for the runnable-flow build of Depot (2026-09-29).",
+    "taskId": "lesson-run-operations",
+    "artifactName": "escalation-policy.json",
+    "skeletonStage": "operate"
+  }
+]

@@ -1,0 +1,80 @@
+{
+  "note": "Terms module-07 introduces, and the build that teaches each. Enforced by scripts/lint-glossary.mjs. Keep ASCII-only.",
+  "module": "module-07",
+  "terms": [
+    {
+      "term": "event",
+      "aliases": [
+        "events",
+        "event stream"
+      ],
+      "teachesIn": "b1",
+      "gloss": "A fact that something happened, delivered when it happens: an order placed, a box scanned. Events can repeat and arrive out of order; the flow has to cope."
+    },
+    {
+      "term": "ledger",
+      "aliases": [
+        "running balance",
+        "committed",
+        "on hand"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Stock kept as rows of movements (receipts, reservations) rather than one number. On hand and committed are sums over it, so two orders arriving together cannot both take the last unit."
+    },
+    {
+      "term": "reserve",
+      "aliases": [
+        "reservation",
+        "reserved"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Committing stock to an order by writing a row to the ledger. The next order sees less."
+    },
+    {
+      "term": "backorder",
+      "aliases": [
+        "backordered"
+      ],
+      "teachesIn": "b1",
+      "gloss": "An order that cannot be reserved yet. Logged, and the customer is told by a person."
+    },
+    {
+      "term": "reorder point",
+      "aliases": [
+        "replenishment",
+        "reorder"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The available position at which a SKU is reordered, and how much. Owned by the planner; the flow only signals."
+    },
+    {
+      "term": "state machine",
+      "aliases": [
+        "transition",
+        "legal transition",
+        "state"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The list of which event may follow which state. An event the current state cannot accept is refused, not applied."
+    },
+    {
+      "term": "idempotent",
+      "aliases": [
+        "repeat",
+        "retried"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Handling the same event twice leaves the same result as handling it once. Here: look the order up before reserving."
+    },
+    {
+      "term": "compensation",
+      "aliases": [
+        "compensate",
+        "compensated",
+        "undo"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Undoing a failed step properly: a new ledger row, a new state, a person told - never pretending the failure did not happen."
+    }
+  ]
+}

@@ -722,6 +722,41 @@ await test('golden: Compass Week 2 flows FAIL Week 3 - unreadable vendor data sc
   ok(!r['b8-unscored'].passed && !r['b8-told'].passed && r['b8-not-routed'].passed)
 })
 
+// ============================================================ Depot golden
+const MOD7 = JSON.parse(readFileSync(path.join(root, 'src/data/flows/module-07.json'), 'utf8'))
+const ref7 = await imp('src/data/flows/module-07.reference.js')
+
+function runBuild7(level, build) {
+  const flows = Object.values(ref7.referenceFlowsFor(level))
+  const dayRes = eng.runModule(flows, MOD7, build.dayId).byDay[build.dayId]
+  return chk.evaluateChecks(build.checks, dayRes, dayRes.dayState, flows)
+}
+const b7id = (id) => MOD7.builds.find((b) => b.id === id)
+
+await test('golden: module-07 builds match the reference levels', () => {
+  eq(MOD7.builds.map((b) => b.id), ref7.REFERENCE_BUILD_IDS)
+})
+
+for (const build of MOD7.builds) {
+  await test(`golden: Depot reference passes ${build.id} (${build.title})`, () => {
+    const results = runBuild7(build.id, build)
+    ok(chk.allPassed(results), `\n    ${failing(results)}`)
+  })
+}
+
+await test('golden: Depot Day 1 flows FAIL Day 2 - a repeated event reserves twice; delivered lands before shipped', () => {
+  const r6 = Object.fromEntries(runBuild7('b5', b7id('b6')).map((x) => [x.id, x]))
+  ok(!r6['b6-once'].passed && !r6['b6-rejected'].passed && r6['b6-order'].passed)
+  ok(r6['b6-once'].detail.includes('2 rows'))
+  const r7 = Object.fromEntries(runBuild7('b6', b7id('b7')).map((x) => [x.id, x]))
+  ok(!r7['b7-state'].passed && !r7['b7-rejected'].passed && r7['b7-legal'].passed)
+})
+
+await test('golden: Depot Day 2 flows FAIL Day 3 - damaged is applied as a state and nothing else happens', () => {
+  const r = Object.fromEntries(runBuild7('b7', b7id('b8')).map((x) => [x.id, x]))
+  ok(!r['b8-state'].passed && !r['b8-ledger'].passed && !r['b8-told'].passed)
+})
+
 await test('golden: the finished desk still passes every earlier build (revisiting never turns a build red)', () => {
   for (const b of MOD2.builds) ok(chk.allPassed(runBuild(referenceFlowsFor('b6'), b)), `Beacon ${b.id}:\n    ${failing(runBuild(referenceFlowsFor('b6'), b))}`)
   for (const b of MOD3.builds) ok(chk.allPassed(runBuild3('b7', b)), `Harbor ${b.id}:\n    ${failing(runBuild3('b7', b))}`)
@@ -729,6 +764,7 @@ await test('golden: the finished desk still passes every earlier build (revisiti
   for (const b of MOD4.builds) ok(chk.allPassed(runBuild4('b8', b)), `Relay ${b.id}:\n    ${failing(runBuild4('b8', b))}`)
   for (const b of MOD5.builds) ok(chk.allPassed(runBuild5('b8', b)), `Ledger ${b.id}:\n    ${failing(runBuild5('b8', b))}`)
   for (const b of MOD6.builds) ok(chk.allPassed(runBuild6('b8', b)), `Compass ${b.id}:\n    ${failing(runBuild6('b8', b))}`)
+  for (const b of MOD7.builds) ok(chk.allPassed(runBuild7('b8', b)), `Depot ${b.id}:\n    ${failing(runBuild7('b8', b))}`)
 })
 
 await test('codegen: python renders Harbor loops, updates and upserts, and compiles', async () => {
@@ -836,7 +872,7 @@ for (const { file, concept } of CONCEPT_FILES) {
 }
 
 await test('concepts: every build.requires in modules 02 and 03 names an existing concept', () => {
-  for (const b of [...MOD1.builds, ...MOD2.builds, ...MOD3.builds, ...MOD4.builds, ...MOD5.builds, ...MOD6.builds]) for (const id of b.requires || []) ok(CONCEPT_IDS.has(id), `${b.id} requires unknown concept ${id}`)
+  for (const b of [...MOD1.builds, ...MOD2.builds, ...MOD3.builds, ...MOD4.builds, ...MOD5.builds, ...MOD6.builds, ...MOD7.builds]) for (const id of b.requires || []) ok(CONCEPT_IDS.has(id), `${b.id} requires unknown concept ${id}`)
   // Every step kind used by the Beacon reference has a rosetta.
   const kinds = new Set()
   for (const f of Object.values(referenceFlowsFor('b6'))) fm.walkSteps(f.steps, (st) => kinds.add(st.kind))

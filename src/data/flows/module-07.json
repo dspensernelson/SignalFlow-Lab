@@ -1,0 +1,1099 @@
+{
+  "moduleId": "module-07",
+  "title": "Depot Order Flow",
+  "org": "Depot Supply",
+  "intro": "Depot ships warehouse orders, and nothing here runs on a morning clock: orders arrive, pickers report, carriers scan, and sometimes a box comes back crushed. You are going to build event-driven automation: reserve stock the moment an order lands (without selling the last unit twice), walk each order through its legal states as events arrive, refuse the events that make no sense, and undo a reservation properly when a shipment fails. Then a digest at 6:00 PM says what happened.",
+  "world": {
+    "oneLiner": "Depot Supply ships warehouse orders as events happen: an order lands and stock is reserved, pickers and carriers report each step, and a daily digest tells Ops what shipped, what waited, and what needs reordering.",
+    "roles": [
+      {
+        "name": "Warehouse Lead",
+        "does": "Owns pick and pack, and hears when an event arrives that the order's state cannot accept."
+      },
+      {
+        "name": "Inventory Planner",
+        "does": "Owns the reorder points and is told when stock crosses one."
+      },
+      {
+        "name": "Carrier Desk",
+        "does": "Owns the handoff to the carrier and the tracking id."
+      },
+      {
+        "name": "Customer Service Rep",
+        "does": "Tells the customer when an order waits or fails, and owns the make-good."
+      },
+      {
+        "name": "Ops DL",
+        "does": "The distribution list that receives the 6:00 PM digest."
+      }
+    ],
+    "deliverable": "an honest record of every order's states, and the 6:00 PM fulfillment digest",
+    "clock": "All day: orders and shipment events arrive and are handled as they land. 6:00 PM: the digest counts the day.",
+    "stakes": "Get it wrong and two customers are promised the last unit, an order is marked delivered that never shipped, or a crushed box quietly ends the order with nobody told."
+  },
+  "owners": [
+    "Warehouse Lead",
+    "Inventory Planner",
+    "Carrier Desk",
+    "Customer Service Rep",
+    "Ops DL"
+  ],
+  "sources": [
+    {
+      "id": "order-events",
+      "label": "Order Events",
+      "labelField": "orderId",
+      "description": "An order placed: which SKU, how many, for whom. An event, not a form - it can arrive twice.",
+      "fields": [
+        "eventId",
+        "orderId",
+        "sku",
+        "qty",
+        "customer",
+        "at"
+      ]
+    },
+    {
+      "id": "shipment-events",
+      "label": "Shipment Events",
+      "labelField": "eventId",
+      "description": "What happened to an order after it was reserved: picked, packed, shipped (with a tracking id), delivered - or damaged.",
+      "fields": [
+        "eventId",
+        "orderId",
+        "event",
+        "tracking",
+        "at"
+      ]
+    }
+  ],
+  "stores": [
+    {
+      "id": "inventory-ledger",
+      "label": "Inventory Ledger",
+      "owner": "Inventory Planner",
+      "tone": "neutral",
+      "description": "Stock as a running balance: every receipt and every reservation is a row with a delta. On hand and committed are sums, never a snapshot.",
+      "fields": [
+        "sku",
+        "onHandDelta",
+        "committedDelta",
+        "reason",
+        "orderId"
+      ]
+    },
+    {
+      "id": "reorder-points",
+      "label": "Reorder Points",
+      "keyField": "sku",
+      "owner": "Inventory Planner",
+      "tone": "neutral",
+      "description": "When the available position of a SKU falls to this number or below, reorder.",
+      "fields": [
+        "sku",
+        "reorderPoint",
+        "reorderQty"
+      ]
+    },
+    {
+      "id": "state-machine",
+      "label": "State Machine",
+      "owner": "Warehouse Lead",
+      "tone": "neutral",
+      "description": "The legal transitions: which event may follow which state.",
+      "fields": [
+        "from",
+        "to"
+      ]
+    },
+    {
+      "id": "compensation-policy",
+      "label": "Compensation Policy",
+      "keyField": "event",
+      "owner": "Customer Service Rep",
+      "tone": "neutral",
+      "description": "For each failure event: what to undo, and who tells the customer.",
+      "fields": [
+        "event",
+        "action",
+        "tell"
+      ]
+    },
+    {
+      "id": "orders",
+      "label": "Orders",
+      "keyField": "orderId",
+      "owner": "Warehouse Lead",
+      "tone": "neutral",
+      "description": "One row per order: its current state, and the last event that moved it.",
+      "fields": [
+        "orderId",
+        "sku",
+        "qty",
+        "customer",
+        "state",
+        "tracking",
+        "at"
+      ]
+    },
+    {
+      "id": "backorders",
+      "label": "Backorders",
+      "daily": true,
+      "owner": "Customer Service Rep",
+      "tone": "hold",
+      "description": "Orders that could not be reserved today.",
+      "fields": [
+        "orderId",
+        "sku",
+        "qty",
+        "available"
+      ]
+    },
+    {
+      "id": "rejected-events",
+      "label": "Rejected Events",
+      "daily": true,
+      "owner": "Warehouse Lead",
+      "tone": "bad",
+      "description": "Events the order's state could not accept, kept for a person to look at.",
+      "fields": [
+        "eventId",
+        "orderId",
+        "event",
+        "state"
+      ]
+    },
+    {
+      "id": "replenishments",
+      "label": "Replenishments",
+      "daily": true,
+      "owner": "Inventory Planner",
+      "tone": "good",
+      "description": "Reorders triggered today.",
+      "fields": [
+        "sku",
+        "position",
+        "reorderQty"
+      ]
+    },
+    {
+      "id": "compensations",
+      "label": "Compensations",
+      "daily": true,
+      "owner": "Customer Service Rep",
+      "tone": "hold",
+      "description": "Orders compensated today: what failed and what was undone.",
+      "fields": [
+        "orderId",
+        "event",
+        "action"
+      ]
+    },
+    {
+      "id": "digest-archive",
+      "label": "Digest Archive",
+      "keyField": "runId",
+      "owner": "Ops DL",
+      "tone": "good",
+      "description": "Every 6:00 PM digest.",
+      "fields": [
+        "runId",
+        "delivered",
+        "backordered",
+        "compensated",
+        "reorders"
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "order-flow",
+      "name": "Order placed",
+      "description": "Runs once per order event.",
+      "trigger": {
+        "mode": "event",
+        "source": "order-events"
+      }
+    },
+    {
+      "id": "shipment-flow",
+      "name": "Shipment events",
+      "description": "Runs once per shipment event.",
+      "trigger": {
+        "mode": "event",
+        "source": "shipment-events"
+      }
+    },
+    {
+      "id": "digest-flow",
+      "name": "The 6:00 PM digest",
+      "description": "Runs every day at 6:00 PM.",
+      "trigger": {
+        "mode": "schedule",
+        "at": "6:00 PM"
+      }
+    }
+  ],
+  "days": [
+    {
+      "id": "day-1",
+      "label": "Day 1 - one clean order, one that waits",
+      "description": "Ten units of SKU-101 on hand, two already committed. ORD-5001 wants four and gets them; ORD-5006 wants nine and has to wait. ORD-5001 is picked, packed, shipped and delivered by evening.",
+      "sources": {
+        "order-events": [
+          {
+            "eventId": "ORD-5001 placed",
+            "orderId": "ORD-5001",
+            "sku": "SKU-101",
+            "qty": 4,
+            "customer": "Harbor Logistics",
+            "at": "9:12 AM"
+          },
+          {
+            "eventId": "ORD-5006 placed",
+            "orderId": "ORD-5006",
+            "sku": "SKU-101",
+            "qty": 9,
+            "customer": "Cascade Packaging",
+            "at": "9:40 AM"
+          }
+        ],
+        "shipment-events": [
+          {
+            "eventId": "E-101",
+            "orderId": "ORD-5001",
+            "event": "picked",
+            "tracking": "",
+            "at": "10:05 AM"
+          },
+          {
+            "eventId": "E-102",
+            "orderId": "ORD-5001",
+            "event": "packed",
+            "tracking": "",
+            "at": "10:30 AM"
+          },
+          {
+            "eventId": "E-103",
+            "orderId": "ORD-5001",
+            "event": "shipped",
+            "tracking": "TRK-1001",
+            "at": "1:15 PM"
+          },
+          {
+            "eventId": "E-104",
+            "orderId": "ORD-5001",
+            "event": "delivered",
+            "tracking": "",
+            "at": "4:50 PM"
+          }
+        ]
+      },
+      "seeds": {
+        "inventory-ledger": [
+          {
+            "sku": "SKU-101",
+            "onHandDelta": 10,
+            "committedDelta": 0,
+            "reason": "receipt",
+            "orderId": ""
+          },
+          {
+            "sku": "SKU-101",
+            "onHandDelta": 0,
+            "committedDelta": 2,
+            "reason": "reserve",
+            "orderId": "ORD-4990"
+          },
+          {
+            "sku": "SKU-102",
+            "onHandDelta": 20,
+            "committedDelta": 0,
+            "reason": "receipt",
+            "orderId": ""
+          }
+        ],
+        "reorder-points": [
+          {
+            "sku": "SKU-101",
+            "reorderPoint": 5,
+            "reorderQty": 20
+          },
+          {
+            "sku": "SKU-102",
+            "reorderPoint": 5,
+            "reorderQty": 40
+          }
+        ],
+        "state-machine": [
+          {
+            "from": "reserved",
+            "to": "picked"
+          },
+          {
+            "from": "picked",
+            "to": "packed"
+          },
+          {
+            "from": "packed",
+            "to": "shipped"
+          },
+          {
+            "from": "shipped",
+            "to": "delivered"
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    },
+    {
+      "id": "day-2",
+      "label": "Day 2 - twice, and out of order",
+      "description": "ORD-5002's placed event arrives twice - the shop retried after a timeout. ORD-5003 is picked and packed, then a 'delivered' event arrives before anything shipped.",
+      "sources": {
+        "order-events": [
+          {
+            "eventId": "ORD-5002 placed",
+            "orderId": "ORD-5002",
+            "sku": "SKU-102",
+            "qty": 3,
+            "customer": "Sierra Tooling",
+            "at": "8:55 AM"
+          },
+          {
+            "eventId": "ORD-5002 placed",
+            "orderId": "ORD-5002",
+            "sku": "SKU-102",
+            "qty": 3,
+            "customer": "Sierra Tooling",
+            "at": "8:55 AM"
+          },
+          {
+            "eventId": "ORD-5003 placed",
+            "orderId": "ORD-5003",
+            "sku": "SKU-101",
+            "qty": 2,
+            "customer": "Northwind Fasteners",
+            "at": "9:20 AM"
+          }
+        ],
+        "shipment-events": [
+          {
+            "eventId": "E-201",
+            "orderId": "ORD-5002",
+            "event": "picked",
+            "tracking": "",
+            "at": "10:00 AM"
+          },
+          {
+            "eventId": "E-202",
+            "orderId": "ORD-5002",
+            "event": "packed",
+            "tracking": "",
+            "at": "10:20 AM"
+          },
+          {
+            "eventId": "E-203",
+            "orderId": "ORD-5002",
+            "event": "shipped",
+            "tracking": "TRK-2001",
+            "at": "1:00 PM"
+          },
+          {
+            "eventId": "E-204",
+            "orderId": "ORD-5002",
+            "event": "delivered",
+            "tracking": "",
+            "at": "4:30 PM"
+          },
+          {
+            "eventId": "E-205",
+            "orderId": "ORD-5003",
+            "event": "picked",
+            "tracking": "",
+            "at": "10:10 AM"
+          },
+          {
+            "eventId": "E-206",
+            "orderId": "ORD-5003",
+            "event": "packed",
+            "tracking": "",
+            "at": "10:40 AM"
+          },
+          {
+            "eventId": "E-207",
+            "orderId": "ORD-5003",
+            "event": "delivered",
+            "tracking": "",
+            "at": "3:00 PM"
+          }
+        ]
+      },
+      "seeds": {},
+      "approvals": {},
+      "failures": []
+    },
+    {
+      "id": "day-3",
+      "label": "Day 3 - crushed in transit",
+      "description": "ORD-5004 ships at noon. At 3:10 PM the carrier reports it damaged. The state machine knows the word; nothing else does.",
+      "sources": {
+        "order-events": [
+          {
+            "eventId": "ORD-5004 placed",
+            "orderId": "ORD-5004",
+            "sku": "SKU-102",
+            "qty": 2,
+            "customer": "Meridian Energy",
+            "at": "9:05 AM"
+          }
+        ],
+        "shipment-events": [
+          {
+            "eventId": "E-301",
+            "orderId": "ORD-5004",
+            "event": "picked",
+            "tracking": "",
+            "at": "9:50 AM"
+          },
+          {
+            "eventId": "E-302",
+            "orderId": "ORD-5004",
+            "event": "packed",
+            "tracking": "",
+            "at": "10:15 AM"
+          },
+          {
+            "eventId": "E-303",
+            "orderId": "ORD-5004",
+            "event": "shipped",
+            "tracking": "TRK-3001",
+            "at": "12:00 PM"
+          },
+          {
+            "eventId": "E-304",
+            "orderId": "ORD-5004",
+            "event": "damaged",
+            "tracking": "",
+            "at": "3:10 PM"
+          }
+        ]
+      },
+      "seeds": {
+        "state-machine": [
+          {
+            "from": "shipped",
+            "to": "damaged"
+          }
+        ],
+        "compensation-policy": [
+          {
+            "event": "damaged",
+            "action": "release the shipment, reserve a replacement, tell the customer",
+            "tell": "Customer Service Rep"
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  ],
+  "builds": [
+    {
+      "id": "b1",
+      "dayId": "day-1",
+      "flowId": "order-flow",
+      "title": "What is really available",
+      "brief": "When an order lands, work out what is actually available: on hand minus already committed.",
+      "goal": "An order names a SKU and a quantity. Stock is not a number in a box; it is a ledger of receipts and reservations. On hand is the sum of the receipts; committed is the sum of the reservations; available is the difference. The naive check - is on hand enough? - sells the last unit twice.",
+      "outcome": "Every order carries onHand, committed and available for its SKU, computed from the Inventory Ledger, and is recorded in Orders.",
+      "constraints": [
+        "Read the ledger rows for the SKU (all rows) and sum them.",
+        "available = onHand - committed.",
+        "One row per order in Orders - add or replace by orderId."
+      ],
+      "requires": [
+        "trigger",
+        "lookup-all",
+        "lists",
+        "transform",
+        "upsert",
+        "json-record"
+      ],
+      "hints": {
+        "question": "There are ten on the shelf. Two are promised to yesterday's order. How many can you sell?",
+        "nudge": "A Lookup on Inventory Ledger, all rows where sku = sku (moves); a Transform onHand = sum(moves, 'onHandDelta'), committed = sum(moves, 'committedDelta'), available = onHand - committed; a Store into Orders, add or replace by orderId.",
+        "steps": [
+          "Connect the Trigger to Order Events.",
+          "Add a Lookup on Inventory Ledger, all rows, where sku = sku. Name it moves.",
+          "Add a Transform: onHand = sum(moves, 'onHandDelta'), committed = sum(moves, 'committedDelta'), available = onHand - committed.",
+          "Add a Store into Orders, add or replace if it exists, same row when orderId. Run it."
+        ]
+      },
+      "mapNodes": [
+        "order-events",
+        "order-record",
+        "inventory-ledger",
+        "availability-check"
+      ],
+      "checks": [
+        {
+          "id": "b1-run",
+          "kind": "runStatus",
+          "flowId": "order-flow",
+          "equals": "succeeded",
+          "why": "An order that fails on arrival is a customer nobody answers.",
+          "label": "The order flow runs without failing"
+        },
+        {
+          "id": "b1-avail",
+          "kind": "recordField",
+          "where": {
+            "orderId": "ORD-5001"
+          },
+          "field": "available",
+          "equals": 8,
+          "why": "Ten on hand, two promised: eight to sell.",
+          "label": "ORD-5001 sees 8 available (10 on hand, 2 committed)"
+        },
+        {
+          "id": "b1-orders",
+          "kind": "storeCount",
+          "store": "orders",
+          "equals": 2,
+          "why": "Every order is recorded, once.",
+          "label": "Both orders are in Orders"
+        }
+      ]
+    },
+    {
+      "id": "b2",
+      "dayId": "day-1",
+      "flowId": "order-flow",
+      "title": "Reserve or backorder",
+      "brief": "Enough stock: reserve it in the ledger. Not enough: backorder and tell the customer.",
+      "goal": "If the quantity fits in what is available, reserve it: write a reservation row to the ledger so the next order sees less. If not, the order is backordered and the Customer Service Rep tells the customer. Either way the order's state is recorded.",
+      "outcome": "Reserved orders add a committed row to the ledger and are in state reserved; the rest are in state backordered, logged in Backorders, and the Customer Service Rep is told.",
+      "constraints": [
+        "A reservation is a ledger row: committedDelta = qty, onHandDelta = 0.",
+        "The order's state is reserved or backordered.",
+        "Reserve first, then check the next order - the ledger is what makes the second order see less."
+      ],
+      "requires": [
+        "condition",
+        "send",
+        "fields-and-paths"
+      ],
+      "hints": {
+        "question": "After ORD-5001 takes four, what does ORD-5006 see?",
+        "nudge": "A Condition on qty <= available: YES lane Transform state = 'reserved', onHandDelta = 0, committedDelta = qty, reason = 'reserve', then Store into Inventory Ledger (add). NO lane: Transform state = 'backordered'; Store into Backorders; Send to Customer Service Rep. Keep the Orders store after the Condition.",
+        "steps": [
+          "Before the Orders store, add a Condition: qty <= available (compare to the field).",
+          "YES lane: Transform state = 'reserved', onHandDelta = 0, committedDelta = qty, reason = 'reserve'; Store into Inventory Ledger.",
+          "NO lane: Transform state = 'backordered'; Store into Backorders; Send to Customer Service Rep ('{{orderId}} backordered: {{qty}} of {{sku}}, {{available}} available').",
+          "Run it. ORD-5006 should now see 4 available and wait."
+        ]
+      },
+      "mapNodes": [
+        "reserve-decision",
+        "backorder-path",
+        "inventory-ledger"
+      ],
+      "checks": [
+        {
+          "id": "b2-reserved",
+          "kind": "storeContains",
+          "store": "orders",
+          "where": {
+            "orderId": "ORD-5001"
+          },
+          "fields": {
+            "state": [
+              "reserved",
+              "picked",
+              "packed",
+              "shipped",
+              "delivered"
+            ]
+          },
+          "why": "Four of eight: reserved.",
+          "label": "ORD-5001 is reserved (and free to walk on)"
+        },
+        {
+          "id": "b2-ledger",
+          "kind": "storeContains",
+          "store": "inventory-ledger",
+          "where": {
+            "orderId": "ORD-5001"
+          },
+          "fields": {
+            "committedDelta": 4
+          },
+          "why": "The reservation lives in the ledger, where the next order will see it.",
+          "label": "The ledger has ORD-5001's reservation (4 committed)"
+        },
+        {
+          "id": "b2-second",
+          "kind": "recordField",
+          "where": {
+            "orderId": "ORD-5006"
+          },
+          "field": "available",
+          "equals": 4,
+          "why": "After the first reservation, only four are left - the ledger did its job.",
+          "label": "ORD-5006 now sees 4 available"
+        },
+        {
+          "id": "b2-back",
+          "kind": "storeContains",
+          "store": "backorders",
+          "where": {
+            "orderId": "ORD-5006"
+          },
+          "why": "Nine into four does not go; the customer waits, and is told.",
+          "label": "ORD-5006 is backordered"
+        },
+        {
+          "id": "b2-told",
+          "kind": "outboxContains",
+          "to": "Customer Service Rep",
+          "recordLabel": "ORD-5006",
+          "why": "A wait nobody explains is a cancellation.",
+          "label": "The Customer Service Rep is told about ORD-5006"
+        }
+      ]
+    },
+    {
+      "id": "b3",
+      "dayId": "day-1",
+      "flowId": "shipment-flow",
+      "title": "Walk the states",
+      "brief": "Each shipment event moves its order to the next state.",
+      "goal": "Pickers, packers and the carrier each send an event. Each one belongs to an order and moves it: picked, packed, shipped (with a tracking id), delivered. Find the order, set its state to the event, and keep the tracking id when there is one.",
+      "outcome": "Every shipment event updates its order's state in Orders; a shipped order carries its tracking id.",
+      "constraints": [
+        "Update the order's existing row; never add one.",
+        "The state is the event's name.",
+        "Keep the tracking id on the order: a later event without one must not blank it."
+      ],
+      "requires": [
+        "update-row"
+      ],
+      "hints": {
+        "question": "E-103 says ORD-5001 shipped with TRK-1001. What should the order's row say afterwards?",
+        "nudge": "Trigger on Shipment Events; a Lookup on Orders by orderId (order); a Transform state = event, tracking = if(len(tracking) > 0, tracking, order.tracking); a Store into Orders, update the existing row by orderId.",
+        "steps": [
+          "Open the Shipment events flow and connect its Trigger to Shipment Events.",
+          "Add a Lookup on Orders where orderId = orderId. Name it order.",
+          "Add a Transform: state = event, tracking = if(len(tracking) > 0, tracking, order.tracking).",
+          "Add a Store into Orders, update the existing row, same row when orderId. Run it."
+        ]
+      },
+      "mapNodes": [
+        "state-machine-policy",
+        "pick-pack-ship",
+        "carrier-handoff",
+        "shipment-events",
+        "delivery-confirmation"
+      ],
+      "checks": [
+        {
+          "id": "b3-run",
+          "kind": "runStatus",
+          "flowId": "shipment-flow",
+          "equals": "succeeded",
+          "why": "A lost event is an order stuck in the wrong state.",
+          "label": "The shipment flow runs without failing"
+        },
+        {
+          "id": "b3-delivered",
+          "kind": "storeContains",
+          "store": "orders",
+          "where": {
+            "orderId": "ORD-5001"
+          },
+          "fields": {
+            "state": "delivered",
+            "tracking": "TRK-1001"
+          },
+          "why": "By evening the order is delivered and its tracking id is on record.",
+          "label": "ORD-5001 is delivered, tracking TRK-1001"
+        },
+        {
+          "id": "b3-rows",
+          "kind": "storeCount",
+          "store": "orders",
+          "equals": 2,
+          "why": "Four events, still two orders.",
+          "label": "Still two orders"
+        }
+      ]
+    },
+    {
+      "id": "b4",
+      "dayId": "day-1",
+      "flowId": "order-flow",
+      "title": "Reorder",
+      "brief": "When a reservation takes the position to the reorder point, tell the planner.",
+      "goal": "After a reservation the available position may have crossed the reorder point. The Inventory Planner owns those points per SKU. In the reserve lane, compute the position after the reservation and, at or below the point, trigger a replenishment.",
+      "outcome": "A reservation that takes a SKU to its reorder point or below logs a replenishment and tells the Inventory Planner.",
+      "constraints": [
+        "position = available minus the quantity just reserved.",
+        "At or below the reorder point triggers.",
+        "Only a reservation can trigger - a backorder changes nothing."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "After ORD-5001 takes four, how many can still be sold, and is that enough?",
+        "nudge": "In the reserve lane, after the ledger Store: Lookup Reorder Points by sku (point); Transform position = available - qty; Condition position <= point.reorderPoint: YES lane Transform reorderQty = point.reorderQty, Store into Replenishments, Send to Inventory Planner.",
+        "steps": [
+          "In the reserve YES lane, after the ledger Store, add a Lookup on Reorder Points where sku = sku. Name it point.",
+          "Add a Transform: position = available - qty.",
+          "Add a Condition: position <= point.reorderPoint. Its YES lane: Transform reorderQty = point.reorderQty; Store into Replenishments; Send to Inventory Planner ('Reorder {{sku}}: position {{position}}').",
+          "Run it."
+        ]
+      },
+      "mapNodes": [
+        "reorder-point-policy",
+        "replenishment-trigger"
+      ],
+      "checks": [
+        {
+          "id": "b4-replen",
+          "kind": "storeContains",
+          "store": "replenishments",
+          "where": {
+            "sku": "SKU-101"
+          },
+          "fields": {
+            "position": 4,
+            "reorderQty": 20
+          },
+          "why": "Four left against a point of five: reorder twenty.",
+          "label": "SKU-101 is reordered at position 4"
+        },
+        {
+          "id": "b4-told",
+          "kind": "outboxContains",
+          "to": "Inventory Planner",
+          "contains": "SKU-101",
+          "why": "The planner places the purchase order; the flow only signals.",
+          "label": "The Inventory Planner is told"
+        },
+        {
+          "id": "b4-once",
+          "kind": "storeCount",
+          "store": "replenishments",
+          "equals": 1,
+          "why": "The backorder did not reserve anything, so it triggers nothing.",
+          "label": "One replenishment, not two"
+        }
+      ]
+    },
+    {
+      "id": "b5",
+      "dayId": "day-1",
+      "flowId": "digest-flow",
+      "title": "The 6 PM digest",
+      "brief": "At 6:00, count the day for Ops.",
+      "goal": "Ops wants the day in numbers: delivered, backordered, compensated, reorders. Read Orders and Replenishments, count, send the digest and archive it.",
+      "outcome": "The Ops DL receives the digest with the day's counts; a copy is archived.",
+      "constraints": [
+        "Name the counts delivered, backordered, compensated and reorders.",
+        "Count from the tables."
+      ],
+      "requires": [
+        "schedule-trigger",
+        "compose"
+      ],
+      "hints": {
+        "question": "How many orders reached the customer today?",
+        "nudge": "All-rows Lookups on Orders (orders) and Replenishments (reordersMade); Transform with count(orders, 'state', ...) and len(reordersMade); Compose; Send to Ops DL; Store into Digest Archive.",
+        "steps": [
+          "Open the 6:00 PM digest flow.",
+          "Lookups, all rows: Orders as orders, Replenishments as reordersMade.",
+          "Transform: delivered = count(orders, 'state', 'delivered'), backordered = count(orders, 'state', 'backordered'), compensated = count(orders, 'state', 'compensated'), reorders = len(reordersMade).",
+          "Compose digest with the counts and {{#each orders}}- {{orderId}} {{state}}{{/each}}.",
+          "Send to Ops DL with {{digest}}; Store into Digest Archive."
+        ]
+      },
+      "mapNodes": [
+        "fulfillment-digest",
+        "order-archive"
+      ],
+      "checks": [
+        {
+          "id": "b5-delivered",
+          "kind": "recordField",
+          "where": {
+            "scheduledAt": "6:00 PM"
+          },
+          "field": "delivered",
+          "equals": 1,
+          "why": "What reached customers today.",
+          "label": "The digest counts 1 delivered"
+        },
+        {
+          "id": "b5-back",
+          "kind": "recordField",
+          "where": {
+            "scheduledAt": "6:00 PM"
+          },
+          "field": "backordered",
+          "equals": 1,
+          "why": "What is waiting.",
+          "label": "The digest counts 1 backordered"
+        },
+        {
+          "id": "b5-reorders",
+          "kind": "recordField",
+          "where": {
+            "scheduledAt": "6:00 PM"
+          },
+          "field": "reorders",
+          "equals": 1,
+          "why": "What the planner has to buy.",
+          "label": "The digest counts 1 reorder"
+        },
+        {
+          "id": "b5-sent",
+          "kind": "outboxContains",
+          "to": "Ops DL",
+          "contains": "ORD-5001",
+          "why": "Ops reads the orders, not just totals.",
+          "label": "Ops receives the digest"
+        },
+        {
+          "id": "b5-archive",
+          "kind": "storeContains",
+          "store": "digest-archive",
+          "where": {
+            "runId": "day-1-run"
+          },
+          "why": "Yesterday's digest is tomorrow's demand history.",
+          "label": "The digest is archived"
+        }
+      ]
+    },
+    {
+      "id": "b6",
+      "dayId": "day-2",
+      "flowId": "order-flow",
+      "title": "Day 2: the same order, twice",
+      "brief": "An order event that arrives twice must reserve once.",
+      "goal": "The shop retried after a timeout, so ORD-5002's placed event arrived twice. Run your Day 1 flow and read the ledger: SKU-102 is committed six, for an order of three. Events repeat; the flow has to notice it has seen this order.",
+      "outcome": "A repeated order event changes nothing: one reservation, one order row, and the repeat is logged as rejected.",
+      "constraints": [
+        "Look the order up before doing anything.",
+        "A known order stops the flow before the ledger is touched.",
+        "Log the repeat so a person can see the shop is retrying."
+      ],
+      "requires": [
+        "stop"
+      ],
+      "hints": {
+        "question": "What did the second ORD-5002 event do to the ledger?",
+        "nudge": "Right after the Trigger, a Lookup on Orders by orderId (seen); a Condition seen exists: YES lane Store into Rejected Events, Stop.",
+        "steps": [
+          "Run first and open the Inventory Ledger in the Data tab: count SKU-102's reservations.",
+          "After the Trigger, add a Lookup on Orders where orderId = orderId. Name it seen.",
+          "Add a Condition: seen exists. YES lane: Transform event = 'placed (repeat)', state = seen.state; Store into Rejected Events; Stop.",
+          "Run again."
+        ]
+      },
+      "mapNodes": [
+        "order-events",
+        "order-record"
+      ],
+      "checks": [
+        {
+          "id": "b6-once",
+          "kind": "storeCount",
+          "store": "inventory-ledger",
+          "where": {
+            "orderId": "ORD-5002"
+          },
+          "equals": 1,
+          "why": "One order, one reservation - the second event must not commit stock again.",
+          "label": "ORD-5002 is reserved once in the ledger"
+        },
+        {
+          "id": "b6-rejected",
+          "kind": "storeContains",
+          "store": "rejected-events",
+          "where": {
+            "orderId": "ORD-5002"
+          },
+          "why": "A retrying shop is something Ops should be able to see.",
+          "label": "The repeat is logged in Rejected Events"
+        },
+        {
+          "id": "b6-order",
+          "kind": "storeCount",
+          "store": "orders",
+          "where": {
+            "orderId": "ORD-5002"
+          },
+          "equals": 1,
+          "why": "One row per order.",
+          "label": "One row for ORD-5002"
+        }
+      ]
+    },
+    {
+      "id": "b7",
+      "dayId": "day-2",
+      "flowId": "shipment-flow",
+      "title": "Day 2: delivered before shipped",
+      "brief": "An event the order's state cannot accept is rejected, not applied.",
+      "goal": "ORD-5003 was picked and packed. Then a 'delivered' event arrived - and your flow marked it delivered, though nothing ever shipped. The State Machine lists which event may follow which state. Check every event against it; reject the ones that do not fit and tell the Warehouse Lead.",
+      "outcome": "An illegal transition is logged in Rejected Events, the Warehouse Lead is told, and the order's state is unchanged; legal events still walk.",
+      "constraints": [
+        "Look the transition up by the order's current state AND the event.",
+        "No transition, no change.",
+        "Legal sequences still work exactly as before."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "Can an order be delivered before it ships?",
+        "nudge": "After the order Lookup, a Lookup on State Machine where from = order.state and to = event (transition); a Condition transition missing: YES lane Transform state = order.state; Store into Rejected Events; Send to Warehouse Lead; Stop.",
+        "steps": [
+          "Run first and read ORD-5003's row.",
+          "After the order Lookup, add a Lookup on State Machine where from = order.state and to = event. Name it transition.",
+          "Add a Condition: transition missing. YES lane: Transform state = order.state; Store into Rejected Events; Send to Warehouse Lead ('{{orderId}}: {{event}} arrived while {{state}}'); Stop.",
+          "Run again."
+        ]
+      },
+      "mapNodes": [
+        "state-machine-policy",
+        "pick-pack-ship"
+      ],
+      "checks": [
+        {
+          "id": "b7-state",
+          "kind": "storeContains",
+          "store": "orders",
+          "where": {
+            "orderId": "ORD-5003"
+          },
+          "fields": {
+            "state": "packed"
+          },
+          "why": "Packed is the truth; delivered was a bad event.",
+          "label": "ORD-5003 stays packed"
+        },
+        {
+          "id": "b7-rejected",
+          "kind": "storeContains",
+          "store": "rejected-events",
+          "where": {
+            "eventId": "E-207"
+          },
+          "why": "The bad event is kept, not dropped - someone sent it.",
+          "label": "E-207 (delivered) is rejected"
+        },
+        {
+          "id": "b7-told",
+          "kind": "outboxContains",
+          "to": "Warehouse Lead",
+          "recordLabel": "E-207",
+          "why": "The Warehouse Lead can find out who scanned what.",
+          "label": "The Warehouse Lead is told"
+        },
+        {
+          "id": "b7-legal",
+          "kind": "storeContains",
+          "store": "orders",
+          "where": {
+            "orderId": "ORD-5002"
+          },
+          "fields": {
+            "state": "delivered",
+            "tracking": "TRK-2001"
+          },
+          "why": "A legal sequence still walks all the way.",
+          "label": "ORD-5002 still walks to delivered"
+        }
+      ]
+    },
+    {
+      "id": "b8",
+      "dayId": "day-3",
+      "flowId": "shipment-flow",
+      "title": "Day 3: crushed in transit",
+      "brief": "A damaged shipment is undone properly: release, re-reserve, tell the customer.",
+      "goal": "ORD-5004 shipped at noon and the carrier reports it damaged at 3:10. The state machine accepts the event, so your flow sets the state to damaged - and stops there. The customer has no order and nobody knows. The Compensation Policy says what a failure undoes: reserve a replacement in the ledger, mark the order compensated, log it, and tell the Customer Service Rep.",
+      "outcome": "A damaged shipment ends in state compensated, with a replacement reservation in the ledger, a row in Compensations, and the Customer Service Rep told.",
+      "constraints": [
+        "Read the action and who to tell from the Compensation Policy.",
+        "Undo means a ledger row, not a deleted one.",
+        "The order's final state is compensated."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "The box is crushed. What should exist in the system an hour later that does not exist now?",
+        "nudge": "After the state Transform, a Condition event == damaged: YES lane Lookup Compensation Policy by event (comp); Transform state = 'compensated', sku = order.sku, onHandDelta = 0, committedDelta = order.qty, reason = 'compensate', action = comp.action; Store into Inventory Ledger; Store into Compensations; Send to Customer Service Rep.",
+        "steps": [
+          "Run first and read ORD-5004's row.",
+          "After the state Transform, add a Condition: event == damaged.",
+          "YES lane: Lookup Compensation Policy where event = event (comp); Transform state = 'compensated', sku = order.sku, onHandDelta = 0, committedDelta = order.qty, reason = 'compensate', action = comp.action; Store into Inventory Ledger; Store into Compensations; Send to Customer Service Rep ('{{orderId}} damaged in transit: {{action}}').",
+          "Keep the Orders update last. Run again."
+        ]
+      },
+      "mapNodes": [
+        "compensation-policy",
+        "exception-compensation",
+        "run-operations"
+      ],
+      "checks": [
+        {
+          "id": "b8-state",
+          "kind": "storeContains",
+          "store": "orders",
+          "where": {
+            "orderId": "ORD-5004"
+          },
+          "fields": {
+            "state": "compensated"
+          },
+          "why": "Damaged is what happened; compensated is what the desk did about it.",
+          "label": "ORD-5004 is compensated"
+        },
+        {
+          "id": "b8-ledger",
+          "kind": "storeContains",
+          "store": "inventory-ledger",
+          "where": {
+            "orderId": "ORD-5004",
+            "reason": "compensate"
+          },
+          "fields": {
+            "committedDelta": 2
+          },
+          "why": "A replacement is reserved in the ledger, where the next order will see it.",
+          "label": "A replacement is reserved in the ledger"
+        },
+        {
+          "id": "b8-log",
+          "kind": "storeContains",
+          "store": "compensations",
+          "where": {
+            "orderId": "ORD-5004"
+          },
+          "why": "Compensations are counted in the digest and audited.",
+          "label": "The compensation is logged"
+        },
+        {
+          "id": "b8-told",
+          "kind": "outboxContains",
+          "to": "Customer Service Rep",
+          "recordLabel": "E-304",
+          "why": "The customer hears from a person, with the plan.",
+          "label": "The Customer Service Rep is told"
+        }
+      ]
+    }
+  ]
+}

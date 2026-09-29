@@ -1,0 +1,79 @@
+[
+  {
+    "id": "order-events",
+    "order": 1,
+    "title": "Phase 1: Order Events",
+    "goal": "Read the stream, materialize the order, and know the stock as a ledger.",
+    "statusSource": "order-record",
+    "nodeIds": [
+      "order-events",
+      "order-record",
+      "inventory-ledger"
+    ],
+    "artifactNames": [
+      "orders.json"
+    ],
+    "unlocks": "An order record and a stock position to decide on."
+  },
+  {
+    "id": "inventory",
+    "order": 2,
+    "title": "Phase 2: Inventory",
+    "goal": "Reserve what is truly available, backorder the rest, and reorder when the position drops.",
+    "statusSource": "reserve-decision",
+    "nodeIds": [
+      "availability-check",
+      "reserve-decision",
+      "backorder-path",
+      "reorder-point-policy",
+      "replenishment-trigger"
+    ],
+    "artifactNames": [],
+    "unlocks": "Reserved orders ready to pick."
+  },
+  {
+    "id": "fulfillment",
+    "order": 3,
+    "title": "Phase 3: Fulfillment States",
+    "goal": "Walk each order through its legal states as events arrive.",
+    "statusSource": "pick-pack-ship",
+    "nodeIds": [
+      "state-machine-policy",
+      "pick-pack-ship",
+      "carrier-handoff",
+      "shipment-events"
+    ],
+    "artifactNames": [],
+    "unlocks": "Orders shipped with tracking, illegal events refused."
+  },
+  {
+    "id": "exceptions",
+    "order": 4,
+    "title": "Phase 4: Exceptions and Compensation",
+    "goal": "Undo a failed shipment properly and confirm the ones that arrive.",
+    "statusSource": "exception-compensation",
+    "nodeIds": [
+      "compensation-policy",
+      "exception-compensation",
+      "delivery-confirmation"
+    ],
+    "artifactNames": [],
+    "unlocks": "Honest final states for every order."
+  },
+  {
+    "id": "confirm",
+    "order": 5,
+    "title": "Phase 5: Confirmation and Replenishment",
+    "goal": "Count the day for Ops and keep the history that tunes the reorder points.",
+    "statusSource": "fulfillment-digest",
+    "nodeIds": [
+      "fulfillment-digest",
+      "order-archive",
+      "run-operations"
+    ],
+    "artifactNames": [
+      "fulfillment-digest.md"
+    ],
+    "unlocks": "The 6:00 PM digest and tomorrow's demand history."
+  }
+]
