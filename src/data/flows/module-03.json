@@ -870,11 +870,13 @@
         },
         {
           "id": "b6-only-blocked",
-          "kind": "storeCount",
+          "kind": "storeMissing",
           "store": "escalations",
-          "equals": 1,
-          "why": "Escalating tasks that are fine buries the one that is not.",
-          "label": "Only the blocked task is escalated"
+          "where": {
+            "state": "done"
+          },
+          "why": "Escalating tasks that are fine buries the one that is not",
+          "label": "No finished task is escalated"
         }
       ]
     },

@@ -14,6 +14,9 @@
 //      src/data/waypoints
 //   6. failures: stepKind is a real step kind; store ids exist
 //   7. map coverage: handled by lint-map (mapNodes vs workflowNodes)
+//   8. canon: curriculum/<id>/canon.json (format "flows") holds - facts about
+//      the raw day data, and about the reference solution's run of the whole
+//      module (every day, stores carried forward)
 // The golden behaviour (reference passes every build; the previous build fails
 // the mess day) lives in scripts/test-runtime.mjs.
 
@@ -25,6 +28,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const imp = (rel) => import('file://' + path.join(root, rel).replace(/\\/g, '/'))
 const { CHECK_KINDS } = await imp('src/runtime/checks.js')
 const { STEP_KINDS } = await imp('src/runtime/flowModel.js')
+const { runModule, getPath } = await imp('src/runtime/engine.js')
 
 const flowsDir = path.join(root, 'src', 'data', 'flows')
 const conceptIds = new Set()
@@ -103,7 +107,54 @@ for (const file of files) {
     // 5. requires
     for (const r of b.requires || []) if (!conceptIds.has(r)) err(`build ${b.id} requires unknown concept "${r}" (no file in src/data/rosettas or src/data/waypoints)`)
   }
-  console.log(`flow lint [${id}]: ${dayIds.length} days, ${builds.length} builds, ${builds.reduce((n, b) => n + (b.checks || []).length, 0)} checks`)
+  // 8. canon
+  const canonPath = path.join(root, 'curriculum', id, 'canon.json')
+  let canonCount = 0
+  if (!existsSync(canonPath)) warn('no curriculum canon.json')
+  else {
+    const canon = JSON.parse(readFileSync(canonPath, 'utf8'))
+    if (canon.format !== 'flows') err('canon.json is not format "flows" (the per-lesson canon was retired with the worksheets)')
+    const refPath = path.join(flowsDir, `${id}.reference.js`)
+    let byDay = null
+    if (!existsSync(refPath)) err(`no ${id}.reference.js to run the canon against`)
+    else {
+      const ref = await imp(`src/data/flows/${id}.reference.js`)
+      const last = builds[builds.length - 1]
+      byDay = runModule(Object.values(ref.referenceFlowsFor(last.id)), m, dayIds[dayIds.length - 1]).byDay
+    }
+    const same = (a, b) => (typeof a === 'number' || typeof b === 'number' ? Math.abs(Number(a) - Number(b)) < 0.005 : String(a) === String(b))
+    const matches = (row, where) => Object.entries(where || {}).every(([k, v]) => same(getPath(row, k), v))
+    for (const a of canon.assertions || []) {
+      canonCount += 1
+      const tag = `canon ${a.kind} ${a.day} ${JSON.stringify(a.where || a.label)}${a.field ? ` .${a.field}` : ''}`
+      const day = (m.days || []).find((d) => d.id === a.day)
+      if (!day) { err(`${tag}: unknown day`); continue }
+      if (a.kind === 'data') {
+        const rows = a.source ? (day.sources || {})[a.source] : (day.seeds || {})[a.seed]
+        const row = (rows || []).find((r) => matches(r, a.where))
+        if (!row) err(`${tag}: no such row in ${a.source || a.seed}`)
+        else if (!same(getPath(row, a.field), a.equals)) err(`${tag} is ${JSON.stringify(getPath(row, a.field))}, canon says ${JSON.stringify(a.equals)}`)
+        continue
+      }
+      if (!byDay || !byDay[a.day]) continue
+      const res = byDay[a.day]
+      if (a.kind === 'record') {
+        const traces = a.flow ? [res.traces[a.flow]].filter(Boolean) : Object.values(res.traces)
+        const rt = traces.flatMap((t) => t.records).find((r) => r.label === a.label)
+        if (!rt) err(`${tag}: no record with that label in the reference run`)
+        else if (!same(getPath(rt.final, a.field), a.equals)) err(`${tag} is ${JSON.stringify(getPath(rt.final, a.field))} in the reference run, canon says ${JSON.stringify(a.equals)}`)
+      } else if (a.kind === 'store') {
+        const rows = (res.stores[a.store] || []).filter((r) => matches(r, a.where))
+        if (a.count !== undefined && rows.length !== a.count) err(`${tag}: ${a.store} has ${rows.length} matching rows in the reference run, canon says ${a.count}`)
+        if (a.exists && rows.length === 0) err(`${tag}: not in ${a.store} in the reference run`)
+        if (a.field !== undefined) {
+          if (!rows.length) err(`${tag}: no matching row in ${a.store}`)
+          else if (!same(getPath(rows[0], a.field), a.equals)) err(`${tag} is ${JSON.stringify(getPath(rows[0], a.field))} in the reference run, canon says ${JSON.stringify(a.equals)}`)
+        }
+      } else err(`${tag}: unknown canon kind`)
+    }
+  }
+  console.log(`flow lint [${id}]: ${dayIds.length} days, ${builds.length} builds, ${builds.reduce((n, b) => n + (b.checks || []).length, 0)} checks, ${canonCount} canon facts`)
 }
 
 // Concept files: shape.

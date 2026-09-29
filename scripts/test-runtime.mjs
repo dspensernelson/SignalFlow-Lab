@@ -572,6 +572,11 @@ await test('golden: a gate that fires on every update sends four packages (the f
   ok(!r['b4-once'].passed && !r['b4-sent-once'].passed)
 })
 
+await test('golden: the finished desk still passes every earlier build (revisiting never turns a build red)', () => {
+  for (const b of MOD2.builds) ok(chk.allPassed(runBuild(referenceFlowsFor('b6'), b)), `Beacon ${b.id}:\n    ${failing(runBuild(referenceFlowsFor('b6'), b))}`)
+  for (const b of MOD3.builds) ok(chk.allPassed(runBuild3('b7', b)), `Harbor ${b.id}:\n    ${failing(runBuild3('b7', b))}`)
+})
+
 await test('codegen: python renders Harbor loops, updates and upserts, and compiles', async () => {
   const flows = ref3.referenceFlowsFor('b7')
   const offer = renderPython(flows['offer-flow'], MOD3)

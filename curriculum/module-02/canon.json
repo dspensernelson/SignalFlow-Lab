@@ -1,63 +1,280 @@
 {
-  "_comment": "Machine-checkable canon for Module 2 (Beacon Invoice Desk), enforced by scripts/lint-lessons.mjs. Same contract as Module 1's canon.json: each assertion resolves a path inside a lesson JSON and compares it to the canonical value (ops: equals, includes). Derivations RECOMPUTE derived numbers from their sources so an internally-consistent-but-wrong figure cannot ship (op delta = a - b; op pctMove = (a - b) / b * 100, rounded to `round` decimals). The prose canon lives in curriculum/module-02/<tier>/_OVERVIEW.md; THIS file prevents cross-lesson drift. Assertions are added per lesson as the tier is built.",
+  "_comment": "Canon for a runnable-flow module, enforced by scripts/lint-flows.mjs. Flow modules have no per-lesson answer keys to drift apart; what can drift is the world data (sources and seeds) and the reference solution that proves every build. So each assertion is checked against the raw day data (kind data) or against the reference solution's run of the whole module (kinds record and store), with every day's stores carried into the next. Change a number in the data and the canon names every fact that moved. The pre-port per-lesson assertions are in git history. ASCII only.",
   "module": "module-02",
-  "derivations": [
-    { "lesson": "lesson-three-way-match", "path": "validation.expected.variance", "op": "delta", "a": 1220, "b": 1200 },
-    { "lesson": "lesson-three-way-match", "path": "validation.expected.variancePct", "op": "pctMove", "a": 1220, "b": 1200, "round": 2 },
-    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59002].variance", "op": "delta", "a": 1230, "b": 1140 },
-    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59002].variancePct", "op": "pctMove", "a": 1230, "b": 1140, "round": 2 },
-    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59005].variance", "op": "delta", "a": 1000, "b": 992 },
-    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59005].variancePct", "op": "pctMove", "a": 1000, "b": 992, "round": 2 },
-    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59001].variance", "op": "delta", "a": 1200, "b": 1200 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59101].variance", "op": "delta", "a": 1224.5, "b": 1200 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59101].variancePct", "op": "pctMove", "a": 1224.5, "b": 1200, "round": 2 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59102].variance", "op": "delta", "a": 1225, "b": 1200 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59102].variancePct", "op": "pctMove", "a": 1225, "b": 1200, "round": 2 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59103].variance", "op": "delta", "a": 1225.5, "b": 1200 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59103].variancePct", "op": "pctMove", "a": 1225.5, "b": 1200, "round": 2 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59104].variance", "op": "delta", "a": 2045, "b": 2000 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59104].variancePct", "op": "pctMove", "a": 2045, "b": 2000, "round": 2 }
-  ],
+  "format": "flows",
   "assertions": [
-    { "lesson": "lesson-invoice-record", "path": "validation.expected.invoiceTotal", "op": "equals", "value": 1220 },
-    { "lesson": "lesson-invoice-record", "path": "validation.expected.quantity", "op": "equals", "value": 500 },
-    { "lesson": "lesson-invoice-record", "path": "validation.expected.unitPrice", "op": "equals", "value": 2.44 },
-    { "lesson": "lesson-three-way-match", "path": "validation.expected.poTotal", "op": "equals", "value": 1200 },
-    { "lesson": "lesson-three-way-match", "path": "validation.expected.toleranceBand", "op": "equals", "value": 25 },
-    { "lesson": "lesson-three-way-match", "path": "validation.expected.withinTolerance", "op": "equals", "value": true },
-    { "lesson": "lesson-duplicate-check", "path": "validation.expected.isDuplicate", "op": "equals", "value": false },
-    { "lesson": "lesson-match-decision", "path": "validation.expected.isDuplicate", "op": "equals", "value": false },
-    { "lesson": "lesson-match-decision", "path": "validation.expected.withinTolerance", "op": "equals", "value": true },
-    { "lesson": "lesson-tolerance-policy", "path": "validation.expected.priceTolerancePct", "op": "equals", "value": 2 },
-    { "lesson": "lesson-tolerance-policy", "path": "validation.expected.priceToleranceAbs", "op": "equals", "value": 25 },
-    { "lesson": "lesson-invoice-record-medium", "path": "validation.expectedRows[invoiceNumber=INV-59001].invoiceTotal", "op": "equals", "value": 1200 },
-    { "lesson": "lesson-invoice-record-medium", "path": "validation.expectedRows[invoiceNumber=INV-59002].invoiceTotal", "op": "equals", "value": 1230 },
-    { "lesson": "lesson-invoice-record-medium", "path": "validation.expectedRows[invoiceNumber=INV-58962].vendorId", "op": "equals", "value": "V-1042" },
-    { "lesson": "lesson-invoice-record-medium", "path": "validation.expectedRows[invoiceNumber=INV-59004].vendorId", "op": "equals", "value": "V-1205" },
-    { "lesson": "lesson-duplicate-check-medium", "path": "validation.expectedRows[invoiceNumber=INV-58962].isDuplicate", "op": "equals", "value": true },
-    { "lesson": "lesson-duplicate-check-medium", "path": "validation.expectedRows[invoiceNumber=INV-59001].isDuplicate", "op": "equals", "value": false },
-    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59002].withinTolerance", "op": "equals", "value": false },
-    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59005].qtyMatch", "op": "equals", "value": false },
-    { "lesson": "lesson-three-way-match-medium", "path": "validation.expectedRows[invoiceNumber=INV-59001].withinTolerance", "op": "equals", "value": true },
-    { "lesson": "lesson-match-decision-medium", "path": "validation.expectedRows[invoiceNumber=INV-59001].route", "op": "equals", "value": "auto-approve" },
-    { "lesson": "lesson-match-decision-medium", "path": "validation.expectedRows[invoiceNumber=INV-59002].route", "op": "equals", "value": "exception" },
-    { "lesson": "lesson-match-decision-medium", "path": "validation.expectedRows[invoiceNumber=INV-58962].reason", "op": "equals", "value": "duplicate" },
-    { "lesson": "lesson-match-decision-medium", "path": "validation.expectedRows[invoiceNumber=INV-59004].reason", "op": "equals", "value": "vendor not in master" },
-    { "lesson": "lesson-match-decision-medium", "path": "validation.expectedRows[invoiceNumber=INV-59005].reason", "op": "equals", "value": "missing receipt" },
-    { "lesson": "lesson-payment-batch-medium", "path": "validation.expected.batchTotal", "op": "equals", "value": 1200 },
-    { "lesson": "lesson-payment-batch-medium", "path": "validation.expected.heldCount", "op": "equals", "value": 4 },
-    { "lesson": "lesson-payment-batch-medium", "path": "validation.expected.invoiceCount", "op": "equals", "value": 1 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59101].poTotal", "op": "equals", "value": 1200 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59101].invoiceTotal", "op": "equals", "value": 1224.5 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59101].toleranceBand", "op": "equals", "value": 25 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59101].withinTolerance", "op": "equals", "value": true },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59102].invoiceTotal", "op": "equals", "value": 1225 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59102].withinTolerance", "op": "equals", "value": true },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59103].invoiceTotal", "op": "equals", "value": 1225.5 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59103].withinTolerance", "op": "equals", "value": false },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59104].poTotal", "op": "equals", "value": 2000 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59104].invoiceTotal", "op": "equals", "value": 2045 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59104].toleranceBand", "op": "equals", "value": 40 },
-    { "lesson": "lesson-three-way-match-hard", "path": "validation.expectedRows[invoiceNumber=INV-59104].withinTolerance", "op": "equals", "value": false }
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "invoiceNumber": "INV-58831"
+      },
+      "field": "invoiceTotal",
+      "equals": 1220,
+      "source": "invoice-inbox"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "invoiceNumber": "INV-58831"
+      },
+      "field": "quantity",
+      "equals": 500,
+      "source": "invoice-inbox"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "invoiceNumber": "INV-58831"
+      },
+      "field": "unitPrice",
+      "equals": 2.44,
+      "source": "invoice-inbox"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "poNumber": "PO-7742"
+      },
+      "field": "poTotal",
+      "equals": 1200,
+      "seed": "po-register"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "version": "1.0.0"
+      },
+      "field": "pricePct",
+      "equals": 2,
+      "seed": "tolerance-policy"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "version": "1.0.0"
+      },
+      "field": "priceAbs",
+      "equals": 25,
+      "seed": "tolerance-policy"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "INV-58831",
+      "field": "variance",
+      "equals": 20,
+      "flow": "invoice-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "INV-58831",
+      "field": "variancePct",
+      "equals": 1.67,
+      "flow": "invoice-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "INV-58831",
+      "field": "band",
+      "equals": 25,
+      "flow": "invoice-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "INV-58831",
+      "field": "qtyMatch",
+      "equals": true,
+      "flow": "invoice-flow"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "payment-batch",
+      "where": {
+        "invoiceNumber": "INV-58831"
+      },
+      "exists": true
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "invoiceNumber": "INV-59001"
+      },
+      "field": "invoiceTotal",
+      "equals": 1200,
+      "source": "invoice-inbox"
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "invoiceNumber": "INV-59002"
+      },
+      "field": "invoiceTotal",
+      "equals": 1230,
+      "source": "invoice-inbox"
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "invoiceNumber": "INV-58962"
+      },
+      "field": "vendorId",
+      "equals": "V-1042",
+      "source": "invoice-inbox"
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "invoiceNumber": "INV-59004"
+      },
+      "field": "vendorId",
+      "equals": "V-1205",
+      "source": "invoice-inbox"
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "INV-59002",
+      "field": "variance",
+      "equals": 90,
+      "flow": "invoice-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "INV-59002",
+      "field": "variancePct",
+      "equals": 7.89,
+      "flow": "invoice-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "INV-59001",
+      "field": "variance",
+      "equals": 0,
+      "flow": "invoice-flow"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "payment-batch",
+      "where": {},
+      "count": 1
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "exception-queue",
+      "where": {},
+      "count": 4
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "exception-queue",
+      "where": {
+        "invoiceNumber": "INV-58962"
+      },
+      "field": "reason",
+      "equals": "duplicate - already paid"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "exception-queue",
+      "where": {
+        "invoiceNumber": "INV-59004"
+      },
+      "field": "reason",
+      "equals": "vendor not in master"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "exception-queue",
+      "where": {
+        "invoiceNumber": "INV-59005"
+      },
+      "field": "reason",
+      "equals": "missing receipt"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "exception-queue",
+      "where": {
+        "invoiceNumber": "INV-59002"
+      },
+      "field": "reason",
+      "equals": "price over tolerance"
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "Scheduled run 2:30 PM",
+      "field": "count",
+      "equals": 1,
+      "flow": "run-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "Scheduled run 2:30 PM",
+      "field": "total",
+      "equals": 1200,
+      "flow": "run-flow"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "payment-history",
+      "where": {
+        "invoiceNumber": "INV-59001"
+      },
+      "exists": true
+    },
+    {
+      "kind": "data",
+      "day": "day-3",
+      "where": {
+        "invoiceNumber": "INV-59101"
+      },
+      "field": "invoiceTotal",
+      "equals": 1200,
+      "source": "invoice-inbox"
+    },
+    {
+      "kind": "data",
+      "day": "day-3",
+      "where": {
+        "poNumber": "PO-7790"
+      },
+      "field": "poTotal",
+      "equals": 1190,
+      "seed": "po-register"
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "payment-batch",
+      "where": {
+        "invoiceNumber": "INV-59101"
+      },
+      "exists": true
+    }
   ]
 }
