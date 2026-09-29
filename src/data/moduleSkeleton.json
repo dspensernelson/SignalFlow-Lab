@@ -112,6 +112,20 @@
         "archive": "Close Archive",
         "operate": "Close Run Operations"
       }
+    },
+    "module-06": {
+      "org": "Compass",
+      "deliverable": "Monday 9:00 AM hygiene report",
+      "map": {
+        "intake": "CRM Export",
+        "reference": "Match Key Policy",
+        "transform": "Duplicate Candidates",
+        "decision": "Merge Decision",
+        "handoff": "Steward Review",
+        "assembly": "Hygiene Report",
+        "archive": "Hygiene Archive",
+        "operate": "Hygiene Run Operations"
+      }
     }
   }
 }

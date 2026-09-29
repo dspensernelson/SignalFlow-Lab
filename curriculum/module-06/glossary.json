@@ -1,0 +1,62 @@
+{
+  "note": "Terms module-06 introduces, and the build that teaches each. Enforced by scripts/lint-glossary.mjs. Keep ASCII-only.",
+  "module": "module-06",
+  "terms": [
+    {
+      "term": "match key",
+      "aliases": [
+        "matchKey"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The normalized value that says two records are the same account - here, the email in lower case with no stray spaces."
+    },
+    {
+      "term": "golden record",
+      "aliases": [
+        "golden records",
+        "the book",
+        "clean book"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The one trusted record per real account, keyed by match key, that everything downstream reads."
+    },
+    {
+      "term": "survivorship",
+      "teachesIn": "b1",
+      "gloss": "The field-by-field rule for a merge: which copy's value wins. A value beats a blank; the golden id survives."
+    },
+    {
+      "term": "confidence",
+      "aliases": [
+        "auto-merge threshold"
+      ],
+      "teachesIn": "b1",
+      "gloss": "How sure the rules are that two records are the same, 0-100. At or above the threshold the rules merge; below it a person decides."
+    },
+    {
+      "term": "enrichment",
+      "aliases": [
+        "enrich",
+        "enriched"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Adding facts a vendor knows (company size, industry) to a record you own. Bought data, checked before it is used."
+    },
+    {
+      "term": "scoring model",
+      "aliases": [
+        "lead score",
+        "hot",
+        "warm",
+        "cold"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Points a lead earns for size, industry and reachability, and the cutoffs that make it hot, warm or cold. Config RevOps owns."
+    },
+    {
+      "term": "territory",
+      "teachesIn": "b1",
+      "gloss": "The sales team a region's leads belong to."
+    }
+  ]
+}

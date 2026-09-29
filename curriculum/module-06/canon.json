@@ -1,0 +1,312 @@
+{
+  "_comment": "Canon for a runnable-flow module, enforced by scripts/lint-flows.mjs. Flow modules have no per-lesson answer keys to drift apart; what can drift is the world data (sources and seeds) and the reference solution that proves every build. So each assertion is checked against the raw day data (kind data) or against the reference solution's run of the whole module (kinds record and store), with every day's stores carried into the next. Change a number in the data and the canon names every fact that moved. The pre-port per-lesson assertions are in git history. ASCII only.",
+  "module": "module-06",
+  "format": "flows",
+  "assertions": [
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "version": "1.0.0"
+      },
+      "field": "autoMergeThreshold",
+      "equals": 80,
+      "seed": "match-key-policy"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "version": "1.0.0"
+      },
+      "field": "sameNamePoints",
+      "equals": 95,
+      "seed": "match-key-policy"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "version": "1.0.0"
+      },
+      "field": "differentNamePoints",
+      "equals": 70,
+      "seed": "match-key-policy"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "version": "1.0.0"
+      },
+      "field": "hotCutoff",
+      "equals": 70,
+      "seed": "scoring-model"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "version": "1.0.0"
+      },
+      "field": "warmCutoff",
+      "equals": 40,
+      "seed": "scoring-model"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "version": "1.0.0"
+      },
+      "field": "bigCompanyMin",
+      "equals": 200,
+      "seed": "scoring-model"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "domain": "northwind.example"
+      },
+      "field": "employees",
+      "equals": 450,
+      "seed": "vendor-data"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "accountId": "ACC-2002"
+      },
+      "field": "email",
+      "equals": "Hello@Cascade.example",
+      "source": "crm-export"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "matchKey": "ops@northwind.example"
+      },
+      "field": "accountId",
+      "equals": "ACC-1001",
+      "seed": "golden-records"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "matchKey": "ops@northwind.example"
+      },
+      "field": "phone",
+      "equals": "555-0101",
+      "seed": "golden-records"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "ACC-2002",
+      "field": "matchKey",
+      "equals": "hello@cascade.example",
+      "flow": "dedupe-flow"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "golden-records",
+      "where": {},
+      "count": 3
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "golden-records",
+      "where": {
+        "matchKey": "ops@northwind.example"
+      },
+      "field": "mergedFrom",
+      "equals": "ACC-2001"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "merge-log",
+      "where": {},
+      "count": 2
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "lead-scores",
+      "where": {
+        "matchKey": "ops@northwind.example"
+      },
+      "field": "score",
+      "equals": 100
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "lead-scores",
+      "where": {
+        "matchKey": "hello@cascade.example"
+      },
+      "field": "score",
+      "equals": 60
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "lead-scores",
+      "where": {
+        "matchKey": "desk@sierra.example"
+      },
+      "field": "score",
+      "equals": 30
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "routed-leads",
+      "where": {},
+      "count": 1
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "routed-leads",
+      "where": {
+        "matchKey": "ops@northwind.example"
+      },
+      "field": "territory",
+      "equals": "East Coast"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run Mon 9:00 AM",
+      "field": "records",
+      "equals": 3,
+      "flow": "report-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run Mon 9:00 AM",
+      "field": "merges",
+      "equals": 2,
+      "flow": "report-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run Mon 9:00 AM",
+      "field": "hot",
+      "equals": 1,
+      "flow": "report-flow"
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "accountId": "ACC-2101"
+      },
+      "field": "name",
+      "equals": "Jonathan Alvarez Agency",
+      "source": "crm-export"
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "accountId": "ACC-2102"
+      },
+      "field": "phone",
+      "equals": "",
+      "source": "crm-export"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "review-queue",
+      "where": {
+        "accountId": "ACC-2101"
+      },
+      "field": "confidence",
+      "equals": 70
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "golden-records",
+      "where": {
+        "matchKey": "jon@alvarez.example"
+      },
+      "field": "name",
+      "equals": "Jon Alvarez Agency"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "golden-records",
+      "where": {
+        "matchKey": "ops@northwind.example"
+      },
+      "field": "phone",
+      "equals": "555-0101"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "golden-records",
+      "where": {},
+      "count": 5
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "merge-log",
+      "where": {
+        "mergedFrom": "ACC-2102"
+      },
+      "field": "confidence",
+      "equals": 95
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "Scheduled run Mon 9:00 AM",
+      "field": "reviews",
+      "equals": 1,
+      "flow": "report-flow"
+    },
+    {
+      "kind": "data",
+      "day": "day-3",
+      "where": {
+        "domain": "depot.example"
+      },
+      "field": "employees",
+      "equals": "unknown",
+      "seed": "vendor-data"
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "lead-scores",
+      "where": {
+        "matchKey": "sales@depot.example"
+      },
+      "field": "band",
+      "equals": "unscored"
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "lead-scores",
+      "where": {},
+      "count": 6
+    }
+  ]
+}

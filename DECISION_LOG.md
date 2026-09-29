@@ -2,6 +2,25 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-09-29 (Compass built as runnable flows)
+
+- COMPASS (module-06) BUILT from its charter; fresh map (17 nodes, temporal
+  loop archive -> match-key policy, ops node). 3 flows (match and merge per
+  export record; a Monday 8:30 loop that enriches, scores and routes the
+  whole book; the 9:00 report), 3 weeks, 8 builds, 31 checks, 33 canon
+  facts. Week 1: match key lower(trim(email)), merge-or-create with lineage
+  (golden id survives, mergedFrom), enrich by domain, score from the model,
+  route hot leads by territory, report. Week 2: a same-email different-name
+  pair - the Week 1 flow merges it blindly; the fix scores confidence from
+  the policy and queues below-threshold pairs for the Data Steward; a
+  newer-but-blank copy erases the phone on merge; the fix is field-level
+  survivorship (if(len(phone) > 0, phone, existing.phone)). Week 3: the
+  vendor returns 'unknown' and the lead scores cold; the fix marks it
+  unscored and tells Sales Ops.
+- AUTHORING NOTES: two scheduled flows on one day share runId; address a
+  scheduled run's record by scheduledAt, not runId. coalesce() treats "" as
+  a value; use if(len(x) > 0, ...) for blank-vs-value.
+
 ## 2026-09-29 (Ledger built as runnable flows)
 
 - LEDGER (module-05) BUILT from its charter; map authored fresh (17 nodes,

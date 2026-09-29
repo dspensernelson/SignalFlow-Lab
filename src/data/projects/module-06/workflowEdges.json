@@ -1,0 +1,112 @@
+[
+  {
+    "from": "crm-export",
+    "to": "dedupe-candidates",
+    "label": "normalized"
+  },
+  {
+    "from": "match-key-policy",
+    "to": "dedupe-candidates",
+    "label": "match key"
+  },
+  {
+    "from": "match-key-policy",
+    "to": "merge-decision",
+    "label": "threshold"
+  },
+  {
+    "from": "dedupe-candidates",
+    "to": "merge-decision",
+    "label": "candidate pair"
+  },
+  {
+    "from": "merge-decision",
+    "to": "golden-record",
+    "label": "auto-merge"
+  },
+  {
+    "from": "merge-decision",
+    "to": "steward-review",
+    "label": "below threshold"
+  },
+  {
+    "from": "survivorship-policy",
+    "to": "golden-record",
+    "label": "field rules"
+  },
+  {
+    "from": "steward-review",
+    "to": "golden-record",
+    "label": "decided merges"
+  },
+  {
+    "from": "golden-record",
+    "to": "enrichment-lookup",
+    "label": "the book"
+  },
+  {
+    "from": "enrichment-source",
+    "to": "enrichment-lookup",
+    "label": "by domain"
+  },
+  {
+    "from": "enrichment-lookup",
+    "to": "lead-scores",
+    "label": "enriched"
+  },
+  {
+    "from": "scoring-model",
+    "to": "lead-scores",
+    "label": "points and cutoffs"
+  },
+  {
+    "from": "lead-scores",
+    "to": "lead-routing",
+    "label": "hot leads"
+  },
+  {
+    "from": "territory-rules",
+    "to": "lead-routing",
+    "label": "owner"
+  },
+  {
+    "from": "lead-scores",
+    "to": "hygiene-report",
+    "label": "scores"
+  },
+  {
+    "from": "lead-routing",
+    "to": "hygiene-report",
+    "label": "routed"
+  },
+  {
+    "from": "golden-record",
+    "to": "hygiene-report",
+    "label": "records"
+  },
+  {
+    "from": "hygiene-report",
+    "to": "hygiene-archive",
+    "label": "archived"
+  },
+  {
+    "from": "hygiene-archive",
+    "to": "quality-trend",
+    "label": "weeks"
+  },
+  {
+    "from": "hygiene-archive",
+    "to": "match-key-policy",
+    "label": "tunes the key"
+  },
+  {
+    "from": "enrichment-source",
+    "to": "run-operations",
+    "label": "feed status"
+  },
+  {
+    "from": "hygiene-archive",
+    "to": "run-operations",
+    "label": "run history"
+  }
+]

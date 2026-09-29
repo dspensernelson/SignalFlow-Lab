@@ -4,7 +4,7 @@
   { "id": "module-03", "name": "Harbor Onboarding", "org": "Harbor Logistics", "status": "active", "clock": "SD-1, 5:00 PM", "goal": "Build a workplace automation that gets every new hire Day-One Ready by 8:00 AM: intake the signed offer, expand the role profile into a dated task plan, run four provisioning branches in parallel, gate on all-tasks-done-within-SLA, and assemble the Day-One package. The map below is the real dependency graph - click any node to see how that piece gets built and reused." },
   { "id": "module-04", "name": "Relay Ticket Triage", "org": "Relay Software", "status": "active", "clock": "2:00 PM", "goal": "Triage every support ticket: classify it, score it, route it, and learn from the ones that went to the wrong queue." },
   { "id": "module-05", "name": "Ledger Month-End Close", "org": "Ledger Retail", "status": "active", "clock": "Workday 5", "goal": "Close the books: reconcile, book or pass each difference, get sign-offs, certify the package." },
-  { "id": "module-06", "name": "Compass CRM Hygiene", "org": "Compass", "status": "planned" },
+  { "id": "module-06", "name": "Compass CRM Hygiene", "org": "Compass Insurance", "status": "active", "clock": "Mon 9:00 AM", "goal": "Clean the book every Monday: merge duplicates, keep the best fields, enrich, score and route." },
   { "id": "module-07", "name": "Depot Order Flow", "org": "Depot", "status": "planned" },
   { "id": "module-08", "name": "Sentinel Evidence Locker", "org": "Sentinel", "status": "planned" },
   { "id": "module-09", "name": "Studio Campaign Ops", "org": "Studio", "status": "planned" },

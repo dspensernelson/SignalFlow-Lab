@@ -1,0 +1,80 @@
+[
+  {
+    "id": "export-profile",
+    "order": 1,
+    "title": "Phase 1: Export and Profile",
+    "goal": "Know the week's export, the key policy, and what the vendor can tell you.",
+    "statusSource": "crm-export",
+    "nodeIds": [
+      "crm-export",
+      "match-key-policy",
+      "enrichment-source"
+    ],
+    "artifactNames": [],
+    "unlocks": "The records and rules the matching reads."
+  },
+  {
+    "id": "dedupe",
+    "order": 2,
+    "title": "Phase 2: Duplicate Detection",
+    "goal": "Find candidate pairs by the key and decide which merge without a person.",
+    "statusSource": "merge-decision",
+    "nodeIds": [
+      "dedupe-candidates",
+      "survivorship-policy",
+      "merge-decision"
+    ],
+    "artifactNames": [],
+    "unlocks": "Sure merges and a steward queue."
+  },
+  {
+    "id": "merge",
+    "order": 3,
+    "title": "Phase 3: Merge and Survivorship",
+    "goal": "Fold duplicates into golden records without losing a field.",
+    "statusSource": "golden-record",
+    "nodeIds": [
+      "steward-review",
+      "golden-record"
+    ],
+    "artifactNames": [
+      "golden-records.json"
+    ],
+    "unlocks": "The clean book the scoring reads."
+  },
+  {
+    "id": "enrich-score",
+    "order": 4,
+    "title": "Phase 4: Enrichment and Scoring",
+    "goal": "Enrich every account from the vendor and score it with the model.",
+    "statusSource": "lead-scores",
+    "nodeIds": [
+      "enrichment-lookup",
+      "scoring-model",
+      "lead-scores",
+      "territory-rules"
+    ],
+    "artifactNames": [
+      "lead-scores.json"
+    ],
+    "unlocks": "Scored leads ready to route."
+  },
+  {
+    "id": "route-report",
+    "order": 5,
+    "title": "Phase 5: Routing and Report",
+    "goal": "Route the hot leads, report the week, and keep the trend.",
+    "statusSource": "hygiene-report",
+    "nodeIds": [
+      "lead-routing",
+      "hygiene-report",
+      "hygiene-archive",
+      "quality-trend",
+      "run-operations"
+    ],
+    "artifactNames": [
+      "hygiene-report.md"
+    ],
+    "unlocks": "A routed Monday and a report RevOps can read."
+  }
+]

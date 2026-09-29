@@ -1,0 +1,625 @@
+[
+  {
+    "id": "crm-export",
+    "label": "CRM Export",
+    "type": "source",
+    "thingOrAction": "thing",
+    "phaseId": "export-profile",
+    "x": 20,
+    "y": 80,
+    "description": "The week's new and changed accounts as reps typed them - capitals, blanks, repeats and all.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "Arrives in the CRM Export source, one record at a time.",
+      "concepts": []
+    },
+    "labVersion": "Arrives in the CRM Export source, one record at a time.",
+    "realWorldSources": [
+      "CRM weekly export (CSV)",
+      "CRM change feed"
+    ],
+    "accessNeeded": [
+      "Export rights on the CRM",
+      "Agreement on the six fields"
+    ],
+    "soloRebuildPath": [
+      "Export the week's changes",
+      "Keep one row per record",
+      "Later subscribe to the change feed"
+    ],
+    "reusedBy": [
+      "dedupe-candidates"
+    ],
+    "governanceNote": "Reps are not wrong to type fast; the flow is where the rules live.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-crm-export",
+    "artifactName": "crm-export.json"
+  },
+  {
+    "id": "match-key-policy",
+    "label": "Match Key Policy",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "export-profile",
+    "x": 20,
+    "y": 190,
+    "description": "What makes two records the same: the normalized email. And how sure a match must be to merge without a person.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Match Key Policy table: threshold 80, same-name 95, different-name 70.",
+      "concepts": []
+    },
+    "labVersion": "The Match Key Policy table: threshold 80, same-name 95, different-name 70.",
+    "realWorldSources": [
+      "Data governance standard",
+      "Dedupe rulebook"
+    ],
+    "accessNeeded": [
+      "The Data Steward's sign-off",
+      "A version"
+    ],
+    "soloRebuildPath": [
+      "Write down the key and the threshold",
+      "Version them",
+      "Later store them where the flow reads them"
+    ],
+    "reusedBy": [
+      "dedupe-candidates",
+      "merge-decision"
+    ],
+    "governanceNote": "The key is a policy, not a habit: change it in one place and every match changes.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-match-key-policy",
+    "artifactName": "match-key-policy.json"
+  },
+  {
+    "id": "enrichment-source",
+    "label": "Enrichment Source",
+    "type": "source",
+    "thingOrAction": "thing",
+    "phaseId": "export-profile",
+    "x": 20,
+    "y": 300,
+    "description": "The vendor feed: employees and industry by domain. Costs money, goes stale, and is sometimes wrong.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Vendor Data table, keyed by domain; Week 3 returns 'unknown'.",
+      "concepts": []
+    },
+    "labVersion": "The Vendor Data table, keyed by domain; Week 3 returns 'unknown'.",
+    "realWorldSources": [
+      "Data enrichment vendor API",
+      "Firmographic data file"
+    ],
+    "accessNeeded": [
+      "A vendor contract",
+      "Read access to the feed"
+    ],
+    "soloRebuildPath": [
+      "Look a few domains up by hand",
+      "Note what comes back blank",
+      "Later call the API"
+    ],
+    "reusedBy": [
+      "enrichment-lookup"
+    ],
+    "governanceNote": "Vendor data is evidence, not truth; the flow says when it cannot read it.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-enrichment-source",
+    "artifactName": "enrichment-source.json"
+  },
+  {
+    "id": "dedupe-candidates",
+    "label": "Duplicate Candidates",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "dedupe",
+    "x": 270,
+    "y": 80,
+    "description": "Each incoming record's match key, looked up in the book: a candidate pair, or a new account.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The match-key Transform and the Golden Records Lookup in the Match and merge flow.",
+      "concepts": []
+    },
+    "labVersion": "The match-key Transform and the Golden Records Lookup in the Match and merge flow.",
+    "realWorldSources": [
+      "Dedupe job",
+      "Match report"
+    ],
+    "accessNeeded": [
+      "The key policy",
+      "Read access to the book"
+    ],
+    "soloRebuildPath": [
+      "Normalize the email",
+      "Look it up in the book",
+      "Later add fuzzy candidates"
+    ],
+    "reusedBy": [
+      "merge-decision"
+    ],
+    "governanceNote": "Candidates are found by the key, never by eye.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-dedupe-candidates",
+    "artifactName": "dedupe-candidates.json"
+  },
+  {
+    "id": "survivorship-policy",
+    "label": "Survivorship Policy",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "dedupe",
+    "x": 270,
+    "y": 190,
+    "description": "Field by field, which value wins a merge: a value beats a blank; the golden id survives.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The survivorship Transform before the merge store (Week 2).",
+      "concepts": []
+    },
+    "labVersion": "The survivorship Transform before the merge store (Week 2).",
+    "realWorldSources": [
+      "Merge rules document",
+      "MDM survivorship config"
+    ],
+    "accessNeeded": [
+      "The Data Steward's rules",
+      "Field-level agreement"
+    ],
+    "soloRebuildPath": [
+      "List every field",
+      "Decide what wins for each",
+      "Later encode it"
+    ],
+    "reusedBy": [
+      "golden-record"
+    ],
+    "governanceNote": "A merge destroys what it overwrites; survivorship is what keeps the phone number.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-survivorship-policy",
+    "artifactName": "survivorship-policy.json"
+  },
+  {
+    "id": "merge-decision",
+    "label": "Merge Decision",
+    "type": "decision",
+    "thingOrAction": "action",
+    "phaseId": "dedupe",
+    "x": 270,
+    "y": 300,
+    "description": "Sure enough to merge, or a person decides: confidence against the policy's threshold.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The confidence Transform and Condition in the duplicate lane.",
+      "concepts": []
+    },
+    "labVersion": "The confidence Transform and Condition in the duplicate lane.",
+    "realWorldSources": [
+      "Match confidence score",
+      "Steward workbench"
+    ],
+    "accessNeeded": [
+      "The threshold",
+      "The candidate's confidence"
+    ],
+    "soloRebuildPath": [
+      "Score the candidate",
+      "Compare with the threshold",
+      "Route to merge or review"
+    ],
+    "reusedBy": [
+      "golden-record",
+      "steward-review"
+    ],
+    "governanceNote": "A bad merge is worse than a duplicate; when unsure, the rules stop and ask.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-merge-decision",
+    "artifactName": "merge-decision.json"
+  },
+  {
+    "id": "steward-review",
+    "label": "Steward Review",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "merge",
+    "x": 520,
+    "y": 80,
+    "description": "The Data Steward's queue: candidate pairs the rules were not sure about, with their confidence.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Steward Review table and the message to the Data Steward.",
+      "concepts": []
+    },
+    "labVersion": "The Steward Review table and the message to the Data Steward.",
+    "realWorldSources": [
+      "Review queue",
+      "Steward inbox"
+    ],
+    "accessNeeded": [
+      "The Data Steward's time"
+    ],
+    "soloRebuildPath": [
+      "Queue the pair with both records",
+      "Tell the steward",
+      "Later capture the decision"
+    ],
+    "reusedBy": [
+      "golden-record"
+    ],
+    "governanceNote": "Human review is for the sampled edge, not the population.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-steward-review",
+    "artifactName": "steward-review.json"
+  },
+  {
+    "id": "golden-record",
+    "label": "Golden Record",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "merge",
+    "x": 520,
+    "y": 190,
+    "description": "One record per real account, keyed by match key, carrying the lineage of what merged into it.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Golden Records table: add-or-replace by matchKey, with mergedFrom.",
+      "concepts": []
+    },
+    "labVersion": "The Golden Records table: add-or-replace by matchKey, with mergedFrom.",
+    "realWorldSources": [
+      "MDM golden record",
+      "CRM master account"
+    ],
+    "accessNeeded": [
+      "Write access to the book",
+      "A merge log"
+    ],
+    "soloRebuildPath": [
+      "Upsert by key",
+      "Record where copies came from",
+      "Later feed it back to the CRM"
+    ],
+    "reusedBy": [
+      "enrichment-lookup",
+      "hygiene-report"
+    ],
+    "governanceNote": "The book is the one place with one row per customer; everything downstream reads it.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-golden-record",
+    "artifactName": "golden-record.json"
+  },
+  {
+    "id": "enrichment-lookup",
+    "label": "Enrichment Lookup",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "enrich-score",
+    "x": 770,
+    "y": 80,
+    "description": "Each golden record joined with the vendor's data by domain - and flagged when the data cannot be read.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Vendor Data Lookup inside the Monday loop, and the Week 3 guard.",
+      "concepts": []
+    },
+    "labVersion": "The Vendor Data Lookup inside the Monday loop, and the Week 3 guard.",
+    "realWorldSources": [
+      "Enrichment job",
+      "API call log"
+    ],
+    "accessNeeded": [
+      "Read access to the vendor feed"
+    ],
+    "soloRebuildPath": [
+      "Look each domain up",
+      "Read employees as a number",
+      "Flag what cannot be read"
+    ],
+    "reusedBy": [
+      "lead-scores"
+    ],
+    "governanceNote": "Trust boundary: what the vendor sends is checked before it scores anyone.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-enrichment-lookup",
+    "artifactName": "enrichment-lookup.json"
+  },
+  {
+    "id": "scoring-model",
+    "label": "Scoring Model",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "enrich-score",
+    "x": 770,
+    "y": 190,
+    "description": "Points for size, industry and reachability, and the cutoffs for hot and warm - versioned config RevOps owns.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Scoring Model table.",
+      "concepts": []
+    },
+    "labVersion": "The Scoring Model table.",
+    "realWorldSources": [
+      "Lead scoring config",
+      "RevOps model doc"
+    ],
+    "accessNeeded": [
+      "The RevOps Manager's sign-off",
+      "A version"
+    ],
+    "soloRebuildPath": [
+      "Write the points and cutoffs",
+      "Version them",
+      "Later backtest a v2"
+    ],
+    "reusedBy": [
+      "lead-scores"
+    ],
+    "governanceNote": "Change the numbers here and every lead rescores; nobody edits the flow.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-scoring-model",
+    "artifactName": "scoring-model.json"
+  },
+  {
+    "id": "lead-scores",
+    "label": "Lead Scores",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "enrich-score",
+    "x": 770,
+    "y": 300,
+    "description": "This week's score and band for every account in the book.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Lead Scores table, filled by the Monday loop.",
+      "concepts": []
+    },
+    "labVersion": "The Lead Scores table, filled by the Monday loop.",
+    "realWorldSources": [
+      "Lead score field on the CRM"
+    ],
+    "accessNeeded": [
+      "The model and the enriched record"
+    ],
+    "soloRebuildPath": [
+      "Add up the points",
+      "Band by the cutoffs",
+      "Later write back to the CRM"
+    ],
+    "reusedBy": [
+      "lead-routing",
+      "hygiene-report"
+    ],
+    "governanceNote": "A score is a claim about a company; an unreadable input makes it 'unscored', not 'cold'.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-lead-scores",
+    "artifactName": "lead-scores.json"
+  },
+  {
+    "id": "territory-rules",
+    "label": "Territory Rules",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "enrich-score",
+    "x": 770,
+    "y": 410,
+    "description": "Region to territory and owner.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Territory Rules table.",
+      "concepts": []
+    },
+    "labVersion": "The Territory Rules table.",
+    "realWorldSources": [
+      "Territory plan",
+      "Routing config"
+    ],
+    "accessNeeded": [
+      "The RevOps Manager's plan"
+    ],
+    "soloRebuildPath": [
+      "Map each region to a territory",
+      "Name the owner",
+      "Later add capacity rules"
+    ],
+    "reusedBy": [
+      "lead-routing"
+    ],
+    "governanceNote": "Routing is config; a reorg is a table edit.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-territory-rules",
+    "artifactName": "territory-rules.json"
+  },
+  {
+    "id": "lead-routing",
+    "label": "Lead Routing",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "route-report",
+    "x": 1020,
+    "y": 80,
+    "description": "Hot leads handed to their territory, with the owner told.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Condition and Send inside the Monday loop.",
+      "concepts": []
+    },
+    "labVersion": "The Condition and Send inside the Monday loop.",
+    "realWorldSources": [
+      "Lead assignment rules",
+      "Round-robin router"
+    ],
+    "accessNeeded": [
+      "The territory rules",
+      "The AE team's DL"
+    ],
+    "soloRebuildPath": [
+      "Route only the hot band",
+      "Tell the owner",
+      "Log it"
+    ],
+    "reusedBy": [
+      "hygiene-report"
+    ],
+    "governanceNote": "A routed lead is a promise to a rep; only hot ones are worth their Monday.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-lead-routing",
+    "artifactName": "lead-routing.json"
+  },
+  {
+    "id": "hygiene-report",
+    "label": "Hygiene Report",
+    "type": "output",
+    "thingOrAction": "thing",
+    "phaseId": "route-report",
+    "x": 1020,
+    "y": 190,
+    "description": "The Monday 9:00 AM report: records, merges, reviews pending, hot leads.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "Composed by the Monday report flow and sent to RevOps.",
+      "concepts": []
+    },
+    "labVersion": "Composed by the Monday report flow and sent to RevOps.",
+    "realWorldSources": [
+      "Weekly data-quality report"
+    ],
+    "accessNeeded": [
+      "The week's tables"
+    ],
+    "soloRebuildPath": [
+      "Count the tables",
+      "Assemble the report",
+      "Later chart the trend"
+    ],
+    "reusedBy": [
+      "hygiene-archive"
+    ],
+    "governanceNote": "The report counts what the rules did; the steward's queue length is a health metric.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-hygiene-report",
+    "artifactName": "hygiene-report.json"
+  },
+  {
+    "id": "hygiene-archive",
+    "label": "Hygiene Archive",
+    "type": "archive",
+    "thingOrAction": "thing",
+    "phaseId": "route-report",
+    "x": 1020,
+    "y": 300,
+    "description": "Every Monday report, kept so the trend can be read.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Hygiene Archive table.",
+      "concepts": []
+    },
+    "labVersion": "The Hygiene Archive table.",
+    "realWorldSources": [
+      "Report archive"
+    ],
+    "accessNeeded": [
+      "Write access"
+    ],
+    "soloRebuildPath": [
+      "Store each report with its date",
+      "Keep the counts as fields",
+      "Later chart them"
+    ],
+    "reusedBy": [
+      "match-key-policy",
+      "quality-trend"
+    ],
+    "governanceNote": "Last week's merges are this week's evidence for tuning the key.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-hygiene-archive",
+    "artifactName": "hygiene-archive.json"
+  },
+  {
+    "id": "quality-trend",
+    "label": "Quality Trend",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "route-report",
+    "x": 1020,
+    "y": 410,
+    "description": "Week over week: is the book getting cleaner? Merges and reviews compared across archived reports.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "Read from the Hygiene Archive's counts across weeks.",
+      "concepts": []
+    },
+    "labVersion": "Read from the Hygiene Archive's counts across weeks.",
+    "realWorldSources": [
+      "Data quality dashboard"
+    ],
+    "accessNeeded": [
+      "The archive"
+    ],
+    "soloRebuildPath": [
+      "Compare this week's counts with last week's",
+      "Chart merges per week",
+      "Later alert on a rising trend"
+    ],
+    "reusedBy": [],
+    "governanceNote": "A rising merge count means the key or the reps need attention, not the flow.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-quality-trend",
+    "artifactName": "quality-trend.json"
+  },
+  {
+    "id": "run-operations",
+    "label": "Hygiene Run Operations",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "route-report",
+    "x": 1020,
+    "y": 520,
+    "description": "The hygiene automation depends on a vendor it does not control. When the vendor's data cannot be read, the run says so instead of scoring on it.",
+    "lesson": {
+      "type": "governance",
+      "status": "now",
+      "intent": "Handle vendor data that cannot be read without scoring on it.",
+      "concepts": [
+        "Trust boundaries",
+        "Degraded scoring"
+      ]
+    },
+    "labVersion": "Built by you in Week 3: unreadable vendor data marks the lead unscored and tells the Sales Ops Analyst.",
+    "realWorldSources": [
+      "Vendor status page",
+      "Run history"
+    ],
+    "accessNeeded": [
+      "Alerts from the enrichment job",
+      "The Sales Ops Analyst's contact"
+    ],
+    "soloRebuildPath": [
+      "Check what the vendor returned before scoring",
+      "Mark what cannot be scored",
+      "Tell the owner"
+    ],
+    "reusedBy": [],
+    "governanceNote": "Trust boundaries are operational: the flow checks the vendor every run, not once at signing.",
+    "auditNote": "Authored for the runnable-flow build of Compass (2026-09-29).",
+    "taskId": "lesson-run-operations",
+    "artifactName": "escalation-policy.json",
+    "skeletonStage": "operate"
+  }
+]

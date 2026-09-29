@@ -31,6 +31,10 @@ const FLOW_MODULE_LOADERS = {
     const [data, ref] = await Promise.all([import('./data/flows/module-05.json'), import('./data/flows/module-05.reference.js')])
     return { moduleData: data.default, loadReference: ref.referenceFlowsFor }
   },
+  'module-06': async () => {
+    const [data, ref] = await Promise.all([import('./data/flows/module-06.json'), import('./data/flows/module-06.reference.js')])
+    return { moduleData: data.default, loadReference: ref.referenceFlowsFor }
+  },
 }
 const FLOW_MODULE_IDS = Object.keys(FLOW_MODULE_LOADERS)
 

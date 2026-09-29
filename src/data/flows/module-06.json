@@ -1,0 +1,1050 @@
+{
+  "moduleId": "module-06",
+  "title": "Compass CRM Hygiene",
+  "org": "Compass Insurance",
+  "intro": "Compass runs its sales team on a CRM that decays every week: reps create duplicate accounts, imported lists disagree with reality, and lead scores drift. Every Monday at 9:00 AM the desk needs a clean book. You are going to build the hygiene automation: find the duplicates by a governed match key, merge the sure ones and send the rest to a person, keep the best value of every field, enrich each account from the vendor feed, score and route the leads, and report the week. Then it meets a week where the rules meet real data.",
+  "world": {
+    "oneLiner": "Compass Insurance's sales desk starts every Monday with a clean book: duplicates merged, records enriched, leads scored and routed to the right team.",
+    "roles": [
+      {
+        "name": "Sales Ops Analyst",
+        "does": "Runs the weekly hygiene and hears when the vendor feed cannot be trusted."
+      },
+      {
+        "name": "Data Steward",
+        "does": "Owns the match-key and survivorship rules, and reviews every merge the rules are not sure about."
+      },
+      {
+        "name": "RevOps Manager",
+        "does": "Owns the scoring model and reads the Monday report."
+      },
+      {
+        "name": "AE Team DL",
+        "does": "The account executives who receive routed hot leads."
+      },
+      {
+        "name": "Enrichment Vendor",
+        "does": "A system, not a person: the external feed that says how big a company is and what industry it is in."
+      }
+    ],
+    "deliverable": "a clean book and the hygiene report by 9:00 AM every Monday",
+    "clock": "Sunday night: the weekly CRM export lands and each record is matched, merged or queued as it arrives. Monday 8:30 AM: the clean population is enriched, scored and routed. Monday 9:00 AM: the report goes to RevOps.",
+    "stakes": "Get it wrong and two records for one customer get two different reps - or worse, a merge quietly erases the only phone number anyone had."
+  },
+  "owners": [
+    "Sales Ops Analyst",
+    "Data Steward",
+    "RevOps Manager",
+    "AE Team DL"
+  ],
+  "sources": [
+    {
+      "id": "crm-export",
+      "label": "CRM Export",
+      "labelField": "accountId",
+      "description": "The week's new and changed account records from the CRM, as reps typed them.",
+      "fields": [
+        "accountId",
+        "name",
+        "email",
+        "domain",
+        "phone",
+        "region"
+      ]
+    }
+  ],
+  "stores": [
+    {
+      "id": "match-key-policy",
+      "label": "Match Key Policy",
+      "keyField": "version",
+      "owner": "Data Steward",
+      "tone": "neutral",
+      "description": "What makes two records the same (the normalized email), and how confident a match must be to merge without a person.",
+      "fields": [
+        "version",
+        "autoMergeThreshold",
+        "sameNamePoints",
+        "differentNamePoints"
+      ]
+    },
+    {
+      "id": "golden-records",
+      "label": "Golden Records",
+      "keyField": "matchKey",
+      "owner": "Data Steward",
+      "tone": "good",
+      "description": "The clean book: one record per real account, keyed by match key.",
+      "fields": [
+        "matchKey",
+        "accountId",
+        "name",
+        "email",
+        "domain",
+        "phone",
+        "region",
+        "mergedFrom"
+      ]
+    },
+    {
+      "id": "merge-log",
+      "label": "Merge Log",
+      "daily": true,
+      "owner": "Data Steward",
+      "tone": "neutral",
+      "description": "Every merge the rules made this week, and how confident they were.",
+      "fields": [
+        "accountId",
+        "mergedFrom",
+        "matchKey",
+        "confidence"
+      ]
+    },
+    {
+      "id": "review-queue",
+      "label": "Steward Review",
+      "daily": true,
+      "owner": "Data Steward",
+      "tone": "hold",
+      "description": "Candidate pairs the rules were not sure about, waiting for the Data Steward.",
+      "fields": [
+        "accountId",
+        "matchKey",
+        "confidence",
+        "name"
+      ]
+    },
+    {
+      "id": "vendor-data",
+      "label": "Vendor Data",
+      "keyField": "domain",
+      "owner": "Enrichment Vendor",
+      "tone": "neutral",
+      "description": "What the Enrichment Vendor knows about each domain: employees and industry. Not always right.",
+      "fields": [
+        "domain",
+        "employees",
+        "industry"
+      ]
+    },
+    {
+      "id": "scoring-model",
+      "label": "Scoring Model",
+      "keyField": "version",
+      "owner": "RevOps Manager",
+      "tone": "neutral",
+      "description": "The points a lead earns for size, industry and a phone number, and the score cutoffs for hot and warm.",
+      "fields": [
+        "version",
+        "bigCompanyMin",
+        "bigCompanyPoints",
+        "targetIndustry",
+        "industryPoints",
+        "phonePoints",
+        "hotCutoff",
+        "warmCutoff"
+      ]
+    },
+    {
+      "id": "territory-rules",
+      "label": "Territory Rules",
+      "keyField": "region",
+      "owner": "RevOps Manager",
+      "tone": "neutral",
+      "description": "Which territory and owner each region routes to.",
+      "fields": [
+        "region",
+        "territory",
+        "owner"
+      ]
+    },
+    {
+      "id": "lead-scores",
+      "label": "Lead Scores",
+      "keyField": "matchKey",
+      "daily": true,
+      "owner": "RevOps Manager",
+      "tone": "neutral",
+      "description": "This week's score and band for every account in the book.",
+      "fields": [
+        "matchKey",
+        "name",
+        "score",
+        "band",
+        "employees",
+        "industry"
+      ]
+    },
+    {
+      "id": "routed-leads",
+      "label": "Routed Leads",
+      "daily": true,
+      "owner": "AE Team DL",
+      "tone": "good",
+      "description": "Hot leads handed to a territory this week.",
+      "fields": [
+        "matchKey",
+        "name",
+        "territory",
+        "owner"
+      ]
+    },
+    {
+      "id": "hygiene-archive",
+      "label": "Hygiene Archive",
+      "keyField": "runId",
+      "owner": "RevOps Manager",
+      "tone": "good",
+      "description": "Every Monday report: merges, reviews, hot leads. The trend is read from here.",
+      "fields": [
+        "runId",
+        "merges",
+        "reviews",
+        "hot",
+        "records"
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "dedupe-flow",
+      "name": "Match and merge",
+      "description": "Runs once per exported record as it lands.",
+      "trigger": {
+        "mode": "event",
+        "source": "crm-export"
+      }
+    },
+    {
+      "id": "score-flow",
+      "name": "Enrich and score",
+      "description": "Runs Monday 8:30 AM over the whole clean book.",
+      "trigger": {
+        "mode": "schedule",
+        "at": "Mon 8:30 AM"
+      }
+    },
+    {
+      "id": "report-flow",
+      "name": "The Monday report",
+      "description": "Runs Monday 9:00 AM.",
+      "trigger": {
+        "mode": "schedule",
+        "at": "Mon 9:00 AM"
+      }
+    }
+  ],
+  "days": [
+    {
+      "id": "day-1",
+      "label": "Week 1 - two obvious duplicates",
+      "description": "Three records arrive. Two are the same accounts the book already has, typed again by a rep - one with the email in capitals. One is new.",
+      "sources": {
+        "crm-export": [
+          {
+            "accountId": "ACC-2001",
+            "name": "Northwind Mutual",
+            "email": "ops@northwind.example",
+            "domain": "northwind.example",
+            "phone": "555-0101",
+            "region": "East"
+          },
+          {
+            "accountId": "ACC-2002",
+            "name": "Cascade Benefits",
+            "email": "Hello@Cascade.example",
+            "domain": "cascade.example",
+            "phone": "555-0102",
+            "region": "West"
+          },
+          {
+            "accountId": "ACC-2003",
+            "name": "Sierra Assurance",
+            "email": "desk@sierra.example",
+            "domain": "sierra.example",
+            "phone": "555-0103",
+            "region": "West"
+          }
+        ]
+      },
+      "seeds": {
+        "match-key-policy": [
+          {
+            "version": "1.0.0",
+            "autoMergeThreshold": 80,
+            "sameNamePoints": 95,
+            "differentNamePoints": 70
+          }
+        ],
+        "golden-records": [
+          {
+            "accountId": "ACC-1001",
+            "name": "Northwind Mutual",
+            "email": "ops@northwind.example",
+            "domain": "northwind.example",
+            "phone": "555-0101",
+            "region": "East",
+            "matchKey": "ops@northwind.example"
+          },
+          {
+            "accountId": "ACC-1002",
+            "name": "Cascade Benefits",
+            "email": "hello@cascade.example",
+            "domain": "cascade.example",
+            "phone": "555-0102",
+            "region": "West",
+            "matchKey": "hello@cascade.example"
+          }
+        ],
+        "vendor-data": [
+          {
+            "domain": "northwind.example",
+            "employees": 450,
+            "industry": "insurance"
+          },
+          {
+            "domain": "cascade.example",
+            "employees": 80,
+            "industry": "insurance"
+          },
+          {
+            "domain": "sierra.example",
+            "employees": 30,
+            "industry": "retail"
+          }
+        ],
+        "scoring-model": [
+          {
+            "version": "1.0.0",
+            "bigCompanyMin": 200,
+            "bigCompanyPoints": 40,
+            "targetIndustry": "insurance",
+            "industryPoints": 30,
+            "phonePoints": 30,
+            "hotCutoff": 70,
+            "warmCutoff": 40
+          }
+        ],
+        "territory-rules": [
+          {
+            "region": "East",
+            "territory": "East Coast",
+            "owner": "AE Team DL"
+          },
+          {
+            "region": "West",
+            "territory": "West Coast",
+            "owner": "AE Team DL"
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    },
+    {
+      "id": "day-2",
+      "label": "Week 2 - same person, different spelling",
+      "description": "Three records. One is Jon Alvarez's agency typed as Jonathan - same email, different name. One is Northwind again, this time with the phone and region left blank. One is new.",
+      "sources": {
+        "crm-export": [
+          {
+            "accountId": "ACC-2101",
+            "name": "Jonathan Alvarez Agency",
+            "email": "jon@alvarez.example",
+            "domain": "alvarez.example",
+            "phone": "",
+            "region": "East"
+          },
+          {
+            "accountId": "ACC-2102",
+            "name": "Northwind Mutual",
+            "email": "ops@northwind.example",
+            "domain": "northwind.example",
+            "phone": "",
+            "region": ""
+          },
+          {
+            "accountId": "ACC-2103",
+            "name": "Harbor Mutual",
+            "email": "team@harbor.example",
+            "domain": "harbor.example",
+            "phone": "555-0104",
+            "region": "East"
+          }
+        ]
+      },
+      "seeds": {
+        "golden-records": [
+          {
+            "accountId": "ACC-1003",
+            "name": "Jon Alvarez Agency",
+            "email": "jon@alvarez.example",
+            "domain": "alvarez.example",
+            "phone": "555-0105",
+            "region": "East",
+            "matchKey": "jon@alvarez.example"
+          }
+        ],
+        "vendor-data": [
+          {
+            "domain": "alvarez.example",
+            "employees": 12,
+            "industry": "insurance"
+          },
+          {
+            "domain": "harbor.example",
+            "employees": 300,
+            "industry": "logistics"
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    },
+    {
+      "id": "day-3",
+      "label": "Week 3 - the vendor says 'unknown'",
+      "description": "One new account. The Enrichment Vendor has a row for its domain - with employees 'unknown' and no industry. Nothing fails. It just scores cold.",
+      "sources": {
+        "crm-export": [
+          {
+            "accountId": "ACC-2201",
+            "name": "Depot Assurance",
+            "email": "sales@depot.example",
+            "domain": "depot.example",
+            "phone": "555-0106",
+            "region": "West"
+          }
+        ]
+      },
+      "seeds": {
+        "vendor-data": [
+          {
+            "domain": "depot.example",
+            "employees": "unknown",
+            "industry": ""
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    }
+  ],
+  "builds": [
+    {
+      "id": "b1",
+      "dayId": "day-1",
+      "flowId": "dedupe-flow",
+      "title": "Match key",
+      "brief": "Give each record a match key and find out whether the book already has it.",
+      "goal": "Two records are the same account when their normalized email is the same - lower case, no stray spaces. Compute that key for every incoming record, look the key up in the Golden Records, and note whether it is a duplicate.",
+      "outcome": "Every incoming record carries matchKey and isDuplicate, and the matching golden record as existing.",
+      "constraints": [
+        "matchKey is the email, lower case and trimmed.",
+        "Look the key up in Golden Records; attach the match as existing.",
+        "isDuplicate is true when a golden record was found."
+      ],
+      "requires": [
+        "trigger",
+        "lookup",
+        "transform",
+        "json-record",
+        "data-types"
+      ],
+      "hints": {
+        "question": "Is Hello@Cascade.example the same account as hello@cascade.example?",
+        "nudge": "A Transform with matchKey = lower(trim(email)); a Lookup on Golden Records where matchKey = matchKey (existing); a Transform isDuplicate = exists(existing).",
+        "steps": [
+          "Connect the Trigger to the CRM Export.",
+          "Add a Transform: matchKey = lower(trim(email)).",
+          "Add a Lookup on Golden Records where matchKey = matchKey. Name it existing.",
+          "Add a Transform: isDuplicate = exists(existing). Run it."
+        ]
+      },
+      "mapNodes": [
+        "crm-export",
+        "match-key-policy",
+        "dedupe-candidates"
+      ],
+      "checks": [
+        {
+          "id": "b1-run",
+          "kind": "runStatus",
+          "flowId": "dedupe-flow",
+          "equals": "succeeded",
+          "why": "A record that fails matching is a record that never reaches the book.",
+          "label": "The match flow runs without failing"
+        },
+        {
+          "id": "b1-key",
+          "kind": "recordField",
+          "where": {
+            "accountId": "ACC-2002"
+          },
+          "field": "matchKey",
+          "equals": "hello@cascade.example",
+          "why": "Capitals in an email are not a different customer.",
+          "label": "ACC-2002's key is hello@cascade.example"
+        },
+        {
+          "id": "b1-dup",
+          "kind": "recordField",
+          "where": {
+            "accountId": "ACC-2002"
+          },
+          "field": "isDuplicate",
+          "equals": true,
+          "why": "The book already has Cascade; this is a second copy.",
+          "label": "ACC-2002 is a duplicate"
+        },
+        {
+          "id": "b1-new",
+          "kind": "recordField",
+          "where": {
+            "accountId": "ACC-2003"
+          },
+          "field": "isDuplicate",
+          "equals": false,
+          "why": "Sierra is new; nothing to merge into.",
+          "label": "ACC-2003 is new"
+        }
+      ]
+    },
+    {
+      "id": "b2",
+      "dayId": "day-1",
+      "flowId": "dedupe-flow",
+      "title": "Merge or create",
+      "brief": "A duplicate merges into its golden record; a new record becomes one.",
+      "goal": "A duplicate is folded into the golden record it matched, keeping the golden record's id and noting where the copy came from; a new record joins the book. Either way there is one row per match key afterwards, and every merge is logged.",
+      "outcome": "Golden Records holds one row per real account; every merge is in the Merge Log.",
+      "constraints": [
+        "One row per matchKey - add or replace, never a second row.",
+        "A merged record keeps the golden accountId; mergedFrom records the copy's id.",
+        "Log every merge."
+      ],
+      "requires": [
+        "condition",
+        "upsert",
+        "store"
+      ],
+      "hints": {
+        "question": "After this week's export, how many Northwind rows should the book have?",
+        "nudge": "A Condition on existing exists: YES lane Transform mergedFrom = accountId, accountId = existing.accountId, then Store into Merge Log; both lanes end at a Store into Golden Records, add or replace by matchKey.",
+        "steps": [
+          "Add a Condition: existing exists.",
+          "YES lane: Transform mergedFrom = accountId and accountId = existing.accountId; Store into Merge Log.",
+          "After the Condition: Store into Golden Records, add or replace if it exists, same row when matchKey.",
+          "Run it."
+        ]
+      },
+      "mapNodes": [
+        "merge-decision",
+        "golden-record",
+        "survivorship-policy"
+      ],
+      "checks": [
+        {
+          "id": "b2-count",
+          "kind": "storeCount",
+          "store": "golden-records",
+          "equals": 3,
+          "why": "Two existing accounts, one new: three rows, not five.",
+          "label": "The book has 3 golden records"
+        },
+        {
+          "id": "b2-merged",
+          "kind": "storeContains",
+          "store": "golden-records",
+          "where": {
+            "matchKey": "ops@northwind.example"
+          },
+          "fields": {
+            "accountId": "ACC-1001",
+            "mergedFrom": "ACC-2001"
+          },
+          "why": "The golden id survives; the copy's id is remembered.",
+          "label": "Northwind keeps ACC-1001 and records the merge from ACC-2001"
+        },
+        {
+          "id": "b2-new",
+          "kind": "storeContains",
+          "store": "golden-records",
+          "where": {
+            "matchKey": "desk@sierra.example"
+          },
+          "fields": {
+            "accountId": "ACC-2003"
+          },
+          "why": "New accounts join the book as themselves.",
+          "label": "Sierra joins the book as ACC-2003"
+        },
+        {
+          "id": "b2-log",
+          "kind": "storeCount",
+          "store": "merge-log",
+          "equals": 2,
+          "why": "Two duplicates, two merges logged - the Data Steward's audit trail.",
+          "label": "2 merges logged"
+        }
+      ]
+    },
+    {
+      "id": "b3",
+      "dayId": "day-1",
+      "flowId": "score-flow",
+      "title": "Enrich and score",
+      "brief": "On Monday morning, look every account up with the vendor and score it with the model.",
+      "goal": "The scoring model gives points for company size, target industry and a phone number, and sets cutoffs for hot and warm. Size and industry come from the Enrichment Vendor by domain. Walk the whole book, enrich and score each account, and record the band.",
+      "outcome": "Every golden record has a row in Lead Scores with score and band from the model.",
+      "constraints": [
+        "Read points and cutoffs from the Scoring Model; do not type them.",
+        "Size and industry come from Vendor Data by domain.",
+        "band is hot, warm or cold by the model's cutoffs."
+      ],
+      "requires": [
+        "schedule-trigger",
+        "lookup-all",
+        "foreach",
+        "fields-and-paths"
+      ],
+      "hints": {
+        "question": "Northwind has 450 employees, is in insurance, and has a phone. What does the model say?",
+        "nudge": "All-rows Lookup on Golden Records (book); a For each over book; inside: Lookups on Vendor Data by domain (vendor) and Scoring Model ('1.0.0', model); a Transform for score with if() and band with nested if(); a Store into Lead Scores.",
+        "steps": [
+          "Open the Enrich and score flow (already on a schedule).",
+          "Lookup Golden Records, all rows. Name it book. Add a For each over book.",
+          "Inside: Lookup Vendor Data where domain = domain (vendor); Lookup Scoring Model where version = '1.0.0' (model).",
+          "Inside: Transform employees = num(vendor.employees), industry = vendor.industry, score = if(employees >= model.bigCompanyMin, model.bigCompanyPoints, 0) + if(industry == model.targetIndustry, model.industryPoints, 0) + if(len(phone) > 0, model.phonePoints, 0), band = if(score >= model.hotCutoff, 'hot', if(score >= model.warmCutoff, 'warm', 'cold')).",
+          "Inside: Store into Lead Scores. Run it."
+        ]
+      },
+      "mapNodes": [
+        "enrichment-source",
+        "enrichment-lookup",
+        "scoring-model",
+        "lead-scores"
+      ],
+      "checks": [
+        {
+          "id": "b3-run",
+          "kind": "runStatus",
+          "flowId": "score-flow",
+          "equals": "succeeded",
+          "why": "If scoring fails, nothing is routed on Monday.",
+          "label": "The scoring flow runs without failing"
+        },
+        {
+          "id": "b3-hot",
+          "kind": "storeContains",
+          "store": "lead-scores",
+          "where": {
+            "matchKey": "ops@northwind.example"
+          },
+          "fields": {
+            "score": 100,
+            "band": "hot"
+          },
+          "why": "Big, target industry, reachable: the model's best case.",
+          "label": "Northwind scores 100, hot"
+        },
+        {
+          "id": "b3-warm",
+          "kind": "storeContains",
+          "store": "lead-scores",
+          "where": {
+            "matchKey": "hello@cascade.example"
+          },
+          "fields": {
+            "score": 60,
+            "band": "warm"
+          },
+          "why": "Small but in the target industry with a phone: warm.",
+          "label": "Cascade scores 60, warm"
+        },
+        {
+          "id": "b3-cold",
+          "kind": "storeContains",
+          "store": "lead-scores",
+          "where": {
+            "matchKey": "desk@sierra.example"
+          },
+          "fields": {
+            "score": 30,
+            "band": "cold"
+          },
+          "why": "Small, wrong industry: cold, however nice the rep says they were.",
+          "label": "Sierra scores 30, cold"
+        }
+      ]
+    },
+    {
+      "id": "b4",
+      "dayId": "day-1",
+      "flowId": "score-flow",
+      "title": "Route the hot leads",
+      "brief": "Hand every hot lead to the territory its region belongs to.",
+      "goal": "A hot lead is worth a rep's Monday. The Territory Rules say which territory and owner each region routes to. Inside the loop, route each hot account: tell the owner and log the routing.",
+      "outcome": "Every hot lead is in Routed Leads with its territory, and its owner is told; warm and cold leads are not routed.",
+      "constraints": [
+        "Only hot leads route.",
+        "Territory and owner come from the Territory Rules by region."
+      ],
+      "requires": [
+        "send"
+      ],
+      "hints": {
+        "question": "Who should hear about Northwind this Monday, and who should not be bothered about Sierra?",
+        "nudge": "Inside the loop, after the Store: Lookup Territory Rules by region (territory); a Condition on band == hot: YES lane Transform territory = territory.territory, owner = territory.owner; Send to the owner; Store into Routed Leads.",
+        "steps": [
+          "Inside the loop, add a Lookup on Territory Rules where region = region. Name it rules.",
+          "Add a Condition: band == hot.",
+          "YES lane: Transform territory = rules.territory, owner = rules.owner; Send to AE Team DL ('Hot lead: {{name}} ({{territory}})'); Store into Routed Leads.",
+          "Run it."
+        ]
+      },
+      "mapNodes": [
+        "territory-rules",
+        "lead-routing"
+      ],
+      "checks": [
+        {
+          "id": "b4-routed",
+          "kind": "storeContains",
+          "store": "routed-leads",
+          "where": {
+            "matchKey": "ops@northwind.example"
+          },
+          "fields": {
+            "territory": "East Coast"
+          },
+          "why": "Northwind is in the East; the East Coast team gets it.",
+          "label": "Northwind is routed to East Coast"
+        },
+        {
+          "id": "b4-sent",
+          "kind": "outboxContains",
+          "to": "AE Team DL",
+          "contains": "Northwind",
+          "why": "A routed lead nobody was told about is not routed.",
+          "label": "The AE team is told about Northwind"
+        },
+        {
+          "id": "b4-only",
+          "kind": "storeCount",
+          "store": "routed-leads",
+          "equals": 1,
+          "why": "Routing cold leads wastes the team's Monday.",
+          "label": "Only the hot lead is routed"
+        }
+      ]
+    },
+    {
+      "id": "b5",
+      "dayId": "day-1",
+      "flowId": "report-flow",
+      "title": "The Monday report",
+      "brief": "At 9:00, count the week and send the report to RevOps.",
+      "goal": "RevOps wants the week in numbers: records in the book, merges made, pairs waiting for the steward, hot leads routed. Read the tables, count, send the report and archive it so next week has a trend to compare with.",
+      "outcome": "RevOps receives the report with the week's counts; a copy is archived.",
+      "constraints": [
+        "Name the counts records, merges, reviews and hot.",
+        "Count from the tables; do not type numbers."
+      ],
+      "requires": [
+        "lists",
+        "compose"
+      ],
+      "hints": {
+        "question": "What would tell RevOps whether the book is getting cleaner?",
+        "nudge": "All-rows Lookups on Lead Scores (scores), Merge Log (mergesMade) and Steward Review (pending); Transform records = len(scores), merges = len(mergesMade), reviews = len(pending), hot = count(scores, 'band', 'hot'); Compose; Send to RevOps Manager; Store into Hygiene Archive.",
+        "steps": [
+          "Open the Monday report flow.",
+          "Lookups, all rows: Lead Scores as scores, Merge Log as mergesMade, Steward Review as pending.",
+          "Transform: records = len(scores), merges = len(mergesMade), reviews = len(pending), hot = count(scores, 'band', 'hot').",
+          "Compose report with the four counts and {{#each scores}}- {{name}} {{score}} {{band}}{{/each}}.",
+          "Send to RevOps Manager with {{report}}; Store into Hygiene Archive."
+        ]
+      },
+      "mapNodes": [
+        "hygiene-report",
+        "hygiene-archive",
+        "quality-trend"
+      ],
+      "checks": [
+        {
+          "id": "b5-records",
+          "kind": "recordField",
+          "where": {
+            "scheduledAt": "Mon 9:00 AM"
+          },
+          "field": "records",
+          "equals": 3,
+          "why": "The size of the clean book.",
+          "label": "The report counts 3 records"
+        },
+        {
+          "id": "b5-merges",
+          "kind": "recordField",
+          "where": {
+            "scheduledAt": "Mon 9:00 AM"
+          },
+          "field": "merges",
+          "equals": 2,
+          "why": "Merges per week is the decay rate.",
+          "label": "The report counts 2 merges"
+        },
+        {
+          "id": "b5-hot",
+          "kind": "recordField",
+          "where": {
+            "scheduledAt": "Mon 9:00 AM"
+          },
+          "field": "hot",
+          "equals": 1,
+          "why": "Hot leads are what sales asks about first.",
+          "label": "The report counts 1 hot lead"
+        },
+        {
+          "id": "b5-sent",
+          "kind": "outboxContains",
+          "to": "RevOps Manager",
+          "contains": "Northwind",
+          "why": "The report names the accounts, not just totals.",
+          "label": "RevOps receives the report"
+        },
+        {
+          "id": "b5-archive",
+          "kind": "storeContains",
+          "store": "hygiene-archive",
+          "where": {
+            "scheduledAt": "Mon 9:00 AM"
+          },
+          "why": "Next week's trend reads this week's archive.",
+          "label": "The report is archived"
+        }
+      ]
+    },
+    {
+      "id": "b6",
+      "dayId": "day-2",
+      "flowId": "dedupe-flow",
+      "title": "Week 2: not sure",
+      "brief": "When the names differ, the merge is not certain. Send it to the Data Steward.",
+      "goal": "Jonathan Alvarez Agency arrives with Jon Alvarez Agency's email. Run your Week 1 flow: it merges them without a second thought and renames the golden record. A match on email with a different name is a candidate, not a certainty. Score the confidence from the policy and merge only above its threshold; queue the rest for the Data Steward.",
+      "outcome": "A candidate pair below the auto-merge threshold goes to Steward Review with its confidence and the Data Steward is told; the golden record is untouched.",
+      "constraints": [
+        "Confidence comes from the Match Key Policy: sameNamePoints when the names match, differentNamePoints when they do not.",
+        "Merge only at or above autoMergeThreshold, read from the policy.",
+        "A queued pair changes nothing in the book."
+      ],
+      "requires": [
+        "stop"
+      ],
+      "hints": {
+        "question": "Same email, different name. Same customer, or a rep's typo - and who should decide?",
+        "nudge": "Look up the Match Key Policy (policy). In the duplicate lane, a Transform confidence = if(lower(name) == lower(existing.name), policy.sameNamePoints, policy.differentNamePoints); then a Condition confidence < policy.autoMergeThreshold: YES lane Store into Steward Review, Send to Data Steward, Stop.",
+        "steps": [
+          "Run first and read Golden Records for alvarez.example.",
+          "Add a Lookup on Match Key Policy where version = '1.0.0'. Name it policy.",
+          "In the duplicate YES lane, first: Transform confidence = if(lower(name) == lower(existing.name), policy.sameNamePoints, policy.differentNamePoints).",
+          "Then a Condition: confidence < policy.autoMergeThreshold. Its YES lane: Store into Steward Review; Send to Data Steward ('Review: {{accountId}} vs {{existing.accountId}}'); Stop.",
+          "Run again."
+        ]
+      },
+      "mapNodes": [
+        "merge-decision",
+        "steward-review",
+        "match-key-policy"
+      ],
+      "checks": [
+        {
+          "id": "b6-queued",
+          "kind": "storeContains",
+          "store": "review-queue",
+          "where": {
+            "accountId": "ACC-2101"
+          },
+          "fields": {
+            "confidence": 70
+          },
+          "why": "70 is below 80: a person decides.",
+          "label": "ACC-2101 waits for the steward at confidence 70"
+        },
+        {
+          "id": "b6-told",
+          "kind": "outboxContains",
+          "to": "Data Steward",
+          "recordLabel": "ACC-2101",
+          "why": "A queue nobody is told about is a queue nobody works.",
+          "label": "The Data Steward is told"
+        },
+        {
+          "id": "b6-untouched",
+          "kind": "storeContains",
+          "store": "golden-records",
+          "where": {
+            "matchKey": "jon@alvarez.example"
+          },
+          "fields": {
+            "name": "Jon Alvarez Agency",
+            "accountId": "ACC-1003"
+          },
+          "why": "Until a person decides, the book stays as it was.",
+          "label": "Jon Alvarez's golden record is untouched"
+        },
+        {
+          "id": "b6-sure",
+          "kind": "storeContains",
+          "store": "merge-log",
+          "where": {
+            "mergedFrom": "ACC-2102"
+          },
+          "fields": {
+            "confidence": 95
+          },
+          "why": "Same name, same email: the rules are sure, and merge.",
+          "label": "The sure pair (ACC-2102 into ACC-1001) still merges at 95"
+        }
+      ]
+    },
+    {
+      "id": "b7",
+      "dayId": "day-2",
+      "flowId": "dedupe-flow",
+      "title": "Week 2: the merge that erases",
+      "brief": "A merge must keep the best value of each field, not the newest one.",
+      "goal": "Northwind arrived again with the phone and region left blank, and merged. Open the golden record: the phone number is gone. A merge that replaces the whole row destroys information. Survivorship means deciding field by field: a blank never wins over a value.",
+      "outcome": "After a merge, every field of the golden record holds a value if either copy had one.",
+      "constraints": [
+        "Field by field: phone, region, name.",
+        "A blank never replaces a value.",
+        "Still one row per matchKey."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "Which Northwind phone number should the book have on Monday: the one it had, or the blank the rep typed?",
+        "nudge": "Before the golden Store, in the merge lane: Transform phone = if(len(phone) > 0, phone, existing.phone), region = if(len(region) > 0, region, existing.region).",
+        "steps": [
+          "Run first and open Golden Records in the Data tab: find Northwind's phone.",
+          "In the duplicate lane, before the merge Store, add a Transform: phone = if(len(phone) > 0, phone, existing.phone), region = if(len(region) > 0, region, existing.region).",
+          "Run again."
+        ]
+      },
+      "mapNodes": [
+        "survivorship-policy",
+        "golden-record"
+      ],
+      "checks": [
+        {
+          "id": "b7-phone",
+          "kind": "storeContains",
+          "store": "golden-records",
+          "where": {
+            "matchKey": "ops@northwind.example"
+          },
+          "fields": {
+            "phone": "555-0101",
+            "region": "East"
+          },
+          "why": "The only phone anyone had for Northwind survives the merge.",
+          "label": "Northwind keeps its phone and region"
+        },
+        {
+          "id": "b7-merged",
+          "kind": "storeContains",
+          "store": "golden-records",
+          "where": {
+            "matchKey": "ops@northwind.example"
+          },
+          "fields": {
+            "mergedFrom": "ACC-2102"
+          },
+          "why": "It still merged - survivorship is not a refusal to merge.",
+          "label": "The merge still happened (from ACC-2102)"
+        },
+        {
+          "id": "b7-rows",
+          "kind": "storeCount",
+          "store": "golden-records",
+          "where": {
+            "matchKey": "ops@northwind.example"
+          },
+          "equals": 1,
+          "why": "One Northwind.",
+          "label": "Still one Northwind row"
+        }
+      ]
+    },
+    {
+      "id": "b8",
+      "dayId": "day-3",
+      "flowId": "score-flow",
+      "title": "Week 3: the vendor says 'unknown'",
+      "brief": "When the vendor's data cannot be read, don't score it - flag it.",
+      "goal": "Depot Assurance is new, and the Enrichment Vendor's row for its domain says employees 'unknown' and no industry. Run your Week 2 flow: Depot scores 30 and is filed as cold. Nobody will call a company whose size nobody knows. When the vendor's numbers cannot be read, mark the lead unscored and tell the Sales Ops Analyst.",
+      "outcome": "A lead whose enrichment cannot be read is marked unscored, not cold; the Sales Ops Analyst is told; it is not routed.",
+      "constraints": [
+        "Unreadable is not zero.",
+        "Check after enriching, before scoring.",
+        "The lead still appears in Lead Scores - as unscored."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "What did the model do with 'unknown'?",
+        "nudge": "Inside the loop, after the enrichment Transform, a Condition on employees missing: YES lane Transform band = 'unscored'; Send to Sales Ops Analyst; Store into Lead Scores; Stop.",
+        "steps": [
+          "Run first and follow Depot through the loop.",
+          "Split the scoring Transform: first employees = num(vendor.employees), industry = vendor.industry; then a Condition: employees missing.",
+          "Its YES lane: Transform band = 'unscored'; Send to Sales Ops Analyst ('Vendor data unreadable for {{domain}}'); Store into Lead Scores; Stop.",
+          "Then the score and band Transform, as before. Run again."
+        ]
+      },
+      "mapNodes": [
+        "enrichment-lookup",
+        "run-operations"
+      ],
+      "checks": [
+        {
+          "id": "b8-unscored",
+          "kind": "storeContains",
+          "store": "lead-scores",
+          "where": {
+            "matchKey": "sales@depot.example"
+          },
+          "fields": {
+            "band": "unscored"
+          },
+          "why": "'Cold' would be a claim about a company nobody has data on.",
+          "label": "Depot is marked unscored, not cold"
+        },
+        {
+          "id": "b8-told",
+          "kind": "outboxContains",
+          "to": "Sales Ops Analyst",
+          "contains": "depot.example",
+          "why": "Someone has to ask the vendor, or look it up by hand.",
+          "label": "The Sales Ops Analyst is told about depot.example"
+        },
+        {
+          "id": "b8-not-routed",
+          "kind": "storeMissing",
+          "store": "routed-leads",
+          "where": {
+            "matchKey": "sales@depot.example"
+          },
+          "why": "an unscored lead is not a hot lead",
+          "label": "Depot is not routed"
+        },
+        {
+          "id": "b8-rows",
+          "kind": "storeCount",
+          "store": "lead-scores",
+          "equals": 6,
+          "why": "Every account in the book is scored or marked, once.",
+          "label": "Every account in the book has a row (6)"
+        }
+      ]
+    }
+  ]
+}
