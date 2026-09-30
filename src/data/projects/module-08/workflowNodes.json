@@ -1,0 +1,627 @@
+[
+  {
+    "id": "control-catalog",
+    "label": "Control Catalog",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "catalog",
+    "x": 20,
+    "y": 80,
+    "description": "Every control Sentinel must prove, its owner, and how long its evidence stays fresh. The rules are the source of the work.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Control Catalog table; the request and coverage loops read it.",
+      "concepts": []
+    },
+    "labVersion": "The Control Catalog table; the request and coverage loops read it.",
+    "realWorldSources": [
+      "Control framework (NIST, SOC 2)",
+      "GRC tool control library"
+    ],
+    "accessNeeded": [
+      "The CISO's catalog",
+      "A version"
+    ],
+    "soloRebuildPath": [
+      "List the controls and owners",
+      "Set a freshness window each",
+      "Later import from the framework"
+    ],
+    "reusedBy": [
+      "evidence-request",
+      "completeness-check"
+    ],
+    "governanceNote": "The only module rooted at a reference: nothing arrives until the catalog asks for it.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-control-catalog",
+    "artifactName": "control-catalog.json"
+  },
+  {
+    "id": "evidence-calendar",
+    "label": "Evidence Calendar",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "catalog",
+    "x": 20,
+    "y": 190,
+    "description": "When each control's evidence expires and must be collected again.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Evidence Calendar table, refilled by the expiry loop after every package.",
+      "concepts": []
+    },
+    "labVersion": "The Evidence Calendar table, refilled by the expiry loop after every package.",
+    "realWorldSources": [
+      "Compliance calendar",
+      "GRC due dates"
+    ],
+    "accessNeeded": [
+      "The catalog's freshness windows",
+      "Last quarter's collection days"
+    ],
+    "soloRebuildPath": [
+      "Add freshness to the collection day",
+      "Keep one date per control",
+      "Later drive requests from it"
+    ],
+    "reusedBy": [
+      "evidence-request"
+    ],
+    "governanceNote": "Proof expires; the calendar is where that is written down.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-evidence-calendar",
+    "artifactName": "evidence-calendar.json"
+  },
+  {
+    "id": "evidence-request",
+    "label": "Evidence Request",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "catalog",
+    "x": 20,
+    "y": 300,
+    "description": "A precise ask: control, period, as-of day, owner.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Evidence Requests table, one row per control per quarter.",
+      "concepts": []
+    },
+    "labVersion": "The Evidence Requests table, one row per control per quarter.",
+    "realWorldSources": [
+      "Evidence request tickets",
+      "Audit PBC list"
+    ],
+    "accessNeeded": [
+      "The quarter's period and end day"
+    ],
+    "soloRebuildPath": [
+      "One request per control",
+      "Name the period and the deadline",
+      "Tell the owner"
+    ],
+    "reusedBy": [
+      "collection-tasks",
+      "attestation-route"
+    ],
+    "governanceNote": "An imprecise request gets imprecise evidence.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-evidence-request",
+    "artifactName": "evidence-request.json"
+  },
+  {
+    "id": "collection-tasks",
+    "label": "Collection Tasks",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "collection",
+    "x": 270,
+    "y": 80,
+    "description": "Requests fanned out to every owner on day 1 of the quarter.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The For each over the catalog in the Quarter start flow.",
+      "concepts": []
+    },
+    "labVersion": "The For each over the catalog in the Quarter start flow.",
+    "realWorldSources": [
+      "Task tracker",
+      "Reminder emails"
+    ],
+    "accessNeeded": [
+      "The owners' inboxes"
+    ],
+    "soloRebuildPath": [
+      "Loop over the catalog",
+      "Store the request",
+      "Send the ask"
+    ],
+    "reusedBy": [
+      "evidence-record"
+    ],
+    "governanceNote": "Fan-out is a loop over the catalog, so a new control is a new row, not a new step.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-collection-tasks",
+    "artifactName": "collection-tasks.json"
+  },
+  {
+    "id": "evidence-record",
+    "label": "Evidence Record",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "collection",
+    "x": 270,
+    "y": 190,
+    "description": "The evidence itself: control, period, collection day, hash, attestation. Added, never edited.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Evidence Records table, append-only from Q2 on.",
+      "concepts": []
+    },
+    "labVersion": "The Evidence Records table, append-only from Q2 on.",
+    "realWorldSources": [
+      "Evidence repository",
+      "Document vault with hashes"
+    ],
+    "accessNeeded": [
+      "Write access to the vault",
+      "A hashing step"
+    ],
+    "soloRebuildPath": [
+      "Record every submission with its hash",
+      "Never overwrite",
+      "Version corrections"
+    ],
+    "reusedBy": [
+      "completeness-check",
+      "audit-package"
+    ],
+    "governanceNote": "The hash is the promise the file was not changed after it was recorded.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-evidence-record",
+    "artifactName": "evidence-record.json"
+  },
+  {
+    "id": "immutability-policy",
+    "label": "Immutability Policy",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "collection",
+    "x": 270,
+    "y": 300,
+    "description": "Records are added, never edited; a correction is a new record that names what it supersedes.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The version and supersedes fields, and the append-only Store.",
+      "concepts": []
+    },
+    "labVersion": "The version and supersedes fields, and the append-only Store.",
+    "realWorldSources": [
+      "Records management policy",
+      "WORM storage rules"
+    ],
+    "accessNeeded": [
+      "The policy",
+      "Version numbering"
+    ],
+    "soloRebuildPath": [
+      "Write the rule down",
+      "Add version and supersedes fields",
+      "Later enforce it in storage"
+    ],
+    "reusedBy": [
+      "evidence-record"
+    ],
+    "governanceNote": "An auditor who finds one edit asks what else was edited.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-immutability-policy",
+    "artifactName": "immutability-policy.json"
+  },
+  {
+    "id": "completeness-check",
+    "label": "Completeness Check",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "attestation",
+    "x": 520,
+    "y": 80,
+    "description": "Every control in the catalog has evidence for this period; a control with none is a finding.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The coverage loop at the start of the Quarter end flow.",
+      "concepts": []
+    },
+    "labVersion": "The coverage loop at the start of the Quarter end flow.",
+    "realWorldSources": [
+      "PBC tracker",
+      "Coverage report"
+    ],
+    "accessNeeded": [
+      "The catalog and the records"
+    ],
+    "soloRebuildPath": [
+      "Loop over the catalog",
+      "Look for evidence for the period",
+      "Log a finding when none"
+    ],
+    "reusedBy": [
+      "finding-decision"
+    ],
+    "governanceNote": "The records cannot tell you what is missing; only the catalog can.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-completeness-check",
+    "artifactName": "completeness-check.json"
+  },
+  {
+    "id": "attestation-route",
+    "label": "Attestation Route",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "attestation",
+    "x": 520,
+    "y": 190,
+    "description": "The owner attests to the period; the Internal Auditor countersigns; both captured on the record.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The attestedPeriod test and the Internal Auditor Approval in the Evidence arrives flow.",
+      "concepts": []
+    },
+    "labVersion": "The attestedPeriod test and the Internal Auditor Approval in the Evidence arrives flow.",
+    "realWorldSources": [
+      "Attestation form",
+      "E-signature"
+    ],
+    "accessNeeded": [
+      "The auditor's countersign"
+    ],
+    "soloRebuildPath": [
+      "Capture who attested to what",
+      "Countersign",
+      "Record both"
+    ],
+    "reusedBy": [
+      "finding-decision"
+    ],
+    "governanceNote": "An attestation to the wrong period is not an attestation.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-attestation-route",
+    "artifactName": "attestation-route.json"
+  },
+  {
+    "id": "finding-decision",
+    "label": "Finding Decision",
+    "type": "decision",
+    "thingOrAction": "action",
+    "phaseId": "attestation",
+    "x": 520,
+    "y": 300,
+    "description": "Sufficient - fresh, attested to this period, countersigned - passes; any gap is a finding.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Condition in the Evidence arrives flow.",
+      "concepts": []
+    },
+    "labVersion": "The Condition in the Evidence arrives flow.",
+    "realWorldSources": [
+      "Test of controls",
+      "Audit workpaper"
+    ],
+    "accessNeeded": [
+      "Freshness windows",
+      "The attestation"
+    ],
+    "soloRebuildPath": [
+      "Test freshness",
+      "Test the period",
+      "Test the countersign"
+    ],
+    "reusedBy": [
+      "pass-log",
+      "remediation-path"
+    ],
+    "governanceNote": "Stale evidence fails even when true.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-finding-decision",
+    "artifactName": "finding-decision.json"
+  },
+  {
+    "id": "remediation-path",
+    "label": "Remediation Path",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "findings",
+    "x": 770,
+    "y": 80,
+    "description": "A finding gets an owner and a deadline, and the owner is told.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The NO lane: Findings store and the message to the owner.",
+      "concepts": []
+    },
+    "labVersion": "The NO lane: Findings store and the message to the owner.",
+    "realWorldSources": [
+      "Issue tracker",
+      "Remediation plan"
+    ],
+    "accessNeeded": [
+      "The control owner's contact"
+    ],
+    "soloRebuildPath": [
+      "Name the owner",
+      "Set the deadline",
+      "Tell them"
+    ],
+    "reusedBy": [
+      "findings-log"
+    ],
+    "governanceNote": "A finding without a date is a note nobody acts on.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-remediation-path",
+    "artifactName": "remediation-path.json"
+  },
+  {
+    "id": "pass-log",
+    "label": "Pass Log",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "findings",
+    "x": 770,
+    "y": 190,
+    "description": "Passing controls are logged too - the quiet path.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Pass Log table.",
+      "concepts": []
+    },
+    "labVersion": "The Pass Log table.",
+    "realWorldSources": [
+      "Test results log"
+    ],
+    "accessNeeded": [
+      "Write access"
+    ],
+    "soloRebuildPath": [
+      "Log every pass with its hash",
+      "Count them in the package"
+    ],
+    "reusedBy": [
+      "audit-package"
+    ],
+    "governanceNote": "Absence of findings is not evidence of passing; a pass is a record.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-pass-log",
+    "artifactName": "pass-log.json"
+  },
+  {
+    "id": "findings-log",
+    "label": "Findings Register",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "findings",
+    "x": 770,
+    "y": 300,
+    "description": "The findings register: control, reason, owner, deadline, and status.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Findings table.",
+      "concepts": []
+    },
+    "labVersion": "The Findings table.",
+    "realWorldSources": [
+      "Findings register",
+      "GRC issues"
+    ],
+    "accessNeeded": [
+      "Write access"
+    ],
+    "soloRebuildPath": [
+      "One row per finding",
+      "Track to remediation",
+      "Later add status"
+    ],
+    "reusedBy": [
+      "audit-package"
+    ],
+    "governanceNote": "The register is what the next audit opens first.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-findings-log",
+    "artifactName": "findings-log.json"
+  },
+  {
+    "id": "audit-package",
+    "label": "Audit Package",
+    "type": "output",
+    "thingOrAction": "thing",
+    "phaseId": "package",
+    "x": 1020,
+    "y": 80,
+    "description": "The quarterly package: every record with its hash, every pass, every finding, and the retention.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "Composed by the Quarter end flow and sent to the Audit DL.",
+      "concepts": []
+    },
+    "labVersion": "Composed by the Quarter end flow and sent to the Audit DL.",
+    "realWorldSources": [
+      "Audit binder",
+      "GRC report"
+    ],
+    "accessNeeded": [
+      "The quarter's tables",
+      "The retention schedule"
+    ],
+    "soloRebuildPath": [
+      "Count passes and findings",
+      "List the evidence with hashes",
+      "Send and archive"
+    ],
+    "reusedBy": [
+      "evidence-archive"
+    ],
+    "governanceNote": "The package reports the gaps in plain words.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-audit-package",
+    "artifactName": "audit-package.json"
+  },
+  {
+    "id": "retention-schedule",
+    "label": "Retention Schedule",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "package",
+    "x": 1020,
+    "y": 190,
+    "description": "How many years each class of record is kept, by regulation.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Retention Schedule table.",
+      "concepts": []
+    },
+    "labVersion": "The Retention Schedule table.",
+    "realWorldSources": [
+      "Records retention policy",
+      "Regulatory requirements"
+    ],
+    "accessNeeded": [
+      "The CISO's schedule",
+      "The regulation"
+    ],
+    "soloRebuildPath": [
+      "List record classes",
+      "Set years per class",
+      "Cite the regulation"
+    ],
+    "reusedBy": [
+      "evidence-archive"
+    ],
+    "governanceNote": "Retention is a regulatory floor, not a preference.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-retention-schedule",
+    "artifactName": "retention-schedule.json"
+  },
+  {
+    "id": "evidence-archive",
+    "label": "Evidence Archive",
+    "type": "archive",
+    "thingOrAction": "thing",
+    "phaseId": "package",
+    "x": 1020,
+    "y": 300,
+    "description": "Every package, kept the years the schedule says; the expiry dates it produces seed next quarter.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Audit Archive table and the expiry loop into the Evidence Calendar.",
+      "concepts": []
+    },
+    "labVersion": "The Audit Archive table and the expiry loop into the Evidence Calendar.",
+    "realWorldSources": [
+      "Archive storage",
+      "WORM bucket"
+    ],
+    "accessNeeded": [
+      "Write access",
+      "The schedule"
+    ],
+    "soloRebuildPath": [
+      "Store the package",
+      "Compute expiries",
+      "Write the calendar"
+    ],
+    "reusedBy": [
+      "evidence-calendar"
+    ],
+    "governanceNote": "The archive is where the freshness loop starts.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-evidence-archive",
+    "artifactName": "evidence-archive.json"
+  },
+  {
+    "id": "freshness-feedback",
+    "label": "Freshness Feedback",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "package",
+    "x": 1020,
+    "y": 410,
+    "description": "Expiring evidence schedules next quarter's requests.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The expiry loop after the package: collectedDay + freshnessDays per control.",
+      "concepts": []
+    },
+    "labVersion": "The expiry loop after the package: collectedDay + freshnessDays per control.",
+    "realWorldSources": [
+      "Compliance calendar automation"
+    ],
+    "accessNeeded": [
+      "The catalog's windows",
+      "This quarter's records"
+    ],
+    "soloRebuildPath": [
+      "Add the window to the collection day",
+      "Write one date per control",
+      "Later drive reminders"
+    ],
+    "reusedBy": [
+      "evidence-calendar"
+    ],
+    "governanceNote": "The loop as compliance engine: what was collected decides what is asked next.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-freshness-feedback",
+    "artifactName": "freshness-feedback.json"
+  },
+  {
+    "id": "run-operations",
+    "label": "Audit Run Operations",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "package",
+    "x": 1020,
+    "y": 520,
+    "description": "Compliance automation fails quietly: an owner who never sends anything makes no event. The run checks coverage against the catalog instead of waiting.",
+    "lesson": {
+      "type": "governance",
+      "status": "now",
+      "intent": "Catch a control nobody sent evidence for.",
+      "concepts": [
+        "Coverage",
+        "Silence as a failure"
+      ]
+    },
+    "labVersion": "Built by you in Q3: a control with no evidence becomes a finding and a message, not an omission.",
+    "realWorldSources": [
+      "Coverage dashboard",
+      "Reminder automation"
+    ],
+    "accessNeeded": [
+      "The catalog",
+      "The Compliance Analyst's contact"
+    ],
+    "soloRebuildPath": [
+      "Check the catalog against the records",
+      "Log the gap",
+      "Tell someone"
+    ],
+    "reusedBy": [],
+    "governanceNote": "Silence is the most dangerous gap; the operator's check is the catalog.",
+    "auditNote": "Authored for the runnable-flow build of Sentinel (2026-09-30).",
+    "taskId": "lesson-run-operations",
+    "artifactName": "escalation-policy.json",
+    "skeletonStage": "operate"
+  }
+]

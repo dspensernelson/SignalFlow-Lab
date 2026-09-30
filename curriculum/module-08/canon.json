@@ -1,0 +1,305 @@
+{
+  "_comment": "Canon for a runnable-flow module, enforced by scripts/lint-flows.mjs. Flow modules have no per-lesson answer keys to drift apart; what can drift is the world data (sources and seeds) and the reference solution that proves every build. So each assertion is checked against the raw day data (kind data) or against the reference solution's run of the whole module (kinds record and store), with every day's stores carried into the next. Change a number in the data and the canon names every fact that moved. The pre-port per-lesson assertions are in git history. ASCII only.",
+  "module": "module-08",
+  "format": "flows",
+  "assertions": [
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "controlId": "AC-2"
+      },
+      "field": "freshnessDays",
+      "equals": 90,
+      "seed": "control-catalog"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "controlId": "CP-9"
+      },
+      "field": "freshnessDays",
+      "equals": 180,
+      "seed": "control-catalog"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "controlId": "AC-2"
+      },
+      "field": "owner",
+      "equals": "owner of AC-2",
+      "seed": "control-catalog"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "key": "current"
+      },
+      "field": "asOfDay",
+      "equals": 90,
+      "seed": "quarter"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "recordClass": "evidence"
+      },
+      "field": "years",
+      "equals": 7,
+      "seed": "retention-schedule"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "submissionId": "S-101"
+      },
+      "field": "collectedDay",
+      "equals": 75,
+      "source": "evidence-submissions"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "submissionId": "S-103"
+      },
+      "field": "collectedDay",
+      "equals": 30,
+      "source": "evidence-submissions"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "evidence-requests",
+      "where": {},
+      "count": 3
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "evidence-requests",
+      "where": {
+        "controlId": "AC-2"
+      },
+      "field": "asOfDay",
+      "equals": 90
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "evidence-records",
+      "where": {
+        "controlId": "AC-2"
+      },
+      "field": "hash",
+      "equals": "h-ac2-q1"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "pass-log",
+      "where": {},
+      "count": 3
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "findings-log",
+      "where": {},
+      "count": 0
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run Q last day",
+      "field": "passes",
+      "equals": 3,
+      "flow": "package-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run Q last day",
+      "field": "retainYears",
+      "equals": 7,
+      "flow": "package-flow"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "evidence-calendar",
+      "where": {
+        "controlId": "AC-2"
+      },
+      "field": "nextDueDay",
+      "equals": 165
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "evidence-calendar",
+      "where": {
+        "controlId": "CP-9"
+      },
+      "field": "nextDueDay",
+      "equals": 210
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "key": "current"
+      },
+      "field": "asOfDay",
+      "equals": 180,
+      "seed": "quarter"
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "submissionId": "S-201"
+      },
+      "field": "collectedDay",
+      "equals": 70,
+      "source": "evidence-submissions"
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "submissionId": "S-202"
+      },
+      "field": "attestedPeriod",
+      "equals": "Q1",
+      "source": "evidence-submissions"
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "submissionId": "S-204"
+      },
+      "field": "hash",
+      "equals": "h-cp9-q2b",
+      "source": "evidence-submissions"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "findings-log",
+      "where": {
+        "controlId": "AC-2"
+      },
+      "field": "deadlineDay",
+      "equals": 210
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "findings-log",
+      "where": {
+        "controlId": "CM-3"
+      },
+      "field": "reason",
+      "equals": "attested to the wrong period"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "findings-log",
+      "where": {},
+      "count": 2
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "evidence-records",
+      "where": {
+        "controlId": "CP-9",
+        "period": "Q2"
+      },
+      "count": 2
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "evidence-records",
+      "where": {
+        "hash": "h-cp9-q2b"
+      },
+      "field": "supersedes",
+      "equals": "h-cp9-q2a"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "evidence-records",
+      "where": {
+        "hash": "h-cp9-q2b"
+      },
+      "field": "version",
+      "equals": 2
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "Scheduled run Q last day",
+      "field": "findings",
+      "equals": 2,
+      "flow": "package-flow"
+    },
+    {
+      "kind": "data",
+      "day": "day-3",
+      "where": {
+        "key": "current"
+      },
+      "field": "asOfDay",
+      "equals": 270,
+      "seed": "quarter"
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "findings-log",
+      "where": {
+        "controlId": "CP-9"
+      },
+      "field": "reason",
+      "equals": "no evidence"
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "findings-log",
+      "where": {
+        "controlId": "CP-9"
+      },
+      "field": "deadlineDay",
+      "equals": 300
+    },
+    {
+      "kind": "record",
+      "day": "day-3",
+      "label": "Scheduled run Q last day",
+      "field": "passes",
+      "equals": 2,
+      "flow": "package-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-3",
+      "label": "Scheduled run Q last day",
+      "field": "findings",
+      "equals": 1,
+      "flow": "package-flow"
+    }
+  ]
+}

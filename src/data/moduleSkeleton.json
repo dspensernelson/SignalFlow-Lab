@@ -140,6 +140,20 @@
         "archive": "Order Archive",
         "operate": "Order Run Operations"
       }
+    },
+    "module-08": {
+      "org": "Sentinel",
+      "deliverable": "quarterly audit package",
+      "map": {
+        "intake": "Evidence Request",
+        "reference": "Control Catalog",
+        "transform": "Completeness Check",
+        "decision": "Finding Decision",
+        "handoff": "Attestation Route",
+        "assembly": "Audit Package",
+        "archive": "Evidence Archive",
+        "operate": "Audit Run Operations"
+      }
     }
   }
 }

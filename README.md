@@ -31,7 +31,8 @@ as Power Automate, Make, n8n, Zapier or Python, and exported.
 | 5 - Ledger Month-End Close | Runnable flows: 8 builds, 3 days |
 | 6 - Compass CRM Hygiene | Runnable flows: 8 builds, 3 days |
 | 7 - Depot Order Flow | Runnable flows: 8 builds, 3 days |
-| 8-10 | Chartered in `curriculum/charters/`, not built |
+| 8 - Sentinel Evidence Locker | Runnable flows: 8 builds, 3 days |
+| 9-10 | Chartered in `curriculum/charters/`, not built |
 
 The worksheet lessons are retired; every module is a flow module.
 

@@ -1,0 +1,82 @@
+[
+  {
+    "id": "catalog",
+    "order": 1,
+    "title": "Phase 1: Control Catalog",
+    "goal": "Know what must be proven, by whom, and when it expires.",
+    "statusSource": "evidence-request",
+    "nodeIds": [
+      "control-catalog",
+      "evidence-calendar",
+      "evidence-request"
+    ],
+    "artifactNames": [
+      "evidence-requests.json"
+    ],
+    "unlocks": "Precise requests to every owner."
+  },
+  {
+    "id": "collection",
+    "order": 2,
+    "title": "Phase 2: Collection",
+    "goal": "Fan the requests out and record what comes back, unaltered.",
+    "statusSource": "evidence-record",
+    "nodeIds": [
+      "collection-tasks",
+      "evidence-record",
+      "immutability-policy"
+    ],
+    "artifactNames": [
+      "evidence-records.json"
+    ],
+    "unlocks": "Hashed, versioned evidence records."
+  },
+  {
+    "id": "attestation",
+    "order": 3,
+    "title": "Phase 3: Attestation and Decision",
+    "goal": "Attest, countersign, and decide whether each piece of evidence is sufficient.",
+    "statusSource": "finding-decision",
+    "nodeIds": [
+      "completeness-check",
+      "attestation-route",
+      "finding-decision"
+    ],
+    "artifactNames": [],
+    "unlocks": "Passes and findings."
+  },
+  {
+    "id": "findings",
+    "order": 4,
+    "title": "Phase 4: Findings",
+    "goal": "Track every finding to an owner and a date; log every pass.",
+    "statusSource": "findings-log",
+    "nodeIds": [
+      "remediation-path",
+      "pass-log",
+      "findings-log"
+    ],
+    "artifactNames": [
+      "findings.json"
+    ],
+    "unlocks": "A register the package can report."
+  },
+  {
+    "id": "package",
+    "order": 5,
+    "title": "Phase 5: Package and Retention",
+    "goal": "Assemble the package, keep it on schedule, and let expiries drive next quarter.",
+    "statusSource": "audit-package",
+    "nodeIds": [
+      "audit-package",
+      "retention-schedule",
+      "evidence-archive",
+      "freshness-feedback",
+      "run-operations"
+    ],
+    "artifactNames": [
+      "audit-package.md"
+    ],
+    "unlocks": "The quarterly package and next quarter's calendar."
+  }
+]

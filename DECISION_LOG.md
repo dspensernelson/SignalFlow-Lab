@@ -2,6 +2,22 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-09-30 (Sentinel built as runnable flows)
+
+- SENTINEL (module-08) BUILT from its charter; fresh map (17 nodes, rooted
+  at the Control Catalog, temporal loop archive -> evidence calendar, ops
+  node). 3 flows (quarter start, evidence arrives, quarter end), 3 quarters,
+  8 builds, 31 checks, 32 canon facts. Q1: requests fanned out from the
+  catalog, evidence recorded with its hash, countersign captured as an
+  Approval, pass or finding (owner + deadline), package with retention from
+  the schedule, expiry dates written to the calendar. Q2: evidence 110 days
+  old passes the Q1 flow (fix: ageDays vs the control's window - stale
+  evidence fails even when true); an attestation to Q1 on a Q2 submission
+  passes (fix: attestedPeriod == period); a correction overwrites the
+  original (fix: append-only with version and supersedes, looked up by
+  control AND period). Q3: nothing arrives for CP-9 and the package has two
+  controls (fix: a coverage loop over the catalog before assembling).
+
 ## 2026-09-29 (Depot built as runnable flows)
 
 - DEPOT (module-07) BUILT from its charter; fresh map (18 nodes, ops node,

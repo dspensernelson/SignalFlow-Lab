@@ -1,0 +1,122 @@
+[
+  {
+    "from": "control-catalog",
+    "to": "evidence-request",
+    "label": "one per control"
+  },
+  {
+    "from": "evidence-calendar",
+    "to": "evidence-request",
+    "label": "due dates"
+  },
+  {
+    "from": "evidence-request",
+    "to": "collection-tasks",
+    "label": "fanned out"
+  },
+  {
+    "from": "collection-tasks",
+    "to": "evidence-record",
+    "label": "submissions"
+  },
+  {
+    "from": "immutability-policy",
+    "to": "evidence-record",
+    "label": "append only"
+  },
+  {
+    "from": "evidence-record",
+    "to": "completeness-check",
+    "label": "what exists"
+  },
+  {
+    "from": "control-catalog",
+    "to": "completeness-check",
+    "label": "what must exist"
+  },
+  {
+    "from": "evidence-request",
+    "to": "attestation-route",
+    "label": "period"
+  },
+  {
+    "from": "evidence-record",
+    "to": "attestation-route",
+    "label": "attested"
+  },
+  {
+    "from": "attestation-route",
+    "to": "finding-decision",
+    "label": "countersigned"
+  },
+  {
+    "from": "completeness-check",
+    "to": "finding-decision",
+    "label": "gaps"
+  },
+  {
+    "from": "finding-decision",
+    "to": "pass-log",
+    "label": "sufficient"
+  },
+  {
+    "from": "finding-decision",
+    "to": "remediation-path",
+    "label": "insufficient"
+  },
+  {
+    "from": "remediation-path",
+    "to": "findings-log",
+    "label": "owner and deadline"
+  },
+  {
+    "from": "pass-log",
+    "to": "audit-package",
+    "label": "passes"
+  },
+  {
+    "from": "findings-log",
+    "to": "audit-package",
+    "label": "findings"
+  },
+  {
+    "from": "evidence-record",
+    "to": "audit-package",
+    "label": "hashes"
+  },
+  {
+    "from": "retention-schedule",
+    "to": "evidence-archive",
+    "label": "years"
+  },
+  {
+    "from": "audit-package",
+    "to": "evidence-archive",
+    "label": "archived"
+  },
+  {
+    "from": "evidence-archive",
+    "to": "freshness-feedback",
+    "label": "collection days"
+  },
+  {
+    "from": "freshness-feedback",
+    "to": "evidence-calendar",
+    "label": "next due"
+  },
+  {
+    "from": "evidence-archive",
+    "to": "evidence-calendar",
+    "label": "seeds next quarter"
+  },
+  {
+    "from": "control-catalog",
+    "to": "run-operations",
+    "label": "coverage"
+  },
+  {
+    "from": "evidence-archive",
+    "to": "run-operations",
+    "label": "run history"
+  }
+]

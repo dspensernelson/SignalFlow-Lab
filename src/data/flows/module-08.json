@@ -1,0 +1,1006 @@
+{
+  "moduleId": "module-08",
+  "title": "Sentinel Evidence Locker",
+  "org": "Sentinel Health",
+  "intro": "Every quarter Sentinel has to prove its controls operated: access reviews ran, backups restored, changes were approved. The auditor does not accept 'we did it' - only evidence, collected on time, unaltered, attested by the right person, kept on schedule. You are going to build the audit automation: request the evidence each quarter, record it so it can never be edited, decide whether it is sufficient, track what is not, and assemble the package. Then it meets a quarter where the evidence is true but too old, attested to the wrong period, corrected, and - for one control - never sent.",
+  "world": {
+    "oneLiner": "Sentinel Health proves every quarter that its security controls operated, with evidence that is fresh, unaltered and attested, assembled into an audit package the auditor can rely on.",
+    "roles": [
+      {
+        "name": "Compliance Analyst",
+        "does": "Runs the quarterly collection and hears when evidence is missing."
+      },
+      {
+        "name": "Control Owners",
+        "does": "Produce the evidence for their controls and attest to it - addressed by control id, like 'owner of AC-2'."
+      },
+      {
+        "name": "Internal Auditor",
+        "does": "Countersigns attested evidence and issues findings."
+      },
+      {
+        "name": "CISO",
+        "does": "Owns the control catalog and the retention schedule."
+      },
+      {
+        "name": "Audit DL",
+        "does": "The distribution list that receives the quarterly package."
+      }
+    ],
+    "deliverable": "a complete audit package at the end of every quarter",
+    "clock": "Day 1 of the quarter: requests go to every control owner. Through the quarter: evidence arrives and is judged as it lands. Last day: the package flow checks every control is covered and sends the package.",
+    "stakes": "Get it wrong and the auditor finds evidence that was quietly edited, a control that was 'proven' with last year's report, or a control nobody collected anything for."
+  },
+  "owners": [
+    "Compliance Analyst",
+    "Control Owners",
+    "Internal Auditor",
+    "CISO",
+    "Audit DL"
+  ],
+  "sources": [
+    {
+      "id": "evidence-submissions",
+      "label": "Evidence Submissions",
+      "labelField": "submissionId",
+      "description": "A control owner's evidence: which control, which period, when it was collected, its hash, and who attests to what.",
+      "fields": [
+        "submissionId",
+        "controlId",
+        "period",
+        "collectedDay",
+        "hash",
+        "attestedBy",
+        "attestedPeriod",
+        "note"
+      ]
+    }
+  ],
+  "stores": [
+    {
+      "id": "control-catalog",
+      "label": "Control Catalog",
+      "keyField": "controlId",
+      "owner": "CISO",
+      "tone": "neutral",
+      "description": "Every control Sentinel must prove: its owner and how many days its evidence stays fresh.",
+      "fields": [
+        "controlId",
+        "name",
+        "owner",
+        "freshnessDays",
+        "version"
+      ]
+    },
+    {
+      "id": "quarter",
+      "label": "Quarter",
+      "keyField": "key",
+      "daily": true,
+      "owner": "Compliance Analyst",
+      "tone": "neutral",
+      "description": "Which quarter this is, and the day number it ends on.",
+      "fields": [
+        "key",
+        "period",
+        "asOfDay"
+      ]
+    },
+    {
+      "id": "evidence-requests",
+      "label": "Evidence Requests",
+      "keyField": "controlId",
+      "daily": true,
+      "owner": "Compliance Analyst",
+      "tone": "neutral",
+      "description": "This quarter's asks, one per control.",
+      "fields": [
+        "controlId",
+        "period",
+        "asOfDay",
+        "owner"
+      ]
+    },
+    {
+      "id": "evidence-records",
+      "label": "Evidence Records",
+      "owner": "Compliance Analyst",
+      "tone": "good",
+      "description": "Every piece of evidence ever received, with its hash. Rows are added, never edited; a correction is a new row that names what it supersedes.",
+      "fields": [
+        "submissionId",
+        "controlId",
+        "period",
+        "hash",
+        "collectedDay",
+        "attestedBy",
+        "version",
+        "supersedes"
+      ]
+    },
+    {
+      "id": "pass-log",
+      "label": "Pass Log",
+      "daily": true,
+      "owner": "Internal Auditor",
+      "tone": "good",
+      "description": "Evidence judged sufficient this quarter.",
+      "fields": [
+        "controlId",
+        "period",
+        "hash",
+        "ageDays"
+      ]
+    },
+    {
+      "id": "findings-log",
+      "label": "Findings",
+      "daily": true,
+      "owner": "Internal Auditor",
+      "tone": "hold",
+      "description": "Controls whose evidence fell short this quarter, with the reason, an owner and a deadline.",
+      "fields": [
+        "controlId",
+        "reason",
+        "owner",
+        "deadlineDay"
+      ]
+    },
+    {
+      "id": "retention-schedule",
+      "label": "Retention Schedule",
+      "keyField": "recordClass",
+      "owner": "CISO",
+      "tone": "neutral",
+      "description": "How many years each class of record is kept, by regulation.",
+      "fields": [
+        "recordClass",
+        "years",
+        "regulation"
+      ]
+    },
+    {
+      "id": "evidence-calendar",
+      "label": "Evidence Calendar",
+      "keyField": "controlId",
+      "owner": "Compliance Analyst",
+      "tone": "neutral",
+      "description": "When each control's evidence expires and must be collected again.",
+      "fields": [
+        "controlId",
+        "nextDueDay"
+      ]
+    },
+    {
+      "id": "audit-archive",
+      "label": "Audit Archive",
+      "keyField": "runId",
+      "owner": "Audit DL",
+      "tone": "good",
+      "description": "Every quarterly package, kept for the years the schedule says.",
+      "fields": [
+        "runId",
+        "passes",
+        "findings",
+        "retainYears"
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "request-flow",
+      "name": "Quarter start",
+      "description": "Runs on day 1 of the quarter: ask every owner for evidence.",
+      "trigger": {
+        "mode": "schedule",
+        "at": "Q day 1"
+      }
+    },
+    {
+      "id": "evidence-flow",
+      "name": "Evidence arrives",
+      "description": "Runs once per submission.",
+      "trigger": {
+        "mode": "event",
+        "source": "evidence-submissions"
+      }
+    },
+    {
+      "id": "package-flow",
+      "name": "Quarter end",
+      "description": "Runs on the last day of the quarter: check coverage, assemble, send.",
+      "trigger": {
+        "mode": "schedule",
+        "at": "Q last day"
+      }
+    }
+  ],
+  "days": [
+    {
+      "id": "day-1",
+      "label": "Q1 - three controls, three clean submissions",
+      "description": "Three controls in the catalog. Every owner sends fresh evidence for Q1, attests to Q1, and the Internal Auditor countersigns.",
+      "sources": {
+        "evidence-submissions": [
+          {
+            "submissionId": "S-101",
+            "controlId": "AC-2",
+            "period": "Q1",
+            "collectedDay": 75,
+            "hash": "h-ac2-q1",
+            "attestedBy": "owner of AC-2",
+            "attestedPeriod": "Q1",
+            "note": "quarterly access review export"
+          },
+          {
+            "submissionId": "S-102",
+            "controlId": "CM-3",
+            "period": "Q1",
+            "collectedDay": 80,
+            "hash": "h-cm3-q1",
+            "attestedBy": "owner of CM-3",
+            "attestedPeriod": "Q1",
+            "note": "change approvals report"
+          },
+          {
+            "submissionId": "S-103",
+            "controlId": "CP-9",
+            "period": "Q1",
+            "collectedDay": 30,
+            "hash": "h-cp9-q1",
+            "attestedBy": "owner of CP-9",
+            "attestedPeriod": "Q1",
+            "note": "restore test log"
+          }
+        ]
+      },
+      "seeds": {
+        "control-catalog": [
+          {
+            "controlId": "AC-2",
+            "name": "Quarterly access review",
+            "owner": "owner of AC-2",
+            "freshnessDays": 90,
+            "version": "1.0.0"
+          },
+          {
+            "controlId": "CM-3",
+            "name": "Change approval",
+            "owner": "owner of CM-3",
+            "freshnessDays": 90,
+            "version": "1.0.0"
+          },
+          {
+            "controlId": "CP-9",
+            "name": "Backup restore test",
+            "owner": "owner of CP-9",
+            "freshnessDays": 180,
+            "version": "1.0.0"
+          }
+        ],
+        "quarter": [
+          {
+            "key": "current",
+            "period": "Q1",
+            "asOfDay": 90
+          }
+        ],
+        "retention-schedule": [
+          {
+            "recordClass": "evidence",
+            "years": 7,
+            "regulation": "HIPAA"
+          },
+          {
+            "recordClass": "package",
+            "years": 7,
+            "regulation": "HIPAA"
+          }
+        ]
+      },
+      "approvals": {
+        "Internal Auditor": {
+          "outcome": "countersigned",
+          "at": "Q1 day 88"
+        }
+      },
+      "failures": []
+    },
+    {
+      "id": "day-2",
+      "label": "Q2 - true but old, the wrong period, and a correction",
+      "description": "AC-2's owner sends the review from 110 days ago - real, but past its 90-day window. CM-3's owner attests to Q1 by mistake. CP-9's owner sends a restore log, then a corrected one.",
+      "sources": {
+        "evidence-submissions": [
+          {
+            "submissionId": "S-201",
+            "controlId": "AC-2",
+            "period": "Q2",
+            "collectedDay": 70,
+            "hash": "h-ac2-q2",
+            "attestedBy": "owner of AC-2",
+            "attestedPeriod": "Q2",
+            "note": "access review (last one we ran)"
+          },
+          {
+            "submissionId": "S-202",
+            "controlId": "CM-3",
+            "period": "Q2",
+            "collectedDay": 170,
+            "hash": "h-cm3-q2",
+            "attestedBy": "owner of CM-3",
+            "attestedPeriod": "Q1",
+            "note": "change approvals report"
+          },
+          {
+            "submissionId": "S-203",
+            "controlId": "CP-9",
+            "period": "Q2",
+            "collectedDay": 150,
+            "hash": "h-cp9-q2a",
+            "attestedBy": "owner of CP-9",
+            "attestedPeriod": "Q2",
+            "note": "restore test log"
+          },
+          {
+            "submissionId": "S-204",
+            "controlId": "CP-9",
+            "period": "Q2",
+            "collectedDay": 160,
+            "hash": "h-cp9-q2b",
+            "attestedBy": "owner of CP-9",
+            "attestedPeriod": "Q2",
+            "note": "restore test log - corrected, first upload was truncated"
+          }
+        ]
+      },
+      "seeds": {
+        "quarter": [
+          {
+            "key": "current",
+            "period": "Q2",
+            "asOfDay": 180
+          }
+        ]
+      },
+      "approvals": {
+        "Internal Auditor": {
+          "outcome": "countersigned",
+          "at": "Q2 day 178"
+        }
+      },
+      "failures": []
+    },
+    {
+      "id": "day-3",
+      "label": "Q3 - one owner never answers",
+      "description": "AC-2 and CM-3 arrive clean. Nothing arrives for CP-9. Nothing fails; the package just has two controls in it.",
+      "sources": {
+        "evidence-submissions": [
+          {
+            "submissionId": "S-301",
+            "controlId": "AC-2",
+            "period": "Q3",
+            "collectedDay": 255,
+            "hash": "h-ac2-q3",
+            "attestedBy": "owner of AC-2",
+            "attestedPeriod": "Q3",
+            "note": "quarterly access review export"
+          },
+          {
+            "submissionId": "S-302",
+            "controlId": "CM-3",
+            "period": "Q3",
+            "collectedDay": 260,
+            "hash": "h-cm3-q3",
+            "attestedBy": "owner of CM-3",
+            "attestedPeriod": "Q3",
+            "note": "change approvals report"
+          }
+        ]
+      },
+      "seeds": {
+        "quarter": [
+          {
+            "key": "current",
+            "period": "Q3",
+            "asOfDay": 270
+          }
+        ]
+      },
+      "approvals": {
+        "Internal Auditor": {
+          "outcome": "countersigned",
+          "at": "Q3 day 268"
+        }
+      },
+      "failures": []
+    }
+  ],
+  "builds": [
+    {
+      "id": "b1",
+      "dayId": "day-1",
+      "flowId": "request-flow",
+      "title": "Ask for the evidence",
+      "brief": "On day 1, send every control owner a precise request.",
+      "goal": "The catalog lists every control Sentinel must prove and who owns it. On the first day of the quarter, turn each control into a request: which control, which period, by when - and tell the owner.",
+      "outcome": "Every control in the catalog has a request for this quarter, and the owners are told.",
+      "constraints": [
+        "One request per control, from the catalog - do not type control ids.",
+        "The period and the as-of day come from the Quarter table.",
+        "Add or replace by controlId."
+      ],
+      "requires": [
+        "schedule-trigger",
+        "lookup",
+        "lookup-all",
+        "foreach",
+        "upsert",
+        "send"
+      ],
+      "hints": {
+        "question": "If the CISO adds a control next quarter, what should your flow have to change?",
+        "nudge": "Lookup Quarter where key = 'current' (q); Lookup Control Catalog, all rows (controls); For each over controls: Transform period = parent.q.period, asOfDay = parent.q.asOfDay; Store into Evidence Requests (add or replace by controlId); Send to Control Owners.",
+        "steps": [
+          "Add a Lookup on Quarter where key = 'current'. Name it q.",
+          "Add a Lookup on Control Catalog, all rows. Name it controls. Add a For each over controls.",
+          "Inside: Transform period = parent.q.period, asOfDay = parent.q.asOfDay.",
+          "Inside: Store into Evidence Requests, add or replace by controlId; Send to Control Owners ('{{controlId}} evidence for {{period}} due by day {{asOfDay}}').",
+          "Run it."
+        ]
+      },
+      "mapNodes": [
+        "control-catalog",
+        "evidence-calendar",
+        "evidence-request",
+        "collection-tasks"
+      ],
+      "checks": [
+        {
+          "id": "b1-run",
+          "kind": "runStatus",
+          "flowId": "request-flow",
+          "equals": "succeeded",
+          "why": "No requests, no evidence, no package.",
+          "label": "The request flow runs without failing"
+        },
+        {
+          "id": "b1-three",
+          "kind": "storeCount",
+          "store": "evidence-requests",
+          "equals": 3,
+          "why": "Three controls, three asks.",
+          "label": "Three requests, one per control"
+        },
+        {
+          "id": "b1-ac2",
+          "kind": "storeContains",
+          "store": "evidence-requests",
+          "where": {
+            "controlId": "AC-2"
+          },
+          "fields": {
+            "period": "Q1",
+            "asOfDay": 90
+          },
+          "why": "A request without a period is not precise enough to attest to.",
+          "label": "AC-2's request is for Q1, as of day 90"
+        },
+        {
+          "id": "b1-told",
+          "kind": "outboxContains",
+          "to": "Control Owners",
+          "contains": "CP-9",
+          "why": "The owner of CP-9 has to hear about CP-9.",
+          "label": "The owners are told (CP-9 named)"
+        }
+      ]
+    },
+    {
+      "id": "b2",
+      "dayId": "day-1",
+      "flowId": "evidence-flow",
+      "title": "Record the evidence",
+      "brief": "When evidence arrives, record it with its hash - the record is the product.",
+      "goal": "An owner's submission is the evidence: its control, its period, when it was collected, its hash, who attests. Look the control up, and record the submission in Evidence Records.",
+      "outcome": "Every submission is in Evidence Records with its hash and attestation, keyed by control.",
+      "constraints": [
+        "Attach the control from the catalog as control.",
+        "Keep the hash exactly as received.",
+        "One record per control for now - add or replace by controlId."
+      ],
+      "requires": [
+        "trigger",
+        "json-record",
+        "store"
+      ],
+      "hints": {
+        "question": "What does the auditor need to see to believe the access review happened?",
+        "nudge": "Trigger on Evidence Submissions; a Lookup on Control Catalog by controlId (control); a Store into Evidence Records, add or replace by controlId.",
+        "steps": [
+          "Open the Evidence arrives flow and connect its Trigger to Evidence Submissions.",
+          "Add a Lookup on Control Catalog where controlId = controlId. Name it control.",
+          "Add a Store into Evidence Records, add or replace if it exists, same row when controlId. Run it."
+        ]
+      },
+      "mapNodes": [
+        "evidence-record"
+      ],
+      "checks": [
+        {
+          "id": "b2-run",
+          "kind": "runStatus",
+          "flowId": "evidence-flow",
+          "equals": "succeeded",
+          "why": "Evidence that fails to record did not happen, as far as the auditor is concerned.",
+          "label": "The evidence flow runs without failing"
+        },
+        {
+          "id": "b2-ac2",
+          "kind": "storeContains",
+          "store": "evidence-records",
+          "where": {
+            "controlId": "AC-2"
+          },
+          "fields": {
+            "hash": "h-ac2-q1",
+            "attestedBy": "owner of AC-2"
+          },
+          "why": "The hash is what proves the file was not changed later.",
+          "label": "AC-2's evidence is recorded with hash h-ac2-q1"
+        },
+        {
+          "id": "b2-all",
+          "kind": "storeCount",
+          "store": "evidence-records",
+          "equals": 3,
+          "why": "Every control's evidence is on record.",
+          "label": "Three records"
+        }
+      ]
+    },
+    {
+      "id": "b3",
+      "dayId": "day-1",
+      "flowId": "evidence-flow",
+      "title": "Attest and decide",
+      "brief": "Attested and countersigned evidence passes; anything else is a finding with an owner and a deadline.",
+      "goal": "Evidence is sufficient when the owner attested to it and the Internal Auditor countersigned. Capture the countersign, decide, and log the outcome either way: a pass, or a finding that names the owner and gives them 30 days.",
+      "outcome": "Every submission ends in the Pass Log or in Findings with a reason, an owner and a deadline; the countersign is captured.",
+      "constraints": [
+        "The countersign is an Approval from the Internal Auditor, captured on the record.",
+        "A finding always carries reason, owner and deadlineDay (as-of day plus 30).",
+        "Passing controls are logged too."
+      ],
+      "requires": [
+        "approval",
+        "condition",
+        "fields-and-paths"
+      ],
+      "hints": {
+        "question": "Who has to say yes before AC-2 counts as proven, and where is that recorded?",
+        "nudge": "Lookup Evidence Requests by controlId (request); Approval from Internal Auditor; Transform attested = len(attestedBy) > 0; Condition attested and approval.outcome == countersigned: YES lane Store into Pass Log; NO lane Transform reason, owner = control.owner, deadlineDay = request.asOfDay + 30; Store into Findings; Send to Control Owners.",
+        "steps": [
+          "After the control Lookup, add a Lookup on Evidence Requests where controlId = controlId. Name it request.",
+          "Add an Approval from Internal Auditor about 'countersign {{controlId}}'.",
+          "Add a Transform: attested = len(attestedBy) > 0.",
+          "Add a Condition: attested == true AND approval.outcome == countersigned. YES lane: Store into Pass Log. NO lane: Transform reason = 'not attested or not countersigned', owner = control.owner, deadlineDay = request.asOfDay + 30; Store into Findings; Send to Control Owners ('Finding on {{controlId}}: {{reason}}').",
+          "Run it."
+        ]
+      },
+      "mapNodes": [
+        "attestation-route",
+        "finding-decision",
+        "pass-log",
+        "remediation-path",
+        "findings-log"
+      ],
+      "checks": [
+        {
+          "id": "b3-pass",
+          "kind": "storeCount",
+          "store": "pass-log",
+          "equals": 3,
+          "why": "A clean quarter: three passes on record, not just an absence of findings.",
+          "label": "All three controls pass"
+        },
+        {
+          "id": "b3-signed",
+          "kind": "recordField",
+          "where": {
+            "submissionId": "S-101"
+          },
+          "field": "approval.outcome",
+          "equals": "countersigned",
+          "why": "The countersign is the auditor's signature; it lives on the record.",
+          "label": "The Internal Auditor's countersign is captured on S-101"
+        },
+        {
+          "id": "b3-none",
+          "kind": "storeCount",
+          "store": "findings-log",
+          "equals": 0,
+          "why": "No findings on a clean quarter.",
+          "label": "No findings"
+        }
+      ]
+    },
+    {
+      "id": "b4",
+      "dayId": "day-1",
+      "flowId": "package-flow",
+      "title": "The package",
+      "brief": "On the last day, assemble the package and send it to the auditors.",
+      "goal": "The package is the quarter: every record with its hash, every pass, every finding, and how long it will all be kept. Count, look up the retention, compose, send to the Audit DL, archive.",
+      "outcome": "The Audit DL receives the package listing every record and finding; the archive row carries the retention years.",
+      "constraints": [
+        "Name the counts passes and findings.",
+        "Retention comes from the Retention Schedule for record class 'evidence'."
+      ],
+      "requires": [
+        "lists",
+        "compose"
+      ],
+      "hints": {
+        "question": "What will the auditor open first?",
+        "nudge": "All-rows Lookups on Evidence Records (records), Pass Log (passed) and Findings (open); Lookup Retention Schedule where recordClass = 'evidence' (retention); Transform passes = len(passed), findings = len(open), retainYears = retention.years; Compose; Send to Audit DL; Store into Audit Archive.",
+        "steps": [
+          "Open the Quarter end flow.",
+          "Lookups, all rows: Evidence Records as records, Pass Log as passed, Findings as open.",
+          "Lookup Retention Schedule where recordClass = 'evidence'. Name it retention.",
+          "Transform: passes = len(passed), findings = len(open), retainYears = retention.years.",
+          "Compose package with the counts, {{#each records}}- {{controlId}} {{period}} {{hash}}{{/each}} and {{#each open}}- {{controlId}}: {{reason}}{{/each}}.",
+          "Send to Audit DL with {{package}}; Store into Audit Archive."
+        ]
+      },
+      "mapNodes": [
+        "audit-package",
+        "retention-schedule",
+        "evidence-archive"
+      ],
+      "checks": [
+        {
+          "id": "b4-passes",
+          "kind": "recordField",
+          "where": {
+            "scheduledAt": "Q last day"
+          },
+          "field": "passes",
+          "equals": 3,
+          "why": "The package states what passed.",
+          "label": "The package counts 3 passes"
+        },
+        {
+          "id": "b4-retain",
+          "kind": "recordField",
+          "where": {
+            "scheduledAt": "Q last day"
+          },
+          "field": "retainYears",
+          "equals": 7,
+          "why": "The regulation sets the floor; the package carries it.",
+          "label": "Retention is 7 years, from the schedule"
+        },
+        {
+          "id": "b4-sent",
+          "kind": "outboxContains",
+          "to": "Audit DL",
+          "contains": "h-ac2-q1",
+          "why": "The auditor checks hashes, not summaries.",
+          "label": "The Audit DL receives the package with the hashes"
+        },
+        {
+          "id": "b4-archive",
+          "kind": "storeContains",
+          "store": "audit-archive",
+          "where": {
+            "runId": "day-1-run"
+          },
+          "fields": {
+            "retainYears": 7
+          },
+          "why": "The archived package is what the next audit reads.",
+          "label": "The package is archived"
+        }
+      ]
+    },
+    {
+      "id": "b5",
+      "dayId": "day-1",
+      "flowId": "package-flow",
+      "title": "When does it expire?",
+      "brief": "Every piece of evidence expires. Put the date on the calendar.",
+      "goal": "Proof goes stale: an access review is good for 90 days, a restore test for 180. After the package, compute when each control's evidence expires and put it on the Evidence Calendar, so next quarter's requests know what to ask for.",
+      "outcome": "The Evidence Calendar holds each control's nextDueDay, from the record's collection day plus the control's freshness window.",
+      "constraints": [
+        "nextDueDay = collectedDay + the control's freshnessDays.",
+        "One row per control in the calendar."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "AC-2 was collected on day 75 and is good for 90 days. When must it be collected again?",
+        "nudge": "After the archive Store, a For each over records; inside: Lookup Control Catalog by controlId (control); Transform nextDueDay = collectedDay + control.freshnessDays; Store into Evidence Calendar, add or replace by controlId.",
+        "steps": [
+          "After the archive Store, add a For each over records.",
+          "Inside: Lookup Control Catalog where controlId = controlId (control); Transform nextDueDay = collectedDay + control.freshnessDays; Store into Evidence Calendar, add or replace if it exists, same row when controlId.",
+          "Run it and open the Evidence Calendar."
+        ]
+      },
+      "mapNodes": [
+        "freshness-feedback",
+        "evidence-calendar"
+      ],
+      "checks": [
+        {
+          "id": "b5-ac2",
+          "kind": "storeContains",
+          "store": "evidence-calendar",
+          "where": {
+            "controlId": "AC-2"
+          },
+          "fields": {
+            "nextDueDay": 165
+          },
+          "why": "75 + 90: the day the review stops being proof.",
+          "label": "AC-2 expires on day 165"
+        },
+        {
+          "id": "b5-cp9",
+          "kind": "storeContains",
+          "store": "evidence-calendar",
+          "where": {
+            "controlId": "CP-9"
+          },
+          "fields": {
+            "nextDueDay": 210
+          },
+          "why": "30 + 180.",
+          "label": "CP-9 expires on day 210"
+        },
+        {
+          "id": "b5-rows",
+          "kind": "storeCount",
+          "store": "evidence-calendar",
+          "equals": 3,
+          "why": "One date per control.",
+          "label": "One calendar row per control"
+        }
+      ]
+    },
+    {
+      "id": "b6",
+      "dayId": "day-2",
+      "flowId": "evidence-flow",
+      "title": "Q2: true, but too old - and the wrong period",
+      "brief": "Stale evidence fails even when true. So does an attestation to the wrong period.",
+      "goal": "AC-2's owner sent the review they ran 110 days ago; CM-3's owner attested to Q1 on a Q2 submission. Run your Q1 flow: both pass. Sufficient means fresh - collected within the control's window as of the quarter end - and attested to THIS period. Add both tests to the decision.",
+      "outcome": "Stale evidence and an attestation to the wrong period are findings with the reason named; fresh, correctly attested evidence still passes.",
+      "constraints": [
+        "ageDays = the request's asOfDay minus collectedDay; fresh when ageDays <= control.freshnessDays.",
+        "attested means attestedPeriod == period, not just a name.",
+        "Each finding names its reason: stale, or wrong period."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "The access review is real. Why does the auditor reject it?",
+        "nudge": "Transform ageDays = request.asOfDay - collectedDay, fresh = ageDays <= control.freshnessDays, attested = attestedPeriod == period; the Condition becomes fresh AND attested AND countersigned; the NO lane's reason = if(fresh == false, 'stale evidence', 'attested to the wrong period').",
+        "steps": [
+          "Run first and read the Pass Log.",
+          "Change the Transform: ageDays = request.asOfDay - collectedDay, fresh = ageDays <= control.freshnessDays, attested = attestedPeriod == period.",
+          "Change the Condition: fresh == true AND attested == true AND approval.outcome == countersigned.",
+          "In the NO lane, reason = if(fresh == false, 'stale evidence', 'attested to the wrong period'). Run again."
+        ]
+      },
+      "mapNodes": [
+        "finding-decision",
+        "remediation-path",
+        "completeness-check"
+      ],
+      "checks": [
+        {
+          "id": "b6-stale",
+          "kind": "storeContains",
+          "store": "findings-log",
+          "where": {
+            "controlId": "AC-2"
+          },
+          "fieldsContain": {
+            "reason": [
+              "stale",
+              "old",
+              "fresh"
+            ]
+          },
+          "why": "110 days old against a 90-day window: not proof of this quarter.",
+          "label": "AC-2 is a finding: stale evidence"
+        },
+        {
+          "id": "b6-period",
+          "kind": "storeContains",
+          "store": "findings-log",
+          "where": {
+            "controlId": "CM-3"
+          },
+          "fieldsContain": {
+            "reason": [
+              "period"
+            ]
+          },
+          "why": "An attestation to Q1 proves nothing about Q2.",
+          "label": "CM-3 is a finding: attested to the wrong period"
+        },
+        {
+          "id": "b6-deadline",
+          "kind": "storeContains",
+          "store": "findings-log",
+          "where": {
+            "controlId": "AC-2"
+          },
+          "fields": {
+            "owner": "owner of AC-2",
+            "deadlineDay": 210
+          },
+          "why": "A finding without an owner and a date is a note nobody acts on.",
+          "label": "AC-2's finding has an owner and a deadline (day 210)"
+        },
+        {
+          "id": "b6-cp9",
+          "kind": "storeMissing",
+          "store": "findings-log",
+          "where": {
+            "controlId": "CP-9"
+          },
+          "why": "CP-9's evidence is fresh and attested to Q2",
+          "label": "CP-9 is not a finding"
+        }
+      ]
+    },
+    {
+      "id": "b7",
+      "dayId": "day-2",
+      "flowId": "evidence-flow",
+      "title": "Q2: the correction",
+      "brief": "Evidence is never edited. A correction is a new record that names what it replaces.",
+      "goal": "CP-9's owner sent a truncated log, then a corrected one. Run your flow and open Evidence Records: the first upload is gone, replaced. That is an edit, and an auditor will ask what else was edited. Records are added, never replaced: the correction is a new row with a version and the hash it supersedes.",
+      "outcome": "Both CP-9 submissions are in Evidence Records; the correction carries version 2 and supersedes the first hash; nothing was overwritten.",
+      "constraints": [
+        "Add, never replace.",
+        "Look up the prior record for the control AND the period; version = prior.version + 1 (or 1); supersedes = prior.hash.",
+        "Every other control still gets version 1."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "After the correction, how many CP-9 records should the auditor be able to see?",
+        "nudge": "Before the record Store, Lookup Evidence Records where controlId = controlId and period = period (prior); Transform version = coalesce(prior.version, 0) + 1, supersedes = coalesce(prior.hash, ''); change the Store to add a new row.",
+        "steps": [
+          "Run first and count CP-9 rows in Evidence Records.",
+          "Before the record Store, add a Lookup on Evidence Records where controlId = controlId and period = period. Name it prior.",
+          "Add a Transform: version = coalesce(prior.version, 0) + 1, supersedes = coalesce(prior.hash, '').",
+          "Change the Store into Evidence Records to 'add a new row'. Run again."
+        ]
+      },
+      "mapNodes": [
+        "immutability-policy",
+        "evidence-record"
+      ],
+      "checks": [
+        {
+          "id": "b7-two",
+          "kind": "storeCount",
+          "store": "evidence-records",
+          "where": {
+            "controlId": "CP-9",
+            "period": "Q2"
+          },
+          "equals": 2,
+          "why": "Both uploads exist; the auditor can see the correction happened.",
+          "label": "Both CP-9 Q2 submissions are on record"
+        },
+        {
+          "id": "b7-super",
+          "kind": "storeContains",
+          "store": "evidence-records",
+          "where": {
+            "hash": "h-cp9-q2b"
+          },
+          "fields": {
+            "version": 2,
+            "supersedes": "h-cp9-q2a"
+          },
+          "why": "The correction says what it corrects.",
+          "label": "The correction is version 2 and supersedes h-cp9-q2a"
+        },
+        {
+          "id": "b7-first",
+          "kind": "storeContains",
+          "store": "evidence-records",
+          "where": {
+            "hash": "h-cp9-q2a"
+          },
+          "fields": {
+            "version": 1
+          },
+          "why": "The original is untouched.",
+          "label": "The original is still there, version 1"
+        }
+      ]
+    },
+    {
+      "id": "b8",
+      "dayId": "day-3",
+      "flowId": "package-flow",
+      "title": "Q3: nothing arrived for CP-9",
+      "brief": "A control with no evidence is a finding, not an omission.",
+      "goal": "AC-2 and CM-3 arrive clean. Nothing arrives for CP-9, so nothing runs for it, and the package lists two controls as if the catalog had two. Before assembling, check every control in the catalog has evidence for this period; a control with none is a finding with an owner and a deadline, and the Compliance Analyst is told.",
+      "outcome": "A control with no evidence this quarter appears in Findings as 'no evidence' with its owner, the Compliance Analyst is told, and the package counts it.",
+      "constraints": [
+        "Check the catalog, not the records - the records cannot tell you what is missing.",
+        "Match on control AND period.",
+        "The finding has an owner and a deadline like any other."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "How many controls are in the catalog? How many are in the package?",
+        "nudge": "At the start of Quarter end: Lookup Quarter (q); Lookup Control Catalog, all rows (controls); For each over controls: Lookup Evidence Records where controlId = controlId and period = parent.q.period (evidence); Condition evidence missing: YES lane Transform reason = 'no evidence', deadlineDay = parent.q.asOfDay + 30; Store into Findings; Send to Compliance Analyst. Then the counts as before.",
+        "steps": [
+          "Run first and read the package.",
+          "At the start of the flow: Lookup Quarter where key = 'current' (q); Lookup Control Catalog, all rows (controls); For each over controls.",
+          "Inside: Lookup Evidence Records where controlId = controlId and period = parent.q.period (evidence); Condition evidence missing; YES lane: Transform reason = 'no evidence', deadlineDay = parent.q.asOfDay + 30; Store into Findings; Send to Compliance Analyst ('No evidence for {{controlId}} in {{parent.q.period}}').",
+          "Keep the counts and the package after the loop. Run again."
+        ]
+      },
+      "mapNodes": [
+        "completeness-check",
+        "run-operations"
+      ],
+      "checks": [
+        {
+          "id": "b8-finding",
+          "kind": "storeContains",
+          "store": "findings-log",
+          "where": {
+            "controlId": "CP-9"
+          },
+          "fields": {
+            "reason": "no evidence",
+            "owner": "owner of CP-9",
+            "deadlineDay": 300
+          },
+          "why": "Silence is the most dangerous gap: nothing failed, so nothing was logged.",
+          "label": "CP-9 is a finding: no evidence, owner named, deadline day 300"
+        },
+        {
+          "id": "b8-told",
+          "kind": "outboxContains",
+          "to": "Compliance Analyst",
+          "contains": "CP-9",
+          "why": "Someone has to chase the owner before the package ships.",
+          "label": "The Compliance Analyst is told"
+        },
+        {
+          "id": "b8-count",
+          "kind": "recordField",
+          "where": {
+            "scheduledAt": "Q last day"
+          },
+          "field": "findings",
+          "equals": 1,
+          "why": "The package counts the gap.",
+          "label": "The package counts 1 finding"
+        },
+        {
+          "id": "b8-passes",
+          "kind": "recordField",
+          "where": {
+            "scheduledAt": "Q last day"
+          },
+          "field": "passes",
+          "equals": 2,
+          "why": "The two clean controls still pass.",
+          "label": "The package counts 2 passes"
+        }
+      ]
+    }
+  ]
+}

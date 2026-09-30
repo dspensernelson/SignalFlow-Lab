@@ -1,0 +1,80 @@
+{
+  "note": "Terms module-08 introduces, and the build that teaches each. Enforced by scripts/lint-glossary.mjs. Keep ASCII-only.",
+  "module": "module-08",
+  "terms": [
+    {
+      "term": "control",
+      "aliases": [
+        "controls",
+        "control catalog"
+      ],
+      "teachesIn": "b1",
+      "gloss": "A rule the organization must prove it followed: access reviews ran, backups restored, changes were approved. Each has an owner and evidence that goes stale."
+    },
+    {
+      "term": "evidence",
+      "aliases": [
+        "evidence record"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The proof a control operated: a file with a hash, a collection day, and an attestation. The record is the product."
+    },
+    {
+      "term": "hash",
+      "aliases": [
+        "hashed"
+      ],
+      "teachesIn": "b1",
+      "gloss": "A short fingerprint of the evidence. If the file changes, the hash changes - which is how the auditor knows nothing was edited."
+    },
+    {
+      "term": "attest",
+      "aliases": [
+        "attestation",
+        "attested",
+        "countersign",
+        "countersigned"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The owner stating the evidence is true for this period, and the auditor countersigning it. Both are captured on the record."
+    },
+    {
+      "term": "finding",
+      "aliases": [
+        "findings",
+        "remediation"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Evidence that fell short - stale, wrong period, missing - with an owner and a deadline to fix it."
+    },
+    {
+      "term": "freshness",
+      "aliases": [
+        "fresh",
+        "stale",
+        "expires"
+      ],
+      "teachesIn": "b1",
+      "gloss": "How long evidence counts as proof. Stale evidence fails even when true."
+    },
+    {
+      "term": "immutable",
+      "aliases": [
+        "immutability",
+        "append-only",
+        "supersedes"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Records are added, never edited. A correction is a new record that names the one it replaces."
+    },
+    {
+      "term": "retention",
+      "aliases": [
+        "retention schedule",
+        "retained"
+      ],
+      "teachesIn": "b1",
+      "gloss": "How many years a record is kept, set by regulation, not preference."
+    }
+  ]
+}
