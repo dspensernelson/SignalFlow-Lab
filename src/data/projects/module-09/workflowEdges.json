@@ -1,0 +1,107 @@
+[
+  {
+    "from": "campaign-brief",
+    "to": "content-record",
+    "label": "becomes"
+  },
+  {
+    "from": "content-record",
+    "to": "channel-renditions",
+    "label": "one message"
+  },
+  {
+    "from": "asset-template-library",
+    "to": "channel-renditions",
+    "label": "wrappers"
+  },
+  {
+    "from": "rendition-rules",
+    "to": "channel-renditions",
+    "label": "limits"
+  },
+  {
+    "from": "tracking-code-policy",
+    "to": "tracking-codes",
+    "label": "pattern"
+  },
+  {
+    "from": "channel-renditions",
+    "to": "tracking-codes",
+    "label": "per rendition"
+  },
+  {
+    "from": "content-record",
+    "to": "review-route",
+    "label": "version"
+  },
+  {
+    "from": "brand-checklist",
+    "to": "review-route",
+    "label": "checked"
+  },
+  {
+    "from": "review-route",
+    "to": "launch-decision",
+    "label": "approvals"
+  },
+  {
+    "from": "launch-decision",
+    "to": "launch-package",
+    "label": "three of current version"
+  },
+  {
+    "from": "launch-decision",
+    "to": "rework-path",
+    "label": "rejected or edited"
+  },
+  {
+    "from": "channel-renditions",
+    "to": "launch-package",
+    "label": "text"
+  },
+  {
+    "from": "tracking-codes",
+    "to": "launch-package",
+    "label": "codes"
+  },
+  {
+    "from": "send-schedule",
+    "to": "launch-package",
+    "label": "send times"
+  },
+  {
+    "from": "launch-package",
+    "to": "performance-rollup",
+    "label": "codes to join"
+  },
+  {
+    "from": "performance-events",
+    "to": "performance-rollup",
+    "label": "events"
+  },
+  {
+    "from": "tracking-codes",
+    "to": "performance-rollup",
+    "label": "join key"
+  },
+  {
+    "from": "performance-rollup",
+    "to": "campaign-archive",
+    "label": "archived"
+  },
+  {
+    "from": "campaign-archive",
+    "to": "asset-template-library",
+    "label": "winners"
+  },
+  {
+    "from": "channel-renditions",
+    "to": "run-operations",
+    "label": "edits"
+  },
+  {
+    "from": "campaign-archive",
+    "to": "run-operations",
+    "label": "run history"
+  }
+]

@@ -1,0 +1,617 @@
+[
+  {
+    "id": "campaign-brief",
+    "label": "Campaign Brief",
+    "type": "source",
+    "thingOrAction": "thing",
+    "phaseId": "brief",
+    "x": 20,
+    "y": 80,
+    "description": "The ask: product, price, offer, headline, launch date. Everything downstream is built from it.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Campaign Briefs source, one brief per campaign.",
+      "concepts": []
+    },
+    "labVersion": "The Campaign Briefs source, one brief per campaign.",
+    "realWorldSources": [
+      "Marketing brief form",
+      "Campaign request ticket"
+    ],
+    "accessNeeded": [
+      "A brief template everyone uses"
+    ],
+    "soloRebuildPath": [
+      "Write the brief with the five fields",
+      "Keep the price in one place",
+      "Later collect it from a form"
+    ],
+    "reusedBy": [
+      "content-record"
+    ],
+    "governanceNote": "The brief is the only place a human types the price.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-campaign-brief",
+    "artifactName": "campaign-brief.json"
+  },
+  {
+    "id": "asset-template-library",
+    "label": "Asset Template Library",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "brief",
+    "x": 20,
+    "y": 190,
+    "description": "Versioned templates per channel: what wraps the message on email, social and web.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The prefix and suffix in the Rendition Rules table.",
+      "concepts": []
+    },
+    "labVersion": "The prefix and suffix in the Rendition Rules table.",
+    "realWorldSources": [
+      "Email templates",
+      "Social post templates"
+    ],
+    "accessNeeded": [
+      "The Channel Specialist's templates",
+      "A version per template"
+    ],
+    "soloRebuildPath": [
+      "Write the wrapper per channel",
+      "Version it",
+      "Later evolve it from winners"
+    ],
+    "reusedBy": [
+      "channel-renditions"
+    ],
+    "governanceNote": "Templates are versioned config; winners from the archive become next quarter's templates.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-asset-template-library",
+    "artifactName": "asset-template-library.json"
+  },
+  {
+    "id": "brand-checklist",
+    "label": "Brand Checklist",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "brief",
+    "x": 20,
+    "y": 300,
+    "description": "What every asset must satisfy before the Brand Reviewer signs.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Brand Reviewer's approval in the Reviews flow.",
+      "concepts": []
+    },
+    "labVersion": "The Brand Reviewer's approval in the Reviews flow.",
+    "realWorldSources": [
+      "Brand guidelines",
+      "Review checklist"
+    ],
+    "accessNeeded": [
+      "The Brand Reviewer's list"
+    ],
+    "soloRebuildPath": [
+      "List the checks",
+      "Attach them to the review",
+      "Later make them fields"
+    ],
+    "reusedBy": [
+      "review-route"
+    ],
+    "governanceNote": "The checklist is the reviewer's; the flow captures the yes.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-brand-checklist",
+    "artifactName": "brand-checklist.json"
+  },
+  {
+    "id": "content-record",
+    "label": "Content Record",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "content",
+    "x": 270,
+    "y": 80,
+    "description": "The single source: one message per campaign with its version and status.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Content Records table, add-or-replace by campaignId.",
+      "concepts": []
+    },
+    "labVersion": "The Content Records table, add-or-replace by campaignId.",
+    "realWorldSources": [
+      "CMS entry",
+      "Campaign object in the marketing platform"
+    ],
+    "accessNeeded": [
+      "Write access to the content store"
+    ],
+    "soloRebuildPath": [
+      "One record per campaign",
+      "Version it",
+      "Never let a channel own the price"
+    ],
+    "reusedBy": [
+      "channel-renditions",
+      "review-route"
+    ],
+    "governanceNote": "Every rendition is derived from this row; an edit here bumps the version and resets the chain.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-content-record",
+    "artifactName": "content-record.json"
+  },
+  {
+    "id": "rendition-rules",
+    "label": "Rendition Rules",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "content",
+    "x": 270,
+    "y": 190,
+    "description": "Per channel: the wrapper and the length limit.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Rendition Rules table.",
+      "concepts": []
+    },
+    "labVersion": "The Rendition Rules table.",
+    "realWorldSources": [
+      "Channel specs",
+      "Character limits"
+    ],
+    "accessNeeded": [
+      "The Channel Specialist's rules"
+    ],
+    "soloRebuildPath": [
+      "Set a limit per channel",
+      "Set the wrapper",
+      "Version them"
+    ],
+    "reusedBy": [
+      "channel-renditions"
+    ],
+    "governanceNote": "Constraints live in a table, so a new channel is a new row.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-rendition-rules",
+    "artifactName": "rendition-rules.json"
+  },
+  {
+    "id": "channel-renditions",
+    "label": "Channel Renditions",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "content",
+    "x": 270,
+    "y": 300,
+    "description": "One record fanned out to three renditions, with a fit check and a code each - and hand edits that must not drift.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The For each over the rules in the Brief flow, and the Channel edits flow.",
+      "concepts": []
+    },
+    "labVersion": "The For each over the rules in the Brief flow, and the Channel edits flow.",
+    "realWorldSources": [
+      "Rendering job",
+      "Channel-specific copy"
+    ],
+    "accessNeeded": [
+      "The record, the rules, the policy"
+    ],
+    "soloRebuildPath": [
+      "Loop over the rules",
+      "Build text and code",
+      "Reject edits that change the price"
+    ],
+    "reusedBy": [
+      "review-route",
+      "launch-package"
+    ],
+    "governanceNote": "A rendition that says a different price than the record is a public mistake.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-channel-renditions",
+    "artifactName": "channel-renditions.json"
+  },
+  {
+    "id": "review-route",
+    "label": "Review Route",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "approval",
+    "x": 520,
+    "y": 80,
+    "description": "Copywriter, Brand Reviewer, Marketing Director: each approval captured with the version it approved.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Approvals store in the Reviews flow.",
+      "concepts": []
+    },
+    "labVersion": "The Approvals store in the Reviews flow.",
+    "realWorldSources": [
+      "Approval workflow",
+      "Review tool"
+    ],
+    "accessNeeded": [
+      "The three reviewers"
+    ],
+    "soloRebuildPath": [
+      "Capture each approval with its version",
+      "Count them",
+      "Launch at three"
+    ],
+    "reusedBy": [
+      "launch-decision"
+    ],
+    "governanceNote": "Approval of version 1 does not carry to version 2.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-review-route",
+    "artifactName": "review-route.json"
+  },
+  {
+    "id": "launch-decision",
+    "label": "Launch Decision",
+    "type": "decision",
+    "thingOrAction": "action",
+    "phaseId": "approval",
+    "x": 520,
+    "y": 190,
+    "description": "Three approvals of the current version launch; anything else is rework.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Condition count == 3 in the Reviews flow.",
+      "concepts": []
+    },
+    "labVersion": "The Condition count == 3 in the Reviews flow.",
+    "realWorldSources": [
+      "Launch gate",
+      "Go/no-go"
+    ],
+    "accessNeeded": [
+      "The approvals and the record version"
+    ],
+    "soloRebuildPath": [
+      "Count approvals for this version",
+      "Launch or wait"
+    ],
+    "reusedBy": [
+      "launch-package",
+      "rework-path"
+    ],
+    "governanceNote": "The count is per version; that is the discipline that prevents the wrong-price email.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-launch-decision",
+    "artifactName": "launch-decision.json"
+  },
+  {
+    "id": "rework-path",
+    "label": "Rework Path",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "approval",
+    "x": 520,
+    "y": 300,
+    "description": "A rejection or an edit bumps the version, logs why, and tells the Copywriter.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The NO lane in the Reviews flow.",
+      "concepts": []
+    },
+    "labVersion": "The NO lane in the Reviews flow.",
+    "realWorldSources": [
+      "Rework ticket",
+      "Revision request"
+    ],
+    "accessNeeded": [
+      "The Copywriter's inbox"
+    ],
+    "soloRebuildPath": [
+      "Bump the version",
+      "Log the reason",
+      "Tell the writer"
+    ],
+    "reusedBy": [],
+    "governanceNote": "Rework is normal; unlogged rework is not.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-rework-path",
+    "artifactName": "rework-path.json"
+  },
+  {
+    "id": "tracking-code-policy",
+    "label": "Tracking Code Policy",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "fanout",
+    "x": 770,
+    "y": 80,
+    "description": "How a code is built: prefix, campaign, channel. Codes that do not follow it cannot be joined on Friday.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Tracking Code Policy table.",
+      "concepts": []
+    },
+    "labVersion": "The Tracking Code Policy table.",
+    "realWorldSources": [
+      "UTM naming convention",
+      "Analytics governance"
+    ],
+    "accessNeeded": [
+      "The Channel Specialist's convention"
+    ],
+    "soloRebuildPath": [
+      "Write the pattern",
+      "Version it",
+      "Generate, never type"
+    ],
+    "reusedBy": [
+      "tracking-codes"
+    ],
+    "governanceNote": "A code is a join key; a typed one breaks the join.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-tracking-code-policy",
+    "artifactName": "tracking-code-policy.json"
+  },
+  {
+    "id": "tracking-codes",
+    "label": "Tracking Codes",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "fanout",
+    "x": 770,
+    "y": 190,
+    "description": "Codes generated per rendition from the policy.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The code field on every rendition.",
+      "concepts": []
+    },
+    "labVersion": "The code field on every rendition.",
+    "realWorldSources": [
+      "UTM parameters",
+      "Link builder"
+    ],
+    "accessNeeded": [
+      "The policy"
+    ],
+    "soloRebuildPath": [
+      "Concatenate prefix, campaign, channel",
+      "Attach to the rendition",
+      "Use it on every link"
+    ],
+    "reusedBy": [
+      "launch-package",
+      "performance-rollup"
+    ],
+    "governanceNote": "Generated codes join; typed codes get flagged on Friday.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-tracking-codes",
+    "artifactName": "tracking-codes.json"
+  },
+  {
+    "id": "send-schedule",
+    "label": "Send Schedule",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "fanout",
+    "x": 770,
+    "y": 300,
+    "description": "When each channel fires.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Send Schedule table.",
+      "concepts": []
+    },
+    "labVersion": "The Send Schedule table.",
+    "realWorldSources": [
+      "Send calendar",
+      "Quiet hours"
+    ],
+    "accessNeeded": [
+      "The Channel Specialist's calendar"
+    ],
+    "soloRebuildPath": [
+      "Set a time per channel",
+      "Respect quiet hours"
+    ],
+    "reusedBy": [
+      "launch-package"
+    ],
+    "governanceNote": "The schedule is config; a change is a row.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-send-schedule",
+    "artifactName": "send-schedule.json"
+  },
+  {
+    "id": "launch-package",
+    "label": "Launch Package",
+    "type": "output",
+    "thingOrAction": "thing",
+    "phaseId": "fanout",
+    "x": 770,
+    "y": 410,
+    "description": "Per campaign per channel: approved text, code, send time, and which review launched it.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Launch Package table, filled by the launch fan-out.",
+      "concepts": []
+    },
+    "labVersion": "The Launch Package table, filled by the launch fan-out.",
+    "realWorldSources": [
+      "Send job",
+      "Launch checklist"
+    ],
+    "accessNeeded": [
+      "The renditions and the schedule"
+    ],
+    "soloRebuildPath": [
+      "Fan out per channel",
+      "Record the send time",
+      "Record which approval launched it"
+    ],
+    "reusedBy": [
+      "performance-rollup",
+      "campaign-archive"
+    ],
+    "governanceNote": "What goes out is what was approved, at the version that was approved.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-launch-package",
+    "artifactName": "launch-package.json"
+  },
+  {
+    "id": "performance-events",
+    "label": "Performance Events",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "rollup",
+    "x": 1020,
+    "y": 80,
+    "description": "This week's clicks and opens, tagged with a code, as the analytics feed delivered them.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Performance Events source.",
+      "concepts": []
+    },
+    "labVersion": "The Performance Events table the Friday rollup reads.",
+    "realWorldSources": [
+      "Analytics export",
+      "Email platform stats"
+    ],
+    "accessNeeded": [
+      "Read access to analytics"
+    ],
+    "soloRebuildPath": [
+      "Export the week's events",
+      "Keep the code on each",
+      "Later pull from the API"
+    ],
+    "reusedBy": [
+      "performance-rollup"
+    ],
+    "governanceNote": "An event without a matching code is a number with no home.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-performance-events",
+    "artifactName": "performance-events.json"
+  },
+  {
+    "id": "performance-rollup",
+    "label": "Performance Rollup",
+    "type": "output",
+    "thingOrAction": "thing",
+    "phaseId": "rollup",
+    "x": 1020,
+    "y": 190,
+    "description": "The Friday rollup, joined by tracking code; unmatched events named.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Friday rollup flow.",
+      "concepts": []
+    },
+    "labVersion": "The Friday rollup flow.",
+    "realWorldSources": [
+      "Weekly marketing report"
+    ],
+    "accessNeeded": [
+      "The events and the renditions"
+    ],
+    "soloRebuildPath": [
+      "Join each event by code",
+      "Total the week",
+      "Name what did not join"
+    ],
+    "reusedBy": [
+      "campaign-archive"
+    ],
+    "governanceNote": "The rollup reports what it could not place, not just what it could.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-performance-rollup",
+    "artifactName": "performance-rollup.json"
+  },
+  {
+    "id": "campaign-archive",
+    "label": "Campaign Archive",
+    "type": "archive",
+    "thingOrAction": "thing",
+    "phaseId": "rollup",
+    "x": 1020,
+    "y": 300,
+    "description": "Every rollup; winners feed the template library.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Campaign Archive table.",
+      "concepts": []
+    },
+    "labVersion": "The Campaign Archive table.",
+    "realWorldSources": [
+      "Report archive"
+    ],
+    "accessNeeded": [
+      "Write access"
+    ],
+    "soloRebuildPath": [
+      "Store each rollup",
+      "Keep the totals",
+      "Later pick winners"
+    ],
+    "reusedBy": [
+      "asset-template-library"
+    ],
+    "governanceNote": "Measured performance, not taste, evolves the templates.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-campaign-archive",
+    "artifactName": "campaign-archive.json"
+  },
+  {
+    "id": "run-operations",
+    "label": "Campaign Run Operations",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "rollup",
+    "x": 1020,
+    "y": 410,
+    "description": "Content operations fail in public. The run refuses what would embarrass the company: an edit that changes the price, an approval that does not cover the current version, a code Friday cannot join.",
+    "lesson": {
+      "type": "governance",
+      "status": "now",
+      "intent": "Refuse the edits, approvals and codes that would go wrong in public.",
+      "concepts": [
+        "Single source",
+        "Chain reset",
+        "Join keys"
+      ]
+    },
+    "labVersion": "Built by you in Weeks 2 and 3.",
+    "realWorldSources": [
+      "Pre-send checks",
+      "Launch runbook"
+    ],
+    "accessNeeded": [
+      "The record, the policy, the approvals"
+    ],
+    "soloRebuildPath": [
+      "Check the price before an edit lands",
+      "Count approvals per version",
+      "Flag codes that do not join"
+    ],
+    "reusedBy": [],
+    "governanceNote": "The safety system is the flow's refusals.",
+    "auditNote": "Authored for the runnable-flow build of Studio (2026-09-30).",
+    "taskId": "lesson-run-operations",
+    "artifactName": "escalation-policy.json",
+    "skeletonStage": "operate"
+  }
+]

@@ -41,6 +41,10 @@ import module08Nodes from '../data/projects/module-08/workflowNodes.json'
 import module08Phases from '../data/projects/module-08/phases.json'
 import module08Edges from '../data/projects/module-08/workflowEdges.json'
 
+import module09Nodes from '../data/projects/module-09/workflowNodes.json'
+import module09Phases from '../data/projects/module-09/phases.json'
+import module09Edges from '../data/projects/module-09/workflowEdges.json'
+
 export const PROJECT_KEY = 'signalflow_project'
 export const DEFAULT_PROJECT = 'module-01'
 
@@ -92,6 +96,11 @@ const PROJECT_DATA = {
     nodes: module08Nodes,
     phases: module08Phases,
     edges: module08Edges,
+  },
+  'module-09': {
+    nodes: module09Nodes,
+    phases: module09Phases,
+    edges: module09Edges,
   },
 }
 

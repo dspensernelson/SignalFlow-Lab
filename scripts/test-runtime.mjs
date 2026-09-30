@@ -791,6 +791,40 @@ await test('golden: Sentinel Q2 flows FAIL Q3 - the control nobody sent evidence
   ok(!r['b8-finding'].passed && !r['b8-told'].passed && !r['b8-count'].passed && r['b8-passes'].passed)
 })
 
+// ============================================================ Studio golden
+const MOD9 = JSON.parse(readFileSync(path.join(root, 'src/data/flows/module-09.json'), 'utf8'))
+const ref9 = await imp('src/data/flows/module-09.reference.js')
+
+function runBuild9(level, build) {
+  const flows = Object.values(ref9.referenceFlowsFor(level))
+  const dayRes = eng.runModule(flows, MOD9, build.dayId).byDay[build.dayId]
+  return chk.evaluateChecks(build.checks, dayRes, dayRes.dayState, flows)
+}
+const b9id = (id) => MOD9.builds.find((b) => b.id === id)
+
+await test('golden: module-09 builds match the reference levels', () => {
+  eq(MOD9.builds.map((b) => b.id), ref9.REFERENCE_BUILD_IDS)
+})
+
+for (const build of MOD9.builds) {
+  await test(`golden: Studio reference passes ${build.id} (${build.title})`, () => {
+    const results = runBuild9(build.id, build)
+    ok(chk.allPassed(results), `\n    ${failing(results)}`)
+  })
+}
+
+await test('golden: Studio Week 1 flows FAIL Week 2 - the edited message launches on an old approval; a typed code vanishes', () => {
+  const r6 = Object.fromEntries(runBuild9('b5', b9id('b6')).map((x) => [x.id, x]))
+  ok(!r6['b6-launched'].passed && r6['b6-launched'].detail.includes('R-204'))
+  const r7 = Object.fromEntries(runBuild9('b6', b9id('b7')).map((x) => [x.id, x]))
+  ok(!r7['b7-unmatched'].passed && !r7['b7-count'].passed && r7['b7-still'].passed)
+})
+
+await test('golden: Studio Week 2 flows FAIL Week 3 - the wrong price is applied to the email', () => {
+  const r = Object.fromEntries(runBuild9('b7', b9id('b8')).map((x) => [x.id, x]))
+  ok(!r['b8-kept'].passed && !r['b8-rejected'].passed && !r['b8-package'].passed)
+})
+
 await test('golden: the finished desk still passes every earlier build (revisiting never turns a build red)', () => {
   for (const b of MOD2.builds) ok(chk.allPassed(runBuild(referenceFlowsFor('b6'), b)), `Beacon ${b.id}:\n    ${failing(runBuild(referenceFlowsFor('b6'), b))}`)
   for (const b of MOD3.builds) ok(chk.allPassed(runBuild3('b7', b)), `Harbor ${b.id}:\n    ${failing(runBuild3('b7', b))}`)
@@ -800,6 +834,7 @@ await test('golden: the finished desk still passes every earlier build (revisiti
   for (const b of MOD6.builds) ok(chk.allPassed(runBuild6('b8', b)), `Compass ${b.id}:\n    ${failing(runBuild6('b8', b))}`)
   for (const b of MOD7.builds) ok(chk.allPassed(runBuild7('b8', b)), `Depot ${b.id}:\n    ${failing(runBuild7('b8', b))}`)
   for (const b of MOD8.builds) ok(chk.allPassed(runBuild8('b8', b)), `Sentinel ${b.id}:\n    ${failing(runBuild8('b8', b))}`)
+  for (const b of MOD9.builds) ok(chk.allPassed(runBuild9('b8', b)), `Studio ${b.id}:\n    ${failing(runBuild9('b8', b))}`)
 })
 
 await test('codegen: python renders Harbor loops, updates and upserts, and compiles', async () => {
@@ -907,7 +942,7 @@ for (const { file, concept } of CONCEPT_FILES) {
 }
 
 await test('concepts: every build.requires in modules 02 and 03 names an existing concept', () => {
-  for (const b of [...MOD1.builds, ...MOD2.builds, ...MOD3.builds, ...MOD4.builds, ...MOD5.builds, ...MOD6.builds, ...MOD7.builds, ...MOD8.builds]) for (const id of b.requires || []) ok(CONCEPT_IDS.has(id), `${b.id} requires unknown concept ${id}`)
+  for (const b of [...MOD1.builds, ...MOD2.builds, ...MOD3.builds, ...MOD4.builds, ...MOD5.builds, ...MOD6.builds, ...MOD7.builds, ...MOD8.builds, ...MOD9.builds]) for (const id of b.requires || []) ok(CONCEPT_IDS.has(id), `${b.id} requires unknown concept ${id}`)
   // Every step kind used by the Beacon reference has a rosetta.
   const kinds = new Set()
   for (const f of Object.values(referenceFlowsFor('b6'))) fm.walkSteps(f.steps, (st) => kinds.add(st.kind))

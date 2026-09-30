@@ -1,0 +1,1213 @@
+{
+  "moduleId": "module-09",
+  "title": "Studio Campaign Ops",
+  "org": "Studio Outdoor",
+  "intro": "Studio markets gear across email, social and web, and every campaign is the same machine wearing different copy: a brief becomes one message, the message becomes three channel renditions, the renditions clear an approval chain, and Friday's rollup says what worked. One mistake here is public - the wrong price emailed to forty thousand people. You are going to build the content operation: one source of truth, many renditions, tracking codes from a policy, an approval chain that resets when anyone edits, and a rollup that joins on the codes. Then it meets a week where someone edits mid-chain, someone types a code by hand, and someone changes a price.",
+  "world": {
+    "oneLiner": "Studio Outdoor launches campaigns across email, social and web from one approved message, tracks each channel by code, and rolls up performance every Friday.",
+    "roles": [
+      {
+        "name": "Campaign Manager",
+        "does": "Writes the brief: product, price, offer, headline, launch date."
+      },
+      {
+        "name": "Copywriter",
+        "does": "Drafts and edits the message, and is the first approval in the chain."
+      },
+      {
+        "name": "Brand Reviewer",
+        "does": "Second approval: the brand checklist."
+      },
+      {
+        "name": "Channel Specialist",
+        "does": "Owns each channel's rendition and send, and hears when a rendition or a code is wrong."
+      },
+      {
+        "name": "Marketing Director",
+        "does": "Final launch approval."
+      },
+      {
+        "name": "Marketing DL",
+        "does": "The distribution list that receives the Friday rollup."
+      }
+    ],
+    "deliverable": "a launch package per campaign with every channel approved, and the Friday rollup",
+    "clock": "A brief lands and its renditions exist within the hour; reviews arrive in order through the week; the launch package goes out when the chain is complete. Friday 4:00 PM: the rollup joins every channel's numbers by tracking code.",
+    "stakes": "Get it wrong and a channel sends a price the message never had, an edited message goes out on an old approval, or Friday's rollup silently drops the channel whose code did not match."
+  },
+  "owners": [
+    "Campaign Manager",
+    "Copywriter",
+    "Brand Reviewer",
+    "Channel Specialist",
+    "Marketing Director",
+    "Marketing DL"
+  ],
+  "sources": [
+    {
+      "id": "campaign-briefs",
+      "label": "Campaign Briefs",
+      "labelField": "campaignId",
+      "description": "The ask: product, price, offer, headline, launch date.",
+      "fields": [
+        "campaignId",
+        "product",
+        "price",
+        "offer",
+        "headline",
+        "launchDate",
+        "from"
+      ]
+    },
+    {
+      "id": "reviews",
+      "label": "Reviews",
+      "labelField": "reviewId",
+      "description": "A reviewer's decision on a version of the message: approved, rejected, or edited.",
+      "fields": [
+        "reviewId",
+        "campaignId",
+        "reviewer",
+        "version",
+        "decision",
+        "note"
+      ]
+    },
+    {
+      "id": "rendition-edits",
+      "label": "Rendition Edits",
+      "labelField": "editId",
+      "description": "A Channel Specialist's hand edit to one channel's rendition.",
+      "fields": [
+        "editId",
+        "campaignId",
+        "channel",
+        "text",
+        "by"
+      ]
+    }
+  ],
+  "stores": [
+    {
+      "id": "performance-events",
+      "label": "Performance Events",
+      "daily": true,
+      "owner": "Channel Specialist",
+      "tone": "neutral",
+      "description": "This week's clicks and opens, as the analytics feed delivered them, tagged with a tracking code.",
+      "fields": [
+        "eventId",
+        "code",
+        "channel",
+        "clicks",
+        "opens"
+      ]
+    },
+    {
+      "id": "rendition-rules",
+      "label": "Rendition Rules",
+      "keyField": "channel",
+      "owner": "Channel Specialist",
+      "tone": "neutral",
+      "description": "Per channel: the template around the message, and the length limit.",
+      "fields": [
+        "channel",
+        "prefix",
+        "suffix",
+        "maxLength",
+        "version"
+      ]
+    },
+    {
+      "id": "tracking-policy",
+      "label": "Tracking Code Policy",
+      "keyField": "version",
+      "owner": "Channel Specialist",
+      "tone": "neutral",
+      "description": "How a tracking code is built: prefix, campaign, channel. Codes that do not follow it cannot be joined on Friday.",
+      "fields": [
+        "version",
+        "prefix",
+        "pattern"
+      ]
+    },
+    {
+      "id": "send-schedule",
+      "label": "Send Schedule",
+      "keyField": "channel",
+      "owner": "Channel Specialist",
+      "tone": "neutral",
+      "description": "When each channel fires.",
+      "fields": [
+        "channel",
+        "sendAt"
+      ]
+    },
+    {
+      "id": "content-records",
+      "label": "Content Records",
+      "keyField": "campaignId",
+      "owner": "Copywriter",
+      "tone": "neutral",
+      "description": "The single source: one message per campaign, with its version and status.",
+      "fields": [
+        "campaignId",
+        "product",
+        "price",
+        "offer",
+        "headline",
+        "version",
+        "status"
+      ]
+    },
+    {
+      "id": "renditions",
+      "label": "Renditions",
+      "owner": "Channel Specialist",
+      "tone": "neutral",
+      "description": "One row per campaign per channel: the text as it will send, its tracking code, and whether it fits.",
+      "fields": [
+        "campaignId",
+        "channel",
+        "text",
+        "code",
+        "fits",
+        "version"
+      ]
+    },
+    {
+      "id": "approvals",
+      "label": "Approvals",
+      "owner": "Marketing Director",
+      "tone": "neutral",
+      "description": "Every approval captured, with the version it approved.",
+      "fields": [
+        "campaignId",
+        "version",
+        "reviewer",
+        "reviewId"
+      ]
+    },
+    {
+      "id": "rework-log",
+      "label": "Rework",
+      "daily": true,
+      "owner": "Copywriter",
+      "tone": "hold",
+      "description": "Rejections and edits that bumped the version.",
+      "fields": [
+        "campaignId",
+        "reviewer",
+        "decision",
+        "note",
+        "version"
+      ]
+    },
+    {
+      "id": "launch-package",
+      "label": "Launch Package",
+      "owner": "Channel Specialist",
+      "tone": "good",
+      "description": "Per campaign per channel: the approved text, code and send time.",
+      "fields": [
+        "campaignId",
+        "channel",
+        "text",
+        "code",
+        "sendAt",
+        "version",
+        "launchedOn"
+      ]
+    },
+    {
+      "id": "rejected-edits",
+      "label": "Rejected Edits",
+      "daily": true,
+      "owner": "Campaign Manager",
+      "tone": "bad",
+      "description": "Hand edits that drifted from the source record.",
+      "fields": [
+        "editId",
+        "campaignId",
+        "channel",
+        "text",
+        "reason"
+      ]
+    },
+    {
+      "id": "rollup-rows",
+      "label": "Rollup Rows",
+      "daily": true,
+      "owner": "Marketing DL",
+      "tone": "good",
+      "description": "Performance joined to campaign and channel by code.",
+      "fields": [
+        "campaignId",
+        "channel",
+        "code",
+        "clicks",
+        "opens"
+      ]
+    },
+    {
+      "id": "unmatched-events",
+      "label": "Unmatched Events",
+      "daily": true,
+      "owner": "Channel Specialist",
+      "tone": "bad",
+      "description": "Performance events whose code matched no rendition.",
+      "fields": [
+        "eventId",
+        "code",
+        "channel",
+        "clicks"
+      ]
+    },
+    {
+      "id": "campaign-archive",
+      "label": "Campaign Archive",
+      "keyField": "runId",
+      "owner": "Marketing DL",
+      "tone": "good",
+      "description": "Every Friday rollup.",
+      "fields": [
+        "runId",
+        "totalClicks",
+        "unmatched"
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "brief-flow",
+      "name": "Brief lands",
+      "description": "Runs once per brief.",
+      "trigger": {
+        "mode": "event",
+        "source": "campaign-briefs"
+      }
+    },
+    {
+      "id": "edit-flow",
+      "name": "Channel edits",
+      "description": "Runs once per hand edit to a rendition.",
+      "trigger": {
+        "mode": "event",
+        "source": "rendition-edits"
+      }
+    },
+    {
+      "id": "review-flow",
+      "name": "Reviews",
+      "description": "Runs once per review decision.",
+      "trigger": {
+        "mode": "event",
+        "source": "reviews"
+      }
+    },
+    {
+      "id": "rollup-flow",
+      "name": "The Friday rollup",
+      "description": "Runs Friday 4:00 PM.",
+      "trigger": {
+        "mode": "schedule",
+        "at": "Fri 4:00 PM"
+      }
+    }
+  ],
+  "days": [
+    {
+      "id": "day-1",
+      "label": "Week 1 - one campaign, a clean chain",
+      "description": "The Trail Tent campaign: one brief, three renditions, a social tweak that keeps the price, three approvals in order, and Friday numbers for all three codes.",
+      "sources": {
+        "campaign-briefs": [
+          {
+            "campaignId": "CMP-101",
+            "product": "Trail Tent 2",
+            "price": 289,
+            "offer": "15% off through Sunday",
+            "headline": "Sleep out there",
+            "launchDate": "Fri",
+            "from": "Campaign Manager"
+          }
+        ],
+        "rendition-edits": [
+          {
+            "editId": "E-101",
+            "campaignId": "CMP-101",
+            "channel": "social",
+            "text": "Sleep out there. Trail Tent 2, now 289 - 15% off through Sunday. #StudioOutdoor",
+            "by": "Channel Specialist"
+          }
+        ],
+        "reviews": [
+          {
+            "reviewId": "R-101",
+            "campaignId": "CMP-101",
+            "reviewer": "Copywriter",
+            "version": 1,
+            "decision": "approved",
+            "note": ""
+          },
+          {
+            "reviewId": "R-102",
+            "campaignId": "CMP-101",
+            "reviewer": "Brand Reviewer",
+            "version": 1,
+            "decision": "approved",
+            "note": ""
+          },
+          {
+            "reviewId": "R-103",
+            "campaignId": "CMP-101",
+            "reviewer": "Marketing Director",
+            "version": 1,
+            "decision": "approved",
+            "note": ""
+          }
+        ]
+      },
+      "seeds": {
+        "rendition-rules": [
+          {
+            "channel": "email",
+            "prefix": "",
+            "suffix": " Shop now at studio.example.",
+            "maxLength": 400,
+            "version": "1.0.0"
+          },
+          {
+            "channel": "social",
+            "prefix": "",
+            "suffix": " #StudioOutdoor",
+            "maxLength": 120,
+            "version": "1.0.0"
+          },
+          {
+            "channel": "web",
+            "prefix": "Featured: ",
+            "suffix": "",
+            "maxLength": 200,
+            "version": "1.0.0"
+          }
+        ],
+        "tracking-policy": [
+          {
+            "version": "1.0.0",
+            "prefix": "STU",
+            "pattern": "prefix-campaignId-channel"
+          }
+        ],
+        "send-schedule": [
+          {
+            "channel": "email",
+            "sendAt": "Fri 7:00 AM"
+          },
+          {
+            "channel": "social",
+            "sendAt": "Fri 9:00 AM"
+          },
+          {
+            "channel": "web",
+            "sendAt": "Fri 6:00 AM"
+          }
+        ],
+        "performance-events": [
+          {
+            "eventId": "P-101",
+            "code": "STU-CMP-101-email",
+            "channel": "email",
+            "clicks": 1200,
+            "opens": 9000
+          },
+          {
+            "eventId": "P-102",
+            "code": "STU-CMP-101-social",
+            "channel": "social",
+            "clicks": 640,
+            "opens": 0
+          },
+          {
+            "eventId": "P-103",
+            "code": "STU-CMP-101-web",
+            "channel": "web",
+            "clicks": 310,
+            "opens": 0
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    },
+    {
+      "id": "day-2",
+      "label": "Week 2 - an edit mid-chain, and a code typed by hand",
+      "description": "The Ridge Pack campaign. The Copywriter approves, then edits the headline. Brand and the Director approve the new version. On Friday, social's numbers arrive under a code someone typed by hand.",
+      "sources": {
+        "campaign-briefs": [
+          {
+            "campaignId": "CMP-102",
+            "product": "Ridge Pack",
+            "price": 149,
+            "offer": "Free shipping this week",
+            "headline": "Carry less, go further",
+            "launchDate": "Fri",
+            "from": "Campaign Manager"
+          }
+        ],
+        "rendition-edits": [],
+        "reviews": [
+          {
+            "reviewId": "R-201",
+            "campaignId": "CMP-102",
+            "reviewer": "Copywriter",
+            "version": 1,
+            "decision": "approved",
+            "note": ""
+          },
+          {
+            "reviewId": "R-202",
+            "campaignId": "CMP-102",
+            "reviewer": "Copywriter",
+            "version": 1,
+            "decision": "edited",
+            "note": "headline tightened"
+          },
+          {
+            "reviewId": "R-203",
+            "campaignId": "CMP-102",
+            "reviewer": "Brand Reviewer",
+            "version": 2,
+            "decision": "approved",
+            "note": ""
+          },
+          {
+            "reviewId": "R-204",
+            "campaignId": "CMP-102",
+            "reviewer": "Marketing Director",
+            "version": 2,
+            "decision": "approved",
+            "note": ""
+          },
+          {
+            "reviewId": "R-205",
+            "campaignId": "CMP-102",
+            "reviewer": "Copywriter",
+            "version": 2,
+            "decision": "approved",
+            "note": ""
+          }
+        ]
+      },
+      "seeds": {
+        "performance-events": [
+          {
+            "eventId": "P-201",
+            "code": "STU-CMP-102-email",
+            "channel": "email",
+            "clicks": 900,
+            "opens": 7000
+          },
+          {
+            "eventId": "P-202",
+            "code": "ridge_social_promo",
+            "channel": "social",
+            "clicks": 400,
+            "opens": 0
+          },
+          {
+            "eventId": "P-203",
+            "code": "STU-CMP-102-web",
+            "channel": "web",
+            "clicks": 200,
+            "opens": 0
+          }
+        ]
+      },
+      "approvals": {},
+      "failures": []
+    },
+    {
+      "id": "day-3",
+      "label": "Week 3 - the wrong price",
+      "description": "The Summit Jacket campaign clears its chain. Then a Channel Specialist tightens the email copy - and types 199 where the record says 249.",
+      "sources": {
+        "campaign-briefs": [
+          {
+            "campaignId": "CMP-103",
+            "product": "Summit Jacket",
+            "price": 249,
+            "offer": "Members save 20%",
+            "headline": "Weatherproof, not heavy",
+            "launchDate": "Fri",
+            "from": "Campaign Manager"
+          }
+        ],
+        "rendition-edits": [
+          {
+            "editId": "E-301",
+            "campaignId": "CMP-103",
+            "channel": "email",
+            "text": "Weatherproof, not heavy. Summit Jacket, now 199. Members save 20%. Shop now at studio.example.",
+            "by": "Channel Specialist"
+          }
+        ],
+        "reviews": [
+          {
+            "reviewId": "R-301",
+            "campaignId": "CMP-103",
+            "reviewer": "Copywriter",
+            "version": 1,
+            "decision": "approved",
+            "note": ""
+          },
+          {
+            "reviewId": "R-302",
+            "campaignId": "CMP-103",
+            "reviewer": "Brand Reviewer",
+            "version": 1,
+            "decision": "approved",
+            "note": ""
+          },
+          {
+            "reviewId": "R-303",
+            "campaignId": "CMP-103",
+            "reviewer": "Marketing Director",
+            "version": 1,
+            "decision": "approved",
+            "note": ""
+          }
+        ]
+      },
+      "seeds": {},
+      "approvals": {},
+      "failures": []
+    }
+  ],
+  "builds": [
+    {
+      "id": "b1",
+      "dayId": "day-1",
+      "flowId": "brief-flow",
+      "title": "One source of truth",
+      "brief": "Turn the brief into the content record every rendition will be built from.",
+      "goal": "Every channel will say the same thing because every channel is built from one record: product, price, offer, headline. Create it from the brief, version 1, status draft.",
+      "outcome": "Every brief becomes one row in Content Records at version 1.",
+      "constraints": [
+        "One record per campaign - add or replace by campaignId.",
+        "version starts at 1; status starts as draft."
+      ],
+      "requires": [
+        "trigger",
+        "transform",
+        "upsert",
+        "json-record"
+      ],
+      "hints": {
+        "question": "If the price changes on Thursday, how many places should have to change?",
+        "nudge": "Trigger on Campaign Briefs; Transform version = 1, status = 'draft'; Store into Content Records, add or replace by campaignId.",
+        "steps": [
+          "Connect the Trigger to Campaign Briefs.",
+          "Add a Transform: version = 1, status = 'draft'.",
+          "Add a Store into Content Records, add or replace if it exists, same row when campaignId. Run it."
+        ]
+      },
+      "mapNodes": [
+        "campaign-brief",
+        "content-record"
+      ],
+      "checks": [
+        {
+          "id": "b1-run",
+          "kind": "runStatus",
+          "flowId": "brief-flow",
+          "equals": "succeeded",
+          "why": "No record, no renditions.",
+          "label": "The brief flow runs without failing"
+        },
+        {
+          "id": "b1-record",
+          "kind": "storeContains",
+          "store": "content-records",
+          "where": {
+            "campaignId": "CMP-101"
+          },
+          "fields": {
+            "price": 289,
+            "version": 1,
+            "status": [
+              "draft",
+              "approved"
+            ]
+          },
+          "why": "The price lives here and nowhere else.",
+          "label": "CMP-101 is on record at 289, version 1"
+        },
+        {
+          "id": "b1-one",
+          "kind": "storeCount",
+          "store": "content-records",
+          "equals": 1,
+          "why": "One campaign, one source.",
+          "label": "One content record"
+        }
+      ]
+    },
+    {
+      "id": "b2",
+      "dayId": "day-1",
+      "flowId": "brief-flow",
+      "title": "Three renditions, one message",
+      "brief": "Render the message for each channel from its rules, with a tracking code from the policy.",
+      "goal": "Each channel wraps the message differently and has its own length limit; those rules live in a table. The tracking code is built from a policy, not typed. Loop over the rules and write one rendition per channel: text, whether it fits, and its code.",
+      "outcome": "Every campaign has one row per channel in Renditions, with text from the rules, a code from the policy, and fits.",
+      "constraints": [
+        "Loop over Rendition Rules; do not write three steps.",
+        "text = prefix + headline + '. ' + product + ', now ' + price + '. ' + offer + suffix.",
+        "code = policy prefix + '-' + campaignId + '-' + channel.",
+        "fits = len(text) <= maxLength."
+      ],
+      "requires": [
+        "lookup",
+        "lookup-all",
+        "foreach",
+        "fields-and-paths"
+      ],
+      "hints": {
+        "question": "What must be true of the social post and the email so that a customer who sees both is not confused?",
+        "nudge": "Lookup Tracking Code Policy ('1.0.0', policy); Lookup Rendition Rules, all rows (rules); For each over rules: Transform text = concat(prefix, parent.headline, '. ', parent.product, ', now ', parent.price, '. ', parent.offer, suffix), code = concat(parent.policy.prefix, '-', parent.campaignId, '-', channel), fits = len(text) <= maxLength, campaignId = parent.campaignId, version = 1; Store into Renditions, add or replace by campaignId, channel.",
+        "steps": [
+          "Before the Store, add a Lookup on Tracking Code Policy where version = '1.0.0' (policy) and a Lookup on Rendition Rules, all rows (rules).",
+          "Add a For each over rules.",
+          "Inside: Transform campaignId = parent.campaignId, version = 1, text = concat(prefix, parent.headline, '. ', parent.product, ', now ', parent.price, '. ', parent.offer, suffix), code = concat(parent.policy.prefix, '-', parent.campaignId, '-', channel), fits = len(text) <= maxLength.",
+          "Inside: Store into Renditions, add or replace if it exists, same row when campaignId, channel. Run it."
+        ]
+      },
+      "mapNodes": [
+        "asset-template-library",
+        "rendition-rules",
+        "channel-renditions",
+        "tracking-code-policy",
+        "tracking-codes"
+      ],
+      "checks": [
+        {
+          "id": "b2-three",
+          "kind": "storeCount",
+          "store": "renditions",
+          "where": {
+            "campaignId": "CMP-101"
+          },
+          "equals": 3,
+          "why": "Three channels, three renditions.",
+          "label": "CMP-101 has three renditions"
+        },
+        {
+          "id": "b2-email",
+          "kind": "storeContains",
+          "store": "renditions",
+          "where": {
+            "campaignId": "CMP-101",
+            "channel": "email"
+          },
+          "fieldsContain": {
+            "text": [
+              "289"
+            ]
+          },
+          "why": "The email says the record's price because it was built from the record.",
+          "label": "The email rendition carries the price 289"
+        },
+        {
+          "id": "b2-code",
+          "kind": "storeContains",
+          "store": "renditions",
+          "where": {
+            "campaignId": "CMP-101",
+            "channel": "social"
+          },
+          "fields": {
+            "code": "STU-CMP-101-social",
+            "fits": true
+          },
+          "why": "A code from the policy is a code Friday can join on.",
+          "label": "Social's code is STU-CMP-101-social and it fits"
+        }
+      ]
+    },
+    {
+      "id": "b3",
+      "dayId": "day-1",
+      "flowId": "edit-flow",
+      "title": "Channel edits",
+      "brief": "A Channel Specialist may tune a channel's wording. Apply the edit to that rendition.",
+      "goal": "Social wants shorter, punchier copy. The Channel Specialist sends an edit for one channel. Find the rendition and replace its text, keeping its code.",
+      "outcome": "A rendition edit updates that channel's text and nothing else.",
+      "constraints": [
+        "Update the existing rendition; the row is the same when campaignId and channel match.",
+        "The code stays."
+      ],
+      "requires": [
+        "update-row"
+      ],
+      "hints": {
+        "question": "Which row does E-101 belong to?",
+        "nudge": "Trigger on Rendition Edits; Store into Renditions, update the existing row, same row when campaignId, channel.",
+        "steps": [
+          "Open the Channel edits flow and connect its Trigger to Rendition Edits.",
+          "Add a Store into Renditions, update the existing row, same row when campaignId, channel. Run it."
+        ]
+      },
+      "mapNodes": [
+        "channel-renditions"
+      ],
+      "checks": [
+        {
+          "id": "b3-run",
+          "kind": "runStatus",
+          "flowId": "edit-flow",
+          "equals": "succeeded",
+          "why": "A lost edit is a specialist who gives up on the flow.",
+          "label": "The edits flow runs without failing"
+        },
+        {
+          "id": "b3-text",
+          "kind": "storeContains",
+          "store": "renditions",
+          "where": {
+            "campaignId": "CMP-101",
+            "channel": "social"
+          },
+          "fieldsContain": {
+            "text": [
+              "#StudioOutdoor",
+              "289"
+            ]
+          },
+          "fields": {
+            "code": "STU-CMP-101-social"
+          },
+          "why": "The new copy is in; the code is untouched.",
+          "label": "Social's text is updated and its code kept"
+        },
+        {
+          "id": "b3-rows",
+          "kind": "storeCount",
+          "store": "renditions",
+          "equals": 3,
+          "why": "An edit is not a fourth rendition.",
+          "label": "Still three renditions"
+        }
+      ]
+    },
+    {
+      "id": "b4",
+      "dayId": "day-1",
+      "flowId": "review-flow",
+      "title": "The approval chain",
+      "brief": "Three approvals launch the campaign; a rejection sends it back with a new version.",
+      "goal": "Copywriter, Brand Reviewer, Marketing Director. Each approval is captured with the version it approved. When three approvals are in, the campaign launches: every rendition goes into the Launch Package with its send time, and the Channel Specialist is told. A rejection or an edit bumps the version, and the Copywriter is told.",
+      "outcome": "Approvals are captured; three of them launch the package for every channel; a rejection or edit increments the version and logs rework.",
+      "constraints": [
+        "Capture every approval in Approvals with its version.",
+        "Launch = the package for every channel, with sendAt from the Send Schedule, and launchedOn = the review that completed the chain.",
+        "Not approved: version + 1 on the record, a rework row, the Copywriter told."
+      ],
+      "requires": [
+        "condition",
+        "send",
+        "lists"
+      ],
+      "hints": {
+        "question": "Who has to say yes before 40,000 people get the email, and in what order?",
+        "nudge": "Lookup Content Records (record); Condition decision == approved: YES lane Store into Approvals; Lookup Approvals all where campaignId = campaignId (done); Transform count = len(done); Condition count == 3 -> launch (update record status, Lookup Renditions all, For each: Lookup Send Schedule, Transform (sendAt, launchedOn, version = parent.record.version), Store into Launch Package, Send). NO lane: Transform version = record.version + 1; Store update Content Records; Store into Rework; Send to Copywriter.",
+        "steps": [
+          "Open the Reviews flow, connect it to Reviews, and Lookup Content Records where campaignId = campaignId (record).",
+          "Condition: decision == approved. NO lane: Transform version = record.version + 1; Store into Content Records, update by campaignId; Store into Rework; Send to Copywriter ('{{campaignId}} back to you: {{decision}} by {{reviewer}}').",
+          "YES lane: Store into Approvals. Then Lookup Approvals, all rows where campaignId = campaignId (done). Transform count = len(done).",
+          "YES lane, then: Condition count == 3. Its YES lane: Transform status = 'approved'; Store into Content Records, update by campaignId; Lookup Renditions all where campaignId = campaignId (rends); For each over rends: Lookup Send Schedule where channel = channel (sched); Transform sendAt = sched.sendAt, launchedOn = parent.reviewId, version = parent.record.version; Store into Launch Package, add or replace by campaignId, channel; Send to Channel Specialist ('Launch {{campaignId}} {{channel}} at {{sendAt}}').",
+          "Run it."
+        ]
+      },
+      "mapNodes": [
+        "brand-checklist",
+        "review-route",
+        "launch-decision",
+        "rework-path",
+        "send-schedule",
+        "launch-package"
+      ],
+      "checks": [
+        {
+          "id": "b4-approvals",
+          "kind": "storeCount",
+          "store": "approvals",
+          "where": {
+            "campaignId": "CMP-101"
+          },
+          "equals": 3,
+          "why": "Three names on record.",
+          "label": "Three approvals captured for CMP-101"
+        },
+        {
+          "id": "b4-package",
+          "kind": "storeCount",
+          "store": "launch-package",
+          "where": {
+            "campaignId": "CMP-101"
+          },
+          "equals": 3,
+          "why": "Every channel launches, or none.",
+          "label": "The launch package has all three channels"
+        },
+        {
+          "id": "b4-email",
+          "kind": "storeContains",
+          "store": "launch-package",
+          "where": {
+            "campaignId": "CMP-101",
+            "channel": "email"
+          },
+          "fields": {
+            "sendAt": "Fri 7:00 AM",
+            "code": "STU-CMP-101-email",
+            "launchedOn": "R-103"
+          },
+          "why": "The package says when, with which code, and which approval launched it.",
+          "label": "Email launches Fri 7:00 AM on R-103"
+        },
+        {
+          "id": "b4-told",
+          "kind": "outboxContains",
+          "to": "Channel Specialist",
+          "count": 3,
+          "why": "One message per channel.",
+          "label": "The Channel Specialist is told, once per channel"
+        },
+        {
+          "id": "b4-status",
+          "kind": "storeContains",
+          "store": "content-records",
+          "where": {
+            "campaignId": "CMP-101"
+          },
+          "fields": {
+            "status": "approved"
+          },
+          "why": "The record knows it launched.",
+          "label": "CMP-101 is approved"
+        }
+      ]
+    },
+    {
+      "id": "b5",
+      "dayId": "day-1",
+      "flowId": "rollup-flow",
+      "title": "The Friday rollup",
+      "brief": "Join every channel's numbers to its campaign by tracking code, and send the rollup.",
+      "goal": "Clicks and opens land in the Performance Events table tagged with a code. The code is the join: look each event's code up in Renditions to know which campaign and channel it belongs to. Total the week, send the rollup to Marketing, archive it.",
+      "outcome": "Every performance event is joined to its campaign and channel in Rollup Rows; the rollup carries totalClicks; a copy is archived.",
+      "constraints": [
+        "Join by code - look the code up in Renditions.",
+        "totalClicks = the sum of clicks over the events."
+      ],
+      "requires": [
+        "schedule-trigger",
+        "compose"
+      ],
+      "hints": {
+        "question": "How does Friday know that 640 clicks belong to the social post and not the email?",
+        "nudge": "Lookup Performance Events all (events); For each: Lookup Renditions where code = code (rendition); Transform campaignId = rendition.campaignId; Store into Rollup Rows. After the loop: Transform totalClicks = sum(events, 'clicks'); Compose; Send to Marketing DL; Store into Campaign Archive.",
+        "steps": [
+          "Open the Friday rollup flow. Lookup Performance Events, all rows (events). For each over events.",
+          "Inside: Lookup Renditions where code = code (rendition); Transform campaignId = rendition.campaignId; Store into Rollup Rows.",
+          "After the loop: Transform totalClicks = sum(events, 'clicks'). Compose rollup with {{totalClicks}} and {{#each events}}- {{channel}} {{code}} {{clicks}}{{/each}}.",
+          "Send to Marketing DL with {{rollup}}; Store into Campaign Archive."
+        ]
+      },
+      "mapNodes": [
+        "performance-events",
+        "performance-rollup",
+        "campaign-archive"
+      ],
+      "checks": [
+        {
+          "id": "b5-rows",
+          "kind": "storeCount",
+          "store": "rollup-rows",
+          "where": {
+            "campaignId": "CMP-101"
+          },
+          "equals": 3,
+          "why": "Three channels reported, three joined.",
+          "label": "All three channels are joined to CMP-101"
+        },
+        {
+          "id": "b5-social",
+          "kind": "storeContains",
+          "store": "rollup-rows",
+          "where": {
+            "code": "STU-CMP-101-social"
+          },
+          "fields": {
+            "channel": "social",
+            "clicks": 640
+          },
+          "why": "The join gives the number a home.",
+          "label": "Social: 640 clicks, joined by code"
+        },
+        {
+          "id": "b5-total",
+          "kind": "recordField",
+          "where": {
+            "scheduledAt": "Fri 4:00 PM"
+          },
+          "field": "totalClicks",
+          "equals": 2150,
+          "why": "1200 + 640 + 310.",
+          "label": "The rollup totals 2150 clicks"
+        },
+        {
+          "id": "b5-sent",
+          "kind": "outboxContains",
+          "to": "Marketing DL",
+          "contains": "2150",
+          "why": "Marketing reads the total first.",
+          "label": "Marketing receives the rollup"
+        }
+      ]
+    },
+    {
+      "id": "b6",
+      "dayId": "day-2",
+      "flowId": "review-flow",
+      "title": "Week 2: an edit mid-chain",
+      "brief": "An approval of version 1 does not carry to version 2. Count approvals for the current version only.",
+      "goal": "The Copywriter approved the Ridge Pack message, then edited the headline. Brand and the Director approved the edited version. Run your Week 1 flow: three approvals are on record, and the campaign launches - with one approval for text nobody else saw. Any edit resets the chain: only approvals of the current version count.",
+      "outcome": "The campaign launches only when three approvals exist for the record's current version; the edit bumped the version and everyone earlier in the chain re-approves.",
+      "constraints": [
+        "count = the approvals whose version equals the record's current version.",
+        "An edit is rework: version + 1, logged, Copywriter told.",
+        "The launch records which review completed the chain."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "Which text did the Copywriter approve on R-201? Which text is going out?",
+        "nudge": "Change count = len(done) to count = count(done, 'version', record.version).",
+        "steps": [
+          "Run first and read Launch Package: launchedOn.",
+          "Change the Transform: count = count(done, 'version', record.version).",
+          "Run again: the chain completes on R-205, not R-204."
+        ]
+      },
+      "mapNodes": [
+        "review-route",
+        "launch-decision",
+        "rework-path"
+      ],
+      "checks": [
+        {
+          "id": "b6-launched",
+          "kind": "storeContains",
+          "store": "launch-package",
+          "where": {
+            "campaignId": "CMP-102",
+            "channel": "email"
+          },
+          "fields": {
+            "launchedOn": "R-205",
+            "version": 2
+          },
+          "why": "Three approvals of version 2 - the third came from the Copywriter, again.",
+          "label": "CMP-102 launches on R-205, at version 2"
+        },
+        {
+          "id": "b6-rework",
+          "kind": "storeContains",
+          "store": "rework-log",
+          "where": {
+            "campaignId": "CMP-102"
+          },
+          "fields": {
+            "decision": "edited"
+          },
+          "why": "The edit is on record as what reset the chain.",
+          "label": "The edit is logged as rework"
+        },
+        {
+          "id": "b6-record",
+          "kind": "storeContains",
+          "store": "content-records",
+          "where": {
+            "campaignId": "CMP-102"
+          },
+          "fields": {
+            "version": 2,
+            "status": "approved"
+          },
+          "why": "The record is at version 2 and approved.",
+          "label": "CMP-102 is at version 2, approved"
+        }
+      ]
+    },
+    {
+      "id": "b7",
+      "dayId": "day-2",
+      "flowId": "rollup-flow",
+      "title": "Week 2: the code typed by hand",
+      "brief": "An event whose code matches nothing must be flagged, not dropped.",
+      "goal": "Social's numbers came in under 'ridge_social_promo' - a code somebody typed instead of taking it from the policy. Run your Week 1 rollup: the join finds nothing, and the 400 clicks vanish from the campaign. When a code matches no rendition, log the event as unmatched, count it in the rollup, and tell the Channel Specialist.",
+      "outcome": "Unmatched events are logged and counted in the rollup, the Channel Specialist is told, and matched events still join.",
+      "constraints": [
+        "An unmatched event is a row in Unmatched Events, not a silent skip.",
+        "The rollup carries unmatched = how many.",
+        "Matched events still roll up as before."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "Where did social's 400 clicks go?",
+        "nudge": "Inside the loop, a Condition rendition missing: YES lane Store into Unmatched Events, Send to Channel Specialist, Stop. After the loop, Lookup Unmatched Events all (misses); unmatched = len(misses); put {{unmatched}} in the rollup.",
+        "steps": [
+          "Run first and count Rollup Rows for CMP-102.",
+          "Inside the loop, after the rendition Lookup, add a Condition: rendition missing. YES lane: Store into Unmatched Events; Send to Channel Specialist ('Unmatched code {{code}} on {{channel}}: {{clicks}} clicks'); Stop.",
+          "After the loop: Lookup Unmatched Events, all rows (misses); add unmatched = len(misses) to the Transform; add {{unmatched}} to the rollup. Run again."
+        ]
+      },
+      "mapNodes": [
+        "tracking-code-policy",
+        "tracking-codes",
+        "performance-rollup"
+      ],
+      "checks": [
+        {
+          "id": "b7-unmatched",
+          "kind": "storeContains",
+          "store": "unmatched-events",
+          "where": {
+            "eventId": "P-202"
+          },
+          "fields": {
+            "clicks": 400
+          },
+          "why": "400 clicks are real; they just have no home yet.",
+          "label": "P-202 (ridge_social_promo) is logged as unmatched"
+        },
+        {
+          "id": "b7-told",
+          "kind": "outboxContains",
+          "to": "Channel Specialist",
+          "why": "The specialist can fix the code at the source.",
+          "label": "The Channel Specialist is told",
+          "contains": "ridge_social_promo"
+        },
+        {
+          "id": "b7-count",
+          "kind": "recordField",
+          "where": {
+            "scheduledAt": "Fri 4:00 PM"
+          },
+          "field": "unmatched",
+          "equals": 1,
+          "why": "The rollup says how much it could not place.",
+          "label": "The rollup counts 1 unmatched event"
+        },
+        {
+          "id": "b7-still",
+          "kind": "storeContains",
+          "store": "rollup-rows",
+          "where": {
+            "code": "STU-CMP-102-email"
+          },
+          "fields": {
+            "clicks": 900
+          },
+          "why": "The good codes still join.",
+          "label": "Email still joins (900 clicks)"
+        }
+      ]
+    },
+    {
+      "id": "b8",
+      "dayId": "day-3",
+      "flowId": "edit-flow",
+      "title": "Week 3: the wrong price",
+      "brief": "A hand edit that changes the price is rejected before it can send.",
+      "goal": "The Summit Jacket campaign is approved. Then a Channel Specialist tightens the email copy and types 199 where the record says 249. Run your flow: the edit is applied, and the launch package now emails a price the message never had. A rendition must still carry the record's price; an edit that does not is rejected, and the Campaign Manager is told.",
+      "outcome": "A rendition edit whose text does not contain the record's price is rejected and logged; the rendition is unchanged; the Campaign Manager is told.",
+      "constraints": [
+        "Compare the edit's text with the price on the Content Record.",
+        "A rejected edit changes nothing.",
+        "Tell the Campaign Manager, who owns the price."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "What does the email say the jacket costs? What does the record say?",
+        "nudge": "Before the Store, Lookup Content Records by campaignId (record); Condition text contains record.price (compare to the field): NO lane Transform reason = 'price does not match the record'; Store into Rejected Edits; Send to Campaign Manager; Stop.",
+        "steps": [
+          "Run first and read the email rendition for CMP-103.",
+          "Before the Store, add a Lookup on Content Records where campaignId = campaignId. Name it record.",
+          "Add a Condition: text contains record.price (compare to the field). NO lane: Transform reason = 'price does not match the record'; Store into Rejected Edits; Send to Campaign Manager ('Rejected edit on {{campaignId}} {{channel}}: {{reason}}'); Stop.",
+          "Run again."
+        ]
+      },
+      "mapNodes": [
+        "content-record",
+        "channel-renditions",
+        "run-operations"
+      ],
+      "checks": [
+        {
+          "id": "b8-kept",
+          "kind": "storeContains",
+          "store": "renditions",
+          "where": {
+            "campaignId": "CMP-103",
+            "channel": "email"
+          },
+          "fieldsContain": {
+            "text": [
+              "249"
+            ]
+          },
+          "why": "The email still says 249, because the record says 249.",
+          "label": "The email rendition still carries 249"
+        },
+        {
+          "id": "b8-rejected",
+          "kind": "storeContains",
+          "store": "rejected-edits",
+          "where": {
+            "editId": "E-301"
+          },
+          "why": "The edit is on record as rejected, with why.",
+          "label": "E-301 is logged as rejected"
+        },
+        {
+          "id": "b8-told",
+          "kind": "outboxContains",
+          "to": "Campaign Manager",
+          "recordLabel": "E-301",
+          "why": "The Campaign Manager owns the price and the conversation.",
+          "label": "The Campaign Manager is told"
+        },
+        {
+          "id": "b8-package",
+          "kind": "storeContains",
+          "store": "launch-package",
+          "where": {
+            "campaignId": "CMP-103",
+            "channel": "email"
+          },
+          "fieldsContain": {
+            "text": [
+              "249"
+            ]
+          },
+          "why": "What goes out matches the record.",
+          "label": "The launch package emails 249"
+        }
+      ]
+    }
+  ]
+}

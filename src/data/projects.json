@@ -7,6 +7,6 @@
   { "id": "module-06", "name": "Compass CRM Hygiene", "org": "Compass Insurance", "status": "active", "clock": "Mon 9:00 AM", "goal": "Clean the book every Monday: merge duplicates, keep the best fields, enrich, score and route." },
   { "id": "module-07", "name": "Depot Order Flow", "org": "Depot Supply", "status": "active", "clock": "6:00 PM", "goal": "Handle orders as events: reserve stock safely, walk legal states, refuse bad events, compensate failures." },
   { "id": "module-08", "name": "Sentinel Evidence Locker", "org": "Sentinel Health", "status": "active", "clock": "Q last day", "goal": "Prove the controls operated: request, record unaltered, attest, decide, package, retain." },
-  { "id": "module-09", "name": "Studio Campaign Ops", "org": "Studio", "status": "planned" },
+  { "id": "module-09", "name": "Studio Campaign Ops", "org": "Studio Outdoor", "status": "active", "clock": "Fri 4:00 PM", "goal": "One message, three channels: render, approve per version, launch by code, roll up on Friday." },
   { "id": "module-10", "name": "Watchtower Incident Response", "org": "Watchtower", "status": "planned" }
 ]

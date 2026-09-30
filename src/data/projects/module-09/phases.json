@@ -1,0 +1,83 @@
+[
+  {
+    "id": "brief",
+    "order": 1,
+    "title": "Phase 1: Brief and Templates",
+    "goal": "Know the ask, the templates, and the brand rules.",
+    "statusSource": "campaign-brief",
+    "nodeIds": [
+      "campaign-brief",
+      "asset-template-library",
+      "brand-checklist"
+    ],
+    "artifactNames": [],
+    "unlocks": "A brief the content record is built from."
+  },
+  {
+    "id": "content",
+    "order": 2,
+    "title": "Phase 2: Content Records",
+    "goal": "One source of truth, fanned out to three renditions that cannot drift.",
+    "statusSource": "content-record",
+    "nodeIds": [
+      "content-record",
+      "rendition-rules",
+      "channel-renditions"
+    ],
+    "artifactNames": [
+      "content-records.json",
+      "renditions.json"
+    ],
+    "unlocks": "Renditions ready for review."
+  },
+  {
+    "id": "approval",
+    "order": 3,
+    "title": "Phase 3: Approval Chain",
+    "goal": "Three approvals of the current version, in order, or back to rework.",
+    "statusSource": "launch-decision",
+    "nodeIds": [
+      "review-route",
+      "launch-decision",
+      "rework-path"
+    ],
+    "artifactNames": [
+      "approvals.json"
+    ],
+    "unlocks": "A launch, or a new version."
+  },
+  {
+    "id": "fanout",
+    "order": 4,
+    "title": "Phase 4: Fan-out and Tracking",
+    "goal": "Codes from the policy, send times from the schedule, a package per channel.",
+    "statusSource": "launch-package",
+    "nodeIds": [
+      "tracking-code-policy",
+      "tracking-codes",
+      "send-schedule",
+      "launch-package"
+    ],
+    "artifactNames": [
+      "launch-package.md"
+    ],
+    "unlocks": "Sends that Friday can measure."
+  },
+  {
+    "id": "rollup",
+    "order": 5,
+    "title": "Phase 5: Rollup and Learning",
+    "goal": "Join the week's numbers by code, name what did not join, keep the winners.",
+    "statusSource": "performance-rollup",
+    "nodeIds": [
+      "performance-events",
+      "performance-rollup",
+      "campaign-archive",
+      "run-operations"
+    ],
+    "artifactNames": [
+      "rollup.md"
+    ],
+    "unlocks": "The Friday rollup and next quarter's templates."
+  }
+]

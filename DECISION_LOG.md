@@ -2,6 +2,28 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-09-30 (Studio built as runnable flows)
+
+- STUDIO (module-09) BUILT from its charter; fresh map (17 nodes, temporal
+  loop archive -> template library, ops node). 4 flows (brief lands,
+  channel edits, reviews, the Friday rollup), 3 weeks, 8 builds, 29 checks,
+  29 canon facts. Week 1: one content record, three renditions rendered
+  in a loop over the rules with codes from the policy, a channel edit
+  applied in place, an approval chain that launches at three with a
+  fan-out per channel (send time from the schedule, launchedOn = the review
+  that completed it), the Friday rollup joined by code. Week 2: the
+  Copywriter approves, then edits; Brand and the Director approve v2; the
+  Week 1 flow launches on R-204 with one approval for text nobody saw (fix:
+  count(done, 'version', record.version) - approvals belong to a version);
+  a hand-typed code drops 400 clicks from the rollup (fix: unmatched events
+  logged, counted, reported). Week 3: a channel edit types 199 where the
+  record says 249 and the Week 2 flow applies it (fix: text contains
+  record.price, else rejected and the Campaign Manager told).
+- AUTHORING NOTES: a scheduled flow can only read STORES; data it needs
+  that "arrives" (performance events) is a daily-seeded store, not a
+  source. Inside a For each, a Send's recordLabel is the outer record's;
+  check such sends with `contains`, not `recordLabel`.
+
 ## 2026-09-30 (Sentinel built as runnable flows)
 
 - SENTINEL (module-08) BUILT from its charter; fresh map (17 nodes, rooted

@@ -154,6 +154,20 @@
         "archive": "Evidence Archive",
         "operate": "Audit Run Operations"
       }
+    },
+    "module-09": {
+      "org": "Studio",
+      "deliverable": "launch package and Friday rollup",
+      "map": {
+        "intake": "Content Record",
+        "reference": "Rendition Rules",
+        "transform": "Channel Renditions",
+        "decision": "Launch Decision",
+        "handoff": "Review Route",
+        "assembly": "Launch Package",
+        "archive": "Campaign Archive",
+        "operate": "Campaign Run Operations"
+      }
     }
   }
 }

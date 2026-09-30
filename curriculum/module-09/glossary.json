@@ -1,0 +1,57 @@
+{
+  "note": "Terms module-09 introduces, and the build that teaches each. Enforced by scripts/lint-glossary.mjs. Keep ASCII-only.",
+  "module": "module-09",
+  "terms": [
+    {
+      "term": "rendition",
+      "aliases": [
+        "renditions"
+      ],
+      "teachesIn": "b1",
+      "gloss": "One channel's version of the message - email, social or web - built from the single content record, never written from scratch."
+    },
+    {
+      "term": "single source",
+      "aliases": [
+        "source of truth",
+        "content record"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The one record every rendition is built from. Change the price there and every channel changes; change it anywhere else and channels drift."
+    },
+    {
+      "term": "tracking code",
+      "aliases": [
+        "tracking codes",
+        "code"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The tag on every link that says which campaign and channel a click came from. Built from a policy so Friday can join on it."
+    },
+    {
+      "term": "approval chain",
+      "aliases": [
+        "chain",
+        "chain reset"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Copywriter, Brand Reviewer, Marketing Director, in order. Any edit starts it over: approvals belong to a version."
+    },
+    {
+      "term": "fan-out",
+      "aliases": [
+        "fanned out"
+      ],
+      "teachesIn": "b1",
+      "gloss": "One approved message becoming a send per channel, each with its own text, code and time."
+    },
+    {
+      "term": "rollup",
+      "aliases": [
+        "Friday rollup"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The weekly report that joins every channel's clicks to its campaign by tracking code - and names the events it could not place."
+    }
+  ]
+}

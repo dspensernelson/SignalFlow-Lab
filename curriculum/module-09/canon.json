@@ -1,0 +1,288 @@
+{
+  "_comment": "Canon for a runnable-flow module, enforced by scripts/lint-flows.mjs. Flow modules have no per-lesson answer keys to drift apart; what can drift is the world data (sources and seeds) and the reference solution that proves every build. So each assertion is checked against the raw day data (kind data) or against the reference solution's run of the whole module (kinds record and store), with every day's stores carried into the next. Change a number in the data and the canon names every fact that moved. The pre-port per-lesson assertions are in git history. ASCII only.",
+  "module": "module-09",
+  "format": "flows",
+  "assertions": [
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "campaignId": "CMP-101"
+      },
+      "field": "price",
+      "equals": 289,
+      "source": "campaign-briefs"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "version": "1.0.0"
+      },
+      "field": "prefix",
+      "equals": "STU",
+      "seed": "tracking-policy"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "channel": "social"
+      },
+      "field": "maxLength",
+      "equals": 120,
+      "seed": "rendition-rules"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "channel": "email"
+      },
+      "field": "sendAt",
+      "equals": "Fri 7:00 AM",
+      "seed": "send-schedule"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "eventId": "P-101"
+      },
+      "field": "clicks",
+      "equals": 1200,
+      "seed": "performance-events"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "eventId": "P-102"
+      },
+      "field": "clicks",
+      "equals": 640,
+      "seed": "performance-events"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "eventId": "P-103"
+      },
+      "field": "clicks",
+      "equals": 310,
+      "seed": "performance-events"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "content-records",
+      "where": {
+        "campaignId": "CMP-101"
+      },
+      "field": "version",
+      "equals": 1
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "renditions",
+      "where": {
+        "campaignId": "CMP-101"
+      },
+      "count": 3
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "renditions",
+      "where": {
+        "campaignId": "CMP-101",
+        "channel": "social"
+      },
+      "field": "code",
+      "equals": "STU-CMP-101-social"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "renditions",
+      "where": {
+        "campaignId": "CMP-101",
+        "channel": "social"
+      },
+      "field": "fits",
+      "equals": true
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "approvals",
+      "where": {
+        "campaignId": "CMP-101"
+      },
+      "count": 3
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "launch-package",
+      "where": {
+        "campaignId": "CMP-101"
+      },
+      "count": 3
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "launch-package",
+      "where": {
+        "campaignId": "CMP-101",
+        "channel": "email"
+      },
+      "field": "launchedOn",
+      "equals": "R-103"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "rollup-rows",
+      "where": {
+        "campaignId": "CMP-101"
+      },
+      "count": 3
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run Fri 4:00 PM",
+      "field": "totalClicks",
+      "equals": 2150,
+      "flow": "rollup-flow"
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "reviewId": "R-202"
+      },
+      "field": "decision",
+      "equals": "edited",
+      "source": "reviews"
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "eventId": "P-202"
+      },
+      "field": "code",
+      "equals": "ridge_social_promo",
+      "seed": "performance-events"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "content-records",
+      "where": {
+        "campaignId": "CMP-102"
+      },
+      "field": "version",
+      "equals": 2
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "approvals",
+      "where": {
+        "campaignId": "CMP-102",
+        "version": 2
+      },
+      "count": 3
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "launch-package",
+      "where": {
+        "campaignId": "CMP-102",
+        "channel": "email"
+      },
+      "field": "launchedOn",
+      "equals": "R-205"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "rework-log",
+      "where": {
+        "campaignId": "CMP-102"
+      },
+      "count": 1
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "unmatched-events",
+      "where": {
+        "eventId": "P-202"
+      },
+      "count": 1
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "rollup-rows",
+      "where": {
+        "campaignId": "CMP-102"
+      },
+      "count": 2
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "Scheduled run Fri 4:00 PM",
+      "field": "unmatched",
+      "equals": 1,
+      "flow": "rollup-flow"
+    },
+    {
+      "kind": "data",
+      "day": "day-3",
+      "where": {
+        "campaignId": "CMP-103"
+      },
+      "field": "price",
+      "equals": 249,
+      "source": "campaign-briefs"
+    },
+    {
+      "kind": "data",
+      "day": "day-3",
+      "where": {
+        "editId": "E-301"
+      },
+      "field": "channel",
+      "equals": "email",
+      "source": "rendition-edits"
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "rejected-edits",
+      "where": {
+        "editId": "E-301"
+      },
+      "count": 1
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "launch-package",
+      "where": {
+        "campaignId": "CMP-103"
+      },
+      "count": 3
+    }
+  ]
+}
