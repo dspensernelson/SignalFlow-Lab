@@ -1,0 +1,1238 @@
+{
+  "moduleId": "module-10",
+  "title": "Watchtower Incident Response",
+  "org": "Watchtower Platform",
+  "intro": "Watchtower runs the platform every other desk in this curriculum sits on. Telemetry streams in all day; thresholds decide what becomes an alert; alerts page humans; runbooks act; postmortems tune the thresholds. This is automation about automation. You are going to build the nervous system: detect a threshold crossing, classify it, page a person or just watch, follow the runbook, tell users the truth, and close the loop with a postmortem that edits the thresholds. Then it meets an alert storm, a runbook that does not match reality, and a page nobody answers.",
+  "world": {
+    "oneLiner": "Watchtower keeps the platform alive: telemetry becomes alerts, alerts become incidents, incidents page people, runbooks resolve them, and postmortems tune the thresholds so it happens less.",
+    "roles": [
+      {
+        "name": "On-call Engineer",
+        "does": "First responder: is paged, acknowledges, follows the runbook."
+      },
+      {
+        "name": "Incident Commander",
+        "does": "Owns severe incidents, and is paged when the on-call does not answer."
+      },
+      {
+        "name": "Service Owner",
+        "does": "Owns each service's alert thresholds and hears the tuning proposals."
+      },
+      {
+        "name": "SRE Lead",
+        "does": "Owns the runbooks and the monthly reliability report; hears when a runbook step did not match reality."
+      },
+      {
+        "name": "Status Page",
+        "does": "An output, not a person: where users are told what is happening."
+      },
+      {
+        "name": "Engineering DL",
+        "does": "The distribution list that receives the reliability report."
+      }
+    ],
+    "deliverable": "a postmortem for every incident, and the monthly reliability report",
+    "clock": "Every minute: telemetry samples arrive and are checked against the thresholds. During an incident: responders report each runbook step as they take it. Month end: postmortems are assembled, the report goes to Engineering, and the thresholds get their proposals.",
+    "stakes": "Get it wrong and forty alerts page one engineer forty times, a page goes unanswered while customers wait, or a runbook that no longer matches the system is followed to the letter."
+  },
+  "owners": [
+    "On-call Engineer",
+    "Incident Commander",
+    "Service Owner",
+    "SRE Lead",
+    "Status Page",
+    "Engineering DL"
+  ],
+  "sources": [
+    {
+      "id": "telemetry",
+      "label": "Telemetry",
+      "labelField": "sampleId",
+      "description": "One sample per service per metric per minute: latency in ms, errors in percent.",
+      "fields": [
+        "sampleId",
+        "service",
+        "metric",
+        "value",
+        "unit",
+        "minute"
+      ]
+    },
+    {
+      "id": "responder-actions",
+      "label": "Responder Actions",
+      "labelField": "actionId",
+      "description": "A responder reporting a runbook step: done, deviated (with why), or resolve.",
+      "fields": [
+        "actionId",
+        "incidentId",
+        "step",
+        "outcome",
+        "note",
+        "by",
+        "minute"
+      ]
+    }
+  ],
+  "stores": [
+    {
+      "id": "alert-thresholds",
+      "label": "Alert Thresholds",
+      "owner": "Service Owner",
+      "tone": "neutral",
+      "description": "Per service and metric: the limit that trips an alert, and the impact and scope a crossing implies. Versioned, because incidents edit them.",
+      "fields": [
+        "service",
+        "metric",
+        "limit",
+        "impact",
+        "scope",
+        "version"
+      ]
+    },
+    {
+      "id": "severity-matrix",
+      "label": "Severity Matrix",
+      "owner": "Incident Commander",
+      "tone": "neutral",
+      "description": "Impact x scope -> severity, and whether that severity pages a human.",
+      "fields": [
+        "impact",
+        "scope",
+        "severity",
+        "page"
+      ]
+    },
+    {
+      "id": "runbook-library",
+      "label": "Runbook Library",
+      "owner": "SRE Lead",
+      "tone": "neutral",
+      "description": "Per service: the numbered steps a responder follows.",
+      "fields": [
+        "service",
+        "step",
+        "action",
+        "version"
+      ]
+    },
+    {
+      "id": "alert-events",
+      "label": "Alert Events",
+      "daily": true,
+      "owner": "On-call Engineer",
+      "tone": "neutral",
+      "description": "Every threshold crossing, as it happened.",
+      "fields": [
+        "sampleId",
+        "service",
+        "metric",
+        "value",
+        "limit",
+        "minute"
+      ]
+    },
+    {
+      "id": "incidents",
+      "label": "Incidents",
+      "keyField": "incidentId",
+      "owner": "Incident Commander",
+      "tone": "hold",
+      "description": "One row per incident: service, metric, severity, who was paged, how many alerts it absorbed, and when it was resolved.",
+      "fields": [
+        "incidentId",
+        "service",
+        "metric",
+        "severity",
+        "status",
+        "pagedTo",
+        "alertCount",
+        "minute",
+        "resolvedMinute",
+        "mttr"
+      ]
+    },
+    {
+      "id": "watch-log",
+      "label": "Watch Log",
+      "daily": true,
+      "owner": "On-call Engineer",
+      "tone": "neutral",
+      "description": "Alerts below the paging band: recorded, not paged.",
+      "fields": [
+        "incidentId",
+        "service",
+        "metric",
+        "severity",
+        "minute"
+      ]
+    },
+    {
+      "id": "executions",
+      "label": "Runbook Executions",
+      "daily": true,
+      "owner": "SRE Lead",
+      "tone": "neutral",
+      "description": "Every runbook step a responder reported, against what the runbook said.",
+      "fields": [
+        "incidentId",
+        "step",
+        "action",
+        "outcome",
+        "note",
+        "by",
+        "minute"
+      ]
+    },
+    {
+      "id": "deviations",
+      "label": "Runbook Deviations",
+      "owner": "SRE Lead",
+      "tone": "bad",
+      "description": "Steps where reality did not match the runbook. The runbook's to-do list.",
+      "fields": [
+        "incidentId",
+        "step",
+        "action",
+        "note",
+        "by"
+      ]
+    },
+    {
+      "id": "postmortems",
+      "label": "Postmortems",
+      "keyField": "incidentId",
+      "owner": "SRE Lead",
+      "tone": "good",
+      "description": "One per resolved incident: timeline, impact, response, actions.",
+      "fields": [
+        "incidentId",
+        "service",
+        "severity",
+        "mttr",
+        "stepsTaken"
+      ]
+    },
+    {
+      "id": "action-items",
+      "label": "Action Items",
+      "owner": "SRE Lead",
+      "tone": "hold",
+      "description": "Tracked commitments from postmortems, each with an owner.",
+      "fields": [
+        "incidentId",
+        "item",
+        "owner",
+        "dueDay"
+      ]
+    },
+    {
+      "id": "tuning-proposals",
+      "label": "Tuning Proposals",
+      "daily": true,
+      "owner": "Service Owner",
+      "tone": "neutral",
+      "description": "Threshold edits proposed by this month's incidents.",
+      "fields": [
+        "service",
+        "metric",
+        "limit",
+        "peak",
+        "incidents"
+      ]
+    },
+    {
+      "id": "reliability-archive",
+      "label": "Reliability Archive",
+      "keyField": "runId",
+      "owner": "Engineering DL",
+      "tone": "good",
+      "description": "Every monthly report.",
+      "fields": [
+        "runId",
+        "incidents",
+        "totalMttr"
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "telemetry-flow",
+      "name": "Telemetry",
+      "description": "Runs once per sample.",
+      "trigger": {
+        "mode": "event",
+        "source": "telemetry"
+      }
+    },
+    {
+      "id": "runbook-flow",
+      "name": "Runbook steps",
+      "description": "Runs once per responder action.",
+      "trigger": {
+        "mode": "event",
+        "source": "responder-actions"
+      }
+    },
+    {
+      "id": "postmortem-flow",
+      "name": "Month end",
+      "description": "Runs at month end: postmortems, report, tuning.",
+      "trigger": {
+        "mode": "schedule",
+        "at": "Month end"
+      }
+    }
+  ],
+  "days": [
+    {
+      "id": "day-1",
+      "label": "Month 1 - one clean incident",
+      "description": "API latency crosses its limit at minute 10 and the on-call answers the page. Web errors tick just over their limit - worth watching, not worth waking anyone. The runbook works and the incident is resolved at minute 32.",
+      "sources": {
+        "telemetry": [
+          {
+            "sampleId": "T-101",
+            "service": "api",
+            "metric": "latency",
+            "value": 850,
+            "unit": "ms",
+            "minute": 10
+          },
+          {
+            "sampleId": "T-102",
+            "service": "web",
+            "metric": "errorPct",
+            "value": 2.5,
+            "unit": "pct",
+            "minute": 10
+          },
+          {
+            "sampleId": "T-103",
+            "service": "db",
+            "metric": "errorPct",
+            "value": 0.4,
+            "unit": "pct",
+            "minute": 10
+          },
+          {
+            "sampleId": "T-104",
+            "service": "api",
+            "metric": "latency",
+            "value": 180,
+            "unit": "ms",
+            "minute": 40
+          }
+        ],
+        "responder-actions": [
+          {
+            "actionId": "A-101",
+            "incidentId": "api-latency-10",
+            "step": 1,
+            "outcome": "done",
+            "note": "checked the dashboard: one upstream slow",
+            "by": "On-call Engineer",
+            "minute": 15
+          },
+          {
+            "actionId": "A-102",
+            "incidentId": "api-latency-10",
+            "step": 2,
+            "outcome": "done",
+            "note": "restarted the slow upstream",
+            "by": "On-call Engineer",
+            "minute": 25
+          },
+          {
+            "actionId": "A-103",
+            "incidentId": "api-latency-10",
+            "step": "resolve",
+            "outcome": "done",
+            "note": "latency back to 180 ms",
+            "by": "On-call Engineer",
+            "minute": 32
+          }
+        ]
+      },
+      "seeds": {
+        "alert-thresholds": [
+          {
+            "service": "api",
+            "metric": "latency",
+            "limit": 500,
+            "impact": "high",
+            "scope": "some",
+            "version": "1.0.0"
+          },
+          {
+            "service": "web",
+            "metric": "errorPct",
+            "limit": 2,
+            "impact": "low",
+            "scope": "some",
+            "version": "1.0.0"
+          },
+          {
+            "service": "db",
+            "metric": "errorPct",
+            "limit": 5,
+            "impact": "high",
+            "scope": "all",
+            "version": "1.0.0"
+          }
+        ],
+        "severity-matrix": [
+          {
+            "impact": "high",
+            "scope": "all",
+            "severity": "SEV1",
+            "page": true
+          },
+          {
+            "impact": "high",
+            "scope": "some",
+            "severity": "SEV2",
+            "page": true
+          },
+          {
+            "impact": "low",
+            "scope": "all",
+            "severity": "SEV3",
+            "page": false
+          },
+          {
+            "impact": "low",
+            "scope": "some",
+            "severity": "SEV4",
+            "page": false
+          }
+        ],
+        "runbook-library": [
+          {
+            "service": "api",
+            "step": 1,
+            "action": "check the latency dashboard for the slow upstream",
+            "version": "1.0.0"
+          },
+          {
+            "service": "api",
+            "step": 2,
+            "action": "restart the slow upstream",
+            "version": "1.0.0"
+          },
+          {
+            "service": "db",
+            "step": 1,
+            "action": "check replication lag",
+            "version": "1.0.0"
+          },
+          {
+            "service": "db",
+            "step": 2,
+            "action": "restart the replica",
+            "version": "1.0.0"
+          }
+        ]
+      },
+      "approvals": {
+        "On-call Engineer": {
+          "outcome": "acknowledged",
+          "at": "minute 13"
+        }
+      },
+      "failures": []
+    },
+    {
+      "id": "day-2",
+      "label": "Month 2 - the storm, and a runbook that lies",
+      "description": "Database errors cross the limit five minutes in a row. The on-call answers, follows the runbook, and finds step 2 does not work any more: restarting the replica did nothing; failing over did.",
+      "sources": {
+        "telemetry": [
+          {
+            "sampleId": "T-201",
+            "service": "db",
+            "metric": "errorPct",
+            "value": 6.1,
+            "unit": "pct",
+            "minute": 20
+          },
+          {
+            "sampleId": "T-202",
+            "service": "db",
+            "metric": "errorPct",
+            "value": 7.4,
+            "unit": "pct",
+            "minute": 21
+          },
+          {
+            "sampleId": "T-203",
+            "service": "db",
+            "metric": "errorPct",
+            "value": 8.0,
+            "unit": "pct",
+            "minute": 22
+          },
+          {
+            "sampleId": "T-204",
+            "service": "db",
+            "metric": "errorPct",
+            "value": 7.7,
+            "unit": "pct",
+            "minute": 23
+          },
+          {
+            "sampleId": "T-205",
+            "service": "db",
+            "metric": "errorPct",
+            "value": 6.9,
+            "unit": "pct",
+            "minute": 24
+          },
+          {
+            "sampleId": "T-206",
+            "service": "api",
+            "metric": "latency",
+            "value": 210,
+            "unit": "ms",
+            "minute": 24
+          }
+        ],
+        "responder-actions": [
+          {
+            "actionId": "A-201",
+            "incidentId": "db-errorPct-20",
+            "step": 1,
+            "outcome": "done",
+            "note": "replication lag 40s",
+            "by": "On-call Engineer",
+            "minute": 26
+          },
+          {
+            "actionId": "A-202",
+            "incidentId": "db-errorPct-20",
+            "step": 2,
+            "outcome": "deviated",
+            "note": "restart did not clear it; failed over to the standby instead",
+            "by": "On-call Engineer",
+            "minute": 38
+          },
+          {
+            "actionId": "A-203",
+            "incidentId": "db-errorPct-20",
+            "step": "resolve",
+            "outcome": "done",
+            "note": "errors back under 1 percent",
+            "by": "On-call Engineer",
+            "minute": 45
+          }
+        ]
+      },
+      "seeds": {},
+      "approvals": {
+        "On-call Engineer": {
+          "outcome": "acknowledged",
+          "at": "minute 22"
+        }
+      },
+      "failures": []
+    },
+    {
+      "id": "day-3",
+      "label": "Month 3 - the page nobody answers",
+      "description": "API latency trips again at minute 5. The page goes out. The on-call's phone is on a plane. Nobody acknowledges.",
+      "sources": {
+        "telemetry": [
+          {
+            "sampleId": "T-301",
+            "service": "api",
+            "metric": "latency",
+            "value": 910,
+            "unit": "ms",
+            "minute": 5
+          },
+          {
+            "sampleId": "T-302",
+            "service": "web",
+            "metric": "errorPct",
+            "value": 0.8,
+            "unit": "pct",
+            "minute": 5
+          }
+        ],
+        "responder-actions": [
+          {
+            "actionId": "A-301",
+            "incidentId": "api-latency-5",
+            "step": 1,
+            "outcome": "done",
+            "note": "one upstream slow again",
+            "by": "Incident Commander",
+            "minute": 22
+          },
+          {
+            "actionId": "A-302",
+            "incidentId": "api-latency-5",
+            "step": "resolve",
+            "outcome": "done",
+            "note": "restarted it; latency normal",
+            "by": "Incident Commander",
+            "minute": 40
+          }
+        ]
+      },
+      "seeds": {},
+      "approvals": {},
+      "failures": []
+    }
+  ],
+  "builds": [
+    {
+      "id": "b1",
+      "dayId": "day-1",
+      "flowId": "telemetry-flow",
+      "title": "Detect",
+      "brief": "A sample over its threshold becomes an alert event; everything else is noise.",
+      "goal": "Every minute, every service reports every metric. Almost all of it is fine. The Alert Thresholds table says, per service and metric, the value that means trouble. Compare each sample with its threshold; at or over it, record an alert event.",
+      "outcome": "Every sample at or over its threshold is in Alert Events with the limit it crossed; nothing else is.",
+      "constraints": [
+        "Look the threshold up by service AND metric.",
+        "At or over the limit trips.",
+        "Attach the threshold as threshold - the next build reads its impact and scope."
+      ],
+      "requires": [
+        "trigger",
+        "lookup",
+        "condition",
+        "store",
+        "json-record"
+      ],
+      "hints": {
+        "question": "Four samples arrived. How many should wake anyone?",
+        "nudge": "A Lookup on Alert Thresholds where service = service and metric = metric (threshold); a Condition value >= threshold.limit: YES lane Transform limit = threshold.limit; Store into Alert Events.",
+        "steps": [
+          "Connect the Trigger to Telemetry.",
+          "Add a Lookup on Alert Thresholds where service = service and metric = metric. Name it threshold.",
+          "Add a Condition: value >= threshold.limit (compare to the field).",
+          "YES lane: Transform limit = threshold.limit; Store into Alert Events. Run it."
+        ]
+      },
+      "mapNodes": [
+        "telemetry-stream",
+        "alert-threshold-policy",
+        "alert-event"
+      ],
+      "checks": [
+        {
+          "id": "b1-run",
+          "kind": "runStatus",
+          "flowId": "telemetry-flow",
+          "equals": "succeeded",
+          "why": "A detector that fails is a platform nobody is watching.",
+          "label": "The telemetry flow runs without failing"
+        },
+        {
+          "id": "b1-api",
+          "kind": "storeContains",
+          "store": "alert-events",
+          "where": {
+            "sampleId": "T-101"
+          },
+          "fields": {
+            "limit": 500
+          },
+          "why": "850 ms against a 500 ms limit: an alert.",
+          "label": "T-101 (api latency 850) is an alert"
+        },
+        {
+          "id": "b1-web",
+          "kind": "storeContains",
+          "store": "alert-events",
+          "where": {
+            "sampleId": "T-102"
+          },
+          "why": "2.5 percent against 2: over, if only just.",
+          "label": "T-102 (web errors 2.5%) is an alert"
+        },
+        {
+          "id": "b1-quiet",
+          "kind": "storeCount",
+          "store": "alert-events",
+          "equals": 2,
+          "why": "The other two samples are noise; recording them would bury the signal.",
+          "label": "Only 2 alerts from 4 samples"
+        }
+      ]
+    },
+    {
+      "id": "b2",
+      "dayId": "day-1",
+      "flowId": "telemetry-flow",
+      "title": "Page, or watch",
+      "brief": "Classify each alert with the matrix; page a human above the band, log the rest.",
+      "goal": "Not every alert is worth waking someone. The threshold says what impact and scope a crossing implies; the Severity Matrix turns those into a severity and says whether it pages. In the alert lane: open an incident, and either page the On-call Engineer (capturing the acknowledgement, and telling the Status Page) or log it in the Watch Log.",
+      "outcome": "Every alert opens an incident with its severity; paging severities page the On-call Engineer and tell the Status Page; the rest go to the Watch Log.",
+      "constraints": [
+        "incidentId = service + '-' + metric + '-' + minute.",
+        "Severity comes from the matrix by the threshold's impact AND scope.",
+        "Page = a Send to the On-call Engineer and an Approval capturing the acknowledgement; record pagedTo.",
+        "Below the band: Watch Log, no page."
+      ],
+      "requires": [
+        "approval",
+        "send",
+        "fields-and-paths"
+      ],
+      "hints": {
+        "question": "Web errors at 2.5 percent, affecting some users. Is that worth a 3 AM phone call?",
+        "nudge": "In the alert lane: Lookup Severity Matrix where impact = threshold.impact and scope = threshold.scope (sev); Transform incidentId, severity = sev.severity, status = 'open', alertCount = 1; Condition sev.page == true: YES lane Send to On-call Engineer, Approval from On-call Engineer, Transform pagedTo = 'On-call Engineer', Send to Status Page; NO lane Store into Watch Log. Then Store into Incidents (add or replace by incidentId).",
+        "steps": [
+          "In the alert YES lane, after the Alert Events store: Lookup Severity Matrix where impact = threshold.impact and scope = threshold.scope. Name it sev.",
+          "Transform: incidentId = concat(service, '-', metric, '-', minute), severity = sev.severity, status = 'open', alertCount = 1.",
+          "Condition: sev.page == true. YES lane: Send to On-call Engineer ('{{severity}} {{service}} {{metric}} {{value}}{{unit}}'); Approval from On-call Engineer about '{{incidentId}}'; Transform pagedTo = 'On-call Engineer'; Send to Status Page ('Investigating {{service}} {{metric}}'). NO lane: Store into Watch Log.",
+          "After that Condition: Store into Incidents, add or replace if it exists, same row when incidentId. Run it."
+        ]
+      },
+      "mapNodes": [
+        "severity-matrix",
+        "severity-decision",
+        "paging-handoff",
+        "watch-log",
+        "status-comms"
+      ],
+      "checks": [
+        {
+          "id": "b2-sev",
+          "kind": "storeContains",
+          "store": "incidents",
+          "where": {
+            "incidentId": "api-latency-10"
+          },
+          "fields": {
+            "severity": "SEV2",
+            "pagedTo": "On-call Engineer"
+          },
+          "why": "High impact, some users: SEV2 pages.",
+          "label": "api-latency-10 is SEV2 and paged the On-call Engineer"
+        },
+        {
+          "id": "b2-ack",
+          "kind": "recordField",
+          "where": {
+            "sampleId": "T-101"
+          },
+          "field": "approval.outcome",
+          "equals": "acknowledged",
+          "why": "A page is not handled until someone says they have it.",
+          "label": "The acknowledgement is captured"
+        },
+        {
+          "id": "b2-status",
+          "kind": "outboxContains",
+          "to": "Status Page",
+          "contains": "api",
+          "why": "Users are told the truth while it is happening.",
+          "label": "The Status Page says investigating api"
+        },
+        {
+          "id": "b2-watch",
+          "kind": "storeContains",
+          "store": "watch-log",
+          "where": {
+            "service": "web"
+          },
+          "fields": {
+            "severity": "SEV4"
+          },
+          "why": "Low impact, some users: watched, not paged.",
+          "label": "Web errors go to the Watch Log as SEV4"
+        },
+        {
+          "id": "b2-once",
+          "kind": "outboxContains",
+          "to": "On-call Engineer",
+          "count": 1,
+          "why": "One page for one incident.",
+          "label": "The On-call Engineer is paged exactly once"
+        }
+      ]
+    },
+    {
+      "id": "b3",
+      "dayId": "day-1",
+      "flowId": "runbook-flow",
+      "title": "Follow the runbook",
+      "brief": "Record each step a responder takes against the runbook, and close the incident on resolve.",
+      "goal": "Responders report each runbook step as they take it. Record each one next to what the runbook said the step was. When the step is resolve, close the incident: status resolved, the minute, and how long it took - then tell the Status Page.",
+      "outcome": "Every responder action is in Runbook Executions with the runbook's action; resolve closes the incident with resolvedMinute and mttr and tells the Status Page.",
+      "constraints": [
+        "Look the incident up; the runbook step is by the incident's service AND the step number.",
+        "mttr = resolve minute minus the incident's minute.",
+        "Update the incident row; never add one."
+      ],
+      "requires": [
+        "update-row"
+      ],
+      "hints": {
+        "question": "At minute 32 the on-call says it is fixed. What should the incident row say, and who else should know?",
+        "nudge": "Trigger on Responder Actions; Lookup Incidents by incidentId (incident); Lookup Runbook Library where service = incident.service and step = step (runbook); Transform action = runbook.action; Store into Runbook Executions; Condition step == resolve: YES lane Transform status = 'resolved', resolvedMinute = minute, mttr = minute - incident.minute; Store into Incidents (update by incidentId); Send to Status Page.",
+        "steps": [
+          "Open the Runbook steps flow and connect it to Responder Actions.",
+          "Lookup Incidents where incidentId = incidentId (incident); Lookup Runbook Library where service = incident.service and step = step (runbook).",
+          "Transform action = runbook.action; Store into Runbook Executions.",
+          "Condition: step == resolve. YES lane: Transform status = 'resolved', resolvedMinute = minute, mttr = minute - incident.minute; Store into Incidents, update the existing row by incidentId; Send to Status Page ('Resolved {{incident.service}}'). Run it."
+        ]
+      },
+      "mapNodes": [
+        "runbook-library",
+        "runbook-execution",
+        "resolution-record",
+        "status-comms"
+      ],
+      "checks": [
+        {
+          "id": "b3-run",
+          "kind": "runStatus",
+          "flowId": "runbook-flow",
+          "equals": "succeeded",
+          "why": "A lost step is a timeline with a hole.",
+          "label": "The runbook flow runs without failing"
+        },
+        {
+          "id": "b3-steps",
+          "kind": "storeCount",
+          "store": "executions",
+          "where": {
+            "incidentId": "api-latency-10"
+          },
+          "equals": 3,
+          "why": "Two steps and a resolve, all on record.",
+          "label": "Three actions recorded for api-latency-10"
+        },
+        {
+          "id": "b3-action",
+          "kind": "storeContains",
+          "store": "executions",
+          "where": {
+            "incidentId": "api-latency-10",
+            "step": 2
+          },
+          "fields": {
+            "action": "restart the slow upstream"
+          },
+          "why": "The record says what the runbook said, next to what was done.",
+          "label": "Step 2 is recorded against the runbook's action"
+        },
+        {
+          "id": "b3-resolved",
+          "kind": "storeContains",
+          "store": "incidents",
+          "where": {
+            "incidentId": "api-latency-10"
+          },
+          "fields": {
+            "status": [
+              "resolved",
+              "closed"
+            ],
+            "mttr": 22
+          },
+          "why": "Tripped at 10, resolved at 32: 22 minutes.",
+          "label": "api-latency-10 is resolved, mttr 22"
+        },
+        {
+          "id": "b3-status",
+          "kind": "outboxContains",
+          "to": "Status Page",
+          "contains": "Resolved",
+          "why": "Users are told when it is over, too.",
+          "label": "The Status Page says resolved"
+        }
+      ]
+    },
+    {
+      "id": "b4",
+      "dayId": "day-1",
+      "flowId": "postmortem-flow",
+      "title": "Postmortem and report",
+      "brief": "At month end, write a postmortem per resolved incident and send the reliability report.",
+      "goal": "Each resolved incident gets a postmortem: what tripped, how severe, how long, which steps were taken. The month gets a report: incidents and total time to resolve. Loop over the resolved incidents, gather each one's steps, write it up, then report to Engineering and archive.",
+      "outcome": "Every resolved incident has a postmortem with its steps; Engineering receives the report; a copy is archived.",
+      "constraints": [
+        "Only resolved incidents get a postmortem.",
+        "stepsTaken = the number of executions for the incident.",
+        "The report counts incidents and totals mttr."
+      ],
+      "requires": [
+        "schedule-trigger",
+        "lookup-all",
+        "foreach",
+        "lists",
+        "compose"
+      ],
+      "hints": {
+        "question": "What does the SRE Lead want to read a month later about minute 10?",
+        "nudge": "Lookup Incidents all where status = 'resolved' (resolved); For each: Lookup Runbook Executions all where incidentId = incidentId (steps); Transform stepsTaken = len(steps); Store into Postmortems (add or replace by incidentId); Transform status = 'closed'; Store into Incidents (update by incidentId). After: Transform incidents = len(resolved), totalMttr = sum(resolved, 'mttr'); Compose; Send to Engineering DL; Store into Reliability Archive.",
+        "steps": [
+          "Open the Month end flow. Lookup Incidents, all rows where status = 'resolved'. Name it resolved. For each over resolved.",
+          "Inside: Lookup Runbook Executions, all rows where incidentId = incidentId (steps); Transform stepsTaken = len(steps); Store into Postmortems, add or replace by incidentId; Transform status = 'closed'; Store into Incidents, update the existing row by incidentId, so next month does not write it again.",
+          "After the loop: Transform incidents = len(resolved), totalMttr = sum(resolved, 'mttr'). Compose report with the counts and {{#each resolved}}- {{incidentId}} {{severity}} {{mttr}} min{{/each}}.",
+          "Send to Engineering DL with {{report}}; Store into Reliability Archive."
+        ]
+      },
+      "mapNodes": [
+        "incident-timeline",
+        "postmortem",
+        "incident-archive"
+      ],
+      "checks": [
+        {
+          "id": "b4-pm",
+          "kind": "storeContains",
+          "store": "postmortems",
+          "where": {
+            "incidentId": "api-latency-10"
+          },
+          "fields": {
+            "stepsTaken": 3,
+            "mttr": 22
+          },
+          "why": "The postmortem carries the timeline's length and the time to resolve.",
+          "label": "api-latency-10 has a postmortem: 3 steps, 22 minutes"
+        },
+        {
+          "id": "b4-count",
+          "kind": "recordField",
+          "where": {
+            "scheduledAt": "Month end"
+          },
+          "field": "incidents",
+          "equals": 1,
+          "why": "One incident this month.",
+          "label": "The report counts 1 incident"
+        },
+        {
+          "id": "b4-sent",
+          "kind": "outboxContains",
+          "to": "Engineering DL",
+          "contains": "api-latency-10",
+          "why": "Engineering reads the incidents, not just a number.",
+          "label": "Engineering receives the report"
+        },
+        {
+          "id": "b4-archive",
+          "kind": "storeContains",
+          "store": "reliability-archive",
+          "where": {
+            "runId": "day-1-run"
+          },
+          "why": "Next month's trend reads this.",
+          "label": "The report is archived"
+        },
+        {
+          "id": "b4-closed",
+          "kind": "storeContains",
+          "store": "incidents",
+          "where": {
+            "incidentId": "api-latency-10"
+          },
+          "fields": {
+            "status": "closed"
+          },
+          "why": "A postmortem written is an incident closed; next month starts clean.",
+          "label": "api-latency-10 is closed"
+        }
+      ]
+    },
+    {
+      "id": "b5",
+      "dayId": "day-1",
+      "flowId": "postmortem-flow",
+      "title": "Close the loop",
+      "brief": "Every postmortem proposes a threshold review, with an owner.",
+      "goal": "Incidents edit thresholds - that is the whole loop. For each resolved incident, create an action item for the Service Owner to review the threshold that tripped, and a tuning proposal that shows the limit, the peak value seen, and how many alerts it absorbed. Tell the Service Owner.",
+      "outcome": "Every resolved incident produces an action item owned by the Service Owner and a tuning proposal, and the Service Owner is told.",
+      "constraints": [
+        "The action item's owner is the Service Owner; dueDay = 14.",
+        "The proposal carries the threshold's current limit."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "The curriculum started with someone setting a threshold. Who sets them now?",
+        "nudge": "Inside the loop: Lookup Alert Thresholds where service = service and metric = metric (threshold); Transform item = concat('review ', service, ' ', metric, ' threshold'), owner = 'Service Owner', dueDay = 14, limit = threshold.limit; Store into Action Items; Store into Tuning Proposals; Send to Service Owner.",
+        "steps": [
+          "Inside the loop, after the Incidents update: Lookup Alert Thresholds where service = service and metric = metric (threshold).",
+          "Transform item = concat('review ', service, ' ', metric, ' threshold'), owner = 'Service Owner', dueDay = 14, limit = threshold.limit.",
+          "Store into Action Items; Store into Tuning Proposals; Send to Service Owner ('Review {{service}} {{metric}} limit {{limit}}: {{severity}}, {{mttr}} min'). Run it."
+        ]
+      },
+      "mapNodes": [
+        "action-items",
+        "threshold-tuning",
+        "incident-archive"
+      ],
+      "checks": [
+        {
+          "id": "b5-item",
+          "kind": "storeContains",
+          "store": "action-items",
+          "where": {
+            "incidentId": "api-latency-10"
+          },
+          "fields": {
+            "owner": "Service Owner",
+            "dueDay": 14
+          },
+          "why": "A commitment with a name and a date.",
+          "label": "An action item for api-latency-10, owned by the Service Owner"
+        },
+        {
+          "id": "b5-proposal",
+          "kind": "storeContains",
+          "store": "tuning-proposals",
+          "where": {
+            "service": "api"
+          },
+          "fields": {
+            "limit": 500
+          },
+          "why": "The proposal names the limit that tripped.",
+          "label": "A tuning proposal for api latency (limit 500)"
+        },
+        {
+          "id": "b5-told",
+          "kind": "outboxContains",
+          "to": "Service Owner",
+          "contains": "api",
+          "why": "The threshold's owner decides; the flow only proposes.",
+          "label": "The Service Owner is told"
+        }
+      ]
+    },
+    {
+      "id": "b6",
+      "dayId": "day-2",
+      "flowId": "telemetry-flow",
+      "title": "Month 2: the storm",
+      "brief": "Five alerts in five minutes are one incident, not five pages.",
+      "goal": "Database errors crossed the limit five minutes running. Run your Month 1 flow: five incidents, five pages, one engineer. An alert for a service and metric that already has an open incident belongs to that incident: count it there and stop.",
+      "outcome": "Repeated alerts attach to the open incident (alertCount grows); one incident, one page.",
+      "constraints": [
+        "An open incident for the same service and metric absorbs the alert.",
+        "alertCount counts every alert absorbed.",
+        "Nothing else is paged or created."
+      ],
+      "requires": [
+        "stop"
+      ],
+      "hints": {
+        "question": "How many times did the on-call's phone ring for one database problem?",
+        "nudge": "In the alert lane, before the Severity lookup: Lookup Incidents where service = service and metric = metric and status = 'open' (open); Condition open exists: YES lane Transform incidentId = open.incidentId, alertCount = open.alertCount + 1, minute = open.minute; Store into Incidents (update by incidentId); Stop.",
+        "steps": [
+          "Run first and count the pages.",
+          "In the alert lane, after the Alert Events store: Lookup Incidents where service = service and metric = metric and status = 'open' (a literal, in quotes). Name it open.",
+          "Condition: open exists. YES lane: Transform incidentId = open.incidentId, alertCount = open.alertCount + 1, minute = open.minute; Store into Incidents, update the existing row by incidentId; Stop.",
+          "Run again."
+        ]
+      },
+      "mapNodes": [
+        "dedup-window",
+        "alert-event"
+      ],
+      "checks": [
+        {
+          "id": "b6-one",
+          "kind": "storeCount",
+          "store": "incidents",
+          "where": {
+            "service": "db"
+          },
+          "equals": 1,
+          "why": "One database problem, one incident.",
+          "label": "One incident for db, not five"
+        },
+        {
+          "id": "b6-count",
+          "kind": "storeContains",
+          "store": "incidents",
+          "where": {
+            "incidentId": "db-errorPct-20"
+          },
+          "fields": {
+            "alertCount": 5
+          },
+          "why": "The incident knows how loud it was.",
+          "label": "db-errorPct-20 absorbed 5 alerts"
+        },
+        {
+          "id": "b6-page",
+          "kind": "outboxContains",
+          "to": "On-call Engineer",
+          "count": 1,
+          "why": "One page.",
+          "label": "The On-call Engineer is paged once"
+        },
+        {
+          "id": "b6-events",
+          "kind": "storeCount",
+          "store": "alert-events",
+          "equals": 5,
+          "why": "Every crossing is still recorded; only the paging is deduplicated.",
+          "label": "All 5 alert events are still recorded"
+        }
+      ]
+    },
+    {
+      "id": "b7",
+      "dayId": "day-2",
+      "flowId": "runbook-flow",
+      "title": "Month 2: the runbook that lies",
+      "brief": "A step that did not work is a deviation: log it and tell the runbook's owner.",
+      "goal": "Step 2 says restart the replica. The on-call did, and it did nothing; failing over fixed it. Run your flow: the step is recorded as 'deviated' and nobody hears. A deviation is the runbook telling you it is wrong. Log it where the SRE Lead will see it, and tell them.",
+      "outcome": "Every deviated step is in Runbook Deviations with the responder's note, and the SRE Lead is told.",
+      "constraints": [
+        "A deviation is anything reported as deviated.",
+        "Keep the responder's note - it is the fix."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "The runbook says restart. Restarting did nothing. What is now wrong, and who owns it?",
+        "nudge": "After the executions Store, a Condition outcome == deviated: YES lane Store into Runbook Deviations; Send to SRE Lead.",
+        "steps": [
+          "Run first and read A-202 in the run.",
+          "After the Runbook Executions store, add a Condition: outcome == deviated. YES lane: Store into Runbook Deviations; Send to SRE Lead ('Runbook {{incident.service}} step {{step}} deviated: {{note}}').",
+          "Run again."
+        ]
+      },
+      "mapNodes": [
+        "runbook-execution",
+        "runbook-library"
+      ],
+      "checks": [
+        {
+          "id": "b7-dev",
+          "kind": "storeContains",
+          "store": "deviations",
+          "where": {
+            "incidentId": "db-errorPct-20"
+          },
+          "fieldsContain": {
+            "note": [
+              "failed over"
+            ]
+          },
+          "why": "The note is the new step 2.",
+          "label": "Step 2's deviation is logged with the note"
+        },
+        {
+          "id": "b7-told",
+          "kind": "outboxContains",
+          "to": "SRE Lead",
+          "recordLabel": "A-202",
+          "why": "The runbook's owner has to hear it lied.",
+          "label": "The SRE Lead is told"
+        },
+        {
+          "id": "b7-only",
+          "kind": "storeCount",
+          "store": "deviations",
+          "equals": 1,
+          "why": "Steps that worked are not deviations.",
+          "label": "Only the deviated step is logged"
+        },
+        {
+          "id": "b7-resolved",
+          "kind": "storeContains",
+          "store": "incidents",
+          "where": {
+            "incidentId": "db-errorPct-20"
+          },
+          "fields": {
+            "status": [
+              "resolved",
+              "closed"
+            ],
+            "mttr": 25
+          },
+          "why": "The incident still resolves.",
+          "label": "db-errorPct-20 is resolved, mttr 25"
+        }
+      ]
+    },
+    {
+      "id": "b8",
+      "dayId": "day-3",
+      "flowId": "telemetry-flow",
+      "title": "Month 3: nobody answers",
+      "brief": "An unacknowledged page climbs the ladder to the Incident Commander.",
+      "goal": "API latency trips at minute 5, the page goes out, and nobody acknowledges. Run your Month 2 flow: the incident says paged to the On-call Engineer, and that is where it stays. When the acknowledgement does not come, page the Incident Commander and say so on the incident.",
+      "outcome": "An unacknowledged page pages the Incident Commander; the incident records pagedTo = Incident Commander.",
+      "constraints": [
+        "The On-call Engineer is still paged first.",
+        "Not acknowledged is anything but acknowledged.",
+        "pagedTo names the last person paged."
+      ],
+      "requires": [],
+      "hints": {
+        "question": "It is minute 15. The page went out at 5. Who knows nobody has picked it up?",
+        "nudge": "In the paging lane, after the Approval and pagedTo Transform: Condition approval.outcome != acknowledged: YES lane Send to Incident Commander; Transform pagedTo = 'Incident Commander'.",
+        "steps": [
+          "Run first and read api-latency-5.",
+          "In the paging YES lane, after pagedTo = 'On-call Engineer', add a Condition: approval.outcome != acknowledged. Its YES lane: Send to Incident Commander ('{{severity}} {{service}}: no acknowledgement from the on-call'); Transform pagedTo = 'Incident Commander'.",
+          "Run again."
+        ]
+      },
+      "mapNodes": [
+        "paging-handoff",
+        "run-operations"
+      ],
+      "checks": [
+        {
+          "id": "b8-ic",
+          "kind": "outboxContains",
+          "to": "Incident Commander",
+          "recordLabel": "T-301",
+          "why": "The next rung wakes up.",
+          "label": "The Incident Commander is paged"
+        },
+        {
+          "id": "b8-paged",
+          "kind": "storeContains",
+          "store": "incidents",
+          "where": {
+            "incidentId": "api-latency-5"
+          },
+          "fields": {
+            "pagedTo": "Incident Commander"
+          },
+          "why": "The incident says who has it.",
+          "label": "api-latency-5 shows pagedTo Incident Commander"
+        },
+        {
+          "id": "b8-first",
+          "kind": "outboxContains",
+          "to": "On-call Engineer",
+          "recordLabel": "T-301",
+          "why": "The first rung is still first.",
+          "label": "The On-call Engineer was paged first"
+        },
+        {
+          "id": "b8-resolved",
+          "kind": "storeContains",
+          "store": "incidents",
+          "where": {
+            "incidentId": "api-latency-5"
+          },
+          "fields": {
+            "status": [
+              "resolved",
+              "closed"
+            ],
+            "mttr": 35
+          },
+          "why": "The Incident Commander resolves it at minute 40.",
+          "label": "api-latency-5 is resolved by minute 40 (mttr 35)"
+        }
+      ]
+    }
+  ]
+}

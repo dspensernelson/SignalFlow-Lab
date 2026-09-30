@@ -8,5 +8,5 @@
   { "id": "module-07", "name": "Depot Order Flow", "org": "Depot Supply", "status": "active", "clock": "6:00 PM", "goal": "Handle orders as events: reserve stock safely, walk legal states, refuse bad events, compensate failures." },
   { "id": "module-08", "name": "Sentinel Evidence Locker", "org": "Sentinel Health", "status": "active", "clock": "Q last day", "goal": "Prove the controls operated: request, record unaltered, attest, decide, package, retain." },
   { "id": "module-09", "name": "Studio Campaign Ops", "org": "Studio Outdoor", "status": "active", "clock": "Fri 4:00 PM", "goal": "One message, three channels: render, approve per version, launch by code, roll up on Friday." },
-  { "id": "module-10", "name": "Watchtower Incident Response", "org": "Watchtower", "status": "planned" }
+  { "id": "module-10", "name": "Watchtower Incident Response", "org": "Watchtower Platform", "status": "active", "clock": "Month end", "goal": "Detect, page, respond, write it up, and let the incidents tune the thresholds." }
 ]

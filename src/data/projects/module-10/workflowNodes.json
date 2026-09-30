@@ -1,0 +1,652 @@
+[
+  {
+    "id": "telemetry-stream",
+    "label": "Telemetry Stream",
+    "type": "source",
+    "thingOrAction": "thing",
+    "phaseId": "telemetry",
+    "x": 20,
+    "y": 80,
+    "description": "One sample per service per metric per minute. Noise is the default; the thresholds decide what is signal.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Telemetry source.",
+      "concepts": []
+    },
+    "labVersion": "The Telemetry source.",
+    "realWorldSources": [
+      "Metrics pipeline (Prometheus, Datadog)",
+      "Health checks"
+    ],
+    "accessNeeded": [
+      "Read access to metrics",
+      "Agreement on units"
+    ],
+    "soloRebuildPath": [
+      "Log a minute of samples",
+      "Notice how few matter",
+      "Later subscribe to the stream"
+    ],
+    "reusedBy": [
+      "alert-event"
+    ],
+    "governanceNote": "Recording every sample as an alert buries the one that matters.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-telemetry-stream",
+    "artifactName": "telemetry-stream.json"
+  },
+  {
+    "id": "alert-threshold-policy",
+    "label": "Alert Thresholds",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "telemetry",
+    "x": 20,
+    "y": 190,
+    "description": "Per service and metric: the limit, and the impact and scope a crossing implies. Versioned, because incidents edit them.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Alert Thresholds table.",
+      "concepts": []
+    },
+    "labVersion": "The Alert Thresholds table.",
+    "realWorldSources": [
+      "Alerting rules",
+      "SLO definitions"
+    ],
+    "accessNeeded": [
+      "The Service Owner's numbers",
+      "A version"
+    ],
+    "soloRebuildPath": [
+      "Set a limit per metric",
+      "Say what a crossing means",
+      "Version it"
+    ],
+    "reusedBy": [
+      "alert-event",
+      "threshold-tuning"
+    ],
+    "governanceNote": "Too low burns humans; too high burns customers. The postmortem loop re-decides it with evidence.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-alert-threshold-policy",
+    "artifactName": "alert-threshold-policy.json"
+  },
+  {
+    "id": "alert-event",
+    "label": "Alert Event",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "telemetry",
+    "x": 20,
+    "y": 300,
+    "description": "A threshold crossing captured as a record: what, how much, against which limit, when.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Alert Events table.",
+      "concepts": []
+    },
+    "labVersion": "The Alert Events table.",
+    "realWorldSources": [
+      "Alert log",
+      "Alertmanager"
+    ],
+    "accessNeeded": [
+      "The thresholds"
+    ],
+    "soloRebuildPath": [
+      "Compare each sample with its limit",
+      "Record the crossing",
+      "Nothing else"
+    ],
+    "reusedBy": [
+      "dedup-window"
+    ],
+    "governanceNote": "Every crossing is recorded even when it is deduplicated for paging.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-alert-event",
+    "artifactName": "alert-event.json"
+  },
+  {
+    "id": "dedup-window",
+    "label": "Dedup Window",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "telemetry",
+    "x": 20,
+    "y": 410,
+    "description": "One incident, not forty alerts: a crossing for a service and metric with an open incident joins it.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The open-incident Lookup and absorb lane (Month 2).",
+      "concepts": []
+    },
+    "labVersion": "The open-incident Lookup and absorb lane (Month 2).",
+    "realWorldSources": [
+      "Alert grouping",
+      "Storm control"
+    ],
+    "accessNeeded": [
+      "The incidents table"
+    ],
+    "soloRebuildPath": [
+      "Look for an open incident",
+      "Count the alert there",
+      "Stop"
+    ],
+    "reusedBy": [
+      "severity-decision"
+    ],
+    "governanceNote": "Storm control is what keeps the on-call able to think.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-dedup-window",
+    "artifactName": "dedup-window.json"
+  },
+  {
+    "id": "severity-matrix",
+    "label": "Severity Matrix",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "triage",
+    "x": 270,
+    "y": 80,
+    "description": "Impact x scope -> severity, and whether it pages.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Severity Matrix table.",
+      "concepts": []
+    },
+    "labVersion": "The Severity Matrix table.",
+    "realWorldSources": [
+      "Incident severity policy"
+    ],
+    "accessNeeded": [
+      "The Incident Commander's grid"
+    ],
+    "soloRebuildPath": [
+      "Grid impact against scope",
+      "Decide which cells page"
+    ],
+    "reusedBy": [
+      "severity-decision"
+    ],
+    "governanceNote": "Who gets woken up is a policy, written down, not a judgement made at 3 AM.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-severity-matrix",
+    "artifactName": "severity-matrix.json"
+  },
+  {
+    "id": "severity-decision",
+    "label": "Severity Decision",
+    "type": "decision",
+    "thingOrAction": "action",
+    "phaseId": "triage",
+    "x": 270,
+    "y": 190,
+    "description": "Page a human, or log and watch.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Condition sev.page == true in the Telemetry flow.",
+      "concepts": []
+    },
+    "labVersion": "The Condition sev.page == true in the Telemetry flow.",
+    "realWorldSources": [
+      "Paging policy"
+    ],
+    "accessNeeded": [
+      "The matrix"
+    ],
+    "soloRebuildPath": [
+      "Look the severity up",
+      "Page or watch"
+    ],
+    "reusedBy": [
+      "paging-handoff",
+      "watch-log"
+    ],
+    "governanceNote": "The costliest boundary in the curriculum.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-severity-decision",
+    "artifactName": "severity-decision.json"
+  },
+  {
+    "id": "paging-handoff",
+    "label": "Paging Handoff",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "triage",
+    "x": 270,
+    "y": 300,
+    "description": "The page: acknowledgement captured, and the ladder to the Incident Commander when it is not.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Send, Approval and escalation in the paging lane.",
+      "concepts": []
+    },
+    "labVersion": "The Send, Approval and escalation in the paging lane.",
+    "realWorldSources": [
+      "PagerDuty",
+      "On-call schedule"
+    ],
+    "accessNeeded": [
+      "The on-call rota",
+      "The escalation policy"
+    ],
+    "soloRebuildPath": [
+      "Page the on-call",
+      "Capture the ack",
+      "Climb the ladder when none"
+    ],
+    "reusedBy": [
+      "runbook-execution"
+    ],
+    "governanceNote": "A page is not handled until someone says they have it.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-paging-handoff",
+    "artifactName": "paging-handoff.json"
+  },
+  {
+    "id": "watch-log",
+    "label": "Watch Log",
+    "type": "handoff",
+    "thingOrAction": "action",
+    "phaseId": "triage",
+    "x": 270,
+    "y": 410,
+    "description": "The quiet path: alerts below the paging band, recorded.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Watch Log table.",
+      "concepts": []
+    },
+    "labVersion": "The Watch Log table.",
+    "realWorldSources": [
+      "Low-priority alert queue"
+    ],
+    "accessNeeded": [
+      "Write access"
+    ],
+    "soloRebuildPath": [
+      "Log the alert with its severity",
+      "Review in daylight"
+    ],
+    "reusedBy": [
+      "postmortem"
+    ],
+    "governanceNote": "Unpaged is not unrecorded.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-watch-log",
+    "artifactName": "watch-log.json"
+  },
+  {
+    "id": "runbook-library",
+    "label": "Runbook Library",
+    "type": "reference",
+    "thingOrAction": "thing",
+    "phaseId": "response",
+    "x": 520,
+    "y": 80,
+    "description": "Per service: the numbered steps a responder follows. Versioned, because deviations edit them.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Runbook Library table.",
+      "concepts": []
+    },
+    "labVersion": "The Runbook Library table.",
+    "realWorldSources": [
+      "Runbook wiki",
+      "Playbooks"
+    ],
+    "accessNeeded": [
+      "The SRE Lead's procedures",
+      "A version"
+    ],
+    "soloRebuildPath": [
+      "Number the steps",
+      "Write what each does",
+      "Version them"
+    ],
+    "reusedBy": [
+      "runbook-execution"
+    ],
+    "governanceNote": "A runbook is executable procedure; when reality disagrees, the runbook is wrong.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-runbook-library",
+    "artifactName": "runbook-library.json"
+  },
+  {
+    "id": "runbook-execution",
+    "label": "Runbook Execution",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "response",
+    "x": 520,
+    "y": 190,
+    "description": "Each step a responder reports, recorded against what the runbook said; deviations logged and reported.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Runbook steps flow.",
+      "concepts": []
+    },
+    "labVersion": "The Runbook steps flow.",
+    "realWorldSources": [
+      "Incident chat",
+      "Response timeline"
+    ],
+    "accessNeeded": [
+      "The runbook and the incident"
+    ],
+    "soloRebuildPath": [
+      "Record each step",
+      "Compare with the runbook",
+      "Report deviations"
+    ],
+    "reusedBy": [
+      "resolution-record",
+      "incident-timeline"
+    ],
+    "governanceNote": "Deviations are the runbook's to-do list.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-runbook-execution",
+    "artifactName": "runbook-execution.json"
+  },
+  {
+    "id": "status-comms",
+    "label": "Status Comms",
+    "type": "output",
+    "thingOrAction": "thing",
+    "phaseId": "response",
+    "x": 520,
+    "y": 300,
+    "description": "Telling users the truth mid-incident: investigating, then resolved.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Sends to the Status Page.",
+      "concepts": []
+    },
+    "labVersion": "The Sends to the Status Page.",
+    "realWorldSources": [
+      "Status page",
+      "Customer comms"
+    ],
+    "accessNeeded": [
+      "Write access to the status page"
+    ],
+    "soloRebuildPath": [
+      "Post when it starts",
+      "Post when it ends",
+      "Say what you know"
+    ],
+    "reusedBy": [
+      "postmortem"
+    ],
+    "governanceNote": "The Status Page is an output channel, not a person.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-status-comms",
+    "artifactName": "status-comms.json"
+  },
+  {
+    "id": "resolution-record",
+    "label": "Resolution Record",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "response",
+    "x": 520,
+    "y": 410,
+    "description": "What ended it, when, by whom, and how long it took.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The resolve lane: status, resolvedMinute, mttr on the incident.",
+      "concepts": []
+    },
+    "labVersion": "The resolve lane: status, resolvedMinute, mttr on the incident.",
+    "realWorldSources": [
+      "Incident record",
+      "Ticket"
+    ],
+    "accessNeeded": [
+      "The incident"
+    ],
+    "soloRebuildPath": [
+      "Close the incident",
+      "Record the minute",
+      "Compute the time"
+    ],
+    "reusedBy": [
+      "incident-timeline",
+      "postmortem"
+    ],
+    "governanceNote": "mttr is the number the report is built on.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-resolution-record",
+    "artifactName": "resolution-record.json"
+  },
+  {
+    "id": "incident-timeline",
+    "label": "Incident Timeline",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "postmortem",
+    "x": 770,
+    "y": 80,
+    "description": "The immutable sequence: alert, page, steps, resolution.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Alert Events and Runbook Executions read by the month-end loop.",
+      "concepts": []
+    },
+    "labVersion": "The Alert Events and Runbook Executions read by the month-end loop.",
+    "realWorldSources": [
+      "Incident timeline",
+      "Chat export"
+    ],
+    "accessNeeded": [
+      "The executions"
+    ],
+    "soloRebuildPath": [
+      "Gather the steps",
+      "Count them",
+      "Keep them in order"
+    ],
+    "reusedBy": [
+      "postmortem"
+    ],
+    "governanceNote": "The timeline is evidence; it is not edited afterwards.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-incident-timeline",
+    "artifactName": "incident-timeline.json"
+  },
+  {
+    "id": "postmortem",
+    "label": "Postmortem",
+    "type": "output",
+    "thingOrAction": "thing",
+    "phaseId": "postmortem",
+    "x": 770,
+    "y": 190,
+    "description": "Timeline, impact, response, actions. Blameless by format.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Postmortems table and the month-end loop.",
+      "concepts": []
+    },
+    "labVersion": "The Postmortems table and the month-end loop.",
+    "realWorldSources": [
+      "Postmortem doc",
+      "Incident review"
+    ],
+    "accessNeeded": [
+      "The resolved incidents"
+    ],
+    "soloRebuildPath": [
+      "One per incident",
+      "Steps and time",
+      "Actions with owners"
+    ],
+    "reusedBy": [
+      "action-items",
+      "incident-archive"
+    ],
+    "governanceNote": "Blameless means the format asks what, not who.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-postmortem",
+    "artifactName": "postmortem.json"
+  },
+  {
+    "id": "action-items",
+    "label": "Action Items",
+    "type": "artifact",
+    "thingOrAction": "thing",
+    "phaseId": "postmortem",
+    "x": 770,
+    "y": 300,
+    "description": "Tracked commitments with owners and dates.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Action Items table.",
+      "concepts": []
+    },
+    "labVersion": "The Action Items table.",
+    "realWorldSources": [
+      "Issue tracker"
+    ],
+    "accessNeeded": [
+      "Owners"
+    ],
+    "soloRebuildPath": [
+      "One item per incident at least",
+      "Name the owner",
+      "Set a date"
+    ],
+    "reusedBy": [
+      "threshold-tuning"
+    ],
+    "governanceNote": "A commitment without an owner is a wish.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-action-items",
+    "artifactName": "action-items.json"
+  },
+  {
+    "id": "incident-archive",
+    "label": "Incident Archive",
+    "type": "archive",
+    "thingOrAction": "thing",
+    "phaseId": "tuning",
+    "x": 1020,
+    "y": 80,
+    "description": "Every monthly report; the evidence the thresholds are tuned from.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Reliability Archive table.",
+      "concepts": []
+    },
+    "labVersion": "The Reliability Archive table.",
+    "realWorldSources": [
+      "Report archive"
+    ],
+    "accessNeeded": [
+      "Write access"
+    ],
+    "soloRebuildPath": [
+      "Store each report",
+      "Keep the counts"
+    ],
+    "reusedBy": [
+      "alert-threshold-policy"
+    ],
+    "governanceNote": "The archive feeds the thresholds: the loop that started the curriculum, closed.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-incident-archive",
+    "artifactName": "incident-archive.json"
+  },
+  {
+    "id": "threshold-tuning",
+    "label": "Threshold Tuning",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "tuning",
+    "x": 1020,
+    "y": 190,
+    "description": "Incidents edit the thresholds: a proposal per incident, to the Service Owner.",
+    "lesson": {
+      "type": "build",
+      "status": "now",
+      "intent": "The Tuning Proposals and the message to the Service Owner.",
+      "concepts": []
+    },
+    "labVersion": "The Tuning Proposals and the message to the Service Owner.",
+    "realWorldSources": [
+      "Alert review",
+      "SLO review"
+    ],
+    "accessNeeded": [
+      "The Service Owner"
+    ],
+    "soloRebuildPath": [
+      "Propose from evidence",
+      "Send to the owner",
+      "Version the change"
+    ],
+    "reusedBy": [],
+    "governanceNote": "The learner is now the mechanism that sets thresholds, from evidence.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-threshold-tuning",
+    "artifactName": "threshold-tuning.json"
+  },
+  {
+    "id": "run-operations",
+    "label": "Platform Run Operations",
+    "type": "process",
+    "thingOrAction": "action",
+    "phaseId": "tuning",
+    "x": 1020,
+    "y": 300,
+    "description": "The system that watches the systems must survive its own failures: storms, runbooks that lie, pages nobody answers.",
+    "lesson": {
+      "type": "governance",
+      "status": "now",
+      "intent": "Keep the watcher alive through storms, stale runbooks and silence.",
+      "concepts": [
+        "Storm control",
+        "Deviation reporting",
+        "Escalation ladder"
+      ]
+    },
+    "labVersion": "Built by you in Months 2 and 3.",
+    "realWorldSources": [
+      "On-call escalation policy",
+      "Alert grouping config"
+    ],
+    "accessNeeded": [
+      "The incidents table",
+      "The escalation ladder"
+    ],
+    "soloRebuildPath": [
+      "Deduplicate",
+      "Report deviations",
+      "Climb the ladder"
+    ],
+    "reusedBy": [],
+    "governanceNote": "Automation about automation still needs an operator, and a way to reach one.",
+    "auditNote": "Authored for the runnable-flow build of Watchtower (2026-09-30).",
+    "taskId": "lesson-run-operations",
+    "artifactName": "escalation-policy.json",
+    "skeletonStage": "operate"
+  }
+]

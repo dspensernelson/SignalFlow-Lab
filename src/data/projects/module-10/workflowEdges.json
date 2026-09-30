@@ -1,0 +1,122 @@
+[
+  {
+    "from": "telemetry-stream",
+    "to": "alert-event",
+    "label": "samples"
+  },
+  {
+    "from": "alert-threshold-policy",
+    "to": "alert-event",
+    "label": "limits"
+  },
+  {
+    "from": "alert-event",
+    "to": "dedup-window",
+    "label": "crossings"
+  },
+  {
+    "from": "dedup-window",
+    "to": "severity-decision",
+    "label": "new incidents"
+  },
+  {
+    "from": "severity-matrix",
+    "to": "severity-decision",
+    "label": "severity"
+  },
+  {
+    "from": "severity-decision",
+    "to": "paging-handoff",
+    "label": "pages"
+  },
+  {
+    "from": "severity-decision",
+    "to": "watch-log",
+    "label": "below the band"
+  },
+  {
+    "from": "paging-handoff",
+    "to": "runbook-execution",
+    "label": "responder"
+  },
+  {
+    "from": "runbook-library",
+    "to": "runbook-execution",
+    "label": "steps"
+  },
+  {
+    "from": "runbook-execution",
+    "to": "resolution-record",
+    "label": "resolve"
+  },
+  {
+    "from": "paging-handoff",
+    "to": "status-comms",
+    "label": "investigating"
+  },
+  {
+    "from": "resolution-record",
+    "to": "status-comms",
+    "label": "resolved"
+  },
+  {
+    "from": "runbook-execution",
+    "to": "incident-timeline",
+    "label": "steps taken"
+  },
+  {
+    "from": "resolution-record",
+    "to": "incident-timeline",
+    "label": "closed"
+  },
+  {
+    "from": "incident-timeline",
+    "to": "postmortem",
+    "label": "timeline"
+  },
+  {
+    "from": "watch-log",
+    "to": "postmortem",
+    "label": "context"
+  },
+  {
+    "from": "status-comms",
+    "to": "postmortem",
+    "label": "what users were told"
+  },
+  {
+    "from": "postmortem",
+    "to": "action-items",
+    "label": "commitments"
+  },
+  {
+    "from": "postmortem",
+    "to": "incident-archive",
+    "label": "archived"
+  },
+  {
+    "from": "action-items",
+    "to": "threshold-tuning",
+    "label": "review"
+  },
+  {
+    "from": "incident-archive",
+    "to": "threshold-tuning",
+    "label": "evidence"
+  },
+  {
+    "from": "incident-archive",
+    "to": "alert-threshold-policy",
+    "label": "tunes"
+  },
+  {
+    "from": "paging-handoff",
+    "to": "run-operations",
+    "label": "ladder"
+  },
+  {
+    "from": "incident-archive",
+    "to": "run-operations",
+    "label": "run history"
+  }
+]

@@ -33,10 +33,11 @@ The earlier worksheet lessons are retired; git history has them.
 3. DONE - Meridian (module-01) as flows; the worksheet path (lesson
    workspace, validators, lesson lints) is removed.
 4. DONE - Relay (module-04), Ledger (module-05), Compass (module-06),
-   Depot (module-07), Sentinel (module-08) and Studio (module-09) as flows.
-5. Module 10 as flows, in order, from their charters in
-   curriculum/charters/. A charter's map and scenario carry over; its
-   interaction-type notes do not.
+   Depot (module-07), Sentinel (module-08), Studio (module-09) and
+   Watchtower (module-10) as flows. The build phase is complete.
+5. Next: whatever the owner picks up from OPEN_QUESTIONS.md (the capstone
+   authoring surface, module order in the switcher) and polish found by
+   walking modules as a learner.
 
 ## Standing rules
 

@@ -1,0 +1,377 @@
+{
+  "_comment": "Canon for a runnable-flow module, enforced by scripts/lint-flows.mjs. Flow modules have no per-lesson answer keys to drift apart; what can drift is the world data (sources and seeds) and the reference solution that proves every build. So each assertion is checked against the raw day data (kind data) or against the reference solution's run of the whole module (kinds record and store), with every day's stores carried into the next. Change a number in the data and the canon names every fact that moved. The pre-port per-lesson assertions are in git history. ASCII only.",
+  "module": "module-10",
+  "format": "flows",
+  "assertions": [
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "service": "api",
+        "metric": "latency"
+      },
+      "field": "limit",
+      "equals": 500,
+      "seed": "alert-thresholds"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "service": "db",
+        "metric": "errorPct"
+      },
+      "field": "limit",
+      "equals": 5,
+      "seed": "alert-thresholds"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "impact": "high",
+        "scope": "all"
+      },
+      "field": "severity",
+      "equals": "SEV1",
+      "seed": "severity-matrix"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "impact": "low",
+        "scope": "some"
+      },
+      "field": "page",
+      "equals": false,
+      "seed": "severity-matrix"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "service": "db",
+        "step": 2
+      },
+      "field": "action",
+      "equals": "restart the replica",
+      "seed": "runbook-library"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "sampleId": "T-101"
+      },
+      "field": "value",
+      "equals": 850,
+      "source": "telemetry"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "sampleId": "T-103"
+      },
+      "field": "value",
+      "equals": 0.4,
+      "source": "telemetry"
+    },
+    {
+      "kind": "data",
+      "day": "day-1",
+      "where": {
+        "actionId": "A-103"
+      },
+      "field": "minute",
+      "equals": 32,
+      "source": "responder-actions"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "alert-events",
+      "where": {},
+      "count": 2
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "incidents",
+      "where": {
+        "incidentId": "api-latency-10"
+      },
+      "field": "severity",
+      "equals": "SEV2"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "incidents",
+      "where": {
+        "incidentId": "api-latency-10"
+      },
+      "field": "mttr",
+      "equals": 22
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "incidents",
+      "where": {
+        "incidentId": "api-latency-10"
+      },
+      "field": "status",
+      "equals": "closed"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "incidents",
+      "where": {
+        "incidentId": "web-errorPct-10"
+      },
+      "field": "status",
+      "equals": "open"
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "watch-log",
+      "where": {},
+      "count": 1
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "executions",
+      "where": {
+        "incidentId": "api-latency-10"
+      },
+      "count": 3
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "postmortems",
+      "where": {
+        "incidentId": "api-latency-10"
+      },
+      "field": "stepsTaken",
+      "equals": 3
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "action-items",
+      "where": {
+        "incidentId": "api-latency-10"
+      },
+      "field": "dueDay",
+      "equals": 14
+    },
+    {
+      "kind": "store",
+      "day": "day-1",
+      "store": "tuning-proposals",
+      "where": {
+        "service": "api"
+      },
+      "field": "limit",
+      "equals": 500
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run Month end",
+      "field": "incidents",
+      "equals": 1,
+      "flow": "postmortem-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-1",
+      "label": "Scheduled run Month end",
+      "field": "totalMttr",
+      "equals": 22,
+      "flow": "postmortem-flow"
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "sampleId": "T-203"
+      },
+      "field": "value",
+      "equals": 8.0,
+      "source": "telemetry"
+    },
+    {
+      "kind": "data",
+      "day": "day-2",
+      "where": {
+        "actionId": "A-202"
+      },
+      "field": "outcome",
+      "equals": "deviated",
+      "source": "responder-actions"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "alert-events",
+      "where": {},
+      "count": 5
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "incidents",
+      "where": {
+        "service": "db"
+      },
+      "count": 1
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "incidents",
+      "where": {
+        "incidentId": "db-errorPct-20"
+      },
+      "field": "alertCount",
+      "equals": 5
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "incidents",
+      "where": {
+        "incidentId": "db-errorPct-20"
+      },
+      "field": "severity",
+      "equals": "SEV1"
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "incidents",
+      "where": {
+        "incidentId": "db-errorPct-20"
+      },
+      "field": "mttr",
+      "equals": 25
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "deviations",
+      "where": {},
+      "count": 1
+    },
+    {
+      "kind": "store",
+      "day": "day-2",
+      "store": "deviations",
+      "where": {
+        "actionId": "A-202"
+      },
+      "field": "step",
+      "equals": 2
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "T-205",
+      "field": "alertCount",
+      "equals": 5,
+      "flow": "telemetry-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "Scheduled run Month end",
+      "field": "incidents",
+      "equals": 1,
+      "flow": "postmortem-flow"
+    },
+    {
+      "kind": "record",
+      "day": "day-2",
+      "label": "Scheduled run Month end",
+      "field": "totalMttr",
+      "equals": 25,
+      "flow": "postmortem-flow"
+    },
+    {
+      "kind": "data",
+      "day": "day-3",
+      "where": {
+        "sampleId": "T-301"
+      },
+      "field": "minute",
+      "equals": 5,
+      "source": "telemetry"
+    },
+    {
+      "kind": "data",
+      "day": "day-3",
+      "where": {
+        "actionId": "A-302"
+      },
+      "field": "minute",
+      "equals": 40,
+      "source": "responder-actions"
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "incidents",
+      "where": {
+        "incidentId": "api-latency-5"
+      },
+      "field": "pagedTo",
+      "equals": "Incident Commander"
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "incidents",
+      "where": {
+        "incidentId": "api-latency-5"
+      },
+      "field": "mttr",
+      "equals": 35
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "postmortems",
+      "where": {},
+      "count": 3
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "action-items",
+      "where": {},
+      "count": 3
+    },
+    {
+      "kind": "store",
+      "day": "day-3",
+      "store": "reliability-archive",
+      "where": {},
+      "count": 3
+    },
+    {
+      "kind": "record",
+      "day": "day-3",
+      "label": "Scheduled run Month end",
+      "field": "totalMttr",
+      "equals": 35,
+      "flow": "postmortem-flow"
+    }
+  ]
+}

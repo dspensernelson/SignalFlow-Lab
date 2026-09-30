@@ -168,6 +168,20 @@
         "archive": "Campaign Archive",
         "operate": "Campaign Run Operations"
       }
+    },
+    "module-10": {
+      "org": "Watchtower",
+      "deliverable": "postmortems and the reliability report",
+      "map": {
+        "intake": "Alert Event",
+        "reference": "Alert Thresholds",
+        "transform": "Dedup Window",
+        "decision": "Severity Decision",
+        "handoff": "Paging Handoff",
+        "assembly": "Postmortem",
+        "archive": "Incident Archive",
+        "operate": "Platform Run Operations"
+      }
     }
   }
 }

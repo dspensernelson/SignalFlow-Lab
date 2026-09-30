@@ -33,9 +33,11 @@ as Power Automate, Make, n8n, Zapier or Python, and exported.
 | 7 - Depot Order Flow | Runnable flows: 8 builds, 3 days |
 | 8 - Sentinel Evidence Locker | Runnable flows: 8 builds, 3 days |
 | 9 - Studio Campaign Ops | Runnable flows: 8 builds, 3 days |
-| 10 | Chartered in `curriculum/charters/`, not built |
+| 10 - Watchtower Incident Response | Runnable flows: 8 builds, 3 days |
 
-The worksheet lessons are retired; every module is a flow module.
+The worksheet lessons are retired; every module is a flow module. All ten
+modules are built. The charter's design-your-own-workflow capstone is parked
+in OPEN_QUESTIONS.md.
 
 - Start here: `BUILDER_KICKOFF.md`, then `FLOW_MODULE_PLAYBOOK.md`.
 - Code: `src/runtime/` (engine, expressions, checks, tool skins, Python

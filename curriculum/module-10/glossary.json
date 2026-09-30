@@ -1,0 +1,83 @@
+{
+  "note": "Terms module-10 introduces, and the build that teaches each. Enforced by scripts/lint-glossary.mjs. Keep ASCII-only.",
+  "module": "module-10",
+  "terms": [
+    {
+      "term": "telemetry",
+      "aliases": [
+        "sample",
+        "samples"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The stream of measurements a system reports about itself, every minute. Almost all of it is fine; thresholds pick out the rest."
+    },
+    {
+      "term": "threshold",
+      "aliases": [
+        "limit",
+        "alert threshold"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The value at which a measurement becomes an alert. Owned, versioned, and edited by the incidents it causes."
+    },
+    {
+      "term": "severity",
+      "aliases": [
+        "SEV1",
+        "SEV2",
+        "SEV3",
+        "SEV4",
+        "severity matrix"
+      ],
+      "teachesIn": "b1",
+      "gloss": "How bad an incident is, from impact and scope, and whether it wakes someone up. A grid, not a feeling."
+    },
+    {
+      "term": "page",
+      "aliases": [
+        "paged",
+        "paging",
+        "acknowledge",
+        "ack"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Reaching a human now. A page is not handled until it is acknowledged; unacknowledged pages climb a ladder."
+    },
+    {
+      "term": "runbook",
+      "aliases": [
+        "runbooks",
+        "deviation",
+        "deviated"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The numbered steps a responder follows. When a step does not match reality, that is a deviation - and the runbook's to-do list."
+    },
+    {
+      "term": "postmortem",
+      "aliases": [
+        "postmortems",
+        "action item"
+      ],
+      "teachesIn": "b1",
+      "gloss": "The write-up after an incident: timeline, impact, response, and commitments with owners. Blameless by format."
+    },
+    {
+      "term": "mttr",
+      "aliases": [
+        "time to resolve"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Minutes from the alert that opened an incident to the step that resolved it."
+    },
+    {
+      "term": "alert storm",
+      "aliases": [
+        "storm",
+        "dedup"
+      ],
+      "teachesIn": "b1",
+      "gloss": "Many alerts for one problem. Deduplication attaches them to the open incident so one engineer is paged once."
+    }
+  ]
+}

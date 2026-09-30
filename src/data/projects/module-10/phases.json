@@ -1,0 +1,85 @@
+[
+  {
+    "id": "telemetry",
+    "order": 1,
+    "title": "Phase 1: Telemetry and Thresholds",
+    "goal": "Turn a stream of samples into the few alerts that matter, once each.",
+    "statusSource": "alert-event",
+    "nodeIds": [
+      "telemetry-stream",
+      "alert-threshold-policy",
+      "alert-event",
+      "dedup-window"
+    ],
+    "artifactNames": [
+      "alert-events.json"
+    ],
+    "unlocks": "Alerts ready to classify."
+  },
+  {
+    "id": "triage",
+    "order": 2,
+    "title": "Phase 2: Detection and Triage",
+    "goal": "Classify each alert and page a human only above the band.",
+    "statusSource": "severity-decision",
+    "nodeIds": [
+      "severity-matrix",
+      "severity-decision",
+      "paging-handoff",
+      "watch-log"
+    ],
+    "artifactNames": [
+      "incidents.json"
+    ],
+    "unlocks": "Incidents with someone on them."
+  },
+  {
+    "id": "response",
+    "order": 3,
+    "title": "Phase 3: Runbook Response",
+    "goal": "Follow the runbook, tell users the truth, close the incident.",
+    "statusSource": "runbook-execution",
+    "nodeIds": [
+      "runbook-library",
+      "runbook-execution",
+      "status-comms",
+      "resolution-record"
+    ],
+    "artifactNames": [
+      "executions.json"
+    ],
+    "unlocks": "Resolved incidents with timelines."
+  },
+  {
+    "id": "postmortem",
+    "order": 4,
+    "title": "Phase 4: Postmortem",
+    "goal": "Write it up, blameless, with commitments.",
+    "statusSource": "postmortem",
+    "nodeIds": [
+      "incident-timeline",
+      "postmortem",
+      "action-items"
+    ],
+    "artifactNames": [
+      "postmortem.md"
+    ],
+    "unlocks": "Evidence for tuning."
+  },
+  {
+    "id": "tuning",
+    "order": 5,
+    "title": "Phase 5: Tuning",
+    "goal": "Let the incidents edit the thresholds.",
+    "statusSource": "threshold-tuning",
+    "nodeIds": [
+      "incident-archive",
+      "threshold-tuning",
+      "run-operations"
+    ],
+    "artifactNames": [
+      "reliability-report.md"
+    ],
+    "unlocks": "Fewer incidents next month."
+  }
+]

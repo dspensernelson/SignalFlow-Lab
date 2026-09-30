@@ -15,7 +15,27 @@ Entry format:
 - Parked: what work is waiting on this
 ```
 
-(No open questions at this time.)
+## 2026-09-30 The Watchtower capstone (design-your-own-workflow)
+- Doing: Watchtower (module-10) built as runnable flows; its charter also
+  asks for a hard finale where the learner authors a workflow for an unseen
+  domain (map, canon, policies, artifacts) on an authoring surface.
+- Blocked on: whether that surface is wanted in the flow-builder product.
+  The charter's fallback (choiceCheck + jsonEditor lessons) is worksheet
+  machinery, which is retired.
+- Options: (a) skip it - ten modules of build-run-break is the product
+  (recommended); (b) a "blank module" build: the learner picks sources,
+  stores and flows from a brief and the checks are business facts, as in
+  every other build - one to two sessions of engine work; (c) the guided
+  paper version, rebuilt on the flow builder.
+- Parked: nothing; the module is complete without it.
+
+## 2026-09-30 Module order in the switcher
+- Doing: the switcher lists Beacon first (the first module built as flows),
+  then Harbor, then Meridian, then 4-10.
+- Blocked on: whether Meridian should come first (charter order) now that
+  it is a flow module too.
+- Options: (a) charter order 1-10 (recommended); (b) keep Beacon first.
+- Parked: nothing; a one-line change in src/App.jsx FLOW_MODULE_LOADERS.
 
 ---
 

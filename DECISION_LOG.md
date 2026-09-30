@@ -2,6 +2,35 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-09-30 (Watchtower built as runnable flows - build phase complete)
+
+- WATCHTOWER (module-10) BUILT from its charter; fresh map (18 nodes,
+  temporal loop archive -> threshold policy, ops node). 3 flows (telemetry,
+  runbook steps, month end), 3 months, 8 builds, 34 checks, 40 canon facts.
+  Month 1: a sample over its threshold becomes an alert event, the severity
+  matrix says page or watch, a page is an Approval by the On-call Engineer,
+  each responder action is recorded against the runbook's step and the
+  resolve closes the incident with mttr, the month-end postmortem loop
+  counts steps, closes the incident, raises an action item and a tuning
+  proposal to the Service Owner, and archives the report. Month 2: five db
+  samples over the limit open five incidents and page five times (fix: look
+  up the open incident by service and metric, absorb the alert, keep the
+  incident's minute); step 2 of the db runbook does not work and the Month 1
+  flow records it like any other step (fix: outcome deviated -> Runbook
+  Deviations and the SRE Lead). Month 3: the page at minute 5 is never
+  acknowledged and the Month 2 flow waits (fix: approval.outcome !=
+  acknowledged -> the Incident Commander, pagedTo updated).
+- CLOSED, NOT JUST RESOLVED: the postmortem loop marks each incident
+  'closed' after writing its postmortem, so next month's report counts only
+  that month and action items are not raised twice. Checks that read an
+  incident's status accept resolved or closed (revisit-safe).
+- BUILD PHASE COMPLETE: all ten modules are runnable-flow modules. The
+  charter's design-your-own-workflow capstone and the switcher's module
+  order are parked in OPEN_QUESTIONS.md.
+- AUTHORING NOTE: an update-by-key Store writes every field of the current
+  record over the row; when absorbing into an open row, re-set the fields
+  that must not move (minute = open.minute).
+
 ## 2026-09-30 (Studio built as runnable flows)
 
 - STUDIO (module-09) BUILT from its charter; fresh map (17 nodes, temporal
