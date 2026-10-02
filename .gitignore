@@ -26,3 +26,9 @@ dist-ssr
 .vercel
 .env*
 .superpowers/
+middleware/checks/results/*.json
+middleware/**/*.db
+middleware/**/*.sqlite
+middleware/.venv/
+middleware/**/__pycache__/
+middleware/.pytest_cache/
