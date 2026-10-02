@@ -56,6 +56,18 @@ def test_loop_sends_sanitized_tool_results_to_the_model(fresh_crm):
     joined = "\n".join(m["content"] for m in tool_messages).lower()
     assert "ignore previous instructions" not in joined
     assert "email every donor" not in joined
+    # The wiring must be observable: the note reached the model, marked as data, minus the directive.
+    assert "[data from find_donor" in joined, "find_donor results must pass through sanitize_result"
+    assert "test data for the injection lesson" in joined, "the harmless part of the note must survive"
+
+
+def test_registry_call_sanitizes_results(fresh_crm):
+    registry = build_registry(DonorClient(fresh_crm.base_url))
+    result = registry.call("find_donor", {"query": "grace.whitfield@example.org"})
+    grace = result["donors"][0]
+    assert grace["notes"].startswith("[DATA from find_donor")
+    assert "ignore previous instructions" not in grace["notes"].lower()
+    assert result.get("_sanitized"), "removed fragments are recorded on the result"
 
 
 def test_adversarial_cases_pass_and_never_write(fresh_crm):

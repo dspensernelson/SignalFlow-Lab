@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Badge, Button, Card, Chip, Icon, SectionLabel, Stepper } from '../ui'
 import ConceptPanel from './ConceptPanel'
 import Workbench from './Workbench'
@@ -31,8 +31,14 @@ export default function LessonView({
   nextLessonId,
   nextStatus,
   onOpenLesson,
+  onStepChange,
 }) {
   const [step, setStep] = useState('concept') // 'concept' | 'workbench' | 'finish'
+
+  // The shell bounds the page only on the workbench step.
+  useEffect(() => {
+    if (onStepChange) onStepChange(step)
+  }, [step, onStepChange])
 
   const isLastInModule = moduleLessons[moduleLessons.length - 1]?.id === lesson.id
   const lessonExplain = lesson.check.kind === 'explain' ? { key: lesson.id, data: lesson.explainIt } : null

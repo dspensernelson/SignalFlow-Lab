@@ -51,6 +51,7 @@ def test_handlers_work_against_the_crm(fresh_crm):
     assert set(registry.tools) == set(TOOL_NAMES)
     found = registry.tools["find_donor"].handler(registry.tools["find_donor"].input_model(query="alvarez"))
     assert found["matches"] == 2 and {d["id"] for d in found["donors"]} == {1, 2}
+    assert all({"id", "name", "email", "notes"} <= set(d) for d in found["donors"])
     history = registry.tools["get_donation_history"].handler(
         registry.tools["get_donation_history"].input_model(donor_id=1, since="2025-04-01")
     )

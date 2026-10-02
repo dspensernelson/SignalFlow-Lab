@@ -17,6 +17,8 @@ import {
   moduleSummary,
   frontierLessonId,
   normalizeProgress,
+  applyCheckResults,
+  markReset,
 } from '../src/lib/middlewareProgress.js'
 
 const ORDER = ['m0-1-a', 'm0-2-b', 'm0-3-c', 'm1-1-d']
@@ -112,11 +114,45 @@ test('module summary counts passed and skipped lessons', () => {
   assert.deepEqual(s, { passed: 1, skipped: 1, total: 3, done: 2 })
 })
 
+test('a passing result for a locked lesson is ignored (sequential order holds)', () => {
+  const p = markPassed(emptyProgress(), 'm0-3-c', { checkedAt: 'now' }, ORDER)
+  assert.equal(p.lessons['m0-3-c'], undefined)
+  assert.equal(deriveLessonStatus(p, 'm0-3-c', ORDER), 'locked')
+})
+
+test('applyCheckResults folds a batch: pass upgrades ready, fail records, locked ignored', () => {
+  const results = {
+    'm0-1-a': { lessonId: 'm0-1-a', passed: true, timestamp: '2026-10-02T10:00:00Z', failing: [] },
+    'm0-2-b': { lessonId: 'm0-2-b', passed: false, timestamp: '2026-10-02T10:01:00Z', failing: ['t'] },
+    'm0-3-c': { lessonId: 'm0-3-c', passed: true, timestamp: '2026-10-02T10:02:00Z', failing: [] },
+    'nope': { lessonId: 'nope', passed: true, timestamp: '2026-10-02T10:03:00Z', failing: [] },
+  }
+  const p = applyCheckResults(emptyProgress(), results, ORDER)
+  assert.equal(deriveLessonStatus(p, 'm0-1-a', ORDER), 'passed')
+  assert.equal(deriveLessonStatus(p, 'm0-2-b', ORDER), 'failed')
+  assert.equal(deriveLessonStatus(p, 'm0-3-c', ORDER), 'locked', 'm0-3 stays locked until m0-2 is done')
+  assert.equal(p.lessons.nope, undefined)
+})
+
+test('results older than the last reset are ignored, newer ones apply', () => {
+  let p = markPassed(emptyProgress(), 'm0-1-a', { checkedAt: '2026-10-02T10:00:00Z' }, ORDER)
+  p = markReset(p, '2026-10-02T11:00:00Z')
+  assert.deepEqual(p.lessons, {})
+  assert.equal(p.resetAt, '2026-10-02T11:00:00Z')
+  const stale = { 'm0-1-a': { lessonId: 'm0-1-a', passed: true, timestamp: '2026-10-02T10:00:00Z', failing: [] } }
+  assert.equal(deriveLessonStatus(applyCheckResults(p, stale, ORDER), 'm0-1-a', ORDER), 'ready')
+  const fresh = { 'm0-1-a': { lessonId: 'm0-1-a', passed: true, timestamp: '2026-10-02T12:00:00Z', failing: [] } }
+  assert.equal(deriveLessonStatus(applyCheckResults(p, fresh, ORDER), 'm0-1-a', ORDER), 'passed')
+  const undated = { 'm0-1-a': { lessonId: 'm0-1-a', passed: true, timestamp: null, failing: [] } }
+  assert.equal(deriveLessonStatus(applyCheckResults(p, undated, ORDER), 'm0-1-a', ORDER), 'ready', 'an undated result cannot prove it is newer than the reset')
+  assert.deepEqual(normalizeProgress(p).resetAt, '2026-10-02T11:00:00Z')
+})
+
 test('normalizeProgress repairs a missing or foreign shape', () => {
   assert.deepEqual(normalizeProgress(null), emptyProgress())
   assert.deepEqual(normalizeProgress({ version: 1, lessons: 'nope' }), emptyProgress())
   const ok = { version: 1, lessons: { 'm0-1-a': { status: 'passed' } }, explainIt: {} }
-  assert.deepEqual(normalizeProgress(ok), ok)
+  assert.deepEqual(normalizeProgress(ok), { ...ok, resetAt: null })
 })
 
 console.log(`\n${passed} middleware progress tests passed.`)

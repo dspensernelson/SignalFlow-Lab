@@ -25,6 +25,7 @@ dist-ssr
 
 .vercel
 .env*
+!middleware/.env.example
 .superpowers/
 middleware/checks/results/*.json
 middleware/**/*.db

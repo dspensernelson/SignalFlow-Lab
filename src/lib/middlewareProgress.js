@@ -27,7 +27,7 @@ export const LESSON_STATUS = {
 const TERMINAL = new Set([LESSON_STATUS.PASSED, LESSON_STATUS.SKIPPED, LESSON_STATUS.FAILED])
 
 export function emptyProgress() {
-  return { version: 1, lessons: {}, explainIt: {} }
+  return { version: 1, lessons: {}, explainIt: {}, resetAt: null }
 }
 
 // Repairs anything that is not the expected shape (missing key, old
@@ -46,7 +46,8 @@ export function normalizeProgress(raw) {
   Object.entries(raw.lessons).forEach(([id, entry]) => {
     if (entry && typeof entry === 'object' && TERMINAL.has(entry.status)) lessons[id] = entry
   })
-  return { version: 1, lessons, explainIt }
+  const resetAt = typeof raw.resetAt === 'string' ? raw.resetAt : null
+  return { version: 1, lessons, explainIt, resetAt }
 }
 
 export function loadMiddlewareProgress() {
@@ -100,7 +101,10 @@ function withLesson(progress, lessonId, entry) {
   }
 }
 
-export function markPassed(progress, lessonId, { checkedAt } = {}) {
+// A pass on a lesson the learner cannot reach yet is ignored when `order` is
+// given, so an out-of-order result file never jumps the sequence.
+export function markPassed(progress, lessonId, { checkedAt } = {}, order) {
+  if (order && deriveLessonStatus(progress, lessonId, order) === LESSON_STATUS.LOCKED) return progress
   return withLesson(progress, lessonId, {
     status: LESSON_STATUS.PASSED,
     checkedAt: checkedAt || new Date().toISOString(),
@@ -140,6 +144,27 @@ export function markSkipped(progress, lessonId, order = []) {
     skippedAt: new Date().toISOString(),
     failingTests: current?.failingTests || [],
   })
+}
+
+// "Reset track": forget every lesson state and answer, and remember WHEN, so
+// result files still on disk from before the reset cannot re-mark lessons.
+export function markReset(progress, at) {
+  return { ...emptyProgress(), resetAt: at || new Date().toISOString() }
+}
+
+// Fold a batch of check results (keyed by lesson id) into progress. Results
+// dated at or before the last reset, or undated after a reset, are ignored;
+// passes and failures both respect the lesson order.
+export function applyCheckResults(progress, results, order) {
+  let next = progress
+  Object.values(results || {}).forEach((r) => {
+    if (!r || typeof r.lessonId !== 'string' || !order.includes(r.lessonId)) return
+    if (next.resetAt && (!r.timestamp || r.timestamp <= next.resetAt)) return
+    next = r.passed
+      ? markPassed(next, r.lessonId, { checkedAt: r.timestamp || undefined }, order)
+      : markFailed(next, r.lessonId, r.failing, r.timestamp || undefined, order)
+  })
+  return next
 }
 
 export function saveExplain(progress, key, answers) {

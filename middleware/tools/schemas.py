@@ -96,7 +96,8 @@ def build_registry(client: DonorClient) -> ToolRegistry:
 
     Handlers (plain dict results; a Donor becomes ``donor.model_dump()``):
 
-    - find_donor -> {"matches": n, "donors": [{id, name, email}, ...]}
+    - find_donor -> {"matches": n, "donors": [{id, name, email, notes}, ...]}
+      (notes is the staff note on the record; Module 6 sanitizes it)
     - get_donation_history -> {"donor_id": id, "donations": [donation dicts]}
       filtered to ``received_at >= since`` when ``since`` is given
     - create_receipt -> POST {CRM_URL}/receipts {donation_id, sent_to}

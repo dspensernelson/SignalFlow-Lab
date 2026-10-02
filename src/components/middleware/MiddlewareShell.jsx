@@ -18,8 +18,9 @@ import {
   clearMiddlewareProgress,
   deriveLessonStatus,
   markPassed,
-  markFailed,
   markSkipped,
+  markReset,
+  applyCheckResults,
   saveExplain,
   frontierLessonId,
   LESSON_STATUS,
@@ -35,6 +36,7 @@ export default function MiddlewareShell({ theme, onToggleTheme, track, onTrackCh
   const [view, setView] = useState('home') // 'home' | 'module' | 'lesson'
   const [activeModuleId, setActiveModuleId] = useState(null)
   const [activeLessonId, setActiveLessonId] = useState(null)
+  const [lessonStep, setLessonStep] = useState('concept') // reported by LessonView; only 'workbench' is bounded
   const [progress, setProgress] = useState(() => loadMiddlewareProgress())
   const [checks, setChecks] = useState({ mode: 'idle', results: {}, fetchedAt: null })
 
@@ -42,19 +44,10 @@ export default function MiddlewareShell({ theme, onToggleTheme, track, onTrackCh
     saveMiddlewareProgress(progress)
   }, [progress])
 
-  // Fold a batch of check results into progress: a pass upgrades, a fail is
-  // recorded without ever downgrading a passed lesson.
+  // Fold a batch of check results into progress (pure, tested in
+  // scripts/test-middleware-progress.mjs): order and the last reset are honored.
   const applyResults = useCallback((results) => {
-    setProgress((prev) => {
-      let next = prev
-      Object.values(results).forEach((r) => {
-        if (!LESSONS[r.lessonId]) return
-        next = r.passed
-          ? markPassed(next, r.lessonId, { checkedAt: r.timestamp || undefined })
-          : markFailed(next, r.lessonId, r.failing, r.timestamp || undefined, LESSON_ORDER)
-      })
-      return next
-    })
+    setProgress((prev) => applyCheckResults(prev, results, LESSON_ORDER))
   }, [])
 
   // State is only set after the fetch resolves (never synchronously in the
@@ -103,6 +96,7 @@ export default function MiddlewareShell({ theme, onToggleTheme, track, onTrackCh
     if (statusOf(lessonId) === LESSON_STATUS.LOCKED) return
     setActiveModuleId(lesson.module)
     setActiveLessonId(lessonId)
+    setLessonStep('concept')
     setView('lesson')
   }
 
@@ -139,7 +133,7 @@ export default function MiddlewareShell({ theme, onToggleTheme, track, onTrackCh
     )
     if (!confirmed) return
     clearMiddlewareProgress()
-    setProgress(loadMiddlewareProgress())
+    setProgress(markReset(loadMiddlewareProgress()))
     goHome()
   }
 
@@ -150,7 +144,9 @@ export default function MiddlewareShell({ theme, onToggleTheme, track, onTrackCh
 
   const activeModule = activeModuleId ? MODULE_BY_ID[activeModuleId] : null
   const activeLesson = activeLessonId ? LESSONS[activeLessonId] : null
-  const workbenchMode = view === 'lesson'
+  // Only the Workbench step is bounded (the no-scroll rule); Concept and the
+  // finish step may scroll.
+  const workbenchMode = view === 'lesson' && lessonStep === 'workbench'
 
   const crumbs = [{ label: TRACK.name, onClick: view === 'home' ? null : goHome }]
   if (activeModule && view !== 'home') {
@@ -210,6 +206,7 @@ export default function MiddlewareShell({ theme, onToggleTheme, track, onTrackCh
             nextLessonId={nextLessonId(activeLesson.id)}
             onOpenLesson={openLesson}
             nextStatus={nextLessonId(activeLesson.id) ? statusOf(nextLessonId(activeLesson.id)) : null}
+            onStepChange={setLessonStep}
           />
         )}
       </main>

@@ -61,27 +61,8 @@ def build_server(client: DonorClient | None = None, **server_kwargs) -> MCPServe
     ``token_verifier`` and ``auth`` from the HTTP app. Lesson m3-3 adds the
     approval gate (see tools/approvals.py) and two approval tools.
     """
-    from mcp_server.resources import register_resources
-    from tools.schemas import CreateReceiptInput, FindDonorInput, GetDonationHistoryInput
-
-    client = client or default_client()
-    registry: ToolRegistry = build_registry(client)
-    server = MCPServer(SERVER_NAME, version=SERVER_VERSION, instructions=INSTRUCTIONS)
-
-    @server.tool(description=FindDonorInput.__doc__)
-    def find_donor(query: str) -> dict:
-        return registry.call("find_donor", {"query": query})
-
-    @server.tool(description=GetDonationHistoryInput.__doc__)
-    def get_donation_history(donor_id: int, since: date | None = None) -> dict:
-        return registry.call("get_donation_history", {"donor_id": donor_id, "since": since.isoformat() if since else None})
-
-    @server.tool(description=CreateReceiptInput.__doc__)
-    def create_receipt(donation_id: int, sent_to: str, format: Literal["email", "pdf"] = "email") -> dict:
-        return registry.call("create_receipt", {"donation_id": donation_id, "sent_to": sent_to, "format": format})
-
-    register_resources(server, client)
-    return server
+    registry: ToolRegistry = build_registry(client or default_client())  # noqa: F841 - used by your tools
+    raise NotImplementedError("Lesson m2-2: implement build_server in mcp_server/server.py")
 
 
 def main() -> None:

@@ -30,8 +30,8 @@ def test_decorator_backs_off_exponentially_with_jitter():
     assert flaky() == "ok"
     assert calls["n"] == 3 and flaky.last_attempts == 3
     assert len(delays) == 2
+    # jitter is on: only the ranges are deterministic (growth is proven in the no-jitter test below)
     assert 0.1 <= delays[0] <= 0.3 and 0.2 <= delays[1] <= 0.6, delays
-    assert delays[1] > delays[0] * 0.9
 
 
 def test_decorator_gives_up_after_max_attempts_and_reraises():
@@ -82,7 +82,7 @@ def test_timeout_then_500_then_ok_succeeds_on_third_attempt(fresh_payments, monk
     assert result["confirmed"] is True and result["attempt"] == 3
     assert client.last_attempts == 3
     assert httpx.get(f"{fresh_payments.base_url}/_attempts").json()["evt_retry_1"] == 3
-    assert len(delays) == 2 and delays[1] >= delays[0] * 0.9
+    assert len(delays) == 2 and 0.1 <= delays[0] <= 0.3 and 0.2 <= delays[1] <= 0.6, delays
 
 
 def test_bad_request_is_not_retried(fresh_payments):
