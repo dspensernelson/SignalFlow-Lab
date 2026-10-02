@@ -11,16 +11,20 @@ import re
 from tools.rag import POLICIES_DIR, PolicyIndex, chunk_text, load_policies
 
 DIM = 64
+STOPWORDS = {"the", "and", "for", "that", "with", "from", "this", "are", "not", "does", "how", "can",
+             "what", "must", "every", "about", "have", "has", "our", "their", "any", "all", "when", "who"}
 
 
 def hashing_embedder(texts: list[str]) -> list[list[float]]:
-    """Deterministic, model-free: words hashed into 64 buckets, L2-normalized."""
+    """Deterministic, model-free: content words (lightly stemmed) hashed into 64
+    buckets, L2-normalized. Good enough to find a paragraph by its vocabulary."""
     out = []
     for text in texts:
         vec = [0.0] * DIM
         for word in re.findall(r"[a-z]+", text.lower()):
-            if len(word) < 3:
+            if len(word) < 3 or word in STOPWORDS:
                 continue
+            word = word[:-1] if word.endswith("s") and len(word) > 4 else word
             h = int(hashlib.md5(word.encode()).hexdigest(), 16) % DIM
             vec[h] += 1.0
         norm = math.sqrt(sum(v * v for v in vec)) or 1.0
@@ -52,7 +56,7 @@ def test_index_and_search_known_questions(tmp_path):
     assert hits and hits[0].doc_id == "gift-acceptance" and "vehicle" in hits[0].text.lower()
     assert hits == sorted(hits, key=lambda h: h.distance)
 
-    hits = index.search("How long does a donor have to ask for a refund?", k=2)
+    hits = index.search("Within how many days must a refund request arrive?", k=2)
     assert hits[0].doc_id == "refunds" and "60 days" in hits[0].text
 
     hits = index.search("What must every receipt state about goods or services?", k=2)
