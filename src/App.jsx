@@ -5,6 +5,8 @@ import ProjectCanvas from './components/ProjectCanvas'
 // leaves the canvas, so they load on demand rather than in the initial bundle.
 const LessonWorkspace = lazy(() => import('./components/LessonWorkspace'))
 const ArtifactViewer = lazy(() => import('./components/ArtifactViewer'))
+// The middleware track is its own chunk and only loads when selected.
+const MiddlewareShell = lazy(() => import('./components/middleware/MiddlewareShell'))
 import {
   loadProgress,
   saveProgress,
@@ -21,6 +23,7 @@ import {
 } from './lib/progress'
 import { PROJECTS, getProjectData, loadProject, saveProject } from './lib/projects'
 import { loadTheme, saveTheme, applyTheme } from './lib/theme'
+import { loadTrack, saveTrack } from './lib/track'
 
 // F7: each project's lesson registry is its own dynamic-import chunk, so a
 // learner only downloads the lessons for the project they open. Projects with
@@ -32,6 +35,7 @@ const LESSON_MODULE_LOADERS = {
 }
 
 export default function App() {
+  const [track, setTrack] = useState(() => loadTrack())
   const [project, setProject] = useState(() => loadProject())
   const [tier, setTier] = useState(() => loadTier())
   const [progress, setProgress] = useState(() => loadProgress())
@@ -73,6 +77,17 @@ export default function App() {
     applyTheme(theme)
     saveTheme(theme)
   }, [theme])
+
+  // Switching tracks leaves the automation working set exactly where it was:
+  // only the track key changes, and the canvas is restored on return.
+  function handleTrackChange(nextTrack) {
+    if (nextTrack === track) return
+    saveTrack(nextTrack)
+    setTrack(nextTrack)
+    setView('canvas')
+    setActiveLessonId(null)
+    setNotice(null)
+  }
 
   function toggleTheme(next) {
     setTheme(next === 'dark' || next === 'light' ? next : theme === 'dark' ? 'light' : 'dark')
@@ -195,6 +210,19 @@ export default function App() {
     setView('canvas')
   }
 
+  if (track === 'middleware') {
+    return (
+      <Suspense fallback={null}>
+        <MiddlewareShell
+          theme={theme}
+          onToggleTheme={toggleTheme}
+          track={track}
+          onTrackChange={handleTrackChange}
+        />
+      </Suspense>
+    )
+  }
+
   if (view === 'lesson' && activeLessonId) {
     const lesson = lessons && lessons[activeLessonId]
     if (!lesson) return null
@@ -246,6 +274,8 @@ export default function App() {
         projects={PROJECTS}
         project={project}
         onProjectChange={handleProjectChange}
+        track={track}
+        onTrackChange={handleTrackChange}
         onToggleTheme={toggleTheme}
         onSelect={handleSelect}
         onStart={openLesson}

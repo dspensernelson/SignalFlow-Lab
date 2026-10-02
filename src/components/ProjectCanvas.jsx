@@ -16,6 +16,7 @@ import {
 } from '../lib/progress'
 import { buildExport, downloadText } from '../lib/export'
 import { WelcomeModal, TierCompleteModal, RecurrenceModal } from './HumanMoments'
+import TrackSwitch from './TrackSwitch'
 import { Logo, ThemeToggle, StatItem, Button, Icon } from './ui'
 import moduleSkeleton from '../data/moduleSkeleton.json'
 import ToolMapModal from './ToolMap'
@@ -163,6 +164,8 @@ export default function ProjectCanvas({
   projects,
   project,
   onProjectChange,
+  track,
+  onTrackChange,
   onToggleTheme,
   onSelect,
   onStart,
@@ -282,6 +285,7 @@ export default function ProjectCanvas({
         <div className="mx-auto flex w-full max-w-[1680px] items-center justify-between gap-4 px-4 py-2.5">
           <div className="flex items-center gap-3">
             <Logo size={22} uppercase wordmark="SignalFlow Lab" />
+            {onTrackChange && <TrackSwitch value={track} onChange={onTrackChange} />}
             <span className="hidden h-6 w-px bg-sf-border sm:inline-block" />
             <div className="hidden flex-col leading-tight sm:flex">
               <span className="text-[9px] font-semibold uppercase tracking-sf-wide text-sf-subtle">Project</span>
