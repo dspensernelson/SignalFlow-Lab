@@ -16,6 +16,14 @@ I am the learner here. If it turns out to be worth handing to someone else, it i
 
 Modules 1 through 3 are complete across all three tiers. Module 4 is in progress and I have not walked it yet.
 
+A second track, **SignalFlow Lab: Middleware**, is built: nine modules, 32
+lessons, teaching the layer between an LLM agent and real business systems
+(tools and schemas, MCP, auth and approval gates, reliability, state,
+observability and evals, orchestration, packaging). Every lesson is
+Simulate (the donor-ops process map in motion), Build (real Python in
+`middleware/`, with Claude Code as the pair), and Check (a pytest acceptance
+check that unlocks the next lesson). See "The Middleware track" below.
+
 ## Build log
 
 Where things stand if you are picking this back up:
@@ -102,6 +110,32 @@ Where things stand if you are picking this back up:
   order -> stop. Parked questions go
   to `OPEN_QUESTIONS.md`; CI runs `npm run check` on every push.
 
+## The Middleware track
+
+Switch tracks with the Track control in the header (Automation | Middleware).
+The track keeps its own storage key (`signalflow_middleware_progress`) and
+never touches the automation track's keys, maps, validators or lints.
+
+- Content: `src/data/middleware/` (track.json with the nine modules,
+  map.json for the donor-ops map, lessons/*.json, scenarios/*.json),
+  validated by `npm run lint:middleware` (part of `npm run check`).
+- Shell: `src/components/middleware/` (TrackHome, ModuleLanding, LessonView
+  with Concept -> Workbench -> Explain it, the simulation player). The
+  Workbench is the no-scroll screen for this track.
+- Builds and checks: `middleware/` is a `uv` project. Stubs with docstring
+  specs are the starting state; checks test behavior (they spawn the MCP
+  server, send real HTTP, replay recorded model replies) and are red until
+  the learner builds. Run one with
+  `uv run --directory middleware python checks/run.py <lesson-id>`; the dev
+  server reads `middleware/checks/results/*.json` through a tiny Vite plugin
+  and the lesson unlocks on a pass. The deployed site has no bridge: it
+  shows "run locally" guidance, and Skip still unlocks.
+- Models: free tiers only (Gemini, Groq, OpenRouter, Ollama) behind one
+  `LLM_PROVIDER` variable; every deterministic check uses the `replay`
+  provider. Nothing in the builds calls Claude.
+- CI: `npm run check:middleware` (mock-service and runner self-tests, plus
+  collecting every lesson check) runs as a second GitHub Actions job.
+
 ## Current Product Model
 
 - The process map is the curriculum; the 10-module long-range plan lives in
@@ -123,11 +157,12 @@ Vite usually starts on port 5173 and may fall back to 5174 if 5173 is in use.
 ## Validate
 
 ```powershell
-npm run check    # eslint + lesson lint + lesson regression tests + build
+npm run check               # eslint + map/lesson/giveaway/glossary/middleware lints + regression tests + build
+npm run check:middleware    # the Python workspace's self-tests (needs uv)
 ```
 
-Individually: `npm run lint`, `npm run lint:lessons`, `npm run test:lessons`,
-`npm run build`.
+Individually: `npm run lint`, `npm run lint:lessons`, `npm run lint:middleware`,
+`npm run test:lessons`, `npm run test:middleware`, `npm run build`.
 
 ## Key Docs
 

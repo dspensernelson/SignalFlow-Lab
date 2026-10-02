@@ -69,9 +69,14 @@ export default function MiddlewareShell({ theme, onToggleTheme, track, onTrackCh
     }
   }, [applyResults])
 
-  // Fetch once on entering the track and again whenever a lesson opens. The
-  // rule-of-hooks linter wants the async call deferred out of the effect body.
+  // Fetch once on entering the track and again whenever a lesson opens. On
+  // the deployed site there is no bridge: after the first probe says so, stop
+  // probing automatically (the Refresh button still can) so a built site does
+  // not log a 404 on every lesson open. The async call is deferred out of the
+  // effect body for the rule-of-hooks linter.
+  const checksMode = checks.mode
   useEffect(() => {
+    if (checksMode === 'unavailable') return undefined
     let cancelled = false
     const timer = setTimeout(() => {
       if (!cancelled) refreshChecks()
@@ -80,7 +85,7 @@ export default function MiddlewareShell({ theme, onToggleTheme, track, onTrackCh
       cancelled = true
       clearTimeout(timer)
     }
-  }, [refreshChecks, activeLessonId])
+  }, [refreshChecks, activeLessonId, checksMode])
 
   function statusOf(lessonId) {
     return deriveLessonStatus(progress, lessonId, LESSON_ORDER)

@@ -47,6 +47,23 @@ Run every check at once with `--all`. Run the raw tests with
 | `checks/run.py` | Runs one lesson's check and writes the result the app reads. |
 | `checks/results/` | Git-ignored result files. |
 
+## Extras per module
+
+| From lesson | Install | What it adds |
+|---|---|---|
+| 0.1 | `uv sync` | httpx, pydantic, typer, pytest, the mock services |
+| 2.2 | `uv sync --extra mcp` | the MCP Python SDK (2.x, 2026-07-28 spec) |
+| 5.3 | `uv sync --extra rag` | fastembed (CPU embeddings) and sqlite-vec |
+| 6.1 | `uv sync --extra otel` | OpenTelemetry API and SDK |
+| 7.1 | `uv sync --extra graph` | LangGraph and langchain-core |
+| any | `uv sync --all-extras` | everything (what CI installs) |
+
+## Markers the checks use
+
+- `live`: needs `LLM_PROVIDER` and its key; skipped otherwise.
+- `docker`: needs `DOCKER_AVAILABLE=1` and a daemon (lesson 8.1).
+- `deployed`: needs `DEPLOY_URL` (and `DEPLOY_TOKEN`) (lesson 8.2).
+
 ## Secrets and free tiers
 
 Keys live in `.env` (git-ignored) and are read through the settings module

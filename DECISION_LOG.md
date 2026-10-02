@@ -2,6 +2,44 @@
 
 Short record of product and implementation decisions. Keep entries factual and brief.
 
+## 2026-10-02 (Middleware track built: owner-ratified second track)
+
+The owner (Spenser) requested a second learning track, "SignalFlow Lab:
+Middleware", in a build brief dated 2026-10-02. This is an OWNER decision
+and the brief is its ratification; it does not amend AUTONOMY_CHARTER.md,
+DECISION_BOUNDARIES.md or PRODUCT_DOCTRINE.md (gate 9), and it changes
+nothing in the automation track.
+
+- Owner decisions taken in the planning session: a top-level Track switch
+  (Automation | Middleware) rather than a project entry; the deployed site
+  shows lessons and simulations with "run locally" check guidance (Skip
+  still unlocks); all nine modules authored in one pass; lesson 5.3 (vector
+  search) stays required; LangGraph for Module 7; Cloudflare Workers is
+  not used for 8.2 (its Python runtime does not fit a SQLite-backed Python
+  server) - a container host is taught instead, limits verified at build
+  time.
+- Doctrine kept: local-first. The check bridge is a dev-server file reader
+  (scripts/vite-plugin-middleware-checks.mjs) that exists only under `vite`;
+  the built site has no backend. Deterministic validation holds: every
+  check is pytest and every model-dependent check replays recorded replies;
+  live-model tests skip without a key.
+- Storage: one new key, `signalflow_track`, plus
+  `signalflow_middleware_progress`. No automation key changes (verified in
+  the browser: a track round trip changes only `signalflow_track`).
+- Starting state is stubs, never solutions: every target file ships its
+  interface and a docstring spec and raises NotImplementedError; checks test
+  behavior (subprocess MCP servers, raw 2026-07-28 JSON-RPC, scope
+  rejection, retry counts, idempotency). Every module's checks were proven
+  satisfiable with a throwaway solution that was not committed.
+- Toolchain facts verified during the build: the MCP Python SDK 2.x
+  (2.0.0 released 2026-07-28) targets the 2026-07-28 spec; raw Streamable
+  HTTP requests need MCP-Protocol-Version and mcp-method headers plus a
+  `_meta` envelope; langchain-mcp-adapters is incompatible with mcp 2.x, so
+  Module 7 teaches a hand-written adapter; embeddings use fastembed (CPU)
+  with sqlite-vec.
+- Lint: `scripts/lint-middleware.mjs` joins `npm run check`; the automation
+  lints never see `src/data/middleware/`. CI gains a `middleware` job.
+
 ## 2026-08-22 (PR #8 merged; production deploy verified; local main realigned)
 
 - MERGED PR #8 to main (a1d52d0): the ecosystem literacy work, the Operations

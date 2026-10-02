@@ -178,3 +178,34 @@ frontier.
    1280x800 AND 1366x650 in the wrong-answer state).
 
 5. Console clean throughout; clear test state before handing back.
+
+## Middleware track (second track)
+
+1. `npm run check` includes `lint:middleware` (track content) and
+   `test:middleware` (progress model + check client unit tests).
+   `npm run check:middleware` runs the Python workspace's self-tests and
+   collects every lesson check (needs `uv`).
+
+2. Track switch: snapshot `localStorage`, switch Track to Middleware and
+   back; only `signalflow_track` may change. The automation project, tier
+   and progress are restored on return.
+
+3. Check bridge: `uv run --directory middleware python checks/run.py
+   m0-1-environment` writes `middleware/checks/results/m0-1-environment.json`;
+   `curl localhost:5173/__middleware/checks` lists it; "Refresh checks" in
+   the lesson shows the failing tests. A passing result marks the lesson
+   passed and unlocks the next; Skip records a "Skipped" chip and unlocks.
+
+4. No page scroll on the Workbench step at 1280x800 and 1366x650 with a
+   failing result shown (the tallest state): verify
+   `document.documentElement.scrollHeight === clientHeight`. The simulation
+   (lesson 0.2) must play, step, and reset inside the same bound.
+
+5. Explain-only lessons (2.1, 7.3, 8.4): answering every question and
+   saving reveals the model answers and marks the lesson passed.
+
+6. Production fallback: `npm run build && npm run preview`; the Workbench's
+   Check panel shows the "Run locally" badge and guidance, Skip still
+   unlocks, console clean.
+
+7. Reset track clears only `signalflow_middleware_progress`.

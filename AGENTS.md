@@ -25,3 +25,12 @@ artifact.
   it still fits. Compactness wins over extra detail.
 - This rule is intentionally duplicated in PRODUCT_DOCTRINE.md and
   LESSON_DESIGN_FRAMEWORK.md so it is never lost.
+
+## Middleware track (second track)
+
+The no-scroll rule applies to the Middleware track's Workbench step (the
+Simulate + Build + Check screen) exactly as it does to Exercise screens.
+Track content lives in `src/data/middleware/` and is linted by
+`scripts/lint-middleware.mjs`; the Python builds and checks live in
+`middleware/`. The automation track's lints, validators, maps and storage
+keys are never touched by middleware work.
