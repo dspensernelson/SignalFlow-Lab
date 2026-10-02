@@ -1,0 +1,49 @@
+{
+  "id": "m2-4-streamable-http",
+  "module": "m2",
+  "order": 4,
+  "title": "Streamable HTTP and the 2026-07-28 spec: stateless by design",
+  "estimateHours": 8,
+  "concept": {
+    "heading": "Over HTTP, every request must carry everything the server needs",
+    "paragraphs": [
+      "stdio is one host, one subprocess, one machine. Streamable HTTP is what you deploy: the server is a web app at /mcp and any client on the network posts JSON-RPC to it. The 2026-07-28 spec removed the initialize handshake from this transport: each request carries the protocol version, the client's capabilities and identity in _meta (and MCP-Protocol-Version plus mcp-method headers), the server answers server/discover with the versions it speaks, and there is no session id. HTTP+SSE, the older transport, is deprecated with removal after July 2027.",
+      "Stateless matters for a small nonprofit more than for anyone: a free host restarts your process without warning, a laptop lid drops a connection, two copies may run at once. If nothing has to be remembered between requests, all of that is fine. State that genuinely must persist (tasks, approvals, dedupe keys) goes in a database in Module 5, never in the server's memory.",
+      "The SDK does the protocol work: streamable_http_app(stateless_http=True, json_response=True) wraps your server as a Starlette app and uvicorn serves it. The SDK's transport is async, which is why this lesson introduces async and await: your tool functions can stay plain def (the SDK runs them on a worker thread), but you need to read async code to follow the SDK."
+    ],
+    "lowCodeEquivalent": "Publishing a flow with an HTTP request trigger and calling it from anywhere with the right headers. The difference is the contract: here the envelope is standardized, so any MCP host already knows how to call you."
+  },
+  "pythonBlock": {
+    "title": "Python you need: async and await",
+    "intro": "An async function returns a coroutine; await runs it and gives the event loop a chance to serve other requests while this one waits on the network. The SDK's HTTP transport is built from these.",
+    "code": "import anyio\nfrom mcp import Client\n\nasync def main() -> None:\n    async with Client(\"http://127.0.0.1:8080/mcp\") as client:     # connects, negotiates 2026-07-28\n        tools = await client.list_tools()                         # await: let others run while we wait\n        result = await client.call_tool(\"find_donor\", {\"query\": \"okafor\"})\n        print([t.name for t in tools.tools], result.structured_content)\n\nanyio.run(main)\n\n# Plain def tools are fine inside MCPServer; the SDK runs them on a worker thread.\n# Use async def only when the tool itself awaits something (an async HTTP client).",
+    "resource": { "type": "docs", "label": "Python docs - asyncio: Coroutines and Tasks", "url": "https://docs.python.org/3/library/asyncio-task.html" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/mcp_server/http_server.py"],
+    "spec": [
+      "Implement build_app: build_server(client).streamable_http_app(stateless_http=True, json_response=True). Keep main() serving on 127.0.0.1:$PORT.",
+      "Start it and connect with the SDK Client at http://127.0.0.1:8080/mcp (the async snippet above). Confirm protocol_version is 2026-07-28.",
+      "Send one raw request with httpx: POST /mcp with headers Accept, Content-Type, MCP-Protocol-Version: 2026-07-28 and mcp-method: server/discover, body {jsonrpc, id, method: 'server/discover', params: {_meta: {io.modelcontextprotocol/protocolVersion, io.modelcontextprotocol/clientCapabilities: {}}}}. Read the supportedVersions and serverInfo in the reply.",
+      "Send tools/list twice with no session header and confirm both succeed and no MCP-Session-Id header comes back. That is what stateless means on the wire."
+    ],
+    "askClaudeFor": [
+      "A walkthrough of what streamable_http_app does with stateless_http=True versus False, and what the mcp-method header is for.",
+      "Why the raw request needs the mcp-name header on tools/call (ask it to show you the SDK's modern route code)."
+    ],
+    "writeYourself": [
+      "build_app, and the raw httpx request script you used to see the envelope (keep it under middleware/scripts/ for yourself)."
+    ],
+    "resources": [
+      { "type": "repo", "label": "Microsoft MCP for Beginners - 1.1 What's Changed in MCP (2026-07-28) and 3.6 HTTP Streaming", "url": "https://github.com/microsoft/mcp-for-beginners" },
+      { "type": "docs", "label": "MCP specification changelog, 2026-07-28 (stateless, server/discover, deprecations)", "url": "https://modelcontextprotocol.io/specification/2026-07-28/changelog" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m2-4-streamable-http",
+    "command": "uv run --directory middleware python checks/run.py m2-4-streamable-http",
+    "summary": "Serves your app on a free port: the SDK Client lists and calls tools over HTTP at 2026-07-28, a raw server/discover answers with supportedVersions and serverInfo, two self-contained tools/list requests succeed with no session id, and a raw tools/call with the full envelope returns CRM data."
+  }
+}

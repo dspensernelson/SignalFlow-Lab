@@ -1,0 +1,50 @@
+{
+  "id": "m2-2-stdio-server",
+  "module": "m2",
+  "order": 2,
+  "title": "First server over stdio with the Python SDK",
+  "estimateHours": 7,
+  "concept": {
+    "heading": "A decorator turns a typed function into a tool a host can call",
+    "paragraphs": [
+      "The SDK's MCPServer keeps a registry much like yours. @server.tool() on a function reads its name, its docstring and its type hints, builds the JSON Schema, and registers it. When a host sends tools/call, the SDK validates the arguments, calls your function, and wraps whatever it returns as the result. You write three functions; the protocol is handled.",
+      "Keep the Module 1 registry underneath. Each MCP tool function calls registry.call(name, arguments) and returns the dict, so validation and errors-as-data still happen in one place, and the error dict rides inside a normal result with isError false, where the model can read it. Do not let a missing donor become a JSON-RPC error: hosts show those to the user as failures.",
+      "stdio means the host launches your server as a subprocess and talks over stdin and stdout. That is how Claude Desktop and Claude Code run local servers, and it is how the check runs yours: it spawns python -m mcp_server.server, lists the tools, and calls find_donor."
+    ],
+    "lowCodeEquivalent": "Publishing a custom connector's actions. The decorator is the action definition; the docstring is the summary the orchestrator reads; the type hints are the request schema you filled in by hand before."
+  },
+  "pythonBlock": {
+    "title": "Python you need: decorators and keyword-only arguments",
+    "intro": "A decorator is a function that takes a function and returns one. @server.tool() registers the function as a side effect and returns it unchanged.",
+    "code": "from mcp.server import MCPServer\nfrom datetime import date\nfrom typing import Literal\n\nserver = MCPServer(\"lakeshore-donor-ops\", version=\"0.1.0\", instructions=INSTRUCTIONS)\n\n@server.tool()\ndef find_donor(query: str) -> dict:\n    \"\"\"Find a donor by exact email, or by name when staff name a person...\"\"\"\n    return registry.call(\"find_donor\", {\"query\": query})\n\n@server.tool()\ndef get_donation_history(donor_id: int, since: date | None = None) -> dict:\n    \"\"\"...\"\"\"\n    return registry.call(\"get_donation_history\", {\"donor_id\": donor_id, \"since\": since.isoformat() if since else None})\n\n# a decorator, by hand:\ndef log_calls(fn):\n    def wrapper(*args, **kwargs):\n        print(\"calling\", fn.__name__)\n        return fn(*args, **kwargs)\n    return wrapper",
+    "resource": { "type": "docs", "label": "Python docs - Decorators (glossary) and PEP 318", "url": "https://docs.python.org/3/glossary.html#term-decorator" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/mcp_server/server.py"],
+    "spec": [
+      "Run uv sync --extra mcp once. Implement build_server: an MCPServer named lakeshore-donor-ops, version 0.1.0, with INSTRUCTIONS, and three @server.tool() functions whose names, parameters and docstrings match the Module 1 contracts.",
+      "Each tool calls the Module 1 registry and returns its dict, including {error: ...} results; a missing donor must not become a protocol error.",
+      "Run the server by hand and watch it wait on stdin, then open MCP Inspector against it: npx @modelcontextprotocol/inspector uv run --directory middleware python -m mcp_server.server.",
+      "Call find_donor from Inspector with 'alvarez' and read the raw JSON-RPC on the wire."
+    ],
+    "askClaudeFor": [
+      "A scaffold of build_server with the three decorated functions and empty bodies.",
+      "How the SDK derives inputSchema from type hints, so you can confirm Literal and Optional render as in Module 1."
+    ],
+    "writeYourself": [
+      "The three tool bodies and the docstrings (copy your Module 1 descriptions on purpose: same contract, new transport).",
+      "The since conversion: an MCP date arrives as a string; the registry wants the same."
+    ],
+    "resources": [
+      { "type": "repo", "label": "Microsoft MCP for Beginners - 3.1 First Server and 3.5 stdio Server", "url": "https://github.com/microsoft/mcp-for-beginners" },
+      { "type": "docs", "label": "MCP Python SDK docs - The Client (the Bookshop example server)", "url": "https://py.sdk.modelcontextprotocol.io/client/" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m2-2-stdio-server",
+    "command": "uv run --directory middleware python checks/run.py m2-2-stdio-server",
+    "summary": "Spawns your server as a subprocess with the SDK Client: server name and 2026-07-28 negotiated, three described tools with typed parameters, find_donor returns CRM matches, a missing donor comes back as error data."
+  }
+}

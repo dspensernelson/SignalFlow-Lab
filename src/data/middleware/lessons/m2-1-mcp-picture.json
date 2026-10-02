@@ -1,0 +1,56 @@
+{
+  "id": "m2-1-mcp-picture",
+  "module": "m2",
+  "order": 1,
+  "title": "MCP in one picture",
+  "estimateHours": 3,
+  "concept": {
+    "heading": "Hosts, clients, servers: the tool list crosses a protocol boundary",
+    "paragraphs": [
+      "In Module 1 the tool list, the loop and the handlers lived in one Python process you wrote. MCP splits that: a host (Claude Desktop, Claude Code, Copilot Studio, an agent framework) owns the model and the loop; a server owns the tools, resources and prompts; a client inside the host speaks JSON-RPC to the server over stdio or HTTP. Your Module 1 code becomes the server. The host is somebody else's.",
+      "Three kinds of thing cross the boundary. Tools are what the model does (find_donor). Resources are what the host can read into context (a donor record, a policy). Prompts are server-owned templates the host offers the user (draft a thank-you). The tool descriptions and schemas you wrote in Module 1 go across unchanged; pydantic still emits them.",
+      "Since the 2026-07-28 spec, every request is self-contained: the protocol version, the client's capabilities and identity travel in the request's _meta, servers answer server/discover with what they speak, and there is no handshake or session to remember. Roots, Sampling and Logging are deprecated, as is the old HTTP+SSE transport. The simulation shows one tools/list and one tools/call on the wire."
+    ],
+    "lowCodeEquivalent": "A custom connector you published once and then used from Power Automate, Copilot Studio and Power Apps. MCP is that idea for AI hosts: publish the tools once, let any host that speaks the protocol use them."
+  },
+  "simulate": { "scenarioId": "jsonrpc-boundary" },
+  "build": {
+    "files": ["middleware/mcp_server/README.md"],
+    "spec": [
+      "No code this lesson. Step through the simulation twice: once watching the JSON-RPC envelopes, once watching which node does the work.",
+      "Read the 2026-07-28 changelog (link below) and write three bullets in your own words at the top of mcp_server/README.md under a heading 'What 2026-07-28 changed': stateless, server/discover, what is deprecated.",
+      "Answer the three explain-it questions on the next step."
+    ],
+    "askClaudeFor": [
+      "A plain-language comparison of MCP's tools, resources and prompts with Copilot Studio actions, knowledge sources and topics."
+    ],
+    "writeYourself": [
+      "The three bullets in the README and the explain-it answers. They are the client-facing explanation you will reuse."
+    ],
+    "resources": [
+      { "type": "docs", "label": "MCP specification changelog, 2026-07-28", "url": "https://modelcontextprotocol.io/specification/2026-07-28/changelog" },
+      { "type": "course", "label": "Hugging Face MCP Course - Unit 1: MCP fundamentals", "url": "https://huggingface.co/learn/mcp-course" }
+    ]
+  },
+  "check": {
+    "kind": "explain",
+    "lessonId": "m2-1-mcp-picture",
+    "summary": "Explain-it only: three questions on hosts, servers, and what the 2026-07-28 spec changed. Answer all three to pass."
+  },
+  "explainIt": {
+    "questions": [
+      {
+        "q": "Who owns the model, who owns the tools, and what travels between them?",
+        "modelAnswer": "The host owns the model and the loop: Claude Desktop, Claude Code, Copilot Studio or an agent framework. The server owns the tools, resources and prompts: that is the code you wrote in Module 1, wrapped. Between them travels JSON-RPC: tools/list and tools/call requests with the tool name and arguments, and results carrying content the model reads."
+      },
+      {
+        "q": "What does 'every request is self-contained' mean after 2026-07-28, in one breath?",
+        "modelAnswer": "Each request carries its own protocol version, client capabilities and client identity in _meta, so the server needs no handshake and keeps no session; any copy of the server can answer any request, and a client that reconnects just sends the next one."
+      },
+      {
+        "q": "Name one thing that is a tool, one that is a resource, and one that is a prompt in the donor-ops scenario, and say why each is that kind.",
+        "modelAnswer": "find_donor is a tool because the model decides to call it to get something done. A donor record at donor://1 is a resource because the host reads it into context; nothing happens. draft-thank-you is a prompt because it is a reusable template the server owns and the host offers the user, already filled with the donor's name and last gift."
+      }
+    ]
+  }
+}

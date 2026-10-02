@@ -1,0 +1,43 @@
+{
+  "id": "m2-3-inspector-hosts",
+  "module": "m2",
+  "order": 3,
+  "title": "Inspector and hosts: Claude Desktop, Claude Code",
+  "estimateHours": 5,
+  "concept": {
+    "heading": "A host is configured, not coded; the description is what the host's model reads",
+    "paragraphs": [
+      "MCP Inspector is the debugger: it launches your server, shows the tool list exactly as a host sees it, lets you call a tool with arguments, and prints the JSON-RPC both ways. Use it before every host; when a host misbehaves, Inspector tells you whether the server or the host is wrong.",
+      "Claude Desktop reads claude_desktop_config.json; Claude Code reads .mcp.json or a claude mcp add command. Both need a command that works from any directory, which is why the snippet uses uv run --directory <absolute path to middleware> python -m mcp_server.server. A relative path that works in your terminal fails inside a host.",
+      "The experiment that matters: connect a host, ask the same question, change one tool description, restart, ask again. Watch which tool the model calls and with what arguments. Write it down in the README; it is the evidence behind the module's explain-it, and the clearest demo you will ever give a client of what a description does."
+    ],
+    "lowCodeEquivalent": "Adding a connector to a Copilot Studio agent and testing it in the test pane. The config snippet is the connection reference; Inspector is the test pane with the raw request visible."
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/mcp_server/README.md"],
+    "spec": [
+      "Replace every TODO in mcp_server/README.md: the Inspector command, a Claude Desktop mcpServers snippet (command uv, args with --directory and mcp_server.server), and a Claude Code .mcp.json snippet. Keep the fenced json blocks valid JSON.",
+      "Connect at least one host (Claude Desktop or Claude Code) and ask 'Did Maria Alvarez give this spring?'. Note what was called.",
+      "Change the find_donor description to just 'Find a donor', restart the host, ask again, and write at least 200 characters on what changed under the README's last heading. Restore the good description afterwards.",
+      "If a host is unavailable on your machine, do the experiment in Inspector with the model-free view (which tool would you pick from this list?) and say so in the write-up."
+    ],
+    "askClaudeFor": [
+      "The exact claude_desktop_config.json location on your OS and the .mcp.json format for Claude Code.",
+      "Help reading the host's MCP log when the server fails to launch (usually a path or a missing uv on PATH)."
+    ],
+    "writeYourself": [
+      "The two JSON snippets and the write-up of the description experiment."
+    ],
+    "resources": [
+      { "type": "repo", "label": "Microsoft MCP for Beginners - 3.13 MCP Inspector", "url": "https://github.com/microsoft/mcp-for-beginners" },
+      { "type": "docs", "label": "MCP docs - Connect local servers to Claude Desktop", "url": "https://modelcontextprotocol.io/docs/develop/connect-local-servers" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m2-3-inspector-hosts",
+    "command": "uv run --directory middleware python checks/run.py m2-3-inspector-hosts",
+    "summary": "Parses the README: no TODOs left, at least two valid JSON snippets, a Claude Desktop mcpServers entry launching this server through uv --directory, the Inspector command, and a 200+ character write-up of the description experiment."
+  }
+}

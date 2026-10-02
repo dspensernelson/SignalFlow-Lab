@@ -1,0 +1,48 @@
+{
+  "id": "m2-5-resources-prompts",
+  "module": "m2",
+  "order": 5,
+  "title": "Resources and prompts: what the host reads, what the server offers",
+  "estimateHours": 5,
+  "concept": {
+    "heading": "Not everything is a tool",
+    "paragraphs": [
+      "A resource is something the host can read into the model's context without the model deciding anything: a donor record at donor://1, a policy document, a schema. Hosts list resources, let the user attach one, and read it by URI. A URI template like donor://{donor_id} turns one function into a family of resources.",
+      "A prompt is a template the server owns and the host offers to the user as a command: draft-thank-you with a donor_id argument. The server fills it with facts it can fetch (the donor's name, their most recent gift, any note the staff left), so the quality of the draft no longer depends on what the staff member typed. Prompt arguments are strings on the wire; convert in your function.",
+      "Both carry the same discipline as tools: a missing donor returns error data, never a crash, and the donor's notes are respected (Grace Whitfield's note is a trap you will meet again in Module 6)."
+    ],
+    "lowCodeEquivalent": "A knowledge source attached to a Copilot Studio agent (resource) and a topic with a templated message (prompt). Here the server owns both and any host gets them."
+  },
+  "pythonBlock": {
+    "title": "Python you need: f-strings and formatting money and dates",
+    "intro": "Format once, in the server, so every host shows the same text.",
+    "code": "newest = donations[0]                       # already newest first\namount = f\"${newest['amount_cents'] / 100:,.2f}\"   # $120.00\nday = newest[\"received_at\"][:10]             # 2026-08-14\ntext = (\n    f\"Draft a short, warm thank-you to {donor.full_name} for their gift of {amount} \"\n    f\"received on {day}. Keep it under 120 words.\"\n)\nif donor.notes:\n    text += f\" Respect this note from staff: {donor.notes}\"",
+    "resource": { "type": "docs", "label": "Python docs - Format Specification Mini-Language", "url": "https://docs.python.org/3/library/string.html#formatspec" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/mcp_server/resources.py", "middleware/mcp_server/server.py"],
+    "spec": [
+      "Implement register_resources: @server.resource('donor://{donor_id}', mime_type='application/json') returning the donor record as a JSON string, or {error: {code: not_found, ...}} as JSON for an unknown id.",
+      "Add @server.prompt('draft-thank-you') with a donor_id string argument; the returned message names the donor, their most recent gift's amount (two decimals) and date (YYYY-MM-DD), and includes the donor's notes when present.",
+      "Call register_resources(server, client) inside build_server so stdio and HTTP both expose them.",
+      "Read donor://1 and run the prompt in Inspector; then attach the resource in Claude Desktop and ask it to summarize the donor."
+    ],
+    "askClaudeFor": [
+      "The SDK's resource template syntax and how a function parameter maps to {donor_id}.",
+      "What a prompt may return (a string, a list of messages) and how the SDK wraps it."
+    ],
+    "writeYourself": [
+      "Both functions, including the not_found JSON for the resource and the notes clause in the prompt."
+    ],
+    "resources": [
+      { "type": "course", "label": "Hugging Face MCP Course - Unit 1: resources and prompts", "url": "https://huggingface.co/learn/mcp-course" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m2-5-resources-prompts",
+    "command": "uv run --directory middleware python checks/run.py m2-5-resources-prompts",
+    "summary": "Over stdio: the donor://{donor_id} template is listed, donor://1 reads as JSON with the email, donor://999 is error data, and draft-thank-you renders with Maria Alvarez, her newest gift's date and amount, and her note."
+  }
+}

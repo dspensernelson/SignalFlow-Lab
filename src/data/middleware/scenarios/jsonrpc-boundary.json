@@ -1,0 +1,94 @@
+{
+  "id": "jsonrpc-boundary",
+  "title": "The same tool call, now crossing an MCP boundary",
+  "steps": [
+    {
+      "id": "s1",
+      "kind": "request",
+      "from": "agent",
+      "to": "tool-router",
+      "label": "Host asks the server what it offers",
+      "status": "ok",
+      "payloadTitle": "JSON-RPC 2.0 over stdio: tools/list",
+      "payload": { "jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": { "_meta": { "io.modelcontextprotocol/protocolVersion": "2026-07-28", "io.modelcontextprotocol/clientCapabilities": {}, "io.modelcontextprotocol/clientInfo": { "name": "claude-desktop", "version": "1.0" } } } },
+      "annotate": "In Module 1 the tool list lived in your process. Now a host you did not write asks for it over a protocol.",
+      "nodeStates": { "agent": "active", "tool-router": "waiting" },
+      "durationMs": 1800
+    },
+    {
+      "id": "s2",
+      "kind": "response",
+      "from": "tool-router",
+      "to": "agent",
+      "label": "Server answers with the tool list",
+      "status": "ok",
+      "payloadTitle": "JSON-RPC result",
+      "payload": { "jsonrpc": "2.0", "id": 1, "result": { "tools": [ { "name": "find_donor", "description": "Find a donor by exact email, or by name...", "inputSchema": { "type": "object", "properties": { "query": { "type": "string", "minLength": 2 } }, "required": ["query"] } }, { "name": "get_donation_history" }, { "name": "create_receipt" } ], "_meta": { "io.modelcontextprotocol/serverInfo": { "name": "lakeshore-donor-ops", "version": "0.1.0" } } } },
+      "annotate": "Same descriptions, same schemas, emitted by the same pydantic models. The protocol is a wrapper, not a rewrite.",
+      "nodeStates": { "tool-router": "ok", "agent": "active" },
+      "durationMs": 1800
+    },
+    {
+      "id": "s3",
+      "kind": "request",
+      "from": "agent",
+      "to": "tool-router",
+      "label": "Host calls a tool",
+      "status": "ok",
+      "payloadTitle": "JSON-RPC request: tools/call",
+      "payload": { "jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": { "name": "find_donor", "arguments": { "query": "Maria Alvarez" }, "_meta": { "io.modelcontextprotocol/protocolVersion": "2026-07-28", "io.modelcontextprotocol/clientCapabilities": {} } } },
+      "annotate": "Every request repeats its protocol version and capabilities in _meta. There is no session the server has to remember.",
+      "nodeStates": { "agent": "ok", "tool-router": "active" },
+      "durationMs": 1600
+    },
+    {
+      "id": "s4",
+      "kind": "request",
+      "from": "tool-router",
+      "to": "donor-crm",
+      "label": "Server runs the Module 1 handler",
+      "status": "ok",
+      "payloadTitle": "registry.call -> HTTP GET /donors?q=Maria%20Alvarez",
+      "payload": { "method": "GET", "url": "{CRM_URL}/donors?q=Maria%20Alvarez" },
+      "nodeStates": { "donor-crm": "waiting" },
+      "durationMs": 1200
+    },
+    {
+      "id": "s5",
+      "kind": "response",
+      "from": "donor-crm",
+      "to": "tool-router",
+      "label": "CRM answers",
+      "status": "ok",
+      "payloadTitle": "Handler result (dict)",
+      "payload": { "matches": 2, "donors": [ { "id": 1, "name": "Maria Alvarez" }, { "id": 2, "name": "Maria Alvarez-Reyes" } ] },
+      "nodeStates": { "donor-crm": "ok" },
+      "durationMs": 1200
+    },
+    {
+      "id": "s6",
+      "kind": "response",
+      "from": "tool-router",
+      "to": "agent",
+      "label": "Server wraps the dict as a tool result",
+      "status": "ok",
+      "payloadTitle": "JSON-RPC result: content + structuredContent",
+      "payload": { "jsonrpc": "2.0", "id": 2, "result": { "content": [ { "type": "text", "text": "{\"matches\": 2, \"donors\": [...]}" } ], "structuredContent": { "matches": 2, "donors": [ { "id": 1, "name": "Maria Alvarez" }, { "id": 2, "name": "Maria Alvarez-Reyes" } ] }, "isError": false } },
+      "annotate": "isError stays false even for a not_found: your error-as-data dict rides inside the result, where the model can read it.",
+      "nodeStates": { "tool-router": "ok", "agent": "active" },
+      "durationMs": 1800
+    },
+    {
+      "id": "s7",
+      "kind": "note",
+      "from": "agent",
+      "to": "agent",
+      "label": "Why a protocol instead of bespoke function calling",
+      "status": "ok",
+      "payloadTitle": "What changed for the client",
+      "payload": { "before": "one Python loop, one provider, tools reachable only from that process", "after": "any host that speaks MCP (Claude Desktop, Claude Code, Copilot Studio, Inspector) discovers and calls the same tools", "you_keep": ["the tool code", "the permissions", "the logs"], "you_do_not_rebuild_when": "the assistant changes" },
+      "nodeStates": { "agent": "ok" },
+      "durationMs": 2400
+    }
+  ]
+}
