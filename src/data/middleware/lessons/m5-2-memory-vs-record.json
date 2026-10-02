@@ -1,0 +1,49 @@
+{
+  "id": "m5-2-memory-vs-record",
+  "module": "m5",
+  "order": 2,
+  "title": "Conversation memory versus the system of record",
+  "estimateHours": 5,
+  "concept": {
+    "heading": "Memory is short, scoped, allow-listed, and never a second copy of the CRM",
+    "paragraphs": [
+      "Across a few turns an assistant should remember which donor the staff member means, what they asked for, and the approval id that is pending. It should not remember a donor's email, their giving total, or anything a staff member could later read back as if it were true. The CRM is the system of record; memory is a sticky note, and sticky notes expire.",
+      "Four rules make that real in code. A TTL: every entry carries expires_at and recall ignores the rest. A scope: entries are keyed by conversation, so one staff member's context never bleeds into another's. An allow-list: remember() refuses any key that is not a conversational one, so a well-meaning prompt cannot turn memory into a shadow database. And isolation: this module never calls the CRM, which the check proves by counting rows before and after.",
+      "When memory and the CRM disagree, the CRM wins and the entry is discarded. Build that into how tools use memory: a remembered donor id is a hint to look the donor up, never a fact to act on."
+    ],
+    "lowCodeEquivalent": "Global variables in a Copilot Studio topic, scoped to the session, versus the Dataverse table. You already knew not to copy the table into variables; here that rule is enforced by the code."
+  },
+  "pythonBlock": {
+    "title": "Python you need: UPSERT in SQLite, frozenset membership, injected time",
+    "intro": "ON CONFLICT ... DO UPDATE makes remember an upsert. time.time is a parameter so the check can age entries instantly.",
+    "code": "def remember(self, conversation_id, key, value):\n    if key not in ALLOWED_KEYS:\n        raise MemoryPolicyError(f\"{key!r} belongs to the system of record, not to memory\")\n    expires = self.clock() + self.ttl_seconds\n    with self.db.connection() as conn:\n        conn.execute(\n            \"INSERT INTO memory (conversation_id, key, value, expires_at) VALUES (?,?,?,?) \"\n            \"ON CONFLICT(conversation_id, key) DO UPDATE SET value = excluded.value, expires_at = excluded.expires_at\",\n            (conversation_id, key, value, expires),\n        )\n\ndef recall(self, conversation_id):\n    now = self.clock()\n    with self.db.connection() as conn:\n        rows = conn.execute(\"SELECT key, value FROM memory WHERE conversation_id = ? AND expires_at > ?\", (conversation_id, now))\n        return {r[\"key\"]: r[\"value\"] for r in rows}",
+    "resource": { "type": "docs", "label": "SQLite docs - UPSERT", "url": "https://www.sqlite.org/lang_upsert.html" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/tools/memory.py", "middleware/mcp_server/server.py"],
+    "spec": [
+      "Implement ConversationMemory per the stub: remember (upsert with TTL, allow-listed keys), recall (unexpired only), forget, forget_expired.",
+      "Add two tools: remember_context(conversation_id, key, value) and recall_context(conversation_id), both requiring donors:read; MemoryPolicyError becomes an invalid_arguments error result.",
+      "Have the loop or agent pass a conversation id so a staff member's context survives a few turns and disappears after 30 minutes.",
+      "Write, in the module docstring, the one-sentence rule for a client: where the truth lives, and what happens when memory disagrees."
+    ],
+    "askClaudeFor": [
+      "A review of the allow-list: is there a key you want to add that is actually a system-of-record fact in disguise?",
+      "How a host could pass a conversation id to an MCP tool (hint: a parameter the host fills, or _meta)."
+    ],
+    "writeYourself": [
+      "remember and recall, including the policy check and the TTL comparison.",
+      "The two tools and their scope checks."
+    ],
+    "resources": [
+      { "type": "repo", "label": "Microsoft AI Agents for Beginners - the memory lesson", "url": "https://github.com/microsoft/ai-agents-for-beginners" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m5-2-memory-vs-record",
+    "command": "uv run --directory middleware python checks/run.py m5-2-memory-vs-record",
+    "summary": "Entries are per conversation and upsert; expired entries vanish on recall and forget_expired; system-of-record keys raise MemoryPolicyError; the CRM's donors and receipts are byte-for-byte unchanged by memory writes."
+  }
+}

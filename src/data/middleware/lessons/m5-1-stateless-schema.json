@@ -1,0 +1,50 @@
+{
+  "id": "m5-1-stateless-schema",
+  "module": "m5",
+  "order": 1,
+  "title": "Stateless by default, one schema for what must persist",
+  "estimateHours": 6,
+  "concept": {
+    "heading": "No session in memory; a migrated database for the facts that outlive a request",
+    "paragraphs": [
+      "The 2026-07-28 spec made the server stateless so any copy can answer any request. That does not mean no database. Three things from earlier modules genuinely must outlive a request: pending approvals, idempotency keys already seen, and task handles. They were each created on the fly by their own store. This lesson gives them one home: a single SQLite file whose schema is created and evolved by numbered migration files.",
+      "A migration is a SQL file with a number. StateDB.migrate() applies the ones not yet recorded in schema_migrations, in order, each in its own transaction, and records the name. Run it on an empty file and you get the full schema; run it again and nothing happens; add 005_something.sql and only that applies. A client's laptop, a free host, and your machine all end up with the same tables, and a schema change is a reviewable file in git.",
+      "The connection context manager is the Python idea this lesson introduces: with db.connection() as conn commits when the block ends normally and rolls back when an exception escapes, so a half-written approval row cannot survive a crash in the middle of approve()."
+    ],
+    "lowCodeEquivalent": "Dataverse tables with solution-managed schema changes: you never edited a production table by hand, you shipped a solution. Migrations are the solution file for SQLite."
+  },
+  "pythonBlock": {
+    "title": "Python you need: context managers",
+    "intro": "@contextmanager turns a generator into a with-block: everything before yield is setup, after yield is teardown, and a finally runs even when the body raises.",
+    "code": "from contextlib import contextmanager\nimport sqlite3\n\n@contextmanager\ndef connection(self):\n    conn = sqlite3.connect(self.db_path)\n    conn.row_factory = sqlite3.Row\n    try:\n        yield conn          # the with-block body runs here\n        conn.commit()       # normal exit\n    except BaseException:\n        conn.rollback()     # the body raised: undo everything\n        raise\n    finally:\n        conn.close()\n\nwith db.connection() as conn:\n    conn.execute(\"INSERT INTO schema_migrations (version, applied_at) VALUES (?, ?)\", (name, now))",
+    "resource": { "type": "docs", "label": "Python docs - contextlib.contextmanager", "url": "https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/tools/db.py", "middleware/tools/migrations/001_approvals.sql", "middleware/tools/migrations/004_memory.sql"],
+    "spec": [
+      "Write migrations 001 to 004 per tools/migrations/README.md with the exact columns the Module 3 and 4 stores use (CREATE TABLE IF NOT EXISTS).",
+      "Implement StateDB: connection() as a commit/rollback context manager, migrate() with a schema_migrations ledger and one transaction per file, schema_version(), tables().",
+      "Point the three stores and the server at one STATE_DB path (keep APPROVALS_DB, TASKS_DB as overrides if you like) and run migrate() at server startup.",
+      "Delete your local state file, start the server, and confirm the tables appear from the migrations alone."
+    ],
+    "askClaudeFor": [
+      "Why each migration runs in its own transaction and what happens to the ledger when 002 fails after 001 succeeded (the check tests this).",
+      "What executescript does with transactions, and whether to use it or execute per statement."
+    ],
+    "writeYourself": [
+      "The four SQL files and the connection context manager.",
+      "migrate(), including the ledger insert in the same transaction as the DDL."
+    ],
+    "resources": [
+      { "type": "docs", "label": "SQLite docs - Transactions and executescript", "url": "https://www.sqlite.org/lang_transaction.html" },
+      { "type": "repo", "label": "Microsoft MCP for Beginners - Module 11 (Database Integration)", "url": "https://github.com/microsoft/mcp-for-beginners" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m5-1-stateless-schema",
+    "command": "uv run --directory middleware python checks/run.py m5-1-stateless-schema",
+    "summary": "Migrations apply from empty in order with the required tables and columns, a second run is a no-op, a new file applies incrementally, a broken file is not recorded, the connection commits and rolls back, and the Module 3/4 stores work on the migrated file."
+  }
+}

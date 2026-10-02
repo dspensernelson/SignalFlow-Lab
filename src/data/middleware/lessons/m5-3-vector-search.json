@@ -1,0 +1,50 @@
+{
+  "id": "m5-3-vector-search",
+  "module": "m5",
+  "order": 3,
+  "title": "When a vector store is warranted: the smallest viable RAG",
+  "estimateHours": 8,
+  "concept": {
+    "heading": "Search by meaning over prose nobody indexed, and nowhere else",
+    "paragraphs": [
+      "Donor lookups, totals and dates are structured: the CRM and a query answer them exactly, and a vector store there only adds cost and fuzz. The pantry's gift acceptance policy, refund rules and receipt wording are prose. Staff ask questions about them in their own words, and the answer is a paragraph. That is the one place a vector store earns its keep.",
+      "The whole mechanism is four steps. Chunk each document into paragraphs (split long ones at sentence ends). Embed each chunk: a model turns text into a vector so that similar meanings land near each other. Store the vectors next to the text, here in SQLite with the sqlite-vec extension, so there is no extra service to run. At query time, embed the question and return the nearest chunks. The model then answers from those chunks instead of from memory, and cites them.",
+      "The embedder is injectable. The check uses a deterministic stand-in so it runs in a second with no download; you run the real one, fastembed's small ONNX model on CPU, by hand and compare results. If a machine cannot fetch the model, the provider wrapper's embedding call is the fallback with the same interface."
+    ],
+    "lowCodeEquivalent": "A knowledge source attached to a Copilot Studio agent, or SharePoint search in a flow. You configured it; here you build the index and decide the chunking, which is where most RAG quality comes from."
+  },
+  "pythonBlock": {
+    "title": "Python you need: sqlite3 extensions, virtual tables, array packing",
+    "intro": "sqlite-vec adds a vec0 virtual table that stores float arrays and answers nearest-neighbor queries. Vectors are passed as packed float32 bytes.",
+    "code": "import sqlite3, struct\nimport sqlite_vec\n\nconn = sqlite3.connect(path)\nconn.enable_load_extension(True); sqlite_vec.load(conn); conn.enable_load_extension(False)\nconn.execute(\"CREATE VIRTUAL TABLE IF NOT EXISTS chunk_vectors USING vec0(embedding float[384])\")\n\ndef pack(vec):\n    return struct.pack(f\"{len(vec)}f\", *vec)\n\nconn.execute(\"INSERT INTO chunk_vectors (rowid, embedding) VALUES (?, ?)\", (rowid, pack(vector)))\nrows = conn.execute(\n    \"SELECT rowid, distance FROM chunk_vectors WHERE embedding MATCH ? ORDER BY distance LIMIT ?\",\n    (pack(query_vector), k),\n).fetchall()\n\n# fastembed, run once by hand:\n# from fastembed import TextEmbedding\n# model = TextEmbedding(\"BAAI/bge-small-en-v1.5\")   # ~70 MB, CPU\n# vectors = [list(v) for v in model.embed(texts)]",
+    "resource": { "type": "docs", "label": "sqlite-vec - Python usage", "url": "https://alexgarcia.xyz/sqlite-vec/python.html" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/tools/rag.py", "middleware/policies/gift-acceptance.md", "middleware/mcp_server/server.py"],
+    "spec": [
+      "Run uv sync --extra rag. Implement chunk_text, load_policies, default_embedder (lazy fastembed import), and PolicyIndex (sqlite-vec vec0 table, index_documents with per-doc replacement, search ordered by distance).",
+      "Add the tool search_policy(question) -> {hits: [{doc_id, text, distance}]}, requiring donors:read, backed by an index built from middleware/policies/ at startup.",
+      "Ask the three questions from the check against the real fastembed model and compare the top chunk with the hashing stand-in. Note any difference in your README.",
+      "Add one more policy document of your own (volunteer gifts, event sponsorships) and confirm the right chunk comes back for a question about it."
+    ],
+    "askClaudeFor": [
+      "How to choose max_chars for chunking and what breaks when chunks are too small or too large.",
+      "What cosine distance means for normalized vectors and why L2-normalizing the embeddings matters."
+    ],
+    "writeYourself": [
+      "chunk_text and the index's insert and search SQL.",
+      "The search_policy tool."
+    ],
+    "resources": [
+      { "type": "course", "label": "Hugging Face AI Agents Course - the RAG unit", "url": "https://huggingface.co/learn/agents-course" },
+      { "type": "docs", "label": "fastembed - Getting started", "url": "https://qdrant.github.io/fastembed/" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m5-3-vector-search",
+    "command": "uv run --directory middleware python checks/run.py m5-3-vector-search",
+    "summary": "Chunking is stable and bounded; the three policy documents load; with an injected deterministic embedder the vehicle, refund-window and receipt-statement questions each return the right chunk first; re-indexing a document replaces its chunks."
+  }
+}
