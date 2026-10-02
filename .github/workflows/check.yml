@@ -16,3 +16,18 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+
+  # The Middleware track's Python workspace. Lesson checks are red by design
+  # (the repo ships stubs), so this job proves the scaffolding: the mock
+  # services and runner self-tests pass, and every lesson check collects.
+  middleware:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: middleware/uv.lock
+      - run: uv sync --all-extras --directory middleware
+      - run: uv run --directory middleware pytest checks/_infra -q
+      - run: uv run --directory middleware pytest checks --collect-only -q
