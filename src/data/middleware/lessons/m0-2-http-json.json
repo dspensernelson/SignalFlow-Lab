@@ -1,0 +1,49 @@
+{
+  "id": "m0-2-http-json",
+  "module": "m0",
+  "order": 2,
+  "title": "HTTP and JSON as code: a typed CRM client",
+  "estimateHours": 5,
+  "concept": {
+    "heading": "A connector is a class: one method per action, typed in and typed out",
+    "paragraphs": [
+      "Every custom connector you have configured is a list of actions with an input schema and an output schema. In code that list is a class. DonorClient has one method per CRM action, and each method returns a pydantic model, not a dict, so a typo in a field name is caught the moment the response is parsed rather than three steps later in a flow.",
+      "The second idea is naming failures. The CRM says 404 when a donor does not exist. A dict-returning client would hand back an empty body and let the caller guess. DonorNotFound carries the donor id and a message, so the tool layer you build in Module 1 can turn it into an error the model can act on.",
+      "Watch the simulation: the model never touches HTTP. The middleware turns a tool call into a request with headers and a query string, validates the response, and hands back trimmed data. That boundary is where you work for the rest of the track."
+    ],
+    "lowCodeEquivalent": "Copilot Studio's custom connector actions, or the HTTP module in n8n with a Set node that renames fields. The schema you clicked together there is a pydantic class here."
+  },
+  "pythonBlock": {
+    "title": "Python you need: classes, type hints, and pydantic models",
+    "intro": "A pydantic BaseModel validates data at construction. A class holds the base URL once and reuses it in every method.",
+    "code": "from pydantic import BaseModel\nimport httpx\n\nclass Donor(BaseModel):\n    id: int\n    email: str\n    phone: str | None = None   # optional, may be null\n\nclass DonorClient:\n    def __init__(self, base_url: str, timeout: float = 5.0):\n        self.base_url = base_url.rstrip('/')\n        self.timeout = timeout\n\n    def get_donor(self, donor_id: int) -> Donor:\n        with httpx.Client(timeout=self.timeout) as http:\n            r = http.get(f'{self.base_url}/donors/{donor_id}')\n        # TODO: 404 -> raise DonorNotFound(donor_id); other errors -> CrmError\n        return Donor.model_validate(r.json())",
+    "resource": { "type": "docs", "label": "pydantic - Models", "url": "https://docs.pydantic.dev/latest/concepts/models/" }
+  },
+  "simulate": { "scenarioId": "request-crossing" },
+  "build": {
+    "files": ["middleware/tools/client.py"],
+    "spec": [
+      "Implement DonorClient.find_donors(q), get_donor(id), and get_donations(id) against the mock CRM (shapes in mock_services/crm.py).",
+      "Every method returns pydantic models (Donor, Donation), never raw dicts.",
+      "A 404 raises DonorNotFound(donor_id); any other non-2xx raises CrmError with the status code in the message.",
+      "Keep one httpx.Client per call or per client instance; either is fine, but set the timeout."
+    ],
+    "askClaudeFor": [
+      "A review of your error mapping: which status codes become which exception.",
+      "How model_validate and a list comprehension turn a JSON array into list[Donation]."
+    ],
+    "writeYourself": [
+      "The three methods, including the status-code branch in each.",
+      "The DonorNotFound raise and the message that names the id."
+    ],
+    "resources": [
+      { "type": "docs", "label": "httpx - Exceptions and raise_for_status", "url": "https://www.python-httpx.org/exceptions/" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m0-2-http-json",
+    "command": "uv run --directory middleware python checks/run.py m0-2-http-json",
+    "summary": "Calls your client against a fresh mock CRM: typed donors and donations come back, near-duplicate names stay distinct, and donor 999 raises DonorNotFound."
+  }
+}

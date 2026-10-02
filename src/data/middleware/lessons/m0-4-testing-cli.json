@@ -1,0 +1,49 @@
+{
+  "id": "m0-4-testing-cli",
+  "module": "m0",
+  "order": 4,
+  "title": "Testing and a CLI: the flow, rebuilt and proven",
+  "estimateHours": 5,
+  "concept": {
+    "heading": "A test is a saved run; a CLI is a flow you can call from anything",
+    "paragraphs": [
+      "pytest tests are small functions that call your code with known input and assert the result. The three you write here are the ones every mapping deserves: the golden case, the unsupported input, and the exit code of the command line. From now on, every lesson's acceptance check is a pytest file; writing your own first makes the checks readable.",
+      "typer turns a function into a command. uv run python -m tools.cli transform event.json is the whole Make scenario from Module 0, runnable from a scheduler, a shell script, or a client's server, with exit codes that a calling system can act on: 0 worked, 2 bad input.",
+      "This closes Module 0: one low-code flow (webhook in, mapped record out) now exists as a client, a transform, a CLI, and tests. The explain-it at the end asks you to tell a client what moved and why it is now more testable."
+    ],
+    "lowCodeEquivalent": "A scheduled or manually triggered flow with a run history. The CLI is the trigger; the tests are the run history you can replay on demand."
+  },
+  "pythonBlock": {
+    "title": "Python you need: pytest basics, fixtures, typer",
+    "intro": "A fixture is a function pytest calls to build an input; tmp_path is a built-in one that gives a fresh folder per test.",
+    "code": "# middleware/tests/test_transform.py\nimport json, subprocess, sys\nimport pytest\nfrom tools.transform import webhook_to_donation, UnsupportedEvent\n\n@pytest.fixture\ndef event():\n    return json.load(open('checks/m0/golden/sample_event.json'))  # or build a dict inline\n\ndef test_golden(event):\n    assert webhook_to_donation(event).amount_cents == 7500\n\ndef test_refund_is_unsupported(event):\n    event['type'] = 'charge.refunded'\n    with pytest.raises(UnsupportedEvent):\n        webhook_to_donation(event)\n\ndef test_cli_exit_code(tmp_path):\n    proc = subprocess.run([sys.executable, '-m', 'tools.cli', 'transform', str(tmp_path / 'missing.json')])\n    assert proc.returncode == 2",
+    "resource": { "type": "docs", "label": "pytest - How to use fixtures", "url": "https://docs.pytest.org/en/stable/how-to/fixtures.html" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/tools/cli.py", "middleware/tests/test_transform.py"],
+    "spec": [
+      "Implement the transform command: read the event file, call webhook_to_donation, print the record as JSON (indent 2) to stdout or write it to --out.",
+      "Exit 2 with a one-line stderr reason (no traceback) when the file is missing, is not JSON, or is an unsupported event.",
+      "Write middleware/tests/test_transform.py with at least three tests: a golden mapping, the UnsupportedEvent case, and a CLI exit code.",
+      "Run uv run pytest tests -q yourself before running the check."
+    ],
+    "askClaudeFor": [
+      "The typer boilerplate and how typer.Exit(code=2) works.",
+      "A review of your tests: do they fail if the transform is wrong? Break the transform on purpose and watch."
+    ],
+    "writeYourself": [
+      "The transform command body, including the error branches.",
+      "All three tests."
+    ],
+    "resources": [
+      { "type": "docs", "label": "typer - Tutorial", "url": "https://typer.tiangolo.com/tutorial/" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m0-4-testing-cli",
+    "command": "uv run --directory middleware python checks/run.py m0-4-testing-cli",
+    "summary": "Runs the CLI on good and bad input (exit 0 / 2, no tracebacks) and runs your own tests/test_transform.py, which must collect at least three passing tests."
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "id": "request-crossing",
+  "title": "One request crossing from the agent to the CRM and back",
+  "steps": [
+    {
+      "id": "s1",
+      "kind": "request",
+      "from": "user",
+      "to": "agent",
+      "label": "Staff asks a question",
+      "status": "ok",
+      "payloadTitle": "Chat message",
+      "payload": { "role": "user", "content": "Did Maria Alvarez give this spring?" },
+      "annotate": "Plain language in. Nothing about HTTP yet.",
+      "nodeStates": { "user": "active", "agent": "waiting" },
+      "durationMs": 1200
+    },
+    {
+      "id": "s2",
+      "kind": "request",
+      "from": "agent",
+      "to": "tool-router",
+      "label": "Model picks a tool and fills its arguments",
+      "status": "ok",
+      "payloadTitle": "Tool call (JSON the model produced)",
+      "payload": { "tool": "find_donor", "arguments": { "query": "Maria Alvarez" } },
+      "annotate": "The model does not call the CRM. It emits a structured request and waits.",
+      "nodeStates": { "user": "idle", "agent": "active", "tool-router": "waiting" },
+      "durationMs": 1400
+    },
+    {
+      "id": "s3",
+      "kind": "request",
+      "from": "tool-router",
+      "to": "donor-crm",
+      "label": "Middleware turns the tool call into HTTP",
+      "status": "ok",
+      "payloadTitle": "HTTP request",
+      "payload": {
+        "method": "GET",
+        "url": "http://crm.local/donors?q=Maria%20Alvarez",
+        "headers": { "Accept": "application/json", "Authorization": "Bearer <redacted>" }
+      },
+      "annotate": "Headers, query string, a bearer token. This is what you build in Module 0.",
+      "nodeStates": { "agent": "waiting", "tool-router": "active", "donor-crm": "waiting" },
+      "counters": { "hop": 1 },
+      "durationMs": 1400
+    },
+    {
+      "id": "s4",
+      "kind": "response",
+      "from": "donor-crm",
+      "to": "tool-router",
+      "label": "CRM answers with JSON",
+      "status": "ok",
+      "payloadTitle": "HTTP 200 response body",
+      "payload": [
+        { "id": 1, "first_name": "Maria", "last_name": "Alvarez", "email": "maria.alvarez@example.org" },
+        { "id": 2, "first_name": "Maria", "last_name": "Alvarez-Reyes", "email": "m.alvarezreyes@example.org" }
+      ],
+      "annotate": "Two matches, not one. The client must not guess; the model gets both.",
+      "nodeStates": { "donor-crm": "ok", "tool-router": "active" },
+      "durationMs": 1400
+    },
+    {
+      "id": "s5",
+      "kind": "response",
+      "from": "tool-router",
+      "to": "agent",
+      "label": "Typed result goes back as a tool result",
+      "status": "ok",
+      "payloadTitle": "Tool result (validated by pydantic)",
+      "payload": {
+        "tool": "find_donor",
+        "result": { "matches": 2, "donors": [ { "id": 1, "name": "Maria Alvarez" }, { "id": 2, "name": "Maria Alvarez-Reyes" } ] }
+      },
+      "annotate": "Validated, trimmed, no secrets. The model sees data, never raw HTTP.",
+      "nodeStates": { "tool-router": "ok", "agent": "active" },
+      "durationMs": 1300
+    },
+    {
+      "id": "s6",
+      "kind": "response",
+      "from": "agent",
+      "to": "user",
+      "label": "Model answers, or asks which Maria",
+      "status": "ok",
+      "payloadTitle": "Chat message",
+      "payload": { "role": "assistant", "content": "I found two donors named Maria Alvarez. Do you mean Maria Alvarez (monthly giver) or Maria Alvarez-Reyes (board member)?" },
+      "annotate": "A good tool result makes the model ask the right follow-up instead of guessing.",
+      "nodeStates": { "agent": "ok", "user": "active" },
+      "durationMs": 1500
+    }
+  ]
+}

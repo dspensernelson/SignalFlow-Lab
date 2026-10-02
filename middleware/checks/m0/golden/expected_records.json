@@ -1,0 +1,22 @@
+{
+  "evt_01HZX4Q0001": {
+    "donor_email": "maria.alvarez@example.org",
+    "donor_name": "Maria Alvarez",
+    "amount_cents": 7500,
+    "currency": "USD",
+    "method": "ach",
+    "received_at": "2026-01-25T13:20:00Z",
+    "processor_ref": "ch_338804917",
+    "campaign": "spring-appeal"
+  },
+  "evt_01HZX4Q0002": {
+    "donor_email": "priya.n@example.org",
+    "donor_name": "Priya Natarajan",
+    "amount_cents": 12000,
+    "currency": "USD",
+    "method": "card",
+    "received_at": "2026-01-26T13:20:00Z",
+    "processor_ref": "ch_990011223",
+    "campaign": "spring-appeal"
+  }
+}

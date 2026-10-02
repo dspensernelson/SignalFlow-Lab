@@ -1,0 +1,51 @@
+{
+  "id": "m0-1-environment",
+  "module": "m0",
+  "order": 1,
+  "title": "Environment: uv, a script, a traceback",
+  "estimateHours": 3,
+  "concept": {
+    "heading": "A Python project is a folder with a lockfile and a way to run things",
+    "paragraphs": [
+      "uv manages the Python version, the virtual environment, and the dependencies for the middleware/ folder from one file, pyproject.toml. You never activate anything by hand: uv run python ... runs inside the right environment every time, on every machine, including a client's.",
+      "The first program in this track does one thing a connector does: call an HTTP endpoint, parse JSON, and hand one field onward. It also fails on purpose once, so you read a traceback from the bottom up and then make the failure a clean exit code instead of a crash.",
+      "That last part is the habit of the whole track. A middleware layer meets failures constantly: a 404, a timeout, a missing field. Each one is an expected outcome with a name, not an exception that escapes to the person asking."
+    ],
+    "lowCodeEquivalent": "This is the HTTP action in Make or Power Automate with a parse-JSON step after it, plus the run history you read when it fails. In code, the run history is the traceback and the exit code."
+  },
+  "pythonBlock": {
+    "title": "Python you need: running a module and reading a traceback",
+    "intro": "A file under a package runs with python -m package.module. When it crashes, read the last line first (the error), then the nearest line in your own file.",
+    "code": "uv run python -m hello.fetch_api http://127.0.0.1:8001/health --field status\n\n# Traceback (most recent call last):\n#   File \"hello/fetch_api.py\", line 31, in main\n#     response.raise_for_status()\n# httpx.HTTPStatusError: Client error '404 Not Found' ...\n#\n# Bottom line: what went wrong. Nearest line in YOUR file: where to handle it.",
+    "resource": { "type": "docs", "label": "uv docs - Running scripts and projects", "url": "https://docs.astral.sh/uv/" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/hello/fetch_api.py"],
+    "spec": [
+      "Run uv sync inside middleware/ once; it creates .venv and installs the core dependencies.",
+      "Start the mock CRM in a second terminal: uv run python -m mock_services crm --port 8001.",
+      "Implement main(argv) so that uv run python -m hello.fetch_api <url> --field <name> prints one JSON line {url, field, value}.",
+      "A missing field exits 2 with {\"error\": \"missing_field\", \"field\": \"<name>\"} on stderr; a non-2xx response exits 1 with error: HTTP <status> on stderr and no traceback.",
+      "Try it against a public JSON API too (any that needs no key), then against the CRM."
+    ],
+    "askClaudeFor": [
+      "The argparse skeleton: url positional, --field option.",
+      "What httpx.Client(timeout=5) and response.raise_for_status() do."
+    ],
+    "writeYourself": [
+      "The try/except that turns an HTTPStatusError into exit code 1 and a one-line message.",
+      "The field lookup and the JSON line printed to stdout."
+    ],
+    "resources": [
+      { "type": "docs", "label": "httpx - QuickStart", "url": "https://www.python-httpx.org/quickstart/" },
+      { "type": "course", "label": "py4e - Chapter 13: Using Web Services", "url": "https://www.py4e.com/" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m0-1-environment",
+    "command": "uv run --directory middleware python checks/run.py m0-1-environment",
+    "summary": "Runs your script as a subprocess against the mock CRM: prints the field as JSON, exits 2 on a missing field, exits 1 with no traceback on a 404."
+  }
+}

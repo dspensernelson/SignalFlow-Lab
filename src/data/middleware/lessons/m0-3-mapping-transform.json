@@ -1,0 +1,50 @@
+{
+  "id": "m0-3-mapping-transform",
+  "module": "m0",
+  "order": 3,
+  "title": "Mapping and transformation, and where secrets live",
+  "estimateHours": 5,
+  "concept": {
+    "heading": "A mapping is a pure function with a golden example",
+    "paragraphs": [
+      "The payment processor sends a webhook event shaped the processor's way: nested objects, cents, lowercase currency, an epoch timestamp. The CRM wants a flat donation record shaped its way. In Make this is the mapping panel; in code it is one function, webhook_to_donation(event), that takes the event dict and returns a DonationRecord.",
+      "Pure means the function depends only on its input. That is what makes it testable with a golden case: the exact event the processor sent last week, and the exact record it must become. When the processor renames a field, the golden test fails before a bad record reaches the CRM.",
+      "This lesson also introduces configuration. The CRM key comes from the environment through a git-ignored .env file, read once by load_config(). It is never a default in code, never in a log line, never in a test fixture. The check proves it by capturing every log line and grepping for the key."
+    ],
+    "lowCodeEquivalent": "The mapping panel of a Make scenario or the Compose and Parse JSON actions in Power Automate, plus the connection reference that held the key. The connection reference becomes an environment variable."
+  },
+  "pythonBlock": {
+    "title": "Python you need: dicts, comprehensions, dataclass vs pydantic, .env",
+    "intro": "Nested dict access with .get() avoids KeyError on optional fields. pydantic (not dataclass) is used here because it validates; dataclass only stores.",
+    "code": "import os\nfrom datetime import datetime, timezone\nfrom dotenv import load_dotenv\n\nload_dotenv()                      # reads .env into os.environ, once\nkey = os.environ.get('CRM_API_KEY')  # None when missing -> raise ValueError('CRM_API_KEY ...')\n\ncharge = event['data']['object']\ncampaign = charge.get('metadata', {}).get('campaign')   # None when absent\nemails = [d['email'].strip().lower() for d in donors]    # a comprehension\nwhen = datetime.fromtimestamp(event['created'], tz=timezone.utc)\nstamp = when.strftime('%Y-%m-%dT%H:%M:%SZ')",
+    "resource": { "type": "docs", "label": "python-dotenv - Getting started", "url": "https://pypi.org/project/python-dotenv/" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/tools/transform.py", "middleware/.env"],
+    "spec": [
+      "Copy .env.example to .env and set CRM_API_KEY to any value. Confirm .env is git-ignored (git status must not list it).",
+      "Implement load_config(): load .env, build Config from CRM_URL and CRM_API_KEY, raise ValueError naming CRM_API_KEY when it is missing.",
+      "Implement webhook_to_donation(event) per the field rules in the DonationRecord docstring; raise UnsupportedEvent for anything but charge.succeeded.",
+      "Log exactly one INFO line per event ('transformed <event id> -> <charge id>') and never log any config value.",
+      "Compare your output against checks/m0/golden/expected_records.json before running the check."
+    ],
+    "askClaudeFor": [
+      "A review of the method mapping (ach_debit -> ach, card -> card, check -> check) for anything you missed.",
+      "How caplog works in pytest, so you understand what the secret-in-logs test is doing."
+    ],
+    "writeYourself": [
+      "The whole webhook_to_donation function, field by field.",
+      "load_config and its ValueError."
+    ],
+    "resources": [
+      { "type": "docs", "label": "Python tutorial - Data Structures (dicts, comprehensions)", "url": "https://docs.python.org/3/tutorial/datastructures.html" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m0-3-mapping-transform",
+    "command": "uv run --directory middleware python checks/run.py m0-3-mapping-transform",
+    "summary": "Golden input produces golden output for two events, a refund raises UnsupportedEvent, config loads from the environment, and the secret is absent from captured logs."
+  }
+}
