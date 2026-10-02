@@ -15,13 +15,22 @@
   },
   "pythonBlock": {
     "title": "Python you need: TypedDict state, an event loop on a thread, LangGraph's StateGraph",
-    "intro": "Run one asyncio loop on a daemon thread and submit coroutines to it with run_coroutine_threadsafe; that is the whole async-to-sync bridge.",
-    "code": "import asyncio, threading\nfrom langgraph.graph import StateGraph, START, END\n\nclass MCPToolSource:\n    def __enter__(self):\n        self._loop = asyncio.new_event_loop()\n        self._thread = threading.Thread(target=self._loop.run_forever, daemon=True); self._thread.start()\n        self._client = self._run(self._connect())   # async with Client(target) ... kept open\n        return self\n    def _run(self, coro):\n        return asyncio.run_coroutine_threadsafe(coro, self._loop).result(timeout=60)\n    def call(self, name, arguments):\n        return result_json(self._run(self._client.call_tool(name, arguments)))\n\ngraph = StateGraph(AgentState)\ngraph.add_node(\"supervisor\", supervisor); graph.add_node(\"lookup\", lookup); graph.add_node(\"draft\", draft)\ngraph.add_node(\"approval\", approval); graph.add_node(\"done\", done)\ngraph.add_edge(START, \"supervisor\")\ngraph.add_conditional_edges(\"supervisor\", lambda s: s[\"route\"], {r: r for r in ROUTES})\nfor n in (\"lookup\", \"draft\", \"approval\"): graph.add_edge(n, \"supervisor\")\ngraph.add_edge(\"done\", END)\ncompiled = graph.compile(checkpointer=checkpointer)",
-    "resource": { "type": "docs", "label": "LangGraph docs - Graph API overview", "url": "https://docs.langchain.com/oss/python/langgraph/overview" }
+    "intro": "Run one asyncio loop on a daemon thread and let ONE task own the Client for its whole life: anyio's cancel scopes must be entered and exited by the same task, so a serve loop that enters once, answers jobs from a queue, and exits once is the whole bridge.",
+    "code": "import asyncio, concurrent.futures, threading\nfrom langgraph.graph import StateGraph, START, END\n\nclass MCPToolSource:\n    async def _serve(self):                      # the one task that owns the client\n        async with Client(self.target) as client:\n            self._ready.set_result(True)\n            while (job := await self._queue.get()) is not None:\n                future, fn = job\n                try:\n                    future.set_result(await fn(client))\n                except BaseException as e:\n                    future.set_exception(e)\n    def _run(self, fn):                           # called from graph nodes (sync)\n        future = concurrent.futures.Future()\n        self._loop.call_soon_threadsafe(self._queue.put_nowait, (future, fn))\n        return future.result(timeout=60)\n    def call(self, name, arguments):\n        return result_json(self._run(lambda c: c.call_tool(name, arguments)))\n\ngraph = StateGraph(AgentState)\nfor name, fn in nodes.items(): graph.add_node(name, fn)\ngraph.add_edge(START, \"supervisor\")\ngraph.add_conditional_edges(\"supervisor\", lambda s: s[\"route\"], {r: r for r in ROUTES})\nfor n in (\"lookup\", \"draft\"): graph.add_edge(n, \"supervisor\")\ngraph.add_edge(\"done\", END)\ncompiled = graph.compile(checkpointer=checkpointer)",
+    "resource": {
+      "type": "docs",
+      "label": "LangGraph docs - Graph API overview",
+      "url": "https://docs.langchain.com/oss/python/langgraph/overview"
+    }
   },
-  "simulate": { "scenarioId": "supervisor-routing" },
+  "simulate": {
+    "scenarioId": "supervisor-routing"
+  },
   "build": {
-    "files": ["middleware/agent/mcp_tools.py", "middleware/agent/graph.py"],
+    "files": [
+      "middleware/agent/mcp_tools.py",
+      "middleware/agent/graph.py"
+    ],
     "spec": [
       "Run uv sync --extra graph. Implement MCPToolSource (loop thread, one Client for the with-block, tools(), call()).",
       "Implement build_graph with the four nodes and the conditional edges per the stub; the lookup node offers read tools only and refuses writes; an unknown route ends the run.",
@@ -37,8 +46,16 @@
       "The supervisor and lookup nodes."
     ],
     "resources": [
-      { "type": "course", "label": "DeepLearning.AI - AI Agents in LangGraph", "url": "https://www.deeplearning.ai/short-courses/" },
-      { "type": "course", "label": "Hugging Face AI Agents Course - frameworks unit (LangGraph)", "url": "https://huggingface.co/learn/agents-course" }
+      {
+        "type": "course",
+        "label": "DeepLearning.AI - AI Agents in LangGraph",
+        "url": "https://www.deeplearning.ai/short-courses/"
+      },
+      {
+        "type": "course",
+        "label": "Hugging Face AI Agents Course - frameworks unit (LangGraph)",
+        "url": "https://huggingface.co/learn/agents-course"
+      }
     ]
   },
   "check": {

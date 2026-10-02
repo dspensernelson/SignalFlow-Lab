@@ -14,7 +14,11 @@ Spec (the check asserts this):
   ``StdioServerParameters``.
 - ``__enter__`` starts the loop thread and connects; ``__exit__``
   disconnects and stops the thread. Use it as ``with MCPToolSource(...) as
-  tools:``.
+  tools:``. Pitfall: anyio cancel scopes must be entered and exited by the
+  SAME task, so do not ``__aenter__`` the Client from one
+  ``run_coroutine_threadsafe`` call and ``__aexit__`` it from another. Let
+  one long-lived task own the Client: it enters ``async with Client(...)``,
+  answers jobs from a queue, and exits when it reads a stop sentinel.
 - ``tools(names=None) -> list[dict]``: provider-agnostic specs
   ``{"name", "description", "input_schema"}`` for every server tool, or
   only ``names`` when given (keeps the agent's tool list small).
