@@ -43,9 +43,11 @@ def test_same_webhook_three_times_is_one_receipt(fresh_crm, tmp_path):
 def test_crm_level_key_protects_a_crash_between_steps(fresh_crm, tmp_path):
     """Even if the local store forgot (a crash after the POST), the CRM key dedupes."""
     client = DonorClient(fresh_crm.base_url)
-    event = copy.deepcopy(SAMPLE_EVENTS[1])  # Priya
-    handle_webhook(event, IdempotencyStore(tmp_path / "a.db"), client)
-    handle_webhook(event, IdempotencyStore(tmp_path / "b.db"), client)  # fresh store, same event
+    event = copy.deepcopy(SAMPLE_EVENTS[0])  # Maria, ch_338804917 (seeded)
+    first = handle_webhook(event, IdempotencyStore(tmp_path / "a.db"), client)
+    assert first["status"] == "processed"
+    again = handle_webhook(event, IdempotencyStore(tmp_path / "b.db"), client)  # fresh store, same event
+    assert again["status"] in ("processed", "duplicate")
     assert len(httpx.get(f"{fresh_crm.base_url}/receipts").json()) == 1
 
 
