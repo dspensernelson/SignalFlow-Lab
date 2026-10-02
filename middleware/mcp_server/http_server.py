@@ -15,10 +15,16 @@ Run it by hand::
 
 Spec (the check asserts this):
 
-- ``build_app(client=None) -> Starlette`` returns
-  ``build_server(client).streamable_http_app(stateless_http=True,
-  json_response=True)`` (stateless: no MCP-Session-Id is issued or required);
+- ``build_app(client=None, *, resource_url="http://127.0.0.1:8080/mcp")
+  -> Starlette`` returns ``build_server(client, ...).streamable_http_app(
+  stateless_http=True, json_response=True)`` (stateless: no MCP-Session-Id
+  is issued or required);
 - ``main()`` serves it with uvicorn on ``127.0.0.1:$PORT`` (default 8080).
+- Lesson m3-2 adds authentication: when ``MCP_TOKENS`` is set, build_app
+  passes ``token_verifier=StaticTokenVerifier(parse_token_table(MCP_TOKENS))``
+  and ``auth=auth_settings(resource_url)`` through to ``build_server`` (which
+  forwards them to ``MCPServer(...)``), so every request without a valid
+  bearer token is answered 401.
 
 Python you need: ``async``/``await``. The SDK's HTTP transport is async; your
 tool functions may stay plain ``def`` (the SDK runs them on a worker
@@ -35,8 +41,8 @@ from mcp_server.server import build_server
 from tools.client import DonorClient
 
 
-def build_app(client: DonorClient | None = None) -> Starlette:
-    server = build_server(client)  # noqa: F841 - wrap it as a stateless HTTP app
+def build_app(client: DonorClient | None = None, *, resource_url: str = "http://127.0.0.1:8080/mcp") -> Starlette:
+    server = build_server(client)  # noqa: F841 - wrap it as a stateless HTTP app (m3-2: pass auth kwargs)
     raise NotImplementedError("Lesson m2-4: implement build_app in mcp_server/http_server.py")
 
 

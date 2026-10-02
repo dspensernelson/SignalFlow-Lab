@@ -1,0 +1,49 @@
+{
+  "id": "m3-3-approval-gate",
+  "module": "m3",
+  "order": 3,
+  "title": "Permission boundaries by design: the approval gate",
+  "estimateHours": 7,
+  "concept": {
+    "heading": "A write tool records a request; a different person, with a different scope, executes it",
+    "paragraphs": [
+      "A scope says what a token may ask for. It does not say a person agreed to this particular action. So write tools stop executing: create_receipt checks its scope, records a pending approval in SQLite, and returns pending_approval with the id. The model can explain the hold to the staff member, and it cannot route around it, because no tool executes a write directly.",
+      "approve_pending is the second tool, callable only with donors:approve, held by a different person (the director's token). It executes the recorded write exactly once and stores the result on the row; approving twice returns not_found with status approved. That makes the gate a dedupe as well as a control, which Module 4 builds on.",
+      "This is the boundary a nonprofit director can understand without reading code: the assistant can look things up; it cannot send, record or change anything until a named person says yes, and the yes is logged. MCP also offers elicitation, where the server asks the host to prompt the user inline; the queue pattern is used here because it survives a dropped connection and works from any host."
+    ],
+    "lowCodeEquivalent": "The Approvals connector in Power Automate: the flow stops at Start and wait for an approval, a person acts on it, and the run resumes. The difference: here the approval and the resumption are in your database, not inside one platform."
+  },
+  "pythonBlock": {
+    "title": "Python you need: context managers, sqlite3 rows, uuid, json round-trips",
+    "intro": "with closes the connection even when an exception escapes. Row factories give you dict-like rows. Store JSON as text and parse it on the way out.",
+    "code": "import json, sqlite3, uuid\nfrom datetime import datetime, timezone\n\ndef request(self, tool, arguments):\n    aid = uuid.uuid4().hex[:12]\n    with self._connect() as conn:                     # commits on success, closes on exit\n        conn.execute(\n            \"INSERT INTO approvals (id, tool, arguments, status, requested_at) VALUES (?,?,?,?,?)\",\n            (aid, tool, json.dumps(arguments), \"pending\", datetime.now(timezone.utc).isoformat()),\n        )\n    return aid\n\ndef get(self, aid):\n    with self._connect() as conn:\n        row = conn.execute(\"SELECT * FROM approvals WHERE id = ?\", (aid,)).fetchone()\n    if row is None:\n        return None\n    d = dict(row); d[\"arguments\"] = json.loads(d[\"arguments\"]); d[\"result\"] = json.loads(d[\"result\"]) if d[\"result\"] else None\n    return d",
+    "resource": { "type": "docs", "label": "Python docs - sqlite3 (connection as context manager, row_factory)", "url": "https://docs.python.org/3/library/sqlite3.html" }
+  },
+  "simulate": { "scenarioId": "write-held-at-gate" },
+  "build": {
+    "files": ["middleware/tools/approvals.py", "middleware/mcp_server/server.py"],
+    "spec": [
+      "Implement ApprovalStore per the stub: table creation, request, get, list_pending, approve (executes once, stores result, second approve is not_found with status approved), reject.",
+      "In the server: create_receipt requires donors:write, then records the request and returns error_result('pending_approval', ..., approval_id=...). Nothing is sent.",
+      "Add list_pending_approvals() -> {pending: [...]} and approve_pending(approval_id, decided_by) -> the executed write's result, both requiring donors:approve; the store path is Settings.approvals_db.",
+      "Walk the simulation, then reproduce it by hand with the three tokens: write token queues, read token is denied on approve, director token approves, a second approve is not_found, the CRM has exactly one receipt."
+    ],
+    "askClaudeFor": [
+      "A review of the SQL: is the approved transition atomic (UPDATE ... WHERE status = 'pending' and check rowcount) so two directors cannot both execute it?",
+      "How MCP elicitation would do the same thing inline, and when you would prefer it."
+    ],
+    "writeYourself": [
+      "ApprovalStore.approve, including the once-only guard.",
+      "The create_receipt body that queues instead of executing, and the two approval tools."
+    ],
+    "resources": [
+      { "type": "docs", "label": "MCP specification - Elicitation (the inline alternative)", "url": "https://modelcontextprotocol.io/specification/2026-07-28/client/elicitation" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m3-3-approval-gate",
+    "command": "uv run --directory middleware python checks/run.py m3-3-approval-gate",
+    "summary": "The store persists across instances and executes an approval exactly once; over HTTP a write token gets pending_approval with the CRM unchanged, a read token is denied on the approval tools, the director token approves once, and the CRM ends with exactly one receipt."
+  }
+}

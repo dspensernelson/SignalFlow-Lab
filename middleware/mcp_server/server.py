@@ -54,8 +54,13 @@ def default_client() -> DonorClient:
     return DonorClient(os.environ.get("CRM_URL", "http://127.0.0.1:8001"))
 
 
-def build_server(client: DonorClient | None = None) -> MCPServer:
-    """Create the MCPServer and register the three tools on it."""
+def build_server(client: DonorClient | None = None, **server_kwargs) -> MCPServer:
+    """Create the MCPServer and register the three tools on it.
+
+    ``server_kwargs`` are forwarded to ``MCPServer(...)``: lesson m3-2 passes
+    ``token_verifier`` and ``auth`` from the HTTP app. Lesson m3-3 adds the
+    approval gate (see tools/approvals.py) and two approval tools.
+    """
     from mcp_server.resources import register_resources
     from tools.schemas import CreateReceiptInput, FindDonorInput, GetDonationHistoryInput
 

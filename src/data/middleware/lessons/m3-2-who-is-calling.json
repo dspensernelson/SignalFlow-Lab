@@ -1,0 +1,50 @@
+{
+  "id": "m3-2-who-is-calling",
+  "module": "m3",
+  "order": 2,
+  "title": "Who is calling: tokens, scopes, and the resource server",
+  "estimateHours": 8,
+  "concept": {
+    "heading": "Authenticate every request, then check a scope per tool",
+    "paragraphs": [
+      "An MCP server over HTTP is a resource server. Each request carries a bearer token; the server validates it and learns who is calling and what they may do, expressed as scopes like donors:read and donors:write. The SDK handles the HTTP side through one interface, TokenVerifier: hand it the token, return an AccessToken with scopes, or None for a 401. The verifier you write here checks a static table from MCP_TOKENS; the OAuth 2.1 version checks a JWT's issuer, audience, expiry and scopes against an authorization server, and swaps in without touching a tool.",
+      "Scopes are checked per tool, inside the tool: require_scope('donors:write') returns None or a permission_denied error dict. Read tools need donors:read; create_receipt needs donors:write. The error goes back as data, so the model can tell the staff member the assistant is not allowed to do that, instead of the host showing a protocol failure.",
+      "stdio has no HTTP, so there is no token. A local host is trusted as a person at the keyboard, but least privilege still applies: without MCP_LOCAL_SCOPES the local server is read-only. The 2026-07-28 spec deprecated OAuth Dynamic Client Registration in favor of client ID metadata documents; that detail is for the docs you link, not for this build."
+    ],
+    "lowCodeEquivalent": "Connection references with a service principal, and the roles you assign in Dataverse security. The token is the connection; the scope is the role; require_scope is the privilege check the platform did for you."
+  },
+  "pythonBlock": {
+    "title": "Python you need: async methods, context from the SDK, string parsing",
+    "intro": "verify_token is async because the OAuth version will call a network. The access token for the current request is read from a context variable the SDK sets.",
+    "code": "from mcp.server.auth.provider import AccessToken, TokenVerifier\nfrom mcp.server.auth.middleware.auth_context import get_access_token\n\nclass StaticTokenVerifier(TokenVerifier):\n    def __init__(self, table: dict[str, list[str]]):\n        self.table = table\n    async def verify_token(self, token: str) -> AccessToken | None:\n        scopes = self.table.get(token)\n        return AccessToken(token=token, client_id=\"static\", scopes=scopes) if scopes else None\n\ndef current_scopes() -> list[str]:\n    tok = get_access_token()                      # None outside an HTTP request\n    if tok is not None:\n        return list(tok.scopes)\n    return [s.strip() for s in os.environ.get(\"MCP_LOCAL_SCOPES\", \"donors:read\").split(\",\") if s.strip()]\n\n# MCPServer(..., token_verifier=verifier, auth=AuthSettings(issuer_url=origin, resource_server_url=url))",
+    "resource": { "type": "docs", "label": "OAuth 2.1 overview (oauth.net)", "url": "https://oauth.net/2.1/" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/tools/auth.py", "middleware/mcp_server/http_server.py", "middleware/mcp_server/server.py"],
+    "spec": [
+      "Implement parse_token_table, StaticTokenVerifier, current_scopes, require_scope and auth_settings per the stub docstrings.",
+      "build_app: when MCP_TOKENS is set, pass token_verifier and auth through build_server(**kwargs) to MCPServer so unauthenticated HTTP requests get 401 with a WWW-Authenticate header.",
+      "In every tool: require_scope(READ) for lookups and resources, require_scope(WRITE) for create_receipt; return the error dict when denied.",
+      "Put the three example tokens from .env.example in your .env, start the HTTP server, and try all three with the SDK Client (headers via httpx2.AsyncClient) and with curl (no token, bogus token)."
+    ],
+    "askClaudeFor": [
+      "A walkthrough of what the SDK's bearer middleware does with the verifier's result (401 vs 403, the WWW-Authenticate header, resource metadata).",
+      "The OAuth 2.1 flow in four sentences: authorization server, resource server, access token, scopes; and where a JWT verifier would plug in."
+    ],
+    "writeYourself": [
+      "parse_token_table and the verifier.",
+      "require_scope and every call to it inside the tools."
+    ],
+    "resources": [
+      { "type": "repo", "label": "Microsoft MCP for Beginners - 2.1 (CIMD and DCR Authorization) and 3.11 (Simple Auth)", "url": "https://github.com/microsoft/mcp-for-beginners" },
+      { "type": "docs", "label": "Auth0 docs - OpenID Connect and OAuth concepts (docs only)", "url": "https://auth0.com/docs/authenticate/protocols/openid-connect-protocol" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m3-2-who-is-calling",
+    "command": "uv run --directory middleware python checks/run.py m3-2-who-is-calling",
+    "summary": "No token and a bogus token get 401 on every method; a read token can find_donor but gets permission_denied on create_receipt with the CRM unchanged; a write token is not denied; the stdio server is read-only by default."
+  }
+}

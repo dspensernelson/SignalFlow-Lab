@@ -1,0 +1,109 @@
+{
+  "id": "write-held-at-gate",
+  "title": "A write is held at the Auth Gate until a person approves",
+  "steps": [
+    {
+      "id": "s1",
+      "kind": "request",
+      "from": "user",
+      "to": "agent",
+      "label": "Staff: 'Send Maria a receipt for her March gift'",
+      "status": "ok",
+      "payloadTitle": "Chat message",
+      "payload": { "role": "user", "content": "Send Maria Alvarez a receipt for her March gift." },
+      "nodeStates": { "user": "active", "agent": "waiting" },
+      "durationMs": 1300
+    },
+    {
+      "id": "s2",
+      "kind": "request",
+      "from": "agent",
+      "to": "tool-router",
+      "label": "After the lookups, the model calls the write tool",
+      "status": "ok",
+      "payloadTitle": "tools/call (bearer token: staff-write-token)",
+      "payload": { "name": "create_receipt", "arguments": { "donation_id": 6, "sent_to": "maria.alvarez@example.org" }, "headers": { "Authorization": "Bearer staff-write-token" } },
+      "annotate": "The token says donors:read and donors:write. Scope is necessary; it is not sufficient for a write.",
+      "nodeStates": { "user": "idle", "agent": "ok", "tool-router": "active" },
+      "durationMs": 1500
+    },
+    {
+      "id": "s3",
+      "kind": "request",
+      "from": "tool-router",
+      "to": "auth-gate",
+      "label": "Scope check passes; the gate takes over",
+      "status": "ok",
+      "payloadTitle": "require_scope('donors:write')",
+      "payload": { "caller_scopes": ["donors:read", "donors:write"], "required": "donors:write", "result": "allowed" },
+      "nodeStates": { "tool-router": "ok", "auth-gate": "active" },
+      "durationMs": 1300
+    },
+    {
+      "id": "s4",
+      "kind": "hold",
+      "from": "auth-gate",
+      "to": "state-store",
+      "label": "The write is recorded as pending, not executed",
+      "status": "held",
+      "payloadTitle": "approvals row (SQLite)",
+      "payload": { "id": "a7c1e9f2b3d4", "tool": "create_receipt", "arguments": { "donation_id": 6, "sent_to": "maria.alvarez@example.org" }, "status": "pending", "requested_at": "2026-10-02T15:04:11Z" },
+      "annotate": "Nothing reached the CRM. The row is the only thing that happened.",
+      "nodeStates": { "auth-gate": "held", "state-store": "ok", "donor-crm": "idle" },
+      "counters": { "pending": 1, "receipts": 0 },
+      "durationMs": 1800
+    },
+    {
+      "id": "s5",
+      "kind": "response",
+      "from": "auth-gate",
+      "to": "agent",
+      "label": "The model gets a pending_approval result",
+      "status": "pending",
+      "payloadTitle": "Tool result (error as data)",
+      "payload": { "error": { "code": "pending_approval", "message": "Receipt queued for approval.", "suggestion": "Tell the staff member a director must approve it.", "details": { "approval_id": "a7c1e9f2b3d4" } } },
+      "annotate": "The model can explain the hold to the user. It cannot skip it: there is no tool that executes a write directly.",
+      "nodeStates": { "agent": "active" },
+      "durationMs": 1600
+    },
+    {
+      "id": "s6",
+      "kind": "release",
+      "from": "user",
+      "to": "auth-gate",
+      "label": "A director approves (token with donors:approve)",
+      "status": "ok",
+      "payloadTitle": "tools/call approve_pending",
+      "payload": { "name": "approve_pending", "arguments": { "approval_id": "a7c1e9f2b3d4", "decided_by": "director@lakeshore.org" }, "headers": { "Authorization": "Bearer director-token" } },
+      "annotate": "A different person, a different token, a different scope. That separation is the control.",
+      "nodeStates": { "user": "active", "agent": "idle", "auth-gate": "active" },
+      "durationMs": 1600
+    },
+    {
+      "id": "s7",
+      "kind": "request",
+      "from": "auth-gate",
+      "to": "donor-crm",
+      "label": "The recorded write executes, once",
+      "status": "ok",
+      "payloadTitle": "POST /receipts",
+      "payload": { "donation_id": 6, "sent_to": "maria.alvarez@example.org" },
+      "nodeStates": { "auth-gate": "ok", "donor-crm": "waiting" },
+      "durationMs": 1300
+    },
+    {
+      "id": "s8",
+      "kind": "response",
+      "from": "donor-crm",
+      "to": "auth-gate",
+      "label": "Receipt created; approval row marked approved",
+      "status": "ok",
+      "payloadTitle": "Result stored on the approval row",
+      "payload": { "receipt_id": 1, "status": "sent", "approval": { "id": "a7c1e9f2b3d4", "status": "approved", "decided_by": "director@lakeshore.org" } },
+      "annotate": "Approving the same id again returns not_found with status approved: the gate is also a dedupe.",
+      "nodeStates": { "donor-crm": "ok", "state-store": "ok" },
+      "counters": { "pending": 0, "receipts": 1 },
+      "durationMs": 1800
+    }
+  ]
+}
