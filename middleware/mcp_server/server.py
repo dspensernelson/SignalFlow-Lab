@@ -24,11 +24,18 @@ Spec (the check connects with the SDK's Client and asserts this):
 
 Python you need: decorators. ``@server.tool()`` registers the function it
 decorates and returns it unchanged.
+
+Pitfall: this module uses ``from __future__ import annotations``, so type
+hints are strings the SDK evaluates against the MODULE's globals. Import
+``date`` and ``Literal`` at the top of the file (already done), never inside
+``build_server``, or the SDK raises "Unable to evaluate type annotations".
 """
 
 from __future__ import annotations
 
 import os
+from datetime import date  # noqa: F401 - tool signatures use it; keep module-level
+from typing import Literal  # noqa: F401 - (string annotations resolve against module globals)
 
 from mcp.server import MCPServer
 
@@ -49,8 +56,27 @@ def default_client() -> DonorClient:
 
 def build_server(client: DonorClient | None = None) -> MCPServer:
     """Create the MCPServer and register the three tools on it."""
-    registry: ToolRegistry = build_registry(client or default_client())  # noqa: F841 - used by your tools
-    raise NotImplementedError("Lesson m2-2: implement build_server in mcp_server/server.py")
+    from mcp_server.resources import register_resources
+    from tools.schemas import CreateReceiptInput, FindDonorInput, GetDonationHistoryInput
+
+    client = client or default_client()
+    registry: ToolRegistry = build_registry(client)
+    server = MCPServer(SERVER_NAME, version=SERVER_VERSION, instructions=INSTRUCTIONS)
+
+    @server.tool(description=FindDonorInput.__doc__)
+    def find_donor(query: str) -> dict:
+        return registry.call("find_donor", {"query": query})
+
+    @server.tool(description=GetDonationHistoryInput.__doc__)
+    def get_donation_history(donor_id: int, since: date | None = None) -> dict:
+        return registry.call("get_donation_history", {"donor_id": donor_id, "since": since.isoformat() if since else None})
+
+    @server.tool(description=CreateReceiptInput.__doc__)
+    def create_receipt(donation_id: int, sent_to: str, format: Literal["email", "pdf"] = "email") -> dict:
+        return registry.call("create_receipt", {"donation_id": donation_id, "sent_to": sent_to, "format": format})
+
+    register_resources(server, client)
+    return server
 
 
 def main() -> None:
