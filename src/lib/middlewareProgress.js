@@ -108,15 +108,23 @@ export function markPassed(progress, lessonId, { checkedAt } = {}) {
   })
 }
 
-// A failing check is informational: it never downgrades a passed lesson and
-// never unlocks anything. Recorded so the lesson can show what failed.
-export function markFailed(progress, lessonId, failingTests = [], checkedAt) {
+// A failing check is informational: it never downgrades a passed or skipped
+// lesson (a skipped one keeps its status and just records the failures) and
+// never unlocks anything. A result for a lesson the learner cannot work on
+// yet (locked) is ignored so stale result files cannot mark the future.
+export function markFailed(progress, lessonId, failingTests = [], checkedAt, order) {
   const current = progress.lessons[lessonId]
+  const failing = Array.isArray(failingTests) ? failingTests : []
+  const stamp = checkedAt || new Date().toISOString()
   if (current && current.status === LESSON_STATUS.PASSED) return progress
+  if (current && current.status === LESSON_STATUS.SKIPPED) {
+    return withLesson(progress, lessonId, { ...current, checkedAt: stamp, failingTests: failing })
+  }
+  if (order && deriveLessonStatus(progress, lessonId, order) === LESSON_STATUS.LOCKED) return progress
   return withLesson(progress, lessonId, {
     status: LESSON_STATUS.FAILED,
-    checkedAt: checkedAt || new Date().toISOString(),
-    failingTests: Array.isArray(failingTests) ? failingTests : [],
+    checkedAt: stamp,
+    failingTests: failing,
   })
 }
 

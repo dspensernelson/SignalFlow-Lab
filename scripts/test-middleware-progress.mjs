@@ -71,6 +71,20 @@ test('a failing result never downgrades a passed lesson', () => {
   assert.equal(deriveLessonStatus(p, 'm0-1-a', ORDER), 'passed')
 })
 
+test('a failing result never downgrades a skipped lesson, but records the failures', () => {
+  let p = markSkipped(emptyProgress(), 'm0-1-a', ORDER)
+  p = markFailed(p, 'm0-1-a', ['t1'], 'later', ORDER)
+  assert.equal(deriveLessonStatus(p, 'm0-1-a', ORDER), 'skipped')
+  assert.deepEqual(p.lessons['m0-1-a'].failingTests, ['t1'])
+  assert.equal(deriveLessonStatus(p, 'm0-2-b', ORDER), 'ready')
+})
+
+test('a failing result for a locked lesson is ignored', () => {
+  const p = markFailed(emptyProgress(), 'm0-3-c', ['t1'], 'now', ORDER)
+  assert.equal(p.lessons['m0-3-c'], undefined)
+  assert.equal(deriveLessonStatus(p, 'm0-3-c', ORDER), 'locked')
+})
+
 test('a locked lesson cannot be skipped or passed out of order', () => {
   const p = markSkipped(emptyProgress(), 'm0-3-c', ORDER)
   assert.equal(deriveLessonStatus(p, 'm0-3-c', ORDER), 'locked')
