@@ -20,14 +20,16 @@ Spec (the checks assert this):
   scopes=[...])`` for a known token and None otherwise;
 - ``current_scopes() -> list[str]`` returns the scopes of the HTTP caller
   (``get_access_token()``), or, when there is no HTTP auth context (stdio,
-  a trusted local host), the scopes in ``MCP_LOCAL_SCOPES`` (default
-  ``donors:read``): a local server is read-only unless configured;
+  a trusted local host), the scopes in ``MCP_LOCAL_SCOPES`` (unset or
+  empty means ``donors:read``): a local server is read-only unless
+  configured;
 - ``require_scope(scope) -> dict | None`` returns None when the caller has
   the scope, else the ``permission_denied`` error dict (``tools/errors.py``)
   naming the missing scope in ``details.required``;
 - ``auth_settings(resource_url) -> AuthSettings`` builds the SDK settings
   the HTTP app needs (issuer_url = resource_url's origin, resource_server_url
-  = resource_url); ``mcp_server/http_server.build_app`` passes a
+  = resource_url, validate_token_resource=False because the static verifier
+  owns the whole decision; a JWT verifier would set it True); ``mcp_server/http_server.build_app`` passes a
   ``StaticTokenVerifier`` built from ``MCP_TOKENS`` and these settings to
   ``build_server`` so every HTTP request is authenticated (401 otherwise).
 
