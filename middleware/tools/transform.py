@@ -59,11 +59,14 @@ class UnsupportedEvent(ValueError):
     """Raised for any event type other than charge.succeeded."""
 
 
-def load_config() -> Config:
-    """Load ``.env`` (if present) and build a Config from the environment.
+def load_config(dotenv_path: str | None = None) -> Config:
+    """Load a ``.env`` file (the default one next to pyproject.toml, or the
+    given path) and build a Config from the environment.
 
     Must raise a clear ``ValueError`` naming the variable when CRM_API_KEY
-    is missing. Must never log the key's value.
+    is missing. Must never log the key's value. The check passes an empty
+    ``dotenv_path`` for the missing-secret case so your real .env cannot
+    rescue it.
     """
     raise NotImplementedError("Lesson m0-3: implement load_config")
 

@@ -41,10 +41,13 @@ def test_config_reads_the_environment():
     assert cfg.crm_url == "http://127.0.0.1:9"
 
 
-def test_missing_secret_is_a_clear_error(monkeypatch):
+def test_missing_secret_is_a_clear_error(monkeypatch, tmp_path):
+    # Point at an empty .env so your real one cannot rescue this case.
     monkeypatch.delenv("CRM_API_KEY", raising=False)
+    empty = tmp_path / ".env"
+    empty.write_text("", encoding="utf-8")
     with pytest.raises(ValueError) as info:
-        load_config()
+        load_config(dotenv_path=str(empty))
     assert "CRM_API_KEY" in str(info.value)
 
 

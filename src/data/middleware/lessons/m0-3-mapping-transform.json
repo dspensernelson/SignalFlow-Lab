@@ -24,7 +24,7 @@
     "files": ["middleware/tools/transform.py", "middleware/.env"],
     "spec": [
       "Copy .env.example to .env and set CRM_API_KEY to any value. Confirm .env is git-ignored (git status must not list it).",
-      "Implement load_config(): load .env, build Config from CRM_URL and CRM_API_KEY, raise ValueError naming CRM_API_KEY when it is missing.",
+      "Implement load_config(dotenv_path=None): load .env (or the given path), build Config from CRM_URL and CRM_API_KEY, raise ValueError naming CRM_API_KEY when it is missing.",
       "Implement webhook_to_donation(event) per the field rules in the DonationRecord docstring; raise UnsupportedEvent for anything but charge.succeeded.",
       "Log exactly one INFO line per event ('transformed <event id> -> <charge id>') and never log any config value.",
       "Compare your output against checks/m0/golden/expected_records.json before running the check."
