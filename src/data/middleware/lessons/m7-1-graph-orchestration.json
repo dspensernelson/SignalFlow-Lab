@@ -1,0 +1,50 @@
+{
+  "id": "m7-1-graph-orchestration",
+  "module": "m7",
+  "order": 1,
+  "title": "Orchestration frameworks, and a graph that uses the middleware",
+  "estimateHours": 8,
+  "concept": {
+    "heading": "A framework adds state, named routes, interrupts and checkpoints to the loop you already wrote",
+    "paragraphs": [
+      "LangGraph, the OpenAI Agents SDK and CrewAI all wrap the same loop from Module 1. What they add is worth having once there are branches: state that is explicit between steps, nodes with names you can see in a trace, conditional edges that route on the state, interrupts for a human, and checkpoints so a run resumes after a restart. LangGraph is used here because you have touched it before and because its interrupt and checkpoint model maps cleanly onto the approval gate.",
+      "The agent in this lesson has four nodes. The supervisor asks the model for one word, lookup, draft, approval or done, and routes on it. The lookup node runs a bounded loop with read tools only, every call going through the MCP server you built; the draft node asks for text; approval is the next lesson. The MCP server is the agent's only door to the CRM, so every control from Modules 3 to 6 applies to the agent automatically.",
+      "The adapter between the async MCP Client and LangGraph's synchronous nodes is thirty lines you write and can debug. langchain-mcp-adapters exists for this, but it lags the MCP SDK's major versions; owning the adapter is the safer bet for a client install."
+    ],
+    "lowCodeEquivalent": "Copilot Studio's generative orchestration with topics, or an n8n AI Agent node with sub-workflows. The supervisor is the orchestrator; the nodes are topics; the MCP server is the connector they all share."
+  },
+  "pythonBlock": {
+    "title": "Python you need: TypedDict state, an event loop on a thread, LangGraph's StateGraph",
+    "intro": "Run one asyncio loop on a daemon thread and submit coroutines to it with run_coroutine_threadsafe; that is the whole async-to-sync bridge.",
+    "code": "import asyncio, threading\nfrom langgraph.graph import StateGraph, START, END\n\nclass MCPToolSource:\n    def __enter__(self):\n        self._loop = asyncio.new_event_loop()\n        self._thread = threading.Thread(target=self._loop.run_forever, daemon=True); self._thread.start()\n        self._client = self._run(self._connect())   # async with Client(target) ... kept open\n        return self\n    def _run(self, coro):\n        return asyncio.run_coroutine_threadsafe(coro, self._loop).result(timeout=60)\n    def call(self, name, arguments):\n        return result_json(self._run(self._client.call_tool(name, arguments)))\n\ngraph = StateGraph(AgentState)\ngraph.add_node(\"supervisor\", supervisor); graph.add_node(\"lookup\", lookup); graph.add_node(\"draft\", draft)\ngraph.add_node(\"approval\", approval); graph.add_node(\"done\", done)\ngraph.add_edge(START, \"supervisor\")\ngraph.add_conditional_edges(\"supervisor\", lambda s: s[\"route\"], {r: r for r in ROUTES})\nfor n in (\"lookup\", \"draft\", \"approval\"): graph.add_edge(n, \"supervisor\")\ngraph.add_edge(\"done\", END)\ncompiled = graph.compile(checkpointer=checkpointer)",
+    "resource": { "type": "docs", "label": "LangGraph docs - Graph API overview", "url": "https://docs.langchain.com/oss/python/langgraph/overview" }
+  },
+  "simulate": { "scenarioId": "supervisor-routing" },
+  "build": {
+    "files": ["middleware/agent/mcp_tools.py", "middleware/agent/graph.py"],
+    "spec": [
+      "Run uv sync --extra graph. Implement MCPToolSource (loop thread, one Client for the with-block, tools(), call()).",
+      "Implement build_graph with the four nodes and the conditional edges per the stub; the lookup node offers read tools only and refuses writes; an unknown route ends the run.",
+      "Run the scripted scenario from the check by hand with a replay provider, then run it --live with a free-tier key and watch the supervisor's choices.",
+      "Add one span per node using Module 6's tracer so a trace shows supervisor, lookup, draft in order."
+    ],
+    "askClaudeFor": [
+      "A one-hour comparison of LangGraph, the OpenAI Agents SDK and CrewAI: what each adds beyond the raw loop, in a table you can show a client.",
+      "A review of your adapter's shutdown: does the loop thread stop and the client disconnect on __exit__, even after an exception?"
+    ],
+    "writeYourself": [
+      "The adapter's call() and the loop-thread lifecycle.",
+      "The supervisor and lookup nodes."
+    ],
+    "resources": [
+      { "type": "course", "label": "DeepLearning.AI - AI Agents in LangGraph", "url": "https://www.deeplearning.ai/short-courses/" },
+      { "type": "course", "label": "Hugging Face AI Agents Course - frameworks unit (LangGraph)", "url": "https://huggingface.co/learn/agents-course" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m7-1-graph-orchestration",
+    "command": "uv run --directory middleware python checks/run.py m7-1-graph-orchestration",
+    "summary": "The adapter lists and calls the in-process server's tools synchronously; a scripted scenario routes lookup -> draft -> done with find_donor then get_donation_history; the lookup node never executes a write; an unknown route ends safely with the CRM untouched."
+  }
+}

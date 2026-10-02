@@ -1,0 +1,49 @@
+{
+  "id": "m7-2-human-in-loop",
+  "module": "m7",
+  "order": 2,
+  "title": "Human in the loop: interrupt, resume, time out",
+  "estimateHours": 6,
+  "concept": {
+    "heading": "Pause the graph before a write, on disk, until a person answers or the clock runs out",
+    "paragraphs": [
+      "LangGraph's interrupt(payload) stops a node and hands the payload to whoever is running the graph: the draft, the tool calls so far, when it was requested. With a checkpointer the paused thread is durable, so the answer can come from another process, hours later, after a restart. Command(resume=value) continues the same node with the decision.",
+      "The approval node is where this lives. Approved: it calls create_receipt through the MCP server, which runs its own gate from Module 3 and returns pending_approval. That is not redundancy by accident: the agent's interrupt is the staff member's checkpoint, the server's queue is the director's, and neither layer assumes the other exists. Rejected: nothing is called. Unanswered: expire_pending resumes the thread with a timeout rejection, so a forgotten request never fires a week later when someone clicks.",
+      "Timeouts need a clock you can inject, which is why requested_at is recorded in state before the interrupt and the check advances a fake clock."
+    ],
+    "lowCodeEquivalent": "Start and wait for an approval, with the flow's 30-day timeout and the resume branch. Here you write what the platform did: durable pause, resume with a value, expiry."
+  },
+  "pythonBlock": {
+    "title": "Python you need: LangGraph interrupt and Command, graph.get_state",
+    "intro": "interrupt raises internally and re-runs the node on resume, so everything before it must be idempotent: record requested_at only if unset.",
+    "code": "from langgraph.types import Command, interrupt\n\ndef approval_node(state, tools, clock):\n    requested_at = state.get(\"requested_at\") or clock()\n    decision = interrupt({\"draft\": state[\"draft\"], \"tool_calls\": state[\"tool_calls\"], \"requested_at\": requested_at})\n    if decision.get(\"approved\"):\n        result = tools.call(\"create_receipt\", {\"donation_id\": decision[\"donation_id\"], \"sent_to\": decision[\"sent_to\"]})\n        return {\"requested_at\": requested_at, \"approval\": result, \"tool_calls\": state[\"tool_calls\"] + [\"create_receipt\"], \"route\": \"done\"}\n    return {\"requested_at\": requested_at, \"approval\": {\"status\": \"rejected\", \"reason\": decision.get(\"reason\", \"declined\")}, \"route\": \"done\"}\n\n# resume from anywhere, later:\n# graph.invoke(Command(resume={\"approved\": True, \"donation_id\": 6, \"sent_to\": \"...\"}), config)\n# snapshot = graph.get_state(config); snapshot.tasks[0].interrupts[0].value  -> the payload",
+    "resource": { "type": "docs", "label": "LangGraph docs - Human-in-the-loop (interrupt)", "url": "https://docs.langchain.com/oss/python/langgraph/interrupts" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/agent/hitl.py", "middleware/agent/graph.py"],
+    "spec": [
+      "Implement approval_node, pending_interrupt, approve, reject and expire_pending per the stub, and wire approval_node into build_graph.",
+      "Run the scripted scenario with an InMemorySaver checkpointer: watch the invoke return with __interrupt__, inspect the payload, approve, and read the server's pending_approval result.",
+      "Reject once and confirm no tool was called. Then simulate a forgotten request: advance the clock past the timeout and call expire_pending.",
+      "Swap InMemorySaver for a SQLite checkpointer (langgraph-checkpoint-sqlite) if you want the pause to survive a real restart; note what changed."
+    ],
+    "askClaudeFor": [
+      "Why interrupt re-executes the node from the top on resume and what that means for side effects before it.",
+      "How get_state exposes pending interrupts, so pending_interrupt can be written without guessing."
+    ],
+    "writeYourself": [
+      "approval_node and expire_pending.",
+      "The decision shape and the reasons you record."
+    ],
+    "resources": [
+      { "type": "docs", "label": "LangGraph docs - Persistence and checkpointers", "url": "https://docs.langchain.com/oss/python/langgraph/persistence" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m7-2-human-in-loop",
+    "command": "uv run --directory middleware python checks/run.py m7-2-human-in-loop",
+    "summary": "With a checkpointer the graph pauses before the write and exposes the draft; approve resumes and the write reaches the server's gate as pending_approval; reject never calls a write; an unanswered approval expires after the timeout with the CRM untouched."
+  }
+}

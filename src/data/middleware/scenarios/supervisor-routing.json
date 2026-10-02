@@ -1,0 +1,112 @@
+{
+  "id": "supervisor-routing",
+  "title": "A supervisor routes between lookup, draft and approval; the MCP server is the only door",
+  "steps": [
+    {
+      "id": "s1",
+      "kind": "request",
+      "from": "user",
+      "to": "agent",
+      "label": "Staff: 'Thank Maria for her latest gift and send the receipt'",
+      "status": "ok",
+      "payloadTitle": "Graph input (AgentState)",
+      "payload": { "messages": [ { "role": "system", "content": "You are the donor-operations assistant..." }, { "role": "user", "content": "Thank Maria Alvarez for her latest gift and send the receipt." } ], "route": "", "tool_calls": [], "draft": null, "done": false },
+      "annotate": "State is explicit from the first step: every node reads and returns this object.",
+      "nodeStates": { "user": "active", "agent": "waiting" },
+      "counters": { "route": 0 },
+      "durationMs": 1500
+    },
+    {
+      "id": "s2",
+      "kind": "note",
+      "from": "agent",
+      "to": "agent",
+      "label": "supervisor -> 'lookup'",
+      "status": "pending",
+      "payloadTitle": "Routing reply",
+      "payload": { "prompt": "Answer with exactly one word: lookup, draft, approval, or done.", "reply": "lookup" },
+      "annotate": "One word, validated against four allowed routes. Anything else routes to done.",
+      "nodeStates": { "user": "idle", "agent": "active" },
+      "counters": { "route": 1 },
+      "durationMs": 1400
+    },
+    {
+      "id": "s3",
+      "kind": "request",
+      "from": "agent",
+      "to": "tool-router",
+      "label": "lookup node: tool calls go through the MCP server",
+      "status": "ok",
+      "payloadTitle": "MCPToolSource.call",
+      "payload": { "name": "find_donor", "arguments": { "query": "maria.alvarez@example.org" }, "then": { "name": "get_donation_history", "arguments": { "donor_id": 1 } } },
+      "annotate": "The lookup node only offers read tools to the model. A write it asks for is refused with an error message.",
+      "nodeStates": { "agent": "active", "tool-router": "active", "donor-crm": "ok" },
+      "durationMs": 1500
+    },
+    {
+      "id": "s4",
+      "kind": "note",
+      "from": "agent",
+      "to": "agent",
+      "label": "supervisor -> 'draft'",
+      "status": "pending",
+      "payloadTitle": "Routing reply",
+      "payload": { "reply": "draft", "state_so_far": { "tool_calls": ["find_donor", "get_donation_history"] } },
+      "nodeStates": { "tool-router": "idle", "agent": "active" },
+      "counters": { "route": 2 },
+      "durationMs": 1200
+    },
+    {
+      "id": "s5",
+      "kind": "note",
+      "from": "agent",
+      "to": "agent",
+      "label": "draft node: text only, no tools",
+      "status": "ok",
+      "payloadTitle": "state.draft",
+      "payload": { "draft": "Dear Maria, thank you for your gift of $75.00 on 25 March. Your support keeps the pantry shelves full." },
+      "nodeStates": { "agent": "ok" },
+      "durationMs": 1400
+    },
+    {
+      "id": "s6",
+      "kind": "hold",
+      "from": "agent",
+      "to": "auth-gate",
+      "label": "supervisor -> 'approval': the graph interrupts before the write",
+      "status": "held",
+      "payloadTitle": "interrupt payload (checkpointed)",
+      "payload": { "draft": "Dear Maria, ...", "tool_calls": ["find_donor", "get_donation_history"], "requested_at": 1759417200.0 },
+      "annotate": "The thread is paused on disk. A person can answer in a minute or tomorrow; a timeout expires it.",
+      "nodeStates": { "agent": "waiting", "auth-gate": "held", "state-store": "ok" },
+      "counters": { "route": 3 },
+      "durationMs": 1800
+    },
+    {
+      "id": "s7",
+      "kind": "release",
+      "from": "user",
+      "to": "auth-gate",
+      "label": "Director resumes: approve(donation_id=6, sent_to=...)",
+      "status": "ok",
+      "payloadTitle": "Command(resume=...)",
+      "payload": { "approved": true, "donation_id": 6, "sent_to": "maria.alvarez@example.org", "decided_by": "director@lakeshore.org" },
+      "nodeStates": { "user": "active", "auth-gate": "active" },
+      "durationMs": 1400
+    },
+    {
+      "id": "s8",
+      "kind": "request",
+      "from": "auth-gate",
+      "to": "tool-router",
+      "label": "create_receipt through MCP: the server's own gate still holds it",
+      "status": "pending",
+      "payloadTitle": "Tool result",
+      "payload": { "error": { "code": "pending_approval", "details": { "approval_id": "a7c1e9f2b3d4" } } },
+      "annotate": "Two gates, two people: the agent's interrupt and the server's approval queue. Neither trusts the other to exist.",
+      "nodeStates": { "auth-gate": "ok", "tool-router": "ok", "agent": "ok", "user": "idle" },
+      "counters": { "route": 4 },
+      "durationMs": 2000
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "id": "m7-3-multi-agent",
+  "module": "m7",
+  "order": 3,
+  "title": "Multi-agent only if needed",
+  "estimateHours": 3,
+  "concept": {
+    "heading": "A second agent is justified by a boundary, not by ambition",
+    "paragraphs": [
+      "Two agents cost twice the prompts, a handoff protocol, and a second place for things to go wrong. They earn that when the two jobs need different tools or different permissions: a research agent with read-only tools feeding a drafting agent with none, or a reconciliation agent with the finance token that the front-desk agent must never hold. The boundary is the reason; the second agent is the mechanism.",
+      "Most of what gets sold as multi-agent is a single agent with a routing node, which you built in 7.1. Before adding an agent, ask whether a node, a tool, or a scope would do. If the answer is a scope, Module 3 already gave you the mechanism, and the agent count stays at one.",
+      "If you do split, the MCP server is still the only door, each agent gets its own token with its own scopes, and the handoff is a plain message with the state the next agent needs, never a shared mutable object. Optional build: a read-only research agent that produces the facts and a drafting agent that cannot call tools at all."
+    ],
+    "lowCodeEquivalent": "A parent flow calling child flows with their own connections, versus one flow with a switch. You already pick the switch unless the child needs different connections; the same instinct applies here."
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/agent/graph.py"],
+    "spec": [
+      "No required code. Optional: split draft into a drafting agent that receives only the facts (no tools) and show in a trace that it made no tool calls.",
+      "Answer the three explain-it questions on the next step."
+    ],
+    "askClaudeFor": [
+      "Three examples from the donor-ops scenario where a second agent is justified, and three where it is theater. Argue with it."
+    ],
+    "writeYourself": [
+      "The explain-it answers, in words for a client who has read about multi-agent systems and wants one."
+    ],
+    "resources": [
+      { "type": "course", "label": "OpenAI Academy - Agents and Workflows", "url": "https://academy.openai.com/" },
+      { "type": "course", "label": "Hugging Face AI Agents Course - multi-agent unit", "url": "https://huggingface.co/learn/agents-course" }
+    ]
+  },
+  "check": {
+    "kind": "explain",
+    "lessonId": "m7-3-multi-agent",
+    "summary": "Explain-it only: when a second agent is justified, how two agents share the middleware safely, and what you would tell a client who asks for one."
+  },
+  "explainIt": {
+    "questions": [
+      {
+        "q": "A client asks for 'a team of agents' for donor operations. What do you ask them first?",
+        "modelAnswer": "What the agents would be allowed to do differently from each other. If every agent would hold the same tools and the same permissions, one agent with routing does the job with fewer failure points. A second agent is justified when a job needs different tools or a different token: a reconciliation agent with the finance scope that the front-desk assistant must never have."
+      },
+      {
+        "q": "If you do run two agents, how do they share the middleware safely?",
+        "modelAnswer": "Both go through the same MCP server, each with its own token and scopes, so the server's gates apply to each separately. The handoff between them is a plain message carrying only the facts the next agent needs, never a shared object both can mutate. Every tool call from either agent lands in the same trace with the same correlation id."
+      },
+      {
+        "q": "Name one piece of the donor-ops build where a second agent would be complexity theater, and say why.",
+        "modelAnswer": "Splitting lookup and draft into two agents. They need the same read tools and the same permissions, and the draft only needs the facts the lookup produced. A routing node with the draft step offered no tools achieves the same separation with one agent, one prompt budget, and one place to debug."
+      }
+    ]
+  }
+}
