@@ -1,0 +1,36 @@
+{
+  "id": "donor-ops",
+  "title": "Donor operations: where the middleware sits",
+  "width": 1100,
+  "height": 400,
+  "nodeWidth": 150,
+  "nodeHeight": 56,
+  "groups": [
+    { "id": "middleware", "label": "Middleware", "x": 440, "y": 20, "w": 380, "h": 360 }
+  ],
+  "nodes": [
+    { "id": "user", "label": "User", "sublabel": "Pantry staff", "kind": "actor", "icon": "user-check", "x": 30, "y": 172 },
+    { "id": "agent", "label": "Agent", "sublabel": "LLM assistant", "kind": "agent", "icon": "sparkles", "x": 230, "y": 172 },
+    { "id": "tool-router", "label": "Tool Router", "sublabel": "Schemas, dispatch", "kind": "middleware", "group": "middleware", "icon": "git-branch", "x": 460, "y": 40 },
+    { "id": "auth-gate", "label": "Auth Gate", "sublabel": "Scopes, approvals", "kind": "middleware", "group": "middleware", "icon": "shield", "x": 460, "y": 172 },
+    { "id": "retry-queue", "label": "Retry / Queue", "sublabel": "Backoff, tasks", "kind": "middleware", "group": "middleware", "icon": "rotate-cw", "x": 460, "y": 304 },
+    { "id": "state-store", "label": "State Store", "sublabel": "SQLite", "kind": "middleware", "group": "middleware", "icon": "database", "x": 650, "y": 106 },
+    { "id": "trace-sink", "label": "Trace Sink", "sublabel": "Logs, spans", "kind": "middleware", "group": "middleware", "icon": "activity", "x": 650, "y": 238 },
+    { "id": "donor-crm", "label": "Donor CRM", "sublabel": "System of record", "kind": "system", "icon": "layers", "x": 900, "y": 40 },
+    { "id": "email-service", "label": "Email / Receipts", "sublabel": "Mocked", "kind": "system", "icon": "send", "x": 900, "y": 172 },
+    { "id": "payment-webhook", "label": "Payment Webhook", "sublabel": "Mocked, flaky", "kind": "system", "icon": "flag", "x": 900, "y": 304 }
+  ],
+  "edges": [
+    { "from": "user", "to": "agent" },
+    { "from": "agent", "to": "tool-router" },
+    { "from": "tool-router", "to": "auth-gate" },
+    { "from": "auth-gate", "to": "retry-queue" },
+    { "from": "retry-queue", "to": "donor-crm" },
+    { "from": "retry-queue", "to": "email-service" },
+    { "from": "payment-webhook", "to": "retry-queue" },
+    { "from": "tool-router", "to": "state-store" },
+    { "from": "auth-gate", "to": "state-store" },
+    { "from": "tool-router", "to": "trace-sink" },
+    { "from": "retry-queue", "to": "trace-sink" }
+  ]
+}
