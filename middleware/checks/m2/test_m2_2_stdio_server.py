@@ -16,7 +16,8 @@ async def test_server_identity_and_tool_list(mock_crm):
         assert client.protocol_version == "2026-07-28"
         assert client.instructions and "find_donor" in client.instructions
         tools = (await client.list_tools()).tools
-        assert {t.name for t in tools} == EXPECTED
+        # Later lessons add tools (approvals in 3.3); the three CRM tools must always be there.
+        assert EXPECTED <= {t.name for t in tools}
         for t in tools:
             assert t.description and len(t.description) >= 40, f"{t.name} needs its description"
         find = next(t for t in tools if t.name == "find_donor")

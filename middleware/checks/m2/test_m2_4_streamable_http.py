@@ -28,7 +28,7 @@ async def test_sdk_client_lists_and_calls_tools_over_http(http_app, fresh_crm):
     async with Client(http_app.url) as client:
         assert client.protocol_version == "2026-07-28"
         names = {t.name for t in (await client.list_tools()).tools}
-        assert names == {"find_donor", "get_donation_history", "create_receipt"}
+        assert {"find_donor", "get_donation_history", "create_receipt"} <= names
         data = result_json(await client.call_tool("find_donor", {"query": "okafor"}))
         assert data["matches"] == 1 and data["donors"][0]["id"] == 3
 
