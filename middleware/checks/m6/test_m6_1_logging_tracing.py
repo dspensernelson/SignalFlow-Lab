@@ -17,6 +17,11 @@ from tools.schemas import build_registry
 SECRET = "lsfp_trace_secret_42_never_log"
 
 
+def tool_spans(exporter):
+    """Only our spans: the in-process mock services may emit their own (fastapi.*)."""
+    return [s for s in exporter.get_finished_spans() if s.name.startswith("tool.")]
+
+
 @pytest.fixture
 def exporter(monkeypatch):
     monkeypatch.setenv("CRM_API_KEY", SECRET)
@@ -31,7 +36,7 @@ def test_tool_span_has_name_duration_and_outcome(exporter, fresh_crm):
     cid = telemetry.set_correlation_id()
     with telemetry.trace_tool_call("find_donor", {"query": "okafor"}) as outcome:
         outcome.result = registry.call("find_donor", {"query": "okafor"})
-    spans = exporter.get_finished_spans()
+    spans = tool_spans(exporter)
     assert [s.name for s in spans] == ["tool.find_donor"]
     attrs = dict(spans[0].attributes)
     assert attrs["tool.name"] == "find_donor" and attrs["tool.outcome"] == "ok"
@@ -46,7 +51,7 @@ def test_error_result_and_exception_are_recorded(exporter, fresh_crm):
     with pytest.raises(RuntimeError):
         with telemetry.trace_tool_call("boom", {}):
             raise RuntimeError("nope")
-    outcomes = {s.name: dict(s.attributes)["tool.outcome"] for s in exporter.get_finished_spans()}
+    outcomes = {s.name: dict(s.attributes)["tool.outcome"] for s in tool_spans(exporter)}
     assert outcomes["tool.get_donation_history"] == "error:not_found"
     assert outcomes["tool.boom"] == "exception:RuntimeError"
 
@@ -54,7 +59,7 @@ def test_error_result_and_exception_are_recorded(exporter, fresh_crm):
 def test_secrets_never_reach_span_attributes(exporter):
     with telemetry.trace_tool_call("create_receipt", {"sent_to": "x@example.org", "api_key": SECRET}) as outcome:
         outcome.result = {"ok": True}
-    attrs = dict(exporter.get_finished_spans()[0].attributes)
+    attrs = dict(tool_spans(exporter)[0].attributes)
     assert SECRET not in json.dumps(attrs, default=str)
 
 
@@ -85,5 +90,5 @@ async def test_mcp_tools_are_traced_in_process(exporter, fresh_crm, monkeypatch,
     server = build_server(DonorClient(fresh_crm.base_url))
     async with Client(server) as client:
         await client.call_tool("find_donor", {"query": "alvarez"})
-    names = [s.name for s in exporter.get_finished_spans()]
+    names = [s.name for s in tool_spans(exporter)]
     assert "tool.find_donor" in names
