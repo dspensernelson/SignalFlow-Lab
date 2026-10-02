@@ -1,0 +1,12 @@
+# Lesson m8-1: the whole stack a nonprofit would run.
+#
+# TODO (m8-1): services the check expects:
+#   middleware   built from ../ with deploy/Dockerfile; env from .env
+#                (CRM_URL, MCP_TOKENS, LLM_PROVIDER, STATE_DB=/data/state.db);
+#                port 8080; volume state:/data; healthcheck on /health
+#   crm          the mock CRM (python -m mock_services crm --port 8001 --db /data/crm.db)
+#                for demos; in production this service is removed and CRM_URL
+#                points at the real system
+#   trace-ui     OPTIONAL, profile "trace": a self-hosted Langfuse or Phoenix
+# volumes: state
+services: {}

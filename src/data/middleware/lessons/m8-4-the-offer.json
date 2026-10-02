@@ -1,0 +1,55 @@
+{
+  "id": "m8-4-the-offer",
+  "module": "m8",
+  "order": 4,
+  "title": "The offer: AI assistant integration for your donor CRM",
+  "estimateHours": 4,
+  "concept": {
+    "heading": "Sell the boundary, not the speed",
+    "paragraphs": [
+      "The thing a nonprofit is buying is an assistant that can look things up and take actions in their donor CRM safely. Every module in this track built one part of 'safely': scopes, the approval gate, idempotency, traces, the sanitizer, the runbook. The offer puts that in one page a director can read: what the assistant does on day one, what it never does without a named person's approval, what it costs to run, what the project includes, and what it does not.",
+      "Price per project, not per hour: discovery, the build against their CRM, the security review, the handoff with the runbook, and a fixed support window. Say plainly that free model tiers are for testing with synthetic data and that production use with real donor data needs a paid tier with a data-processing agreement; that sentence is what makes you the trustworthy option.",
+      "This is a document, not code. The check is the explain-it: the capstone walkthrough as if presented to a board, five minutes, notes in the app."
+    ],
+    "lowCodeEquivalent": "The statement of work you wrote for a Power Automate engagement, with one new section: what the automation may do on its own, and what it may not."
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/deploy/docs/offer.md"],
+    "spec": [
+      "Write offer.md: headline, who it is for, what the assistant does on day one, what stays off limits without approval, what the project includes, timeline, price, what it does not include, and the testing-versus-production note on model providers.",
+      "Keep it to one page. Read it aloud; cut anything you would not say to a director's face.",
+      "Record your five-minute board walkthrough as notes in the capstone explain-it on the next step."
+    ],
+    "askClaudeFor": [
+      "A critique of the offer from a skeptical board treasurer: what would they ask, and does the page answer it?"
+    ],
+    "writeYourself": [
+      "The whole offer. It is your voice the client is buying."
+    ],
+    "resources": [
+      { "type": "course", "label": "Anthropic Academy (for the vocabulary clients will have heard)", "url": "https://anthropic.skilljar.com/" }
+    ]
+  },
+  "check": {
+    "kind": "explain",
+    "lessonId": "m8-4-the-offer",
+    "summary": "Explain-it only: three questions that are the offer's hardest paragraphs. Answer them to pass; the module's capstone walkthrough follows."
+  },
+  "explainIt": {
+    "questions": [
+      {
+        "q": "In three sentences for the offer: what does the assistant do on day one, and what does it never do alone?",
+        "modelAnswer": "On day one your staff can ask the assistant to find a donor, show their giving history, search your policies, and draft a thank-you, and it answers in seconds from your CRM. It never sends an email, records a gift, or changes a donor record on its own: every such action waits in a queue until a person you name approves it, and the approval is logged. If it is ever unsure, it asks you instead of guessing."
+      },
+      {
+        "q": "What does it cost to run, and what is the sentence about free model tiers?",
+        "modelAnswer": "Hosting is free or a few dollars a month at a small nonprofit's volume, and the model is the main variable cost. We build and test on free tiers with synthetic donor data, because free tiers may use what they see to improve their products; before real donor data touches the assistant, we switch to a paid tier with a data-processing agreement, and that cost is in the proposal."
+      },
+      {
+        "q": "A director asks 'why not just use the chatbot our CRM vendor sells?' Answer in four sentences.",
+        "modelAnswer": "The vendor's chatbot knows only their product and stays inside it. This middleware is yours: it connects whichever assistant you use (Claude, Copilot, a custom one) to your CRM, your email, and your policies through one standard, and you keep the permissions, the approval queue, and the logs. When you change assistants or add a system, the middleware stays. If the vendor's chatbot does what you need and you are fine with their terms, use it; this is for the gaps it leaves."
+      }
+    ]
+  }
+}

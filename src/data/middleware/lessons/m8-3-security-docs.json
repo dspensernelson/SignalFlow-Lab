@@ -1,0 +1,43 @@
+{
+  "id": "m8-3-security-docs",
+  "module": "m8",
+  "order": 3,
+  "title": "Security review and docs: threat model, runbook, host configuration",
+  "estimateHours": 5,
+  "concept": {
+    "heading": "Write down what could go wrong, what stops it, and how to run the thing without you",
+    "paragraphs": [
+      "A client deploys what they understand. Three short documents make the middleware understandable. The threat model names the assets (donor data, the write path, the tokens), the threats (a manipulated assistant, a leaked token, a flaky processor, a lost database), and the control you built for each: scopes, the approval gate, the sanitizer, redaction, idempotency, traces. It also says what is out of scope, which is where most arguments with a board are avoided.",
+      "The runbook is for the day you are not there: start, stop, rotate a secret, restore state from a backup, what to do when the CRM is down (the breaker opens; here is what staff see; here is how to tell it recovered). Every step is a command someone can paste.",
+      "Host configuration is the bridge to the tools the client already uses: the Claude Desktop snippet from Module 2, the Copilot Studio custom connector or MCP tool setup with the bearer token, and the Inspector command for support calls. The check parses the snippets and refuses TODOs; the module's explain-it asks you to present the threat model."
+    ],
+    "lowCodeEquivalent": "The solution documentation deck and the DLP policy summary you handed over with a Power Platform project. Same job, written for an assistant that can act."
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/deploy/docs/threat-model.md", "middleware/deploy/docs/runbook.md", "middleware/deploy/docs/host-config.md"],
+    "spec": [
+      "Write threat-model.md with sections Assets, Threats, Controls, Out of scope; each threat names the control from this track that answers it.",
+      "Write runbook.md with Start, Stop, Rotate a secret, Restore state, When the CRM is down; every step is a command or a click path.",
+      "Write host-config.md with Claude Desktop, Copilot Studio and MCP Inspector sections; include the JSON snippets and say how each host presents the bearer token.",
+      "Have someone who is not you follow the runbook's Start section cold. Fix what they tripped on."
+    ],
+    "askClaudeFor": [
+      "A first draft of the threat table from the list of controls you built; then cut everything you cannot defend in a meeting.",
+      "The current Copilot Studio steps for adding an MCP server as a tool, as a lead to verify in the product."
+    ],
+    "writeYourself": [
+      "The Controls section of the threat model and the whole runbook."
+    ],
+    "resources": [
+      { "type": "repo", "label": "Microsoft MCP for Beginners - Module 8 (Best Practices) and Module 2 (Security)", "url": "https://github.com/microsoft/mcp-for-beginners" },
+      { "type": "docs", "label": "OWASP Top 10 for LLM Applications (for the threat table)", "url": "https://owasp.org/www-project-top-10-for-large-language-model-applications/" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m8-3-security-docs",
+    "command": "uv run --directory middleware python checks/run.py m8-3-security-docs",
+    "summary": "The three documents exist with the required sections, no TODOs, and real length; the threat model names scopes, approvals, sanitizing, redaction, idempotency and traces; the host-config JSON snippets parse and the token handling is described."
+  }
+}

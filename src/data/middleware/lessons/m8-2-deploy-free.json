@@ -1,0 +1,43 @@
+{
+  "id": "m8-2-deploy-free",
+  "module": "m8",
+  "order": 2,
+  "title": "Deploy free: a container host, secrets in the platform",
+  "estimateHours": 6,
+  "concept": {
+    "heading": "Ship the image to a free container host, and keep every secret out of the image",
+    "paragraphs": [
+      "The server is a Python process with a SQLite file. That rules out Cloudflare Workers for this build: its Python runtime is a browser-style sandbox without the native modules and persistent disk this server needs. A free container host fits: Hugging Face Spaces runs a Dockerfile for free with a persistent /data option, and several other platforms offer a free or trial tier for one small container. Free tiers change without notice; confirm the current limits the day you deploy and write them into the runbook.",
+      "What does not change: secrets are configured in the platform's settings, read by the settings module from the environment, and never present in the image or the repo. The server listens on 0.0.0.0 and the port the platform assigns. The state volume is the one thing that must be persistent; if the host does not offer that, the approvals queue is lost on restart and you say so to the client.",
+      "Proof of a deployment is the same three requests as Module 2 and 3 against the public URL: server/discover answers at 2026-07-28, an unauthenticated tools/list is refused, and /health is 200. The check runs those only when DEPLOY_URL is set."
+    ],
+    "lowCodeEquivalent": "Publishing a Copilot Studio agent to a channel and setting its environment variables in the target environment. Here the channel is a URL and the environment is the host's secrets page."
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/deploy/docs/runbook.md"],
+    "spec": [
+      "Pick a free container host that runs a Dockerfile and has persistent storage; confirm today's free limits and record them, with the date, in the runbook.",
+      "Deploy the image; set CRM_URL (a public mock or the client's test CRM), MCP_TOKENS, LLM_PROVIDER and its key, STATE_DB=/data/state.db as platform secrets.",
+      "Run this lesson's check with DEPLOY_URL=https://<your-host>/mcp and DEPLOY_TOKEN set; all three must pass.",
+      "Point MCP Inspector and Claude Desktop at the public URL with a token (host-config.md, lesson 8.3)."
+    ],
+    "askClaudeFor": [
+      "The current free tiers for Hugging Face Spaces (Docker), Fly.io, Render and Railway, with the date, so you can choose today; treat the answer as a lead to verify, not a fact.",
+      "Why Cloudflare Workers' Python runtime does not fit this server, in two sentences for the runbook."
+    ],
+    "writeYourself": [
+      "The deploy section of the runbook: exact steps, the secrets list, how to roll back to the previous image."
+    ],
+    "resources": [
+      { "type": "docs", "label": "Hugging Face Spaces - Docker Spaces", "url": "https://huggingface.co/docs/hub/spaces-sdks-docker" },
+      { "type": "docs", "label": "Cloudflare Workers pricing (reference: why it is not used here)", "url": "https://developers.cloudflare.com/workers/platform/pricing/" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m8-2-deploy-free",
+    "command": "DEPLOY_URL=https://your-host/mcp DEPLOY_TOKEN=... uv run --directory middleware python checks/run.py m8-2-deploy-free",
+    "summary": "With DEPLOY_URL (and DEPLOY_TOKEN) set: the public URL answers server/discover at 2026-07-28 with the server name, refuses an unauthenticated tools/list with 401, and /health is 200. Skipped when DEPLOY_URL is unset."
+  }
+}

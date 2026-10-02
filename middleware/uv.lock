@@ -1975,6 +1975,7 @@ dependencies = [
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "python-dotenv" },
+    { name = "pyyaml" },
     { name = "typer" },
     { name = "uvicorn" },
 ]
@@ -2019,6 +2020,7 @@ requires-dist = [
     { name = "pytest", specifier = ">=8.3" },
     { name = "pytest-asyncio", specifier = ">=0.26" },
     { name = "python-dotenv", specifier = ">=1.1" },
+    { name = "pyyaml", specifier = ">=6.0" },
     { name = "signalflow-middleware", extras = ["mcp", "otel", "rag", "graph"], marker = "extra == 'all'" },
     { name = "sqlite-vec", marker = "extra == 'rag'", specifier = ">=0.1.6" },
     { name = "typer", specifier = ">=0.16" },

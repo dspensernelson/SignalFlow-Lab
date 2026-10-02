@@ -1,0 +1,49 @@
+{
+  "id": "m8-1-containerize",
+  "module": "m8",
+  "order": 1,
+  "title": "Containerize: one image, one compose file, one health check",
+  "estimateHours": 6,
+  "concept": {
+    "heading": "A container is the runnable artifact a client can start without you",
+    "paragraphs": [
+      "Everything so far runs from your terminal with uv. A client's server does not have your terminal. A Docker image packages the Python version, the locked dependencies and the code into one artifact that starts the same way everywhere; a compose file names the services around it (the CRM mock for demos, a volume for state, an optional trace UI) and how they connect. docker compose up is the whole install.",
+      "Three details separate a demo image from a deployable one. Copy the lock file and install dependencies before copying the code, so a code change does not reinstall the world. Run as a non-root user. Give the orchestrator a HEALTHCHECK that hits /health, so a crashed server is restarted and a half-started one is not sent traffic.",
+      "State lives in a volume under /data, never inside the container; an image is replaced on every update and must not carry the approvals queue with it. Secrets arrive as environment variables from the platform, never baked into the image."
+    ],
+    "lowCodeEquivalent": "Exporting a managed solution and importing it in the client's environment, with connection references supplied there. The image is the solution; the compose file is the environment; the env vars are the connection references."
+  },
+  "pythonBlock": {
+    "title": "Python you need: a health route on the Starlette app, PORT from the environment",
+    "intro": "The SDK lets you add plain HTTP routes next to /mcp. A health route that does not touch the CRM is what the orchestrator polls.",
+    "code": "from starlette.responses import JSONResponse\n\n@server.custom_route(\"/health\", methods=[\"GET\"])\nasync def health(request):\n    return JSONResponse({\"status\": \"ok\", \"service\": \"lakeshore-donor-ops\"})\n\n# Dockerfile sketch\n# FROM python:3.11-slim\n# COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv\n# WORKDIR /app\n# COPY pyproject.toml uv.lock ./\n# RUN uv sync --frozen --no-dev --extra mcp --extra otel --extra rag\n# COPY . .\n# RUN useradd -m app && chown -R app /app && mkdir -p /data && chown app /data\n# USER app\n# ENV PORT=8080 STATE_DB=/data/state.db\n# HEALTHCHECK --interval=15s --timeout=3s CMD python -c \"import urllib.request,os; urllib.request.urlopen(f'http://127.0.0.1:{os.environ.get(\\\"PORT\\\",\\\"8080\\\")}/health')\"\n# CMD [\"uv\", \"run\", \"--no-sync\", \"python\", \"-m\", \"mcp_server.http_server\"]",
+    "resource": { "type": "docs", "label": "Docker docs - Get started", "url": "https://docs.docker.com/get-started/" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/deploy/Dockerfile", "middleware/deploy/compose.yaml", "middleware/mcp_server/http_server.py"],
+    "spec": [
+      "Add the /health route and make the HTTP server bind 0.0.0.0 when HOST is set (containers need it).",
+      "Write the Dockerfile per the TODO in the stub: slim base, uv, lock copied first, non-root user, HEALTHCHECK on /health, state under /data.",
+      "Write compose.yaml with the middleware and crm services, the state volume, env from .env, and an optional trace-ui under a profile.",
+      "docker compose up --build, wait for healthy, then run the Module 2 HTTP check against http://127.0.0.1:8080/mcp with a token. Set DOCKER_AVAILABLE=1 and run this lesson's check."
+    ],
+    "askClaudeFor": [
+      "A review of the Dockerfile's layer order and the uv flags for a frozen, non-dev install.",
+      "What the compose healthcheck and depends_on condition: service_healthy do together."
+    ],
+    "writeYourself": [
+      "The Dockerfile and compose file, line by line; read every flag you use."
+    ],
+    "resources": [
+      { "type": "docs", "label": "uv docs - Using uv in Docker", "url": "https://docs.astral.sh/uv/guides/integration/docker/" },
+      { "type": "repo", "label": "Microsoft MCP for Beginners - 3.9 Deployment", "url": "https://github.com/microsoft/mcp-for-beginners" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m8-1-containerize",
+    "command": "uv run --directory middleware python checks/run.py m8-1-containerize",
+    "summary": "The Dockerfile has the required shape (slim base, lock-first uv sync, non-root, HEALTHCHECK on /health, runs the HTTP server); compose declares middleware and crm with port 8080, a /data volume and a healthcheck; with DOCKER_AVAILABLE=1, compose up reaches healthy and /health answers 200."
+  }
+}
