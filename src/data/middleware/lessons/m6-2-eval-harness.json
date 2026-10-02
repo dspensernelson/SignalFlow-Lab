@@ -1,0 +1,50 @@
+{
+  "id": "m6-2-eval-harness",
+  "module": "m6",
+  "order": 2,
+  "title": "Eval harness: golden cases, run offline, every change",
+  "estimateHours": 8,
+  "concept": {
+    "heading": "A saved conversation with an expected outcome is a test; twenty of them are a regression suite",
+    "paragraphs": [
+      "A prompt edit or a description change can silently make the assistant call the wrong tool. Unit tests do not catch that, because the behavior lives in the interaction between model, tools and middleware. An eval case saves one interaction: the user message, the model replies to replay, and what must be true afterwards: which tools ran in what order, that no write executed, that a phrase appears in the final answer, that an error code came back, that a retrieved string reached the model sanitized.",
+      "Offline, the replay provider stands in for the model, so the run is deterministic, free, and fast enough to run on every change; it tests your middleware's behavior given a model's choices. With --live the same cases run against the real free-tier model and the replay is ignored; that run tells you whether the model does the right thing with your descriptions, which is a different question and worth asking occasionally.",
+      "The harness never executes writes: a write tool is wrapped to record the attempt and return pending_approval, exactly as the approval gate would. A case that expects no_write fails if an attempt was recorded. That is the hook Module 6.3's adversarial cases hang on."
+    ],
+    "lowCodeEquivalent": "Copilot Studio's test pane and a spreadsheet of sample questions you ran by hand before every release. The eval runner is that spreadsheet, executed by a command and failing the build when a row breaks."
+  },
+  "pythonBlock": {
+    "title": "Python you need: argparse, pydantic models from JSON files, wrapping an object",
+    "intro": "Wrapping the registry means replacing one method on a copy so the harness controls writes without touching the real code.",
+    "code": "import copy\nfrom tools.errors import error_result\n\ndef guard_writes(registry):\n    guarded = copy.copy(registry)\n    attempts = []\n    original = registry.call\n    def call(name, arguments):\n        tool = registry.tools.get(name)\n        if tool is not None and tool.writes:\n            attempts.append(name)\n            return error_result(\"pending_approval\", \"Writes are not executed in evals.\", approval_id=\"eval\")\n        return original(name, arguments)\n    guarded.call = call\n    return guarded, attempts\n\n# per case:\n# provider = ReplayProvider(case.replay) if not live else get_provider()\n# result = run_loop(provider, guarded, case.user_message)\n# reasons = []; if case.expect.tools is not None and [c.name for c in result.tool_calls] != case.expect.tools: reasons.append(...)",
+    "resource": { "type": "docs", "label": "Python docs - argparse tutorial", "url": "https://docs.python.org/3/howto/argparse.html" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/evals/runner.py", "middleware/evals/cases/lookup-by-email.json"],
+    "spec": [
+      "Implement load_cases, run_case (replay or live provider, write guard, one reason per failed expectation), run_all, and main with --cases, --live and --min-pass.",
+      "Write at least 20 regular cases covering every tool, both Marias, the lapsed donor, a missing donor, a malformed date, a duplicate call, and a receipt request that must end as pending_approval. Ask Claude Code to draft the first ten from your Module 1 checks; read every one and fix what it got wrong.",
+      "Run uv run --directory middleware python -m evals.runner and read the per-case lines. Break a description on purpose and run with --live (if you have a key) to see which cases change.",
+      "Make the runner part of your habit: run it before every commit to middleware/."
+    ],
+    "askClaudeFor": [
+      "Ten draft cases in the documented JSON shape, one per tool behavior you list.",
+      "A review of your expectations: is any case true no matter what the middleware does? Tighten it."
+    ],
+    "writeYourself": [
+      "run_case, including the write guard and the sanitized check against provider.calls.",
+      "At least half of the cases, by hand, from your own understanding of what should happen."
+    ],
+    "resources": [
+      { "type": "course", "label": "Hugging Face AI Agents Course - evaluation unit", "url": "https://huggingface.co/learn/agents-course" },
+      { "type": "docs", "label": "Phoenix by Arize - evals (optional)", "url": "https://docs.arize.com/phoenix" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m6-2-eval-harness",
+    "command": "uv run --directory middleware python checks/run.py m6-2-eval-harness",
+    "summary": "At least 20 regular cases with unique ids cover every tool; run offline, at least 18 pass; a wrong expectation fails with reasons; a write in a no_write case is blocked and reported with the CRM untouched; the CLI prints PASS/FAIL lines and exits 1 below --min-pass."
+  }
+}

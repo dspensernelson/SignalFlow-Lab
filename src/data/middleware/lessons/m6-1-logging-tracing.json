@@ -1,0 +1,50 @@
+{
+  "id": "m6-1-logging-tracing",
+  "module": "m6",
+  "order": 1,
+  "title": "Structured logging and tracing",
+  "estimateHours": 6,
+  "concept": {
+    "heading": "One span per tool call, one JSON line per log, one id that joins them",
+    "paragraphs": [
+      "When a staff member says 'it sent the wrong receipt', you need the full story of that one request: which tools ran, in what order, with what arguments, how long each took, and what came back. A trace is that story; each hop is a span with a name, attributes, a duration and an outcome. OpenTelemetry is the standard way to produce them, and a span around every tool call is the minimum instrumentation this track ships with.",
+      "Logs are the lines inside the hops. As JSON, one object per line, they are searchable and carry a correlation id (one per request) plus the current trace and span ids, so a log line and a span can be joined later in any tool. Plain text logs cannot be joined by anything.",
+      "Two rules carry over from Module 3: the arguments attribute is redacted with the same secret list the log filter uses, and nothing in telemetry ever changes behavior. The exporter is injectable: the check captures spans in memory, you print them to the console, and a client can point them at a free self-hosted collector (Langfuse or Phoenix) without touching a tool."
+    ],
+    "lowCodeEquivalent": "The run history of a flow with every action's inputs, outputs and duration. You read those by clicking; here you emit the same record as data a client can keep, search, and show an auditor."
+  },
+  "pythonBlock": {
+    "title": "Python you need: contextvars, the OpenTelemetry tracer, context managers again",
+    "intro": "A ContextVar is a value scoped to the current request even across threads and async tasks. The tracer's start_as_current_span is a context manager; your trace_tool_call wraps it.",
+    "code": "import contextvars, time, json\nfrom opentelemetry import trace\n\ncorrelation_id = contextvars.ContextVar(\"correlation_id\", default=None)\n\n@contextmanager\ndef trace_tool_call(name, arguments):\n    tracer = trace.get_tracer(\"middleware\")\n    outcome = Outcome()\n    started = time.perf_counter()\n    with tracer.start_as_current_span(f\"tool.{name}\") as span:\n        span.set_attribute(\"tool.name\", name)\n        span.set_attribute(\"tool.arguments\", redact(json.dumps(arguments, default=str)))\n        if correlation_id.get():\n            span.set_attribute(\"correlation_id\", correlation_id.get())\n        try:\n            yield outcome\n        except Exception as e:\n            span.set_attribute(\"tool.outcome\", f\"exception:{e.__class__.__name__}\")\n            raise\n        else:\n            code = (outcome.result or {}).get(\"error\", {}).get(\"code\") if isinstance(outcome.result, dict) else None\n            span.set_attribute(\"tool.outcome\", f\"error:{code}\" if code else \"ok\")\n        finally:\n            span.set_attribute(\"tool.duration_ms\", (time.perf_counter() - started) * 1000)",
+    "resource": { "type": "docs", "label": "OpenTelemetry Python - Getting Started", "url": "https://opentelemetry.io/docs/languages/python/getting-started/" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/tools/telemetry.py", "middleware/mcp_server/server.py"],
+    "spec": [
+      "Run uv sync --extra otel. Implement configure_tracing, set_correlation_id, trace_tool_call, JsonFormatter and configure_logging per the stub.",
+      "Wrap every MCP tool body in trace_tool_call and set a fresh correlation id per tool call; call configure_logging() and configure_tracing() at server startup (console exporter when OTEL_CONSOLE=1).",
+      "Run the server with OTEL_CONSOLE=1, call find_donor from Inspector, and read the span and the JSON log lines side by side. Find the id that joins them.",
+      "Optional: point the exporter at a self-hosted Langfuse or Phoenix and look at the same trace in a UI."
+    ],
+    "askClaudeFor": [
+      "How start_as_current_span, the global tracer provider and the exporter fit together, and why configure_tracing must be idempotent.",
+      "How to read the current span's trace_id and span_id inside a logging formatter."
+    ],
+    "writeYourself": [
+      "trace_tool_call, including the outcome and exception branches and the redaction of arguments.",
+      "JsonFormatter.format."
+    ],
+    "resources": [
+      { "type": "docs", "label": "OpenTelemetry - Traces concepts", "url": "https://opentelemetry.io/docs/concepts/signals/traces/" },
+      { "type": "docs", "label": "Langfuse self-hosting (optional trace UI)", "url": "https://langfuse.com/self-hosting" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m6-1-logging-tracing",
+    "command": "uv run --directory middleware python checks/run.py m6-1-logging-tracing",
+    "summary": "An in-memory exporter captures a tool.find_donor span with name, duration, outcome and correlation id; error results and exceptions are recorded; a secret passed as an argument is absent from the span; JSON log lines carry correlation, trace and span ids; MCP tools called in-process produce spans."
+  }
+}
