@@ -1,0 +1,49 @@
+{
+  "id": "m4-2-idempotency",
+  "module": "m4",
+  "order": 2,
+  "title": "Idempotency and deduplication",
+  "estimateHours": 5,
+  "concept": {
+    "heading": "At-least-once delivery in, at-most-once effect out",
+    "paragraphs": [
+      "A payment processor keeps delivering a webhook until it hears a 2xx, so the same event arrives two or three times on a bad day. A retry is good: the same request again because no clear answer came back. A duplicate is bad: the same business effect twice, two receipts for one gift. The key that lets you retry freely and never duplicate is the event id, used as an idempotency key everywhere the effect could happen.",
+      "Two layers. The local store claims the event id before any work (begin), and remembers the result after (remember); a replay is answered from the store without touching the network. The CRM also receives the key on the receipt, so a crash between the POST and the remember cannot create a second receipt when the event is replayed into a fresh store. Belt and braces, because the failure you did not think of is the one that happens.",
+      "Unmatched donors and ignored event types are remembered too. A replay must not re-run the search, and 'we saw this and chose to do nothing' is a result worth keeping."
+    ],
+    "lowCodeEquivalent": "A trigger condition plus a lookup to a 'processed events' SharePoint list before the create step. Here the list is a SQLite table with a primary key, and the CRM is told the key as well."
+  },
+  "pythonBlock": {
+    "title": "Python you need: INSERT OR IGNORE, sqlite3.IntegrityError, early returns",
+    "intro": "Claiming a key atomically is one INSERT with a primary key; the database decides who was first.",
+    "code": "def begin(self, key: str) -> bool:\n    with self._connect() as conn:\n        cur = conn.execute(\n            \"INSERT OR IGNORE INTO idempotency (key, result, created_at) VALUES (?, NULL, ?)\",\n            (key, datetime.now(timezone.utc).isoformat()),\n        )\n        return cur.rowcount == 1          # 1 = we claimed it; 0 = someone already had it\n\ndef handle_webhook(event, store, client):\n    done = store.get(event[\"id\"])\n    if done is not None:\n        return {**done, \"status\": \"duplicate\"}\n    if not store.begin(event[\"id\"]):\n        return {\"status\": \"in_progress\"}\n    ...  # transform, match, POST /receipts with idempotency_key=event['id'], remember",
+    "resource": { "type": "docs", "label": "Stripe docs - Idempotent requests", "url": "https://docs.stripe.com/api/idempotent_requests" }
+  },
+  "simulate": { "scenarioId": "duplicate-delivery" },
+  "build": {
+    "files": ["middleware/tools/idempotency.py", "middleware/tools/webhook.py"],
+    "spec": [
+      "Implement IdempotencyStore: table creation, get, begin (atomic claim), remember; a new store on the same path sees earlier keys.",
+      "Implement handle_webhook per the stub's six steps, passing event['id'] as the CRM idempotency_key and remembering every outcome (processed, unmatched, ignored).",
+      "Replay the processor's sample events through your handler three times each and read the CRM's /receipts: exactly one row per charge.succeeded event with a matching donor.",
+      "Delete your local store file and replay again: the CRM still shows one receipt per event (duplicate: true in the response)."
+    ],
+    "askClaudeFor": [
+      "What INSERT OR IGNORE does versus INSERT OR REPLACE, and why begin must use the first and remember the second.",
+      "A review of the crash windows: after begin, after the POST, after remember. What happens on replay in each?"
+    ],
+    "writeYourself": [
+      "begin and the handler's ordering of claim, work, remember.",
+      "The unmatched and ignored branches."
+    ],
+    "resources": [
+      { "type": "docs", "label": "SQLite docs - ON CONFLICT clause", "url": "https://www.sqlite.org/lang_conflict.html" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m4-2-idempotency",
+    "command": "uv run --directory middleware python checks/run.py m4-2-idempotency",
+    "summary": "The store claims and remembers across instances; the same webhook delivered three times yields one receipt and two duplicate results with the same id; a fresh store plus the CRM key still dedupes; unmatched and ignored events are remembered and never create receipts."
+  }
+}

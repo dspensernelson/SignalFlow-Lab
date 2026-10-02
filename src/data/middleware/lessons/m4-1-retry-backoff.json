@@ -1,0 +1,50 @@
+{
+  "id": "m4-1-retry-backoff",
+  "module": "m4",
+  "order": 1,
+  "title": "Failure taxonomy and retry with backoff",
+  "estimateHours": 6,
+  "concept": {
+    "heading": "Retry the unknowns, never the definite answers, and spread the retries out",
+    "paragraphs": [
+      "A call to another system ends one of three ways: a clear yes, a clear no, or silence. Timeouts, connection errors, 429 and 5xx are silence or a temporary no, and retrying them is right. A 400, 401, 403, 404 or a schema mismatch is a definite no, and retrying it only burns the provider's rate limit and hides a bug. The decorator you write encodes exactly that taxonomy.",
+      "Backoff is the space between attempts: 0.2 s, 0.4 s, 0.8 s, capped. Jitter multiplies each by a random factor so a hundred clients that failed together do not retry together and knock the recovering service down again. Retry-After, when a 429 carries it, is the server telling you the minimum; honor it.",
+      "Retrying is only safe when the effect is idempotent, which is why the Idempotency-Key header is on attempt 1 in the simulation and not added later. The next lesson makes that key durable. The sleep function is injectable so the check runs instantly and can see the delays you chose."
+    ],
+    "lowCodeEquivalent": "The retry policy on an HTTP action in Power Automate (count, interval, exponential) and the run-after conditions on the next step. You have configured those; here you write the policy, and you decide which errors it applies to."
+  },
+  "pythonBlock": {
+    "title": "Python you need: decorator factories, functools.wraps, random.uniform",
+    "intro": "A decorator factory takes settings and returns a decorator. functools.wraps keeps the wrapped function's name and docstring, which matters for logs and MCP.",
+    "code": "import functools, random\n\ndef retry(max_attempts=4, base_delay=0.2, max_delay=2.0, jitter=True, sleep=time.sleep):\n    def decorator(fn):\n        @functools.wraps(fn)\n        def wrapper(*args, **kwargs):\n            last = None\n            for attempt in range(1, max_attempts + 1):\n                wrapper.last_attempts = attempt\n                try:\n                    return fn(*args, **kwargs)\n                except (RetryableError, httpx.TimeoutException, httpx.ConnectError) as e:\n                    last = e\n                    if attempt == max_attempts:\n                        raise\n                    delay = min(max_delay, base_delay * 2 ** (attempt - 1))\n                    if jitter:\n                        delay *= random.uniform(0.5, 1.5)\n                    sleep(delay)\n            raise last  # unreachable, keeps type checkers calm\n        wrapper.last_attempts = 0\n        return wrapper\n    return decorator",
+    "resource": { "type": "docs", "label": "Python docs - functools.wraps", "url": "https://docs.python.org/3/library/functools.html#functools.wraps" }
+  },
+  "simulate": { "scenarioId": "webhook-retry" },
+  "build": {
+    "files": ["middleware/tools/retry.py", "middleware/tools/payments.py"],
+    "spec": [
+      "Implement is_retryable_status, RetryableError handling and the retry decorator per the stub: exponential delay with cap, optional jitter in [0.5, 1.5], Retry-After honored, last exception re-raised, wrapper.last_attempts recorded.",
+      "Implement PaymentsClient.confirm wrapped with retry(max_attempts=4, base_delay=0.2, sleep=self.sleep): map timeouts, connection errors, 429 and 5xx to retries; 4xx raise PaymentsError immediately with status and attempts.",
+      "Run the processor mock and reproduce the simulation: fail_sequence 'timeout,500,ok' with timeout 0.3 s. Watch /_attempts.",
+      "Then try '400,ok' and confirm it stops after one attempt."
+    ],
+    "askClaudeFor": [
+      "The list of httpx exception classes for timeouts and connection failures, and which base class covers them.",
+      "A review of your delay math against the formula in the stub (attempt 2 waits base_delay, attempt 3 waits 2x)."
+    ],
+    "writeYourself": [
+      "The decorator's loop, the taxonomy branch (what retries, what raises), and the jitter.",
+      "PaymentsClient.confirm."
+    ],
+    "resources": [
+      { "type": "docs", "label": "Google SRE Book - Handling Overload", "url": "https://sre.google/sre-book/handling-overload/" },
+      { "type": "docs", "label": "Google SRE Book - Addressing Cascading Failures", "url": "https://sre.google/sre-book/addressing-cascading-failures/" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m4-1-retry-backoff",
+    "command": "uv run --directory middleware python checks/run.py m4-1-retry-backoff",
+    "summary": "The decorator backs off exponentially with jitter, honors Retry-After, gives up after max attempts and never retries non-retryable errors; against the mock processor, timeout,500,ok succeeds on attempt 3, a 400 stops at attempt 1, and a persistent 503 gives up after 4."
+  }
+}

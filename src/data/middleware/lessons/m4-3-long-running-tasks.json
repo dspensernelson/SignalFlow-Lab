@@ -1,0 +1,50 @@
+{
+  "id": "m4-3-long-running-tasks",
+  "module": "m4",
+  "order": 3,
+  "title": "Long-running work: the MCP Tasks pattern",
+  "estimateHours": 6,
+  "concept": {
+    "heading": "Return a durable handle now; let the work finish whether or not anyone is watching",
+    "paragraphs": [
+      "Reconciling a month means reading every donor's gifts, which on a real CRM is minutes. A tool that blocks for minutes fails the first time a laptop sleeps, a free host restarts, or a browser tab closes, and the staff member never learns whether it finished. The fix is a task: create a row in SQLite with status working, start the work in a background thread, and return the task id at once.",
+      "The client polls get_task(task_id) until the status is completed or failed, and the result is on the row. Because the state is in the database and the thread lives in the server process, a client that disconnects can come back, or a different client can take over, and finish the poll. The 2026-07-28 spec standardizes this as the tasks extension with tasks/get; the SDK's support is still settling, so this lesson implements the same pattern as two ordinary tools that every host can already call.",
+      "Two details carry the weight: a failure inside the thread must land on the row as status failed with the error text, never vanish; and the thread must not hold a connection open across the whole job. Each donor is its own short call."
+    ],
+    "lowCodeEquivalent": "A long-running flow started by a child-flow call that returns immediately, with the parent checking a status row in Dataverse. Or an Azure Durable Function status endpoint. The handle-and-poll shape is the same."
+  },
+  "pythonBlock": {
+    "title": "Python you need: threading.Thread, daemon threads, try/except around the whole job",
+    "intro": "A daemon thread does not keep the process alive on exit. The try/except is what turns a crash into a failed row instead of a silent loss.",
+    "code": "import threading\n\ndef run_in_background(self, task_id, fn, *args):\n    def job():\n        try:\n            self.complete(task_id, fn(*args))\n        except Exception as e:                       # noqa: BLE001 - the row IS the error report\n            self.fail(task_id, f\"{e.__class__.__name__}: {e}\")\n    t = threading.Thread(target=job, name=f\"task-{task_id}\", daemon=True)\n    t.start()\n    return t\n\n# in the server:\n# @server.tool()\n# def reconcile_month(year: int, month: int) -> dict:\n#     tid = tasks.create(\"reconcile_month\", {\"year\": year, \"month\": month})\n#     tasks.run_in_background(tid, reconcile, client, year, month)\n#     return {\"task_id\": tid, \"status\": \"working\"}",
+    "resource": { "type": "docs", "label": "Python docs - threading", "url": "https://docs.python.org/3/library/threading.html" }
+  },
+  "simulate": { "scenarioId": "task-polling" },
+  "build": {
+    "files": ["middleware/tools/tasks.py", "middleware/mcp_server/server.py"],
+    "spec": [
+      "Implement TaskStore (create, get, complete, fail, run_in_background) and reconcile_month per the stub.",
+      "Add the tools reconcile_month(year, month) -> {task_id, status: working} and get_task(task_id) -> the row (status, result, error), unknown id -> not_found. Store path from TASKS_DB.",
+      "Over Streamable HTTP: start a reconcile, kill your client, reconnect, poll until completed. Over stdio the server dies with the host, which is the point of the lesson: note it in your README.",
+      "Make the per-donor delay configurable so the task visibly takes a few seconds in your demo and no time in the check."
+    ],
+    "askClaudeFor": [
+      "The MCP tasks extension in the 2026-07-28 changelog: what tasks/get returns and how your two tools map onto it.",
+      "Whether SQLite needs anything special for a writer thread and a reader thread (it does not at this scale; ask why)."
+    ],
+    "writeYourself": [
+      "run_in_background with its try/except, and reconcile_month.",
+      "The two tools."
+    ],
+    "resources": [
+      { "type": "docs", "label": "MCP specification changelog, 2026-07-28 - tasks extension", "url": "https://modelcontextprotocol.io/specification/2026-07-28/changelog" },
+      { "type": "repo", "label": "Microsoft MCP for Beginners - 3.10 Advanced Server Usage", "url": "https://github.com/microsoft/mcp-for-beginners" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m4-3-long-running-tasks",
+    "command": "uv run --directory middleware python checks/run.py m4-3-long-running-tasks",
+    "summary": "The store persists tasks and records completion and failure from a background thread; reconcile_month's totals match the CRM; over HTTP a task started on one connection is polled to completed on fresh connections, and an unknown id is not_found."
+  }
+}

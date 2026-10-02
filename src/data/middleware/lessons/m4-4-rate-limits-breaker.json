@@ -1,0 +1,49 @@
+{
+  "id": "m4-4-rate-limits-breaker",
+  "module": "m4",
+  "order": 4,
+  "title": "Rate limits and circuit breakers",
+  "estimateHours": 5,
+  "concept": {
+    "heading": "Stay under the ceiling on purpose, and stop calling what is already down",
+    "paragraphs": [
+      "Free tiers publish their ceilings: roughly 30 requests a minute on Groq, a daily quota on Gemini Flash, about 50 a day on OpenRouter's free models. A rate limiter in your middleware enforces that ceiling before the request leaves, so the assistant degrades politely (wait 12 s) instead of discovering the limit through a burst of 429s that also count against you.",
+      "A circuit breaker protects the other direction. When a dependency fails three times in a row, the breaker opens and every call fails fast for a recovery window instead of each one waiting out a timeout. After the window, one call is let through (half-open); success closes the breaker, failure reopens it. Staff see 'the CRM is unavailable, try in a minute' at once, not a frozen assistant.",
+      "Both are small state machines with a clock. Injecting the clock makes them testable in milliseconds and makes the rules legible: the check reads like the spec."
+    ],
+    "lowCodeEquivalent": "Concurrency control on a trigger and the 'limit' settings on a connector, plus the manual habit of turning a flow off when its target is down. The breaker is that habit, automated."
+  },
+  "pythonBlock": {
+    "title": "Python you need: a sliding window over a list, state as a string, injected clocks",
+    "intro": "Keep timestamps, drop the old ones, count what is left. The clock is a parameter so tests control time.",
+    "code": "def acquire(self) -> bool:\n    now = self.clock()\n    self._calls = [t for t in self._calls if now - t < self.per_seconds]\n    if len(self._calls) >= self.max_calls:\n        return False\n    self._calls.append(now)\n    return True\n\ndef allow(self) -> bool:                       # breaker\n    if self.state == \"open\":\n        if self.clock() - self.opened_at >= self.recovery_seconds:\n            self.state = \"half_open\"\n            return True\n        return False\n    return True",
+    "resource": { "type": "docs", "label": "Groq docs - Rate limits", "url": "https://console.groq.com/docs/rate-limits" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/tools/limits.py", "middleware/tools/provider.py"],
+    "spec": [
+      "Implement RateLimiter (sliding window, acquire, wait_time), CircuitBreaker (closed, open, half_open per the stub), and the guarded decorator that raises CircuitOpen or RateLimited before the call and records success or failure after it.",
+      "Wrap the provider's network call with guarded(RateLimiter(28, 60), CircuitBreaker(3, 30)) for groq and sensible numbers for the others; keep replay unguarded.",
+      "Run the live smoke test from Module 1 thirty times in a loop with LLM_PROVIDER=groq and watch RateLimited appear before any 429 does (skip if you have no key).",
+      "Point CRM_URL at a dead port, call find_donor four times through the server, and confirm the fourth fails fast with CircuitOpen instead of waiting on a timeout."
+    ],
+    "askClaudeFor": [
+      "The current published free-tier limits for the providers you use, so your limiter numbers are real (they change; verify today).",
+      "A review of the half-open transition: exactly one trial call, then closed or reopened."
+    ],
+    "writeYourself": [
+      "Both state machines and the decorator.",
+      "The provider wiring and the numbers you chose, with a comment saying when you checked them."
+    ],
+    "resources": [
+      { "type": "docs", "label": "Google SRE Book - Handling Overload (client-side throttling)", "url": "https://sre.google/sre-book/handling-overload/" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m4-4-rate-limits-breaker",
+    "command": "uv run --directory middleware python checks/run.py m4-4-rate-limits-breaker",
+    "summary": "With an injected clock: the limiter allows N calls per window and refills; the breaker opens after N failures, refuses while open, half-opens after recovery, closes on success and reopens on failure; guarded() raises RateLimited and CircuitOpen without calling through."
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "id": "duplicate-delivery",
+  "title": "The processor delivers the same event three times; one receipt results",
+  "steps": [
+    {
+      "id": "s1",
+      "kind": "request",
+      "from": "payment-webhook",
+      "to": "retry-queue",
+      "label": "Delivery 1 of evt_01HZX4Q0001",
+      "status": "ok",
+      "payloadTitle": "Webhook event",
+      "payload": { "id": "evt_01HZX4Q0001", "type": "charge.succeeded", "data": { "object": { "id": "ch_338804917", "amount": 7500, "billing_details": { "email": "maria.alvarez@example.org" } } } },
+      "annotate": "At-least-once delivery: the processor retries until it hears a 2xx, so you will see this event again.",
+      "nodeStates": { "payment-webhook": "active", "retry-queue": "waiting" },
+      "counters": { "deliveries": 1, "receipts": 0 },
+      "durationMs": 1500
+    },
+    {
+      "id": "s2",
+      "kind": "request",
+      "from": "retry-queue",
+      "to": "state-store",
+      "label": "store.begin('evt_01HZX4Q0001') -> True",
+      "status": "ok",
+      "payloadTitle": "idempotency row (claimed)",
+      "payload": { "key": "evt_01HZX4Q0001", "result": null, "created_at": "2026-10-02T15:10:02Z" },
+      "annotate": "Claim first, work second. A second worker arriving now gets False and backs off.",
+      "nodeStates": { "retry-queue": "active", "state-store": "ok" },
+      "durationMs": 1300
+    },
+    {
+      "id": "s3",
+      "kind": "request",
+      "from": "retry-queue",
+      "to": "donor-crm",
+      "label": "Transform, match the donor, POST /receipts with the event id as key",
+      "status": "ok",
+      "payloadTitle": "POST /receipts",
+      "payload": { "donation_id": 6, "sent_to": "maria.alvarez@example.org", "idempotency_key": "evt_01HZX4Q0001" },
+      "annotate": "The CRM gets the key too. If the process dies after this POST but before the store is updated, the CRM still refuses a second receipt.",
+      "nodeStates": { "donor-crm": "waiting" },
+      "durationMs": 1400
+    },
+    {
+      "id": "s4",
+      "kind": "response",
+      "from": "donor-crm",
+      "to": "retry-queue",
+      "label": "201 Created",
+      "status": "ok",
+      "payloadTitle": "Receipt",
+      "payload": { "id": 1, "donation_id": 6, "idempotency_key": "evt_01HZX4Q0001", "duplicate": false },
+      "nodeStates": { "donor-crm": "ok" },
+      "counters": { "deliveries": 1, "receipts": 1 },
+      "durationMs": 1200
+    },
+    {
+      "id": "s5",
+      "kind": "request",
+      "from": "retry-queue",
+      "to": "state-store",
+      "label": "store.remember(event id, result)",
+      "status": "ok",
+      "payloadTitle": "idempotency row (completed)",
+      "payload": { "key": "evt_01HZX4Q0001", "result": { "status": "processed", "receipt_id": 1, "donor_id": 1 } },
+      "nodeStates": { "state-store": "ok", "retry-queue": "ok" },
+      "durationMs": 1200
+    },
+    {
+      "id": "s6",
+      "kind": "request",
+      "from": "payment-webhook",
+      "to": "retry-queue",
+      "label": "Delivery 2 (the processor never got our 2xx in time)",
+      "status": "ok",
+      "payloadTitle": "Webhook event (identical)",
+      "payload": { "id": "evt_01HZX4Q0001", "type": "charge.succeeded" },
+      "nodeStates": { "payment-webhook": "active", "retry-queue": "active" },
+      "counters": { "deliveries": 2, "receipts": 1 },
+      "durationMs": 1300
+    },
+    {
+      "id": "s7",
+      "kind": "response",
+      "from": "state-store",
+      "to": "retry-queue",
+      "label": "store.get -> stored result; answered without any network",
+      "status": "ok",
+      "payloadTitle": "Handler result",
+      "payload": { "status": "duplicate", "receipt_id": 1, "donor_id": 1 },
+      "annotate": "The CRM is not even contacted. Delivery 3 goes the same way.",
+      "nodeStates": { "state-store": "ok", "donor-crm": "idle" },
+      "counters": { "deliveries": 3, "receipts": 1 },
+      "durationMs": 1600
+    },
+    {
+      "id": "s8",
+      "kind": "note",
+      "from": "retry-queue",
+      "to": "retry-queue",
+      "label": "Retry vs duplicate",
+      "status": "ok",
+      "payloadTitle": "The distinction a client cares about",
+      "payload": { "retry": "the same request sent again because no clear answer came back", "duplicate": "the same business effect happening twice", "rule": "retry freely; never duplicate; the key is what makes both true at once" },
+      "nodeStates": { "retry-queue": "ok" },
+      "durationMs": 2200
+    }
+  ]
+}

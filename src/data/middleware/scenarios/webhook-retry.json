@@ -1,0 +1,113 @@
+{
+  "id": "webhook-retry",
+  "title": "A confirm call times out, backs off, and succeeds on the third try",
+  "steps": [
+    {
+      "id": "s1",
+      "kind": "request",
+      "from": "retry-queue",
+      "to": "payment-webhook",
+      "label": "Attempt 1: POST /confirm",
+      "status": "pending",
+      "payloadTitle": "HTTP request",
+      "payload": { "method": "POST", "url": "{PAYMENTS_URL}/confirm", "headers": { "Idempotency-Key": "evt_01HZX4Q0001" }, "body": { "charge_id": "ch_338804917", "amount_cents": 7500 } },
+      "annotate": "The idempotency key goes on attempt 1, before anything can go wrong.",
+      "nodeStates": { "retry-queue": "active", "payment-webhook": "waiting" },
+      "counters": { "attempt": 1 },
+      "durationMs": 1400
+    },
+    {
+      "id": "s2",
+      "kind": "error",
+      "from": "payment-webhook",
+      "to": "retry-queue",
+      "label": "No answer within 1.0 s: timeout",
+      "status": "timeout",
+      "payloadTitle": "httpx.ReadTimeout",
+      "payload": { "exception": "ReadTimeout", "elapsed_s": 1.0, "retryable": true },
+      "annotate": "A timeout is not a no. It is an unknown. Retrying is safe only because the key makes the effect idempotent.",
+      "nodeStates": { "payment-webhook": "error", "retry-queue": "active" },
+      "durationMs": 1600
+    },
+    {
+      "id": "s3",
+      "kind": "wait",
+      "from": "retry-queue",
+      "to": "retry-queue",
+      "label": "Back off: 0.2 s x jitter",
+      "status": "pending",
+      "payloadTitle": "retry decorator",
+      "payload": { "delay_s": 0.23, "formula": "min(max_delay, base * 2**(attempt-2)) * uniform(0.5, 1.5)" },
+      "annotate": "Jitter spreads a hundred clients that all failed at once across the next second instead of the same millisecond.",
+      "nodeStates": { "retry-queue": "waiting", "payment-webhook": "idle" },
+      "counters": { "attempt": 1, "backoffMs": 230 },
+      "durationMs": 1300
+    },
+    {
+      "id": "s4",
+      "kind": "request",
+      "from": "retry-queue",
+      "to": "payment-webhook",
+      "label": "Attempt 2: same request, same key",
+      "status": "pending",
+      "payloadTitle": "HTTP request (identical)",
+      "payload": { "method": "POST", "url": "{PAYMENTS_URL}/confirm", "headers": { "Idempotency-Key": "evt_01HZX4Q0001" } },
+      "nodeStates": { "retry-queue": "active", "payment-webhook": "waiting" },
+      "counters": { "attempt": 2 },
+      "durationMs": 1200
+    },
+    {
+      "id": "s5",
+      "kind": "error",
+      "from": "payment-webhook",
+      "to": "retry-queue",
+      "label": "HTTP 500",
+      "status": "error",
+      "payloadTitle": "Response",
+      "payload": { "status": 500, "body": { "error": "upstream_unavailable", "attempt": 2 }, "retryable": true },
+      "annotate": "5xx and 429 retry. A 400 would stop here: the answer would not change.",
+      "nodeStates": { "payment-webhook": "error" },
+      "durationMs": 1300
+    },
+    {
+      "id": "s6",
+      "kind": "wait",
+      "from": "retry-queue",
+      "to": "retry-queue",
+      "label": "Back off: 0.4 s x jitter",
+      "status": "pending",
+      "payloadTitle": "retry decorator",
+      "payload": { "delay_s": 0.51 },
+      "nodeStates": { "retry-queue": "waiting", "payment-webhook": "idle" },
+      "counters": { "attempt": 2, "backoffMs": 510 },
+      "durationMs": 1200
+    },
+    {
+      "id": "s7",
+      "kind": "request",
+      "from": "retry-queue",
+      "to": "payment-webhook",
+      "label": "Attempt 3",
+      "status": "ok",
+      "payloadTitle": "HTTP request (identical)",
+      "payload": { "method": "POST", "headers": { "Idempotency-Key": "evt_01HZX4Q0001" } },
+      "nodeStates": { "retry-queue": "active", "payment-webhook": "waiting" },
+      "counters": { "attempt": 3 },
+      "durationMs": 1200
+    },
+    {
+      "id": "s8",
+      "kind": "response",
+      "from": "payment-webhook",
+      "to": "retry-queue",
+      "label": "HTTP 200: confirmed, exactly once",
+      "status": "ok",
+      "payloadTitle": "Response",
+      "payload": { "status": 200, "body": { "confirmed": true, "charge_id": "ch_338804917", "attempt": 3, "idempotency_key": "evt_01HZX4Q0001" } },
+      "annotate": "Three attempts, one effect. Had attempt 1 actually landed, the key would have returned the same result instead of a second confirm.",
+      "nodeStates": { "payment-webhook": "ok", "retry-queue": "ok" },
+      "counters": { "attempt": 3, "confirmed": 1 },
+      "durationMs": 1800
+    }
+  ]
+}

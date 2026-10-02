@@ -1,0 +1,110 @@
+{
+  "id": "task-polling",
+  "title": "Reconcile a month as a task: a handle now, the answer later, across a dropped connection",
+  "steps": [
+    {
+      "id": "s1",
+      "kind": "request",
+      "from": "agent",
+      "to": "tool-router",
+      "label": "tools/call reconcile_month(2026, 3)",
+      "status": "ok",
+      "payloadTitle": "Tool call",
+      "payload": { "name": "reconcile_month", "arguments": { "year": 2026, "month": 3 } },
+      "annotate": "This will take minutes on a real CRM. A tool that blocks for minutes dies with the first dropped connection.",
+      "nodeStates": { "agent": "active", "tool-router": "waiting" },
+      "durationMs": 1400
+    },
+    {
+      "id": "s2",
+      "kind": "request",
+      "from": "tool-router",
+      "to": "state-store",
+      "label": "tasks row created; work starts in the background",
+      "status": "pending",
+      "payloadTitle": "tasks row",
+      "payload": { "id": "t_5e9a21c0b7f3", "kind": "reconcile_month", "params": { "year": 2026, "month": 3 }, "status": "working" },
+      "nodeStates": { "tool-router": "active", "state-store": "ok", "retry-queue": "waiting" },
+      "counters": { "poll": 0 },
+      "durationMs": 1300
+    },
+    {
+      "id": "s3",
+      "kind": "response",
+      "from": "tool-router",
+      "to": "agent",
+      "label": "The handle comes back at once",
+      "status": "pending",
+      "payloadTitle": "Tool result",
+      "payload": { "task_id": "t_5e9a21c0b7f3", "status": "working" },
+      "annotate": "The 2026-07-28 tasks extension standardizes this shape and a tasks/get method; the pattern is the same when you implement it as two tools.",
+      "nodeStates": { "agent": "active" },
+      "durationMs": 1500
+    },
+    {
+      "id": "s4",
+      "kind": "error",
+      "from": "agent",
+      "to": "tool-router",
+      "label": "Connection dropped (laptop lid, host restart)",
+      "status": "timeout",
+      "payloadTitle": "Transport",
+      "payload": { "event": "client disconnected", "server_process": "still running", "task_thread": "still running" },
+      "annotate": "Nothing is lost: the task id is in the staff member's chat and the state is in SQLite.",
+      "nodeStates": { "agent": "error", "tool-router": "idle", "retry-queue": "waiting" },
+      "durationMs": 1600
+    },
+    {
+      "id": "s5",
+      "kind": "request",
+      "from": "retry-queue",
+      "to": "donor-crm",
+      "label": "Meanwhile: the background thread walks every donor's March gifts",
+      "status": "ok",
+      "payloadTitle": "GET /donors/{id}/donations, 12 times",
+      "payload": { "donors": 12, "per_donor_delay_s": 0.05 },
+      "nodeStates": { "retry-queue": "active", "donor-crm": "waiting" },
+      "durationMs": 1500
+    },
+    {
+      "id": "s6",
+      "kind": "request",
+      "from": "agent",
+      "to": "tool-router",
+      "label": "New connection: get_task(task_id)",
+      "status": "pending",
+      "payloadTitle": "Tool call",
+      "payload": { "name": "get_task", "arguments": { "task_id": "t_5e9a21c0b7f3" } },
+      "nodeStates": { "agent": "active", "tool-router": "active", "donor-crm": "ok" },
+      "counters": { "poll": 1 },
+      "durationMs": 1300
+    },
+    {
+      "id": "s7",
+      "kind": "response",
+      "from": "tool-router",
+      "to": "agent",
+      "label": "Still working; poll again",
+      "status": "pending",
+      "payloadTitle": "Tool result",
+      "payload": { "task_id": "t_5e9a21c0b7f3", "status": "working" },
+      "nodeStates": { "agent": "active" },
+      "counters": { "poll": 2 },
+      "durationMs": 1300
+    },
+    {
+      "id": "s8",
+      "kind": "response",
+      "from": "tool-router",
+      "to": "agent",
+      "label": "Completed: the result is on the row",
+      "status": "ok",
+      "payloadTitle": "Tool result",
+      "payload": { "task_id": "t_5e9a21c0b7f3", "status": "completed", "result": { "year": 2026, "month": 3, "donation_count": 4, "total_cents": 27500, "by_donor": [ { "donor_id": 1, "name": "Maria Alvarez", "count": 1, "total_cents": 7500 } ] } },
+      "annotate": "Durable handle, polled: the shape every long-running tool in this track uses.",
+      "nodeStates": { "tool-router": "ok", "retry-queue": "ok", "agent": "ok" },
+      "counters": { "poll": 3 },
+      "durationMs": 2000
+    }
+  ]
+}
