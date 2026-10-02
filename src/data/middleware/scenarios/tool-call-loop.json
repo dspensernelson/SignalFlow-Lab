@@ -1,0 +1,110 @@
+{
+  "id": "tool-call-loop",
+  "title": "The loop: two tool calls, then a final answer",
+  "steps": [
+    {
+      "id": "s1",
+      "kind": "request",
+      "from": "user",
+      "to": "agent",
+      "label": "Turn 1: messages + tools go to the model",
+      "status": "ok",
+      "payloadTitle": "What the loop sends",
+      "payload": { "messages": [ { "role": "system", "content": "You are the donor-operations assistant..." }, { "role": "user", "content": "Has Priya given before?" } ], "tools": ["find_donor", "get_donation_history", "create_receipt"] },
+      "annotate": "The loop owns the conversation. The model only ever sees this list.",
+      "nodeStates": { "user": "active", "agent": "waiting" },
+      "counters": { "turn": 1 },
+      "durationMs": 1500
+    },
+    {
+      "id": "s2",
+      "kind": "response",
+      "from": "agent",
+      "to": "tool-router",
+      "label": "Model replies with a tool call, not text",
+      "status": "pending",
+      "payloadTitle": "ModelReply",
+      "payload": { "text": null, "tool_calls": [ { "id": "call_1", "name": "find_donor", "arguments": { "query": "Priya" } } ], "stop_reason": "tool_calls" },
+      "annotate": "stop_reason tells the loop what to do next: run the tool, do not stop.",
+      "nodeStates": { "user": "idle", "agent": "ok", "tool-router": "active" },
+      "durationMs": 1400
+    },
+    {
+      "id": "s3",
+      "kind": "request",
+      "from": "tool-router",
+      "to": "donor-crm",
+      "label": "registry.call('find_donor', {query: 'Priya'})",
+      "status": "ok",
+      "payloadTitle": "HTTP GET /donors?q=Priya",
+      "payload": { "method": "GET", "url": "{CRM_URL}/donors?q=Priya" },
+      "annotate": "Arguments were validated by the pydantic model first.",
+      "nodeStates": { "donor-crm": "waiting" },
+      "durationMs": 1200
+    },
+    {
+      "id": "s4",
+      "kind": "response",
+      "from": "donor-crm",
+      "to": "tool-router",
+      "label": "One match",
+      "status": "ok",
+      "payloadTitle": "Tool result (dict)",
+      "payload": { "matches": 1, "donors": [ { "id": 4, "name": "Priya Natarajan", "email": "priya.n@example.org" } ] },
+      "nodeStates": { "donor-crm": "ok" },
+      "durationMs": 1200
+    },
+    {
+      "id": "s5",
+      "kind": "request",
+      "from": "tool-router",
+      "to": "agent",
+      "label": "Turn 2: the result is appended as a tool message",
+      "status": "ok",
+      "payloadTitle": "Appended messages",
+      "payload": [ { "role": "assistant", "content": null, "tool_calls": [ { "id": "call_1", "name": "find_donor", "arguments": { "query": "Priya" } } ] }, { "role": "tool", "tool_call_id": "call_1", "name": "find_donor", "content": "{\"matches\": 1, \"donors\": [{\"id\": 4, ...}]}" } ],
+      "annotate": "Same loop, one more turn. The whole history goes back every time.",
+      "nodeStates": { "tool-router": "ok", "agent": "active" },
+      "counters": { "turn": 2 },
+      "durationMs": 1500
+    },
+    {
+      "id": "s6",
+      "kind": "response",
+      "from": "agent",
+      "to": "tool-router",
+      "label": "Second tool call, now with the id it learned",
+      "status": "pending",
+      "payloadTitle": "ModelReply",
+      "payload": { "tool_calls": [ { "id": "call_2", "name": "get_donation_history", "arguments": { "donor_id": 4 } } ], "stop_reason": "tool_calls" },
+      "nodeStates": { "agent": "ok", "tool-router": "active" },
+      "durationMs": 1300
+    },
+    {
+      "id": "s7",
+      "kind": "response",
+      "from": "donor-crm",
+      "to": "tool-router",
+      "label": "History comes back, newest first",
+      "status": "ok",
+      "payloadTitle": "Tool result",
+      "payload": { "donor_id": 4, "donations": [ { "id": 31, "amount_cents": 12000, "received_at": "2026-08-14T10:05:00Z" }, { "id": 22, "amount_cents": 5000, "received_at": "2026-02-02T16:40:00Z" } ] },
+      "nodeStates": { "donor-crm": "ok" },
+      "counters": { "turn": 3 },
+      "durationMs": 1300
+    },
+    {
+      "id": "s8",
+      "kind": "response",
+      "from": "agent",
+      "to": "user",
+      "label": "Turn 3: final text, the loop stops",
+      "status": "ok",
+      "payloadTitle": "ModelReply -> final_text",
+      "payload": { "text": "Yes. Priya Natarajan has given twice, most recently $120.00 on 14 August 2026.", "tool_calls": [], "stop_reason": "stop" },
+      "annotate": "No tool calls means done. max_turns is the safety net for a model that never says done.",
+      "nodeStates": { "agent": "ok", "user": "active", "tool-router": "idle" },
+      "durationMs": 1600
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "m1-3-bad-inputs",
+  "module": "m1",
+  "order": 3,
+  "title": "Structured outputs and bad inputs: errors as data",
+  "estimateHours": 6,
+  "concept": {
+    "heading": "A tool never raises; it returns an error the model can act on",
+    "paragraphs": [
+      "The model will ask for a donor that does not exist, pass a date in the wrong format, call the same tool twice, and invent a tool name. Each of those is a normal Tuesday, not a bug. If the handler raises, the loop dies and the staff member sees nothing. If the handler returns {\"error\": {\"code\": \"not_found\", \"message\": ..., \"suggestion\": ...}}, the model reads it like any other result and recovers: tells the user, tries the last name, stops.",
+      "The registry is where this happens. ToolRegistry.call validates arguments against the pydantic model (invalid_arguments, naming the fields), maps a DonorNotFound to not_found, a CrmError to upstream_error, and an unknown name to unknown_tool with the list of real names. The handlers stay simple; the registry is the one place that promises never to raise.",
+      "One case belongs to the loop: the model repeating an identical call in the same run. Executing it again would double a write. The loop returns a duplicate_call error instead, which is the first idempotency rule in this track; Module 4 makes it durable."
+    ],
+    "lowCodeEquivalent": "Configure run after: has failed, the scope with a catch branch, and the Terminate action with a custom message. The difference: here the error goes back to the model as data, so the assistant can keep working instead of the flow ending."
+  },
+  "pythonBlock": {
+    "title": "Python you need: try/except with specific exceptions, pydantic ValidationError, dict equality",
+    "intro": "Catch the narrowest exception you can name, and turn it into data at the boundary.",
+    "code": "from pydantic import ValidationError\nfrom tools.client import DonorNotFound, CrmError\nfrom tools.errors import error_result\n\ntry:\n    args = tool.input_model.model_validate(arguments)\nexcept ValidationError as e:\n    fields = sorted({str(err[\"loc\"][0]) for err in e.errors() if err[\"loc\"]})\n    return error_result(\"invalid_arguments\", f\"Invalid arguments: {', '.join(fields)}\", fields=fields)\ntry:\n    return tool.handler(args)\nexcept DonorNotFound as e:\n    return error_result(\"not_found\", str(e), suggestion=\"Use find_donor first.\", donor_id=e.donor_id)\nexcept CrmError as e:\n    return error_result(\"upstream_error\", str(e))\n\n# duplicate detection in the loop: (tc.name, tc.arguments) == (prev.name, prev.arguments)",
+    "resource": { "type": "docs", "label": "pydantic - Validation errors", "url": "https://docs.pydantic.dev/latest/errors/validation_errors/" }
+  },
+  "simulate": null,
+  "build": {
+    "files": ["middleware/tools/errors.py", "middleware/tools/schemas.py", "middleware/tools/loop.py"],
+    "spec": [
+      "Implement error_result and is_error in tools/errors.py exactly to the documented shape.",
+      "Implement ToolRegistry.call: unknown_tool (details.available), invalid_arguments (details.fields), not_found for DonorNotFound (details.donor_id), upstream_error for CrmError and for any httpx connection failure. It never raises.",
+      "In run_loop, when a tool call repeats the name and arguments of one already executed in this run, do not execute it; append a duplicate_call error result instead.",
+      "An empty find_donor match is a normal result with matches 0, not an error. Decide why, and write that reasoning into the description if it is not there."
+    ],
+    "askClaudeFor": [
+      "The list of exceptions httpx can raise on a dead host and which of them your upstream_error branch must catch.",
+      "A review of your error messages: would a model (or a staff member reading the transcript) know what to do next?"
+    ],
+    "writeYourself": [
+      "ToolRegistry.call, branch by branch.",
+      "The duplicate-call guard in the loop."
+    ],
+    "resources": [
+      { "type": "repo", "label": "Microsoft AI Agents for Beginners - Tool use lesson (error handling section)", "url": "https://github.com/microsoft/ai-agents-for-beginners" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m1-3-bad-inputs",
+    "command": "uv run --directory middleware python checks/run.py m1-3-bad-inputs",
+    "summary": "Missing donor, malformed date, wrong type, unknown tool, dead CRM and a repeated write each come back as a structured error with the right code; the repeated receipt is created exactly once."
+  }
+}

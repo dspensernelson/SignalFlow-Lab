@@ -1,0 +1,51 @@
+{
+  "id": "m1-1-tool-contracts",
+  "module": "m1",
+  "order": 1,
+  "title": "What a tool is to a model",
+  "estimateHours": 6,
+  "concept": {
+    "heading": "A tool contract is a name, a description the model reads, and a schema the model fills",
+    "paragraphs": [
+      "A model does not run code. It emits a JSON object that says which tool it wants and what arguments to pass, and it decides both by reading the tool list you send with every request. The description is the only steering you have: a vague one gets a tool called at the wrong moments with guessed arguments; a precise one gets the lookup before the write and the right query shape.",
+      "The schema is the second half. pydantic models emit JSON Schema, so required fields, minimum lengths, enums and dates are enforced before any handler runs. The model learns the shape from the schema; your code trusts nothing until the model's arguments validate against it.",
+      "The simulation shows the same request with two descriptions. With the good one the model looks the person up first; with the lazy one it guesses an id. Nothing else changed. That is why a tool description is a product decision a client should read, not documentation you write last."
+    ],
+    "lowCodeEquivalent": "A Copilot Studio action or a Power Automate custom-connector action: the display name, the description the orchestrator uses to pick it, and the input schema. You have written those; now you write them for a model that will call them thousands of times."
+  },
+  "pythonBlock": {
+    "title": "Python you need: pydantic Field descriptions, Literal enums, model_json_schema",
+    "intro": "Descriptions on the class docstring and on each Field end up in the JSON Schema the model sees. Literal becomes an enum; a default makes a field optional.",
+    "code": "from datetime import date\nfrom typing import Literal\nfrom pydantic import BaseModel, Field\n\nclass CreateReceiptInput(BaseModel):\n    \"\"\"WRITE: sends a receipt for one donation. Only when the staff member\n    explicitly asked, and only for a donation id you confirmed with\n    get_donation_history.\"\"\"\n\n    donation_id: int = Field(description=\"The CRM donation id to receipt.\")\n    sent_to: str = Field(min_length=3, description=\"Recipient email address.\")\n    format: Literal[\"email\", \"pdf\"] = Field(default=\"email\", description=\"Delivery format.\")\n\nCreateReceiptInput.model_json_schema()\n# {'description': 'WRITE: sends a receipt ...', 'properties': {...}, 'required': ['donation_id', 'sent_to'], ...}",
+    "resource": { "type": "docs", "label": "pydantic - JSON Schema", "url": "https://docs.pydantic.dev/latest/concepts/json_schema/" }
+  },
+  "simulate": { "scenarioId": "model-reads-tools" },
+  "build": {
+    "files": ["middleware/tools/schemas.py"],
+    "spec": [
+      "Write the three input models' docstrings and Field descriptions for the model that reads them: when to use the tool, what a good argument looks like, and (for create_receipt) that it is a write.",
+      "Keep the required fields exactly as the stub declares them; since and format stay optional, format is an enum with default email.",
+      "Implement tool_specs(): the three {name, description, input_schema} dicts in TOOL_NAMES order, description taken from the model docstring.",
+      "Implement build_registry(client): register the three Tools with handlers returning plain dicts (shapes in the docstring); create_receipt POSTs to {CRM_URL}/receipts and is marked writes=True.",
+      "Run uv run python -c \"from tools.schemas import tool_specs; import json; print(json.dumps(tool_specs(), indent=2))\" and read what the model will read."
+    ],
+    "askClaudeFor": [
+      "A critique of your three descriptions from the model's point of view: what would make it call the wrong tool?",
+      "How model_json_schema renders Optional and Literal fields, so the check's enum and required assertions make sense."
+    ],
+    "writeYourself": [
+      "Every description. This is the product decision; do not delegate it.",
+      "The three handler functions and build_registry."
+    ],
+    "resources": [
+      { "type": "course", "label": "Hugging Face AI Agents Course - Unit 1: What are Tools?", "url": "https://huggingface.co/learn/agents-course" },
+      { "type": "course", "label": "Anthropic Academy - Introduction to MCP: tool design sections", "url": "https://anthropic.skilljar.com/" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m1-1-tool-contracts",
+    "command": "uv run --directory middleware python checks/run.py m1-1-tool-contracts",
+    "summary": "Schemas validate with real descriptions (40+ chars per tool, 15+ per field), required fields and the format enum are right, and the handlers answer against a fresh mock CRM."
+  }
+}

@@ -23,7 +23,7 @@ otel = ["opentelemetry-api>=1.30", "opentelemetry-sdk>=1.30"]
 # Module 5.3: CPU-only embeddings + a SQLite vector extension.
 rag = ["fastembed>=0.7", "sqlite-vec>=0.1.6"]
 # Module 7: LangGraph orchestration over the MCP server.
-graph = ["langgraph>=1.0", "langchain-core>=1.0", "langchain-mcp-adapters>=0.1"]
+graph = ["langgraph>=1.0", "langchain-core>=1.0"]
 all = [
   "signalflow-middleware[mcp,otel,rag,graph]",
 ]

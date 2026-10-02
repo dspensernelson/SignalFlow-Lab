@@ -1,0 +1,51 @@
+{
+  "id": "m1-2-tool-loop",
+  "module": "m1",
+  "order": 2,
+  "title": "The loop: send, receive a tool call, execute, repeat",
+  "estimateHours": 8,
+  "concept": {
+    "heading": "The agent is a while loop that owns the conversation",
+    "paragraphs": [
+      "Send the messages and the tool list. The model answers with either text or one or more tool calls. If tool calls: validate the arguments, run each tool, append an assistant message carrying the calls and a tool message carrying each result, and send everything again. If text: stop. That loop is the whole agent; frameworks add convenience around it, never a different idea.",
+      "The provider wrapper (tools/provider.py, shipped complete) hides every vendor's wire format behind one complete(messages, tools) call that returns a ModelReply. Your loop never sees Gemini's functionCall parts or Groq's OpenAI-style tool_calls, so free tiers can come and go and the loop does not move. The replay provider returns recorded replies, which is how the check stays deterministic and free.",
+      "Two safety rails belong in the loop, not in a prompt: max_turns stops a model that never says done, and nothing a tool does may escape as an exception. The next lesson makes every failure a structured error; this lesson makes sure the loop terminates and keeps the transcript honest."
+    ],
+    "lowCodeEquivalent": "A Copilot Studio generative orchestrator or an n8n AI Agent node: you configured the tools and watched the run log of calls. Here you write the thing that produces that run log."
+  },
+  "pythonBlock": {
+    "title": "Python you need: a while loop with a turn budget, json.dumps, list of dicts",
+    "intro": "The messages list is the state. Each turn appends; nothing is ever rewritten.",
+    "code": "import json\n\nmessages = [{\"role\": \"system\", \"content\": system_prompt}, {\"role\": \"user\", \"content\": user_message}]\nexecuted = []\nfor turn in range(1, max_turns + 1):\n    reply = provider.complete(messages, registry.specs())\n    if not reply.wants_tools:\n        return LoopResult(final_text=reply.text, stop_reason=\"final\", turns=turn, messages=messages, tool_calls=executed)\n    messages.append({\"role\": \"assistant\", \"content\": reply.text,\n                     \"tool_calls\": [tc.model_dump() for tc in reply.tool_calls]})\n    for tc in reply.tool_calls:\n        result = registry.call(tc.name, tc.arguments)        # never raises (m1-3)\n        messages.append({\"role\": \"tool\", \"tool_call_id\": tc.id, \"name\": tc.name, \"content\": json.dumps(result)})\n        executed.append(ExecutedCall(id=tc.id, name=tc.name, arguments=tc.arguments, result=result))\n# out of turns -> stop_reason=\"max_turns\", final_text=None",
+    "resource": { "type": "docs", "label": "Python tutorial - Control flow (for, range, break)", "url": "https://docs.python.org/3/tutorial/controlflow.html" }
+  },
+  "simulate": { "scenarioId": "tool-call-loop" },
+  "build": {
+    "files": ["middleware/tools/loop.py", "middleware/.env"],
+    "spec": [
+      "Implement run_loop per the docstring: system + user on turn 1, registry.specs() as the tool list, tool results appended as tool messages with content=json.dumps(result).",
+      "Stop on a reply without tool calls (stop_reason final) or after max_turns (stop_reason max_turns, final_text None). Record every executed call in result.tool_calls.",
+      "Until m1-3 exists, call registry.call and let its NotImplementedError surface; the check's scripted cases are written to pass once both lessons are done. Build m1-2 and m1-3 together if you prefer.",
+      "Get one free-tier key (Gemini or Groq, no card), put LLM_PROVIDER and the key in middleware/.env, and run the live smoke test: uv run --directory middleware pytest checks/m1/test_m1_2_tool_loop.py -m live -q. It is skipped when no key is set.",
+      "Read provider.py once end to end. It is plumbing you will own for clients."
+    ],
+    "askClaudeFor": [
+      "A walkthrough of provider.py: where each vendor's format is translated and why the loop never sees it.",
+      "How to write the assistant message that carries tool_calls so the next turn is valid for an OpenAI-style API."
+    ],
+    "writeYourself": [
+      "The loop body: the turn counter, the two stop conditions, and the message appends.",
+      "The LoopResult construction for both stop reasons."
+    ],
+    "resources": [
+      { "type": "course", "label": "Hugging Face AI Agents Course - Unit 1: Thoughts, Actions, Observations", "url": "https://huggingface.co/learn/agents-course" },
+      { "type": "docs", "label": "Groq docs - Tool use (OpenAI-compatible)", "url": "https://console.groq.com/docs/tool-use" }
+    ]
+  },
+  "check": {
+    "kind": "pytest",
+    "lessonId": "m1-2-tool-loop",
+    "command": "uv run --directory middleware python checks/run.py m1-2-tool-loop",
+    "summary": "With a scripted replay model the loop runs find_donor against the mock CRM, feeds the result back as a tool message, terminates on text, and stops at max_turns. A live smoke test runs only when LLM_PROVIDER and its key are set."
+  }
+}

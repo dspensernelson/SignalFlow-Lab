@@ -1,0 +1,91 @@
+{
+  "id": "model-reads-tools",
+  "title": "The model reads the tool list and picks one",
+  "steps": [
+    {
+      "id": "s1",
+      "kind": "request",
+      "from": "tool-router",
+      "to": "agent",
+      "label": "Middleware hands the model its tool list",
+      "status": "ok",
+      "payloadTitle": "tools (JSON Schema, emitted by pydantic)",
+      "payload": [
+        {
+          "name": "find_donor",
+          "description": "Find a donor by exact email, or by name when the staff member names a person. Returns every match; ask the user when there is more than one.",
+          "input_schema": { "type": "object", "properties": { "query": { "type": "string", "minLength": 2, "description": "An email address, or a first and/or last name." } }, "required": ["query"] }
+        },
+        {
+          "name": "get_donation_history",
+          "description": "A donor's gifts, newest first. Use after find_donor gives you a donor id.",
+          "input_schema": { "type": "object", "properties": { "donor_id": { "type": "integer" }, "since": { "type": "string", "format": "date" } }, "required": ["donor_id"] }
+        },
+        {
+          "name": "create_receipt",
+          "description": "WRITE: sends a receipt. Only when the staff member explicitly asked, and only for a confirmed donation id.",
+          "input_schema": { "type": "object", "properties": { "donation_id": { "type": "integer" }, "sent_to": { "type": "string" }, "format": { "enum": ["email", "pdf"], "default": "email" } }, "required": ["donation_id", "sent_to"] }
+        }
+      ],
+      "annotate": "This list is sent with every request. The descriptions are the only thing steering the choice.",
+      "nodeStates": { "tool-router": "active", "agent": "waiting" },
+      "durationMs": 2200
+    },
+    {
+      "id": "s2",
+      "kind": "request",
+      "from": "user",
+      "to": "agent",
+      "label": "Staff: 'Did Maria Alvarez give this spring?'",
+      "status": "ok",
+      "payloadTitle": "Chat message",
+      "payload": { "role": "user", "content": "Did Maria Alvarez give this spring?" },
+      "annotate": "No email, a name. The find_donor description says names are fine, so the model has a match.",
+      "nodeStates": { "user": "active", "agent": "waiting", "tool-router": "idle" },
+      "durationMs": 1400
+    },
+    {
+      "id": "s3",
+      "kind": "note",
+      "from": "agent",
+      "to": "agent",
+      "label": "Model weighs the three tools",
+      "status": "pending",
+      "payloadTitle": "What the model is deciding",
+      "payload": {
+        "find_donor": "matches: a person is named, no id yet",
+        "get_donation_history": "needs a donor_id I do not have yet",
+        "create_receipt": "a WRITE; nobody asked for a receipt"
+      },
+      "annotate": "A tool description is a product decision: it is what makes the model skip the write and start with the lookup.",
+      "nodeStates": { "user": "idle", "agent": "active" },
+      "durationMs": 2000
+    },
+    {
+      "id": "s4",
+      "kind": "request",
+      "from": "agent",
+      "to": "tool-router",
+      "label": "Model emits one tool call",
+      "status": "ok",
+      "payloadTitle": "Tool call",
+      "payload": { "id": "call_7f3a", "name": "find_donor", "arguments": { "query": "Maria Alvarez" } },
+      "annotate": "Validated against the schema before anything runs: query is a string of at least 2 characters.",
+      "nodeStates": { "agent": "ok", "tool-router": "active" },
+      "durationMs": 1400
+    },
+    {
+      "id": "s5",
+      "kind": "note",
+      "from": "tool-router",
+      "to": "tool-router",
+      "label": "What a worse description would have done",
+      "status": "error",
+      "payloadTitle": "Same request, description changed to 'Find a donor'",
+      "payload": { "likely_call": { "name": "get_donation_history", "arguments": { "donor_id": 1 } }, "problem": "The model guessed an id. Nothing in the description told it to look the person up first." },
+      "annotate": "Write descriptions for the reader that matters: the model. Then watch, in Module 2, how hosts show the difference.",
+      "nodeStates": { "tool-router": "error" },
+      "durationMs": 2200
+    }
+  ]
+}
