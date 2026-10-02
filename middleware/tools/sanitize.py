@@ -29,9 +29,13 @@ Spec (the check asserts this):
 - ``sanitize_result(result, source="tool") -> dict`` returns a deep copy in
   which every string value longer than 20 characters is sanitized, and
   values under keys named ``notes``, ``body``, ``text``, ``message_body``
-  or ``content`` are additionally wrapped with ``wrap_as_data``. It also
-  adds ``"_sanitized": [...]`` (the removed fragments) when anything was
-  removed. Error dicts (``{"error": {...}}``) pass through untouched.
+  or ``content`` are additionally wrapped with ``wrap_as_data``. When
+  anything was removed it adds ``"_sanitized": <count>`` (an integer, never
+  the fragments: putting the removed text back into the result would hand
+  the directive to the model after all) and logs the fragments once at
+  WARNING on the ``middleware.sanitize`` logger, so they show up in the
+  JSON logs and traces of Module 6.1 where a human reviews them. Error
+  dicts (``{"error": {...}}``) pass through untouched.
 
 Wiring: ``ToolRegistry.call`` (or the loop) passes every successful result
 through ``sanitize_result`` before it is serialized for the model; the eval

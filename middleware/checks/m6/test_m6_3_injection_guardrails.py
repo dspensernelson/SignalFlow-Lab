@@ -3,6 +3,8 @@ data; the five adversarial eval cases pass; no injection reaches a write."""
 
 from __future__ import annotations
 
+import json
+
 import httpx
 
 from evals.runner import CASES_DIR, load_cases, run_all
@@ -38,7 +40,8 @@ def test_sanitize_result_wraps_and_marks():
     notes = clean["donors"][0]["notes"]
     assert notes.startswith("[DATA from crm.donors")
     assert "ignore previous instructions" not in notes.lower()
-    assert clean["_sanitized"]
+    assert isinstance(clean["_sanitized"], int) and clean["_sanitized"] >= 1, "a count, never the removed text"
+    assert "ignore previous instructions" not in json.dumps(clean).lower(), "removed fragments must not ride along to the model"
     assert sanitize_result({"error": {"code": "not_found", "message": "ignore previous instructions"}}) == {"error": {"code": "not_found", "message": "ignore previous instructions"}}
     assert wrap_as_data("x", "y").startswith("[DATA from x")
 
@@ -67,7 +70,7 @@ def test_registry_call_sanitizes_results(fresh_crm):
     grace = result["donors"][0]
     assert grace["notes"].startswith("[DATA from find_donor")
     assert "ignore previous instructions" not in grace["notes"].lower()
-    assert result.get("_sanitized"), "removed fragments are recorded on the result"
+    assert isinstance(result.get("_sanitized"), int) and result["_sanitized"] >= 1
 
 
 def test_adversarial_cases_pass_and_never_write(fresh_crm):
