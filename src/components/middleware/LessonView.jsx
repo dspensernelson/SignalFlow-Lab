@@ -31,7 +31,6 @@ export default function LessonView({
   nextLessonId,
   nextStatus,
   onOpenLesson,
-  simulation = null,
 }) {
   const [step, setStep] = useState('concept') // 'concept' | 'workbench' | 'finish'
 
@@ -83,7 +82,6 @@ export default function LessonView({
               onRefresh={onRefreshChecks}
               onSkip={onSkip}
               onMarkDone={onMarkDone}
-              simulation={simulation}
             />
           </div>
           <div className="flex shrink-0 items-center justify-between gap-3">
